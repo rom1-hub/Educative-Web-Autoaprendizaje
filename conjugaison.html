@@ -146,8 +146,10 @@
 
 <footer class="footer" id="footer"><div class="footer-grid"><div><div class="logo"><img src="coq-logo.jpg" alt="Coq"></div><p>Apprendre le français · A1 → B2</p><p>Un proyecto creado por École FLE et ELE.</p></div><div><div class="footer-title">Apprendre</div><div class="footer-links"><a href="a1.html">A1</a><a href="#">A2</a><a href="#">B1</a><a href="#">B2</a></div></div><div><div class="footer-title">Pratiquer</div><div class="footer-links"><a href="conjugaison.html">Conjugación</a><a href="grammar-possessifs.html">Gramática</a><a href="stage-vocabulario.html">Vocabulario</a></div></div><div><div class="footer-title">Información</div><div class="footer-links"><a href="#">Aviso legal</a><a href="#">Política de privacidad</a><a href="#">Política de cookies</a><a href="https://www.ecole-fle-ele.com/" target="_blank" rel="noopener">Clases de francés online · École FLE et ELE</a></div></div></div></footer>
 
-<script src="script.js">
-</script>
+<script src="js/core/navigation.js"></script>
+<script src="js/core/audio.js"></script>
+<script src="js/exercises/exercise-engine.js"></script>
+<script src="script.js"></script>
 <script>
 const tabButtons=[...document.querySelectorAll('.tab')];
 tabButtons.forEach(btn=>btn.addEventListener('click',()=>{
@@ -633,51 +635,5 @@ document.addEventListener('click', function(e){
   }, 50);
 });
 </script>
-<script>
-/* Conjugaison fallback: keeps the shared mobile/tablet menu working even if the global initializer is unavailable. */
-(function(){
-  function initConjugaisonMenu(){
-    document.querySelectorAll('.nav').forEach(function(nav){
-      var button=nav.querySelector('.menu');
-      var links=nav.querySelector('.navlinks');
-      if(!button || !links || button.dataset.coqMenuReady==='1') return;
-      button.dataset.coqMenuReady='1';
-      button.setAttribute('aria-expanded','false');
-      button.addEventListener('click',function(e){
-        e.preventDefault();
-        e.stopPropagation();
-        if(window.innerWidth>900) return;
-        var open=links.classList.toggle('mobile-open');
-        button.setAttribute('aria-expanded',open?'true':'false');
-      });
-      var level=links.querySelector('.nav-item > .nav-button');
-      if(level){
-        level.addEventListener('click',function(e){
-          if(window.innerWidth<=900){
-            e.preventDefault();
-            e.stopPropagation();
-            level.parentElement.classList.toggle('mobile-submenu-open');
-          }
-        });
-      }
-      links.addEventListener('click',function(e){
-        if(window.innerWidth<=900 && e.target.closest('a')){
-          links.classList.remove('mobile-open');
-          links.querySelectorAll('.mobile-submenu-open').forEach(function(x){x.classList.remove('mobile-submenu-open')});
-          button.setAttribute('aria-expanded','false');
-        }
-      });
-      document.addEventListener('click',function(e){
-        if(window.innerWidth<=900 && links.classList.contains('mobile-open') && !nav.contains(e.target)){
-          links.classList.remove('mobile-open');
-          links.querySelectorAll('.mobile-submenu-open').forEach(function(x){x.classList.remove('mobile-submenu-open')});
-          button.setAttribute('aria-expanded','false');
-        }
-      });
-    });
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initConjugaisonMenu);
-  else initConjugaisonMenu();
-})();
-</script>
+
 </body></html>
