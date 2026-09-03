@@ -38,3 +38,16 @@ No se modifica la lógica de conjugación, datos, ejercicios, buscador, progreso
 - El motor global de ejercicios conserva su comportamiento y ahora llama a `markStageComplete()`.
 - Añadida la carga de `js/progress/progress.js` en las 10 páginas HTML.
 - No se modifica todavía el modelo futuro de progreso; la clave de `localStorage` sigue siendo `coq-stage-complete-` + `location.pathname`.
+
+
+## Fase 2E — separar buscador global
+- Extraída la lógica del buscador global de `script.js` a `js/search/search.js`.
+- Se conserva el índice actual y el comportamiento de búsqueda; no se amplía todavía el buscador.
+- Las 10 páginas HTML cargan `js/search/search.js` antes de `script.js`.
+- Protegidos: conjugación, audio, navegación, ejercicios, progreso, estilos y contenido.
+
+## Validación FASE 2E
+- `script.js` ya no contiene el bloque del buscador global.
+- `search.js` contiene una única implementación del buscador global.
+- Todas las páginas HTML cargan `search.js` una sola vez.
+- El buscador mantiene el mismo índice y comportamiento de V43.
