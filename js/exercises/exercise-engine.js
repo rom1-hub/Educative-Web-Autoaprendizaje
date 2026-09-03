@@ -22,8 +22,7 @@ document.querySelectorAll(".exercise").forEach(ex=>{
     const correct=questions.filter(x=>x.dataset.correct==="1").length;
     const score=ex.querySelector(".exercise-score"); if(score)score.textContent=`Resultado: ${correct} / ${questions.length}`;
     const complete=ex.querySelector(".exercise-complete"); if(complete)complete.classList.remove("hidden");
-    localStorage.setItem("coq-stage-complete-"+location.pathname,"1");
-    const pageComplete=document.querySelector("#completeBox"); if(pageComplete)pageComplete.classList.remove("hidden");
+    markStageComplete();
    }
   }));
  });

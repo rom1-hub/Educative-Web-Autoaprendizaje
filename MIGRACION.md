@@ -31,3 +31,10 @@ No se modifica la lógica de conjugación, datos, ejercicios, buscador, progreso
 - El motor aparece una sola vez en `js/exercises/exercise-engine.js`.
 - Todas las páginas HTML cargan `exercise-engine.js` antes de `script.js`.
 - No se modificó `styles.css` ni la lógica específica de `conjugaison.html`.
+
+
+## Fase 2D — separar progreso global
+- Extraída la escritura de finalización de etapa y la revelación de `#completeBox` a `js/progress/progress.js`.
+- El motor global de ejercicios conserva su comportamiento y ahora llama a `markStageComplete()`.
+- Añadida la carga de `js/progress/progress.js` en las 10 páginas HTML.
+- No se modifica todavía el modelo futuro de progreso; la clave de `localStorage` sigue siendo `coq-stage-complete-` + `location.pathname`.
