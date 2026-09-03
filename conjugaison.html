@@ -1,0 +1,683 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Coq — conjugación francesa."><title>Conjugación · Coq</title><link rel="stylesheet" href="styles.css"><style>
+.lookup-time-filter{margin:18px 0 4px;padding:15px 16px;background:#f8fbff;border:1px solid #dcecf7;border-radius:14px;max-width:520px}.lookup-time-filter .field-label{display:block;font-weight:700;color:var(--navy);margin-bottom:7px}.lookup-time-filter .select{width:100%;min-height:44px}.lookup-time-filter .field-help{margin-top:7px}
+</style><style>
+.conj-empty-state{margin-top:8px;color:var(--muted,#58708f);font-size:.9rem}.verb-summary .conj-result-head{gap:10px}.verb-summary #speakVerb{padding:8px 12px;font-size:.9rem}.verb-summary #practiceThisVerb{padding:8px 12px;font-size:.9rem}.verb-summary .conj-result-head>div{min-width:0}@media(max-width:700px){.tense-table{min-width:520px}.tense-block{overflow-x:auto}.verb-summary .conj-result-head{flex-wrap:wrap}.verb-summary #speakVerb,.verb-summary #practiceThisVerb{font-size:.86rem;padding:7px 10px}}
+</style>
+
+<style id="conj-final-polish">
+.conj-search-wrap{position:relative}
+.lookup-status{
+  margin-top:10px;
+  padding:10px 14px;
+  border-radius:12px;
+  font-size:.92rem;
+  line-height:1.4;
+}
+.lookup-status.empty{background:#f3f7fb;color:#58708f}
+.lookup-status.error{background:#fff1f2;color:#b4232c}
+.lookup-status.success{background:#eef9ff;color:#075985}
+.lookup-status[hidden]{display:none}
+@media (max-width:700px){
+  .lookup-time-filter select{width:100%}
+  .lookup-time-filter{margin-top:12px}
+  .lookup-status{font-size:.9rem}
+}
+</style>
+
+
+<style id="conj-v24-fixes">
+#practiceThisVerb{
+  white-space:nowrap;
+  min-width:max-content;
+}
+</style>
+
+
+
+<style id="conj-v25-layout">
+@media (min-width: 701px){
+  .verb-summary #speakVerb{
+    white-space:nowrap;
+    min-width:max-content;
+  }
+}
+</style>
+
+<style id="conj-v42-polish">
+#practiceGroupHelp:empty{display:none}
+.practice-answer-rule{margin:10px 0 12px;color:var(--muted,#58708f);font-size:.9rem;line-height:1.4}
+#questionSubject{font-size:clamp(1.35rem,2.6vw,2rem);line-height:1.25}
+@media(max-width:700px){
+  #questionSubject{font-size:1.25rem}
+  .practice-answer-rule{font-size:.84rem}
+  .result-table{display:block;width:100%}
+  .result-table thead{display:none}
+  .result-table tbody,.result-table tr,.result-table td{display:block;width:100%}
+  .result-table tr{padding:12px 0;border-bottom:1px solid #dce7f0}
+  .result-table tr:last-child{border-bottom:0}
+  .result-table td{border:0;padding:4px 12px;text-align:left;white-space:normal}
+  .result-table td::before{content:attr(data-label);display:block;font-size:.72rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--muted,#58708f);margin-bottom:2px}
+}
+</style>
+</head><body>
+<header class="header"><nav class="nav"><a class="logo" href="index.html" aria-label="Coq"><img src="coq-logo.jpg" alt="Coq"></a><div class="navlinks"><a href="index.html">Inicio</a><div class="nav-item"><button class="nav-button">Niveles ▾</button><div class="dropdown"><a href="a1.html">A1</a><a href="#">A2</a><a href="#">B1</a><a href="#">B2</a></div></div><a class="active" aria-current="page" href="conjugaison.html">Conjugación</a><a href="grammar-possessifs.html">Gramática</a><a href="stage-vocabulario.html">Vocabulario</a><a href="blog.html">Blog</a></div><div class="search-wrap"><label class="search">🔎<input id="searchInput" placeholder="Buscar en Coq…"></label><div id="searchResults" class="search-results"></div></div><button class="menu" aria-label="Abrir menú">☰</button></nav></header>
+
+<main class="container"><div class="breadcrumb"><a href="index.html">Inicio</a> / Conjugación</div>
+<section class="hero"><span class="eyebrow">Pratique autonome</span><h1>Conjugación</h1><p class="lead">Consulta una conjugación completa o entrena tus conjugaciones con una sesión de 20 preguntas.</p></section>
+
+<section class="section">
+<div class="tabs" role="tablist">
+<button class="tab active" data-tab="view">Ver una conjugación</button>
+<button class="tab" data-tab="practice">Practicar con ejercicios las conjugaciones</button>
+</div>
+
+<div class="tab-panel active" id="tab-view">
+<div class="card">
+<div class="section-head"><div><span class="tag">Consulta</span><h2>Ver una conjugación</h2></div><p>Escribe el verbo que quieras consultar. No estás limitado a una lista.</p></div>
+<div class="conj-search"><input id="lookupVerb" type="text" placeholder="Escribe un verbo: prendre, finir, aller…"></div>
+<div class="lookup-status empty" id="lookupStatus">Escribe el infinitivo de un verbo francés.</div>
+<div id="lookupEmptyState" class="conj-empty-state"></div>
+<div class="lookup-time-filter">
+<label class="field-label" for="lookupTense">Tiempo verbal</label>
+<select id="lookupTense" class="select">
+<option value="" selected>-seleccionar-</option><option value="Todos los tiempos">Todos los tiempos</option>
+<option value="présent de l'indicatif">Présent de l'indicatif</option>
+<option value="impératif présent">Impératif présent</option>
+<option value="passé composé">Passé composé</option>
+<option value="imparfait">Imparfait</option>
+<option value="futur simple">Futur simple</option>
+<option value="conditionnel présent">Conditionnel présent</option>
+<option value="plus-que-parfait">Plus-que-parfait</option>
+<option value="conditionnel passé">Conditionnel passé</option>
+<option value="futur antérieur">Futur antérieur</option>
+<option value="subjonctif présent">Subjonctif présent</option>
+<option value="subjonctif passé">Subjonctif passé</option>
+</select>
+<div class="field-help">Selecciona un tiempo para cargar automáticamente la conjugación.</div>
+</div>
+<div class="suggestions"><span class="muted" style="align-self:center">Sugerencias:</span><button class="suggestion" data-verb="être">être</button><button class="suggestion" data-verb="avoir">avoir</button><button class="suggestion" data-verb="prendre">prendre</button><button class="suggestion" data-verb="aller">aller</button><button class="suggestion" data-verb="finir">finir</button><button class="suggestion" data-verb="venir">venir</button></div>
+<div id="lookupMessage" class="form-message"></div>
+<div id="conjResult" class="verb-result hidden"></div>
+</div>
+</div>
+
+<div class="tab-panel" id="tab-practice">
+<div class="card">
+<div class="section-head"><div><span class="tag">Entrenamiento</span><h2>Practicar con ejercicios las conjugaciones</h2></div></div>
+<div class="mode-note"><strong>Regla:</strong> puedes escribir un verbo concreto o dejarlo vacío para practicar aleatoriamente según el entrenamiento elegido. El grupo verbal es opcional y sirve para afinar la selección.</div>
+<div class="exercise-config">
+<div><label for="practiceVerb">BUSCAR UN VERBO</label><div class="conj-search"><input id="practiceVerb" type="text" placeholder="Escribe un verbo concreto…"><button class="btn secondary" id="clearVerb" type="button">Borrar</button></div><div class="field-help">Campo libre: la base de datos definitiva podrá contener cientos o miles de verbos.</div></div>
+<div class="row">
+<div><label for="practiceTense">Tiempo verbal <span class="required">*</span></label><select id="practiceTense"><option value="" selected disabled>-seleccionar-</option><option>Todos los tiempos</option><option>présent de l'indicatif</option><option>impératif présent</option><option>passé composé</option><option>imparfait</option><option>futur simple</option><option>conditionnel présent</option><option>plus-que-parfait</option><option>conditionnel passé</option><option>futur antérieur</option><option>subjonctif présent</option><option>subjonctif passé</option></select></div>
+<div><label for="practiceGroup">Grupo verbal</label><select id="practiceGroup"><option value="" selected>-seleccionar-</option><option value="Todos">Todos</option><option>Premier groupe normal</option><option>Premier groupe verbes en -ELER</option><option>Premier groupe verbes en -ETER</option><option>Premier groupe verbes en -GER</option><option>Premier groupe verbe en -CER</option><option>Premier groupe verbes en -YER</option><option>Premier groupe verbe en -E (È) + consonne + ER</option><option>Deuxième groupe</option><option>Verbes du troisième groupe</option></select><div class="field-help" id="practiceGroupHelp"></div></div>
+<div><label for="practiceMode">Entraînement <span class="required">*</span></label><select id="practiceMode" disabled><option value="" selected>-seleccionar un tiempo primero-</option></select><div class="field-help" id="practiceModeHelp">Elige primero un tiempo verbal.</div></div>
+</div>
+<div id="practiceMessage" class="form-message"></div>
+<button class="btn blue" id="startPractice" type="button">Commencer les 20 questions →</button>
+</div>
+</div>
+
+<div class="practice-wrap hidden" id="practiceSession">
+<div class="practice-card">
+<div class="practice-top"><div><span class="tag">Session en cours</span><h2 style="margin:9px 0 0">Conjugue le verbe</h2></div></div>
+<div class="practice-progress"><span id="practiceProgressBar"></span></div>
+<div class="practice-meta"><span id="practiceProgressText">Question 1 / 20</span><span id="practiceCriteria">—</span></div>
+<div class="practice-question">
+<div class="verb-time" id="questionVerb">verbe · temps</div>
+<div class="subject" id="questionSubject">je</div>
+<div class="verb-time">Écris la forme correcte.</div><div class="practice-answer-rule">Puedes escribir tu respuesta con el sujeto o directamente el verbo conjugado.</div>
+<div class="answer-row"><input id="answerInput" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Écris ta réponse…"><button class="btn blue" id="validateAnswer" type="button">Validar</button></div>
+<div class="practice-hint">También puedes pulsar Enter.</div>
+<div id="practiceFeedback" class="feedback-box" aria-live="polite"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+
+<div class="result-modal" id="resultModal" aria-hidden="true">
+<div class="result-window">
+<span class="tag">Session terminée</span><h2>Tu resultado</h2>
+<div class="stats" style="margin-top:16px"><div class="stat"><strong id="finalCorrect">0</strong><span class="muted">sin errores</span></div><div class="stat"><strong id="finalWrong">0</strong><span class="muted">con errores</span></div><div class="stat"><strong id="finalScore">0 / 20</strong><span class="muted">puntuación</span></div></div>
+<div class="result-table-wrap"><table class="result-table"><thead><tr><th>#</th><th>Verbe</th><th>Sujet</th><th>Temps</th><th>Ta réponse</th><th>Réponse correcte</th><th>Résultat</th></tr></thead><tbody id="resultRows"></tbody></table></div>
+<div class="result-actions"><button class="btn blue" id="reviewDone">Ya repasé todo</button></div>
+</div></div>
+
+<footer class="footer" id="footer"><div class="footer-grid"><div><div class="logo"><img src="coq-logo.jpg" alt="Coq"></div><p>Apprendre le français · A1 → B2</p><p>Un proyecto creado por École FLE et ELE.</p></div><div><div class="footer-title">Apprendre</div><div class="footer-links"><a href="a1.html">A1</a><a href="#">A2</a><a href="#">B1</a><a href="#">B2</a></div></div><div><div class="footer-title">Pratiquer</div><div class="footer-links"><a href="conjugaison.html">Conjugación</a><a href="grammar-possessifs.html">Gramática</a><a href="stage-vocabulario.html">Vocabulario</a></div></div><div><div class="footer-title">Información</div><div class="footer-links"><a href="#">Aviso legal</a><a href="#">Política de privacidad</a><a href="#">Política de cookies</a><a href="https://www.ecole-fle-ele.com/" target="_blank" rel="noopener">Clases de francés online · École FLE et ELE</a></div></div></div></footer>
+
+<script src="script.js">
+</script>
+<script>
+const tabButtons=[...document.querySelectorAll('.tab')];
+tabButtons.forEach(btn=>btn.addEventListener('click',()=>{
+ tabButtons.forEach(b=>b.classList.remove('active'));
+ document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+ btn.classList.add('active');
+ document.querySelector('#tab-'+btn.dataset.tab).classList.add('active');
+}));
+
+const conjugations={
+ être:{"présent de l'indicatif":[["je","suis"],["tu","es"],["il/elle/on","est"],["nous","sommes"],["vous","êtes"],["ils/elles","sont"]],"imparfait":[["j'","étais"],["tu","étais"],["il/elle/on","était"],["nous","étions"],["vous","étiez"],["ils/elles","étaient"]],"futur simple":[["je","serai"],["tu","seras"],["il/elle/on","sera"],["nous","serons"],["vous","serez"],["ils/elles","seront"]]},
+ avoir:{"passé composé":[["j'","ai eu"],["tu","as eu"],["il/elle/on","a eu"],["nous","avons eu"],["vous","avez eu"],["ils/elles","ont eu"]],"présent de l'indicatif":[["j'","ai"],["tu","as"],["il/elle/on","a"],["nous","avons"],["vous","avez"],["ils/elles","ont"]],"imparfait":[["j'","avais"],["tu","avais"],["il/elle/on","avait"],["nous","avions"],["vous","aviez"],["ils/elles","avaient"]],"futur simple":[["j'","aurai"],["tu","auras"],["il/elle/on","aura"],["nous","aurons"],["vous","aurez"],["ils/elles","auront"]]},
+ prendre:{"passé composé":[["je","ai pris"],["tu","as pris"],["il/elle/on","a pris"],["nous","avons pris"],["vous","avez pris"],["ils/elles","ont pris"]],"présent de l'indicatif":[["je","prends"],["tu","prends"],["il/elle/on","prend"],["nous","prenons"],["vous","prenez"],["ils/elles","prennent"]],"imparfait":[["je","prenais"],["tu","prenais"],["il/elle/on","prenait"],["nous","prenions"],["vous","preniez"],["ils/elles","prenaient"]],"futur simple":[["je","prendrai"],["tu","prendras"],["il/elle/on","prendra"],["nous","prendrons"],["vous","prendrez"],["ils/elles","prendront"]]},
+ finir:{"présent de l'indicatif":[["je","finis"],["tu","finis"],["il/elle/on","finit"],["nous","finissons"],["vous","finissez"],["ils/elles","finissent"]],"imparfait":[["je","finissais"],["tu","finissais"],["il/elle/on","finissait"],["nous","finissions"],["vous","finissiez"],["ils/elles","finissaient"]]},
+ aller:{"passé composé":[["je","suis allé(e)"],["tu","es allé(e)"],["il/elle/on","est allé(e)"],["nous","sommes allé(e)s"],["vous","êtes allé(e)(s)"],["ils/elles","sont allé(e)s"]],"présent de l'indicatif":[["je","vais"],["tu","vas"],["il/elle/on","va"],["nous","allons"],["vous","allez"],["ils/elles","vont"]]},
+ parler:{"présent de l'indicatif":[["je","parle"],["tu","parles"],["il/elle/on","parle"],["nous","parlons"],["vous","parlez"],["ils/elles","parlent"]]},
+ manger:{"présent de l'indicatif":[["je","mange"],["tu","manges"],["il/elle/on","mange"],["nous","mangeons"],["vous","mangez"],["ils/elles","mangent"]]},
+ commencer:{"présent de l'indicatif":[["je","commence"],["tu","commences"],["il/elle/on","commence"],["nous","commençons"],["vous","commencez"],["ils/elles","commencent"]]},
+ venir:{"passé composé":[["je","suis venu(e)"],["tu","es venu(e)"],["il/elle/on","est venu(e)"],["nous","sommes venu(e)s"],["vous","êtes venu(e)(s)"],["ils/elles","sont venu(e)s"]],"présent de l'indicatif":[["je","viens"],["tu","viens"],["il/elle/on","vient"],["nous","venons"],["vous","venez"],["ils/elles","viennent"]]},
+ faire:{"passé composé":[["je","ai fait"],["tu","as fait"],["il/elle/on","a fait"],["nous","avons fait"],["vous","avez fait"],["ils/elles","ont fait"]],"présent de l'indicatif":[["je","fais"],["tu","fais"],["il/elle/on","fait"],["nous","faisons"],["vous","faites"],["ils/elles","font"]]}
+};
+
+conjugations['se lever']={"présent de l'indicatif":[["je","me lève"],["tu","te lèves"],["il/elle/on","se lève"],["nous","nous levons"],["vous","vous levez"],["ils/elles","se lèvent"]],"passé composé":[["je","me suis levé(e)"],["tu","t'es levé(e)"],["il/elle/on","s'est levé(e)"],["nous","nous sommes levé(e)s"],["vous","vous êtes levé(e)(s)"],["ils/elles","se sont levé(e)s"]]};
+
+const verbGroups={
+  être:'Verbes du troisième groupe', avoir:'Verbes du troisième groupe', prendre:'Verbes du troisième groupe', aller:'Verbes du troisième groupe', venir:'Verbes du troisième groupe', faire:'Verbes du troisième groupe',
+  finir:'deuxième groupe', parler:'premier groupe normal', manger:'premier groupe verbes en -GER', commencer:'premier groupe verbe en -CER', 'se lever':'premier groupe normal'
+};
+
+const verbMeta={être:{pronominal:false,auxiliaire:'être'},avoir:{pronominal:false,auxiliaire:'avoir'},prendre:{pronominal:false,auxiliaire:'avoir'},finir:{pronominal:false,auxiliaire:'avoir'},aller:{pronominal:false,auxiliaire:'être'},parler:{pronominal:false,auxiliaire:'avoir'},manger:{pronominal:false,auxiliaire:'avoir'},commencer:{pronominal:false,auxiliaire:'avoir'},venir:{pronominal:false,auxiliaire:'être'},faire:{pronominal:false,auxiliaire:'avoir'},'se lever':{pronominal:true,auxiliaire:'être'}};
+
+function normalizeVerb(v){return v.trim().toLowerCase();}
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+function normalizeAnswerText(v){return v.trim().toLocaleLowerCase().replace(/\s+/g,' ');}
+function answerVariants(q){
+ const expected=normalizeAnswerText(q.answer);
+ const variants=new Set([expected]);
+ const subject=(q.subject||'').split(' (')[0].trim();
+ if(!subject)return variants;
+
+ // El alumno puede escribir la conjugación sola o repetir el sujeto mostrado en la pregunta.
+ // Generamos ambas formas para TODOS los sujetos, verbos y tiempos.
+ const isPronominalStart=/^(me |m\'|te |t\'|se |s\'|nous |vous )/.test(expected);
+ let withSubject='';
+ if(subject==='je'){
+   // Con un verbo pronominal: je me suis..., je m'appelle..., etc.
+   if(/^((me )|(m\'))/.test(expected)) withSubject='je '+expected;
+   // Con una conjugación que empieza por vocal/h muda: j'ai, j'aime...
+   else if(/^[aeiouyàâäéèêëîïôöùûüÿh]/i.test(expected)) withSubject="j'"+expected;
+   else withSubject='je '+expected;
+ }else{
+   withSubject=subject+' '+expected;
+ }
+ variants.add(normalizeAnswerText(withSubject));
+
+ // Para las formas contractas que ya contienen el pronombre (tu t'es, il s'est...),
+ // la forma completa sigue siendo válida con el sujeto delante.
+ if(isPronominalStart) variants.add(normalizeAnswerText(subject+' '+expected));
+ return variants;
+}
+function sameAnswer(a,q){return answerVariants(q).has(normalizeAnswerText(a));}
+
+function renderConjugation(verb){
+ const result=document.querySelector('#conjResult');result.classList.remove('hidden');
+ const data=conjugations[verb];
+ const selectedTense=document.querySelector('#lookupTense')?.value || '';
+ let html=`<div class="card verb-summary" style="background:var(--soft-blue);border-color:#CBEAF4"><span class="tag">Conjugaison</span><div class="conj-result-head"><div><h2 style="margin-top:10px">${escapeHtml(verb)}</h2><p class="muted">Prototipo de consulta. La base definitiva mostrará todos los tiempos previstos.</p></div><button class="btn secondary" type="button" id="speakVerb" aria-label="Escuchar el verbo">🔊 Escuchar el verbo</button><button class="btn tiny secondary" type="button" id="practiceThisVerb">Practicar este verbo</button></div></div>`;
+ if(data && selectedTense){
+  const timesToShow = selectedTense === 'Todos los tiempos' ? Object.entries(data) : Object.entries(data).filter(([t]) => t === selectedTense);
+  html+=`<div class="conj-toolbar"><span class="muted">${selectedTense === 'Todos los tiempos' ? 'Todos los tiempos' : 'Tiempo seleccionado'}</span></div>`;
+  if(!timesToShow.length){
+    html+=`<div class="callout">Todavía no hay una conjugación disponible para <strong>${escapeHtml(verb)}</strong> en el tiempo «${escapeHtml(selectedTense)}» en esta versión.</div>`;
+  }else{
+    html+=`<div class="conj-times" id="conjTimes">`;
+    timesToShow.forEach(([t,rows])=>{
+     html+=`<div class="tense-block"><div class="tense-head"><h3>${escapeHtml(t)}</h3><button class="btn tiny secondary" type="button" data-speak-tense="${escapeHtml(t)}" aria-label="Escuchar todas las formas de ${escapeHtml(t)}">🔊</button></div><table class="tense-table"><thead><tr><th>Sujeto</th><th>Forma</th><th>Audio</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${escapeHtml(r[0])}</td><td><strong>${escapeHtml(r[1])}</strong></td><td><button class="audio-btn" type="button" data-speak="${escapeHtml((r[0]+ ' '+r[1]).trim())}" aria-label="Escuchar ${escapeHtml((r[0]+' '+r[1]).trim())}">▶</button></td></tr>`).join('')}</tbody></table></div>`
+    });
+    html+=`</div><div class="conj-tip">💡 Pulsa <strong>▶</strong> para escuchar cada forma con su sujeto. La pronunciación se reproducirá en francés.</div>`;
+  }
+ }else if(data && !selectedTense) html+=`<div class="callout">Selecciona un tiempo verbal para mostrar la conjugación.</div>`;
+ else html+=`<div class="callout"><strong>Verbo introducido:</strong> ${escapeHtml(verb)}. En la versión completa el motor consultará la gran base de datos.</div>`;
+ result.innerHTML=html;
+ const speak=(text)=>{if(!('speechSynthesis' in window)){return} window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='fr-FR';u.rate=.88;u.pitch=1;window.speechSynthesis.speak(u)};
+ const vb=document.querySelector('#speakVerb'); if(vb)vb.addEventListener('click',()=>speak(verb));
+ document.querySelectorAll('[data-speak]').forEach(b=>b.addEventListener('click',()=>speak(b.dataset.speak)));
+ document.querySelectorAll('[data-speak-tense]').forEach(b=>b.addEventListener('click',()=>{const rows=data[b.dataset.speakTense]||[];speak(rows.map(r=>(r[0]+' '+r[1]).trim()).join('. '))}));
+}
+
+const lookupTense=document.querySelector('#lookupTense');
+lookupTense?.addEventListener('change',()=>{
+ const verb=normalizeVerb(document.querySelector('#lookupVerb').value);
+ const msg=document.querySelector('#lookupMessage');
+ const result=document.querySelector('#conjResult');
+ if(!verb){
+   msg.className='form-message error';
+   msg.textContent='Escribe un verbo para consultar su conjugación.';
+   result.classList.add('hidden');
+   return;
+ }
+ if(!conjugations[verb]){
+   msg.className='';
+   msg.textContent='';
+   result.classList.add('hidden');
+   return;
+ }
+ const selectedTense=lookupTense.value;
+ if(!selectedTense){
+   msg.className='';
+   msg.textContent='';
+   result.classList.add('hidden');
+   return;
+ }
+ msg.className='form-message info';
+ msg.textContent=(selectedTense==='Todos los tiempos'
+   ? 'Conjugación de todos los tiempos verbales cargada para «'+verb+'».'
+   : 'Conjugación del «'+selectedTense+'» cargada para «'+verb+'».');
+ renderConjugation(verb);
+});
+function lookup(){
+ const v=normalizeVerb(document.querySelector('#lookupVerb').value),msg=document.querySelector('#lookupMessage'),result=document.querySelector('#conjResult');
+ if(!v){
+   msg.className='';
+   msg.textContent='';
+   result.classList.add('hidden');
+   return;
+ }
+ // Solo mostramos la ficha cuando el infinitivo coincide exactamente con un verbo válido.
+ if(!conjugations[v]){
+   msg.className='';
+   msg.textContent='';
+   result.classList.add('hidden');
+   return;
+ }
+ const tense=lookupTense.value;
+ if(!tense){
+   msg.className='';
+   msg.textContent='';
+   result.classList.add('hidden');
+   return;
+ }
+ msg.className='form-message info';
+ msg.textContent=(tense==='Todos los tiempos'
+   ? 'Conjugación de todos los tiempos verbales cargada para «'+v+'».'
+   : 'Conjugación del «'+tense+'» cargada para «'+v+'».');
+ renderConjugation(v);
+}
+document.querySelector('#lookupVerb').addEventListener('change',lookup);
+document.querySelector('#lookupVerb').addEventListener('keydown',e=>{if(e.key==='Enter')lookup()});
+document.querySelectorAll('.suggestion').forEach(b=>b.addEventListener('click',()=>{document.querySelector('#lookupVerb').value=b.dataset.verb;lookup()}));
+document.querySelector('#clearVerb').addEventListener('click',()=>{
+  const verbInput=document.querySelector('#practiceVerb');
+  verbInput.value='';
+  document.querySelector('#practiceTense').value='';
+  document.querySelector('#practiceMode').value='';
+  updatePracticeGroupState();
+  updatePracticeModeOptions();
+  const msg=document.querySelector('#practiceMessage'); msg.className='form-message'; msg.textContent='';
+  verbInput.focus();
+});
+
+let session={questions:[],index:0,correct:0,results:[],locked:false};
+
+function expandPracticeRows(rows){
+ const expanded=[];
+ rows.forEach(r=>{
+  const subjects=r[0].split('/').map(x=>x.trim()).filter(Boolean);
+  if(subjects.length>1){
+   subjects.forEach(subject=>expanded.push({subject,answer:r[1]}));
+  }else{
+   expanded.push({subject:r[0],answer:r[1]});
+  }
+ });
+ return expanded;
+}
+function shuffleArray(arr){
+ const a=[...arr];
+ for(let i=a.length-1;i>0;i--){
+  const j=Math.floor(Math.random()*(i+1));
+  [a[i],a[j]]=[a[j],a[i]];
+ }
+ return a;
+}
+function buildQuestions(verb,tense,group,mode){
+ let pool=[];
+ const add=v=>{
+  if(!conjugations[v])return;
+  if(!verb && group && group!=='Todos' && verbGroups[v]!==group)return;
+  if(!matchesPracticeMode(v,tense,mode))return;
+  const ts=tense==="Todos los tiempos"?Object.keys(conjugations[v]):[tense];
+  ts.forEach(t=>{
+   if(conjugations[v][t]){
+    expandPracticeRows(conjugations[v][t]).forEach(r=>{
+     // En passé composé avec ÊTRE, "vous" est ambigu sans indicar género y número.
+     // Generamos cuatro preguntas distintas para que exista una única respuesta válida.
+     if(t==='passé composé' && (verbMeta[v]||{}).auxiliaire==='être'){
+      // Avec ÊTRE, chaque question doit avoir une seule réponse correcte.
+      // On précise genre et nombre lorsque le pronom ne suffit pas à les déterminer.
+      const agree=(answer,gender,number)=>answer
+       .replace(/\(e\)\(s\)/g,()=>number==='pluriel'?(gender==='féminin'?'es':'s'):(gender==='féminin'?'e':''))
+       .replace(/\(e\)s/g,()=>number==='pluriel'?(gender==='féminin'?'es':'s'):(gender==='féminin'?'e':''))
+       .replace(/\(e\)/g,()=>gender==='féminin'?'e':'');
+      const variants={
+       je:[['je (féminin singulier)',agree(r.answer,'féminin','singulier')],['je (masculin singulier)',agree(r.answer,'masculin','singulier')]],
+       tu:[['tu (féminin singulier)',agree(r.answer,'féminin','singulier')],['tu (masculin singulier)',agree(r.answer,'masculin','singulier')]],
+       nous:[['nous (féminin pluriel)',agree(r.answer,'féminin','pluriel')],['nous (masculin pluriel)',agree(r.answer,'masculin','pluriel')]],
+       vous:[['vous (féminin singulier)',agree(r.answer,'féminin','singulier')],['vous (masculin singulier)',agree(r.answer,'masculin','singulier')],['vous (féminin pluriel)',agree(r.answer,'féminin','pluriel')],['vous (masculin pluriel)',agree(r.answer,'masculin','pluriel')]],
+       il:[['il',agree(r.answer,'masculin','singulier')]],
+       elle:[['elle',agree(r.answer,'féminin','singulier')]],
+       ils:[['ils',agree(r.answer,'masculin','pluriel')]],
+       elles:[['elles',agree(r.answer,'féminin','pluriel')]]
+      };
+      if(variants[r.subject]) variants[r.subject].forEach(([subject,answer])=>pool.push({verb:v,tense:t,subject,answer}));
+      else pool.push({verb:v,tense:t,subject:r.subject,answer:agree(r.answer,'masculin','singulier')});
+     }else{
+      pool.push({verb:v,tense:t,subject:r.subject,answer:r.answer});
+     }
+    });
+   }
+  });
+ };
+ if(verb) add(verb); else Object.keys(conjugations).forEach(add);
+ if(!pool.length)return [];
+
+ // Reparte los sujetos de forma más equilibrada y evita repetir el mismo sujeto seguido.
+ const buckets=new Map();
+ shuffleArray(pool).forEach(q=>{
+  if(!buckets.has(q.subject))buckets.set(q.subject,[]);
+  buckets.get(q.subject).push(q);
+ });
+ const subjects=shuffleArray([...buckets.keys()]);
+ const selected=[];
+ while(selected.length<20){
+  const available=subjects.filter(s=>(buckets.get(s)||[]).length && (!selected.length || s!==selected[selected.length-1].subject));
+  if(!available.length)break;
+  const subject=available[selected.length % available.length];
+  const bucket=buckets.get(subject);
+  const q=bucket.splice(Math.floor(Math.random()*bucket.length),1)[0];
+  selected.push({...q});
+ }
+ // Si faltan preguntas por falta de variedad, completa con el resto sin crear bloques artificiales.
+ if(selected.length<20){
+  let leftovers=[];
+  buckets.forEach(list=>leftovers.push(...list));
+  leftovers=shuffleArray(leftovers);
+  while(selected.length<20 && leftovers.length){
+   let idx=leftovers.findIndex(q=>!selected.length || q.subject!==selected[selected.length-1].subject);
+   if(idx<0)idx=0;
+   selected.push({...leftovers.splice(idx,1)[0]});
+  }
+ }
+ // Si el pool no llega a 20, reutilizamos preguntas pero manteniendo la separación de sujetos.
+ const reusable=shuffleArray(pool);
+ let guard=0;
+ while(selected.length<20 && reusable.length && guard<200){
+  const last=selected[selected.length-1]?.subject;
+  const idx=reusable.findIndex(q=>q.subject!==last);
+  const pick=idx>=0?reusable.splice(idx,1)[0]:reusable.shift();
+  selected.push({...pick});
+  guard++;
+  if(!reusable.length)reusable.push(...shuffleArray(pool));
+ }
+ return selected.slice(0,20);
+}
+
+function updatePracticeModeOptions(){
+ const tense=document.querySelector('#practiceTense').value,mode=document.querySelector('#practiceMode'),help=document.querySelector('#practiceModeHelp');
+ const verb=normalizeVerb(document.querySelector('#practiceVerb').value);
+ mode.innerHTML='';
+ if(!tense){mode.disabled=true;mode.innerHTML='<option value="" selected>-seleccionar un tiempo primero-</option>';if(help)help.textContent='Elige primero un tiempo verbal.';return;}
+ // Cuando se ha escrito un verbo concreto, el entrenamiento deja de ser necesario.
+ if(verb){
+   mode.disabled=true;
+   const o=document.createElement('option');o.value='';o.textContent='No necesario: verbo concreto';o.selected=true;mode.appendChild(o);
+   if(help)help.textContent='Con un verbo concreto no necesitas seleccionar un entrenamiento.';
+   return;
+ }
+ mode.disabled=false;
+ const opts=tense==='passé composé'?[['','-seleccionar-'],['pc-avoir','Passé composé — avec AVOIR'],['pc-etre','Passé composé — avec ÊTRE'],['pc-both','Passé composé — AVOIR + ÊTRE'],['pronominal','Verbes pronominaux']]:[['','-seleccionar-'],['all','Tous les verbes'],['pronominal','Verbes pronominaux']];
+ opts.forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;mode.appendChild(o);});
+ if(help)help.textContent=tense==='passé composé'?'Practica al azar con AVOIR, ÊTRE o ambos.':'Practica al azar con todos los verbos o solo con los verbes pronominaux.';
+}
+document.querySelector('#practiceTense').addEventListener('change',()=>{updatePracticeModeOptions();const m=document.querySelector('#practiceMessage');m.className='form-message';m.textContent='';});
+function updatePracticeGroupState(){
+ const verb=normalizeVerb(document.querySelector('#practiceVerb').value);
+ const group=document.querySelector('#practiceGroup');
+ const help=document.querySelector('#practiceGroupHelp');
+ if(verb){
+   group.disabled=true;
+   group.innerHTML='<option value="" selected>No necesario: verbo concreto</option>';
+   if(help) help.textContent='';
+ }else{
+   group.disabled=false;
+   group.innerHTML='<option value="" selected>-seleccionar-</option><option value="Todos">Todos</option><option>Premier groupe normal</option><option>Premier groupe verbes en -ELER</option><option>Premier groupe verbes en -ETER</option><option>Premier groupe verbes en -GER</option><option>Premier groupe verbe en -CER</option><option>Premier groupe verbes en -YER</option><option>Premier groupe verbe en -E (È) + consonne + ER</option><option>Deuxième groupe</option><option>Verbes du troisième groupe</option>';
+   if(help) help.textContent='';
+ }
+}
+document.querySelector('#practiceVerb').addEventListener('input',()=>{
+ const verb=normalizeVerb(document.querySelector('#practiceVerb').value);
+ if(!verb){
+   document.querySelector('#practiceMode').value='';
+ }
+ updatePracticeGroupState();
+ updatePracticeModeOptions();
+ const m=document.querySelector('#practiceMessage');m.className='form-message';m.textContent='';
+});
+updatePracticeGroupState();
+function matchesPracticeMode(v,tense,mode){const m=verbMeta[v]||{};if(mode==='pronominal')return m.pronominal===true;if(mode==='pc-avoir')return tense==='passé composé'&&m.auxiliaire==='avoir'&&!m.pronominal;if(mode==='pc-etre')return tense==='passé composé'&&m.auxiliaire==='être';if(mode==='pc-both')return tense==='passé composé'&&(m.auxiliaire==='avoir'||m.auxiliaire==='être');return true;}
+function startSession(){
+ const verb=normalizeVerb(document.querySelector('#practiceVerb').value);
+ const tense=document.querySelector('#practiceTense').value;
+ const group=document.querySelector('#practiceGroup').value;
+ const mode=document.querySelector('#practiceMode').value;
+ const msg=document.querySelector('#practiceMessage');
+ if(!tense){msg.className='form-message error';msg.textContent='Debes seleccionar un tiempo verbal para comenzar la práctica.';return}
+ if(!verb && !mode){msg.className='form-message error';msg.textContent='Debes seleccionar el tipo de entrenamiento cuando no has indicado un verbo concreto.';return}
+ if(verb&&!conjugations[verb]){msg.className='form-message error';msg.textContent='En este prototipo, ese verbo todavía no está en la base de demostración.';return}
+ const questions=buildQuestions(verb,tense,group,mode);
+ if(questions.length<20){msg.className='form-message error';msg.textContent='No hay suficientes preguntas disponibles para crear una sesión de 20 preguntas con esta configuración.';return}
+ session={questions,index:0,correct:0,results:[],locked:false};
+ document.querySelector('#practiceSession').classList.remove('hidden');
+ document.querySelector('#practiceCriteria').textContent=[verb||"grupo",tense,mode,group||""].filter(Boolean).join(" · ");
+ showQuestion();
+ document.querySelector('#practiceSession').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function showQuestion(){
+ const q=session.questions[session.index];
+ session.locked=false;
+ q.attempts=0;q.firstError='';q.secondError='';
+ document.querySelector('#questionVerb').textContent=`${q.verb} · ${q.tense}`;
+ document.querySelector('#questionSubject').textContent=q.subject;
+ const input=document.querySelector('#answerInput');input.value='';input.className='';input.disabled=false;
+ const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box';fb.textContent='';
+ document.querySelector('#practiceProgressText').textContent=`Question ${session.index+1} / 20`;
+ document.querySelector('#practiceProgressBar').style.width=`${(session.index/20)*100}%`;
+ setTimeout(()=>input.focus(),80);
+}
+function validateAnswer(){
+ if(session.locked)return;
+ const q=session.questions[session.index],input=document.querySelector('#answerInput'),value=input.value.trim();
+ if(!value)return;
+ q.attempts++;
+ if(sameAnswer(value,q)){
+  input.className='success';session.correct++;
+  let outcome;
+  if(q.attempts===1) outcome='correct-first';
+  else if(q.attempts===2) outcome='correct-after-first-error';
+  else outcome='correct-after-help';
+  session.results.push({question:q,finalAnswer:value,outcome});
+  session.locked=true;
+  const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box ok';fb.textContent='✓ Correcto. Pasamos a la siguiente pregunta.';
+  document.querySelector('#practiceProgressBar').style.width=`${((session.index+1)/20)*100}%`;
+  setTimeout(()=>{session.index++;session.index>=20?finishSession():showQuestion()},650);
+ }else{
+  if(q.attempts===1){
+   q.firstError=value;input.className='error-first';
+   const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box warn';fb.textContent='⚠ Cuidado, hay una falta. Corrige tu respuesta y vuelve a validar.';
+  }else{
+   q.secondError=value;input.className='error-help';
+   const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box help';
+   fb.innerHTML=`Te ayudamos: es <span class="help-answer">${escapeHtml(q.answer)}</span>. Escríbela en la barra de respuesta y valida para continuar.`;
+  }
+ }
+}
+document.querySelector('#validateAnswer').addEventListener('click',validateAnswer);
+document.querySelector('#answerInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();validateAnswer()}});
+function finishSession(){
+ document.querySelector('#practiceProgressBar').style.width='100%';
+ document.querySelector('#practiceProgressText').textContent='Session terminée · 20 / 20';
+ const firstCorrect=session.results.filter(r=>r.outcome==='correct-first').length;
+ const withErrors=session.results.filter(r=>r.outcome!=='correct-first').length;
+ const score=session.results.reduce((sum,r)=>sum+(r.outcome==='correct-first'?1:r.outcome==='correct-after-first-error'?.5:0),0);
+ document.querySelector('#finalCorrect').textContent=firstCorrect;
+ document.querySelector('#finalWrong').textContent=withErrors;
+ document.querySelector('#finalScore').textContent=score.toFixed(1).replace('.0','')+' / 20';
+ const tbody=document.querySelector('#resultRows');tbody.innerHTML='';
+ session.results.forEach((r,i)=>{
+  const q=r.question;
+  let user='',outcome='';
+  if(r.outcome==='correct-after-first-error'){
+   user=`<span class="error-first-cell">${escapeHtml(q.firstError)}</span><div class="attempt-detail">→ corregida: <span class="correct-cell">${escapeHtml(r.finalAnswer)}</span></div>`;
+   outcome=`<span class="error-first-cell">↺ Primer error · corregida sola</span>`;
+  }else if(r.outcome==='correct-after-help'){
+   user=`<span class="error-first-cell">${escapeHtml(q.firstError)}</span><div class="attempt-detail">→ 2.º intento: <span class="error-help-cell">${escapeHtml(q.secondError)}</span></div><div class="attempt-detail">→ con ayuda: <span class="correct-cell">${escapeHtml(r.finalAnswer)}</span></div>`;
+   outcome=`<span class="error-help-cell">✗ Ayuda necesaria</span>`;
+  }else{
+   user=`<span class="correct-cell">${escapeHtml(r.finalAnswer)}</span>`;
+  }
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td data-label="#">${i+1}</td><td data-label="Verbe">${escapeHtml(q.verb)}</td><td data-label="Sujet">${escapeHtml(q.subject)}</td><td data-label="Temps">${escapeHtml(q.tense)}</td><td data-label="Ta réponse">${user}</td><td data-label="Réponse correcte" class="correct-answer">${escapeHtml(q.answer)}</td><td data-label="Résultat">${outcome}</td>`;
+  tbody.appendChild(tr);
+
+ });
+ const modal=document.querySelector('#resultModal');modal.classList.add('open');modal.setAttribute('aria-hidden','false');
+}
+document.querySelector('#reviewDone').addEventListener('click',()=>{
+ document.querySelector('#resultModal').classList.remove('open');document.querySelector('#resultModal').setAttribute('aria-hidden','true');
+ document.querySelector('#practiceSession').classList.add('hidden');document.querySelector('#practiceVerb').focus();
+});
+document.querySelector('#startPractice').addEventListener('click',startSession);
+
+
+// Coq: búsqueda automática solo cuando el infinitivo es válido.
+(function(){
+  const verbInput=document.getElementById('lookupVerb');
+  const tenseSelect=document.getElementById('lookupTense');
+  if(!verbInput || !tenseSelect) return;
+  let timer=null;
+  verbInput.addEventListener('input',()=>{
+    clearTimeout(timer);
+    timer=setTimeout(()=>{
+      const verb=normalizeVerb(verbInput.value);
+      if(verb && conjugations[verb] && tenseSelect.value) lookup();
+      else {
+        document.getElementById('conjResult').classList.add('hidden');
+        document.getElementById('lookupMessage').className='';
+        document.getElementById('lookupMessage').textContent='';
+      }
+    },300);
+  });
+})();
+
+function updateLookupStatus(){
+  const input = document.getElementById('lookupVerb');
+  const status = document.getElementById('lookupStatus');
+  const tense = document.getElementById('lookupTense');
+  if(!input || !status) return;
+  const value = input.value.trim();
+  if(!value){
+    status.className = 'lookup-status empty';
+    status.textContent = 'Escribe el infinitivo de un verbo francés.';
+    status.hidden = false;
+    return;
+  }
+  // A ficha válida ya se encarga de la lógica existente; aquí solo evitamos
+  // mostrar mensajes de resultado mientras el texto aún está incompleto.
+  const hasResult = document.getElementById('lookupResult') ||
+                    document.querySelector('.verb-card');
+  if(!hasResult){
+    status.className = 'lookup-status empty';
+    status.textContent = tense && tense.value
+      ? 'Escribe el verbo (en infinitivo) que quieras consultar. No estás limitado a una lista.'
+      : 'Ahora selecciona un tiempo verbal.';
+    status.hidden = false;
+  }
+}
+
+document.addEventListener('input', function(e){
+  if(e.target && e.target.id === 'lookupVerb') updateLookupStatus();
+});
+document.addEventListener('change', function(e){
+  if(e.target && (e.target.id === 'lookupVerb' || e.target.id === 'lookupTense')) {
+    setTimeout(updateLookupStatus, 30);
+  }
+});
+
+// Coq v25: enlace directo desde la ficha del verbo a la práctica.
+document.addEventListener('click', function(e){
+  const button = e.target.closest('#practiceThisVerb');
+  if(!button) return;
+
+  const verbInput = document.getElementById('lookupVerb');
+  const practiceTab = document.querySelector('.tab[data-tab="practice"]');
+  const practicePanel = document.getElementById('tab-practice');
+  const practiceInput = document.getElementById('practiceVerb');
+
+  if(practiceInput && verbInput){
+    practiceInput.value = verbInput.value.trim();
+    practiceInput.dispatchEvent(new Event('input', {bubbles:true}));
+    practiceInput.dispatchEvent(new Event('change', {bubbles:true}));
+  }
+
+  if(practiceTab){
+    practiceTab.click();
+  } else if(practicePanel){
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    practicePanel.classList.add('active');
+  }
+
+  setTimeout(function(){
+    const panel = document.getElementById('tab-practice');
+    if(panel) panel.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 50);
+});
+</script>
+<script>
+/* Conjugaison fallback: keeps the shared mobile/tablet menu working even if the global initializer is unavailable. */
+(function(){
+  function initConjugaisonMenu(){
+    document.querySelectorAll('.nav').forEach(function(nav){
+      var button=nav.querySelector('.menu');
+      var links=nav.querySelector('.navlinks');
+      if(!button || !links || button.dataset.coqMenuReady==='1') return;
+      button.dataset.coqMenuReady='1';
+      button.setAttribute('aria-expanded','false');
+      button.addEventListener('click',function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        if(window.innerWidth>900) return;
+        var open=links.classList.toggle('mobile-open');
+        button.setAttribute('aria-expanded',open?'true':'false');
+      });
+      var level=links.querySelector('.nav-item > .nav-button');
+      if(level){
+        level.addEventListener('click',function(e){
+          if(window.innerWidth<=900){
+            e.preventDefault();
+            e.stopPropagation();
+            level.parentElement.classList.toggle('mobile-submenu-open');
+          }
+        });
+      }
+      links.addEventListener('click',function(e){
+        if(window.innerWidth<=900 && e.target.closest('a')){
+          links.classList.remove('mobile-open');
+          links.querySelectorAll('.mobile-submenu-open').forEach(function(x){x.classList.remove('mobile-submenu-open')});
+          button.setAttribute('aria-expanded','false');
+        }
+      });
+      document.addEventListener('click',function(e){
+        if(window.innerWidth<=900 && links.classList.contains('mobile-open') && !nav.contains(e.target)){
+          links.classList.remove('mobile-open');
+          links.querySelectorAll('.mobile-submenu-open').forEach(function(x){x.classList.remove('mobile-submenu-open')});
+          button.setAttribute('aria-expanded','false');
+        }
+      });
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initConjugaisonMenu);
+  else initConjugaisonMenu();
+})();
+</script>
+</body></html>
