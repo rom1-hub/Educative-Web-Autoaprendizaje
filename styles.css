@@ -351,3 +351,14 @@ h3{font-size:25px;margin:0 0 9px}
 @media (min-width: 901px){
   .nav .navlinks.mobile-open{display:none !important}
 }
+
+
+/* Conjugaison — resumen responsive sin scroll horizontal */
+@media(max-width:700px){
+ .result-modal{padding:12px}
+ .result-window{width:100%;max-width:100%;max-height:calc(100vh - 24px);padding:16px;border-radius:20px;box-sizing:border-box;overflow-y:auto;overflow-x:hidden}
+ .result-table-wrap{width:100%;max-width:100%;overflow-x:hidden;box-sizing:border-box}
+ .result-table{width:100%;min-width:0;table-layout:fixed}
+ .result-table tbody,.result-table tr,.result-table td{max-width:100%;box-sizing:border-box}
+ .result-table td{overflow-wrap:anywhere;word-break:break-word}
+}

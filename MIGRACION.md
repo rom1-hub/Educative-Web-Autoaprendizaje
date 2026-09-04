@@ -51,3 +51,16 @@ No se modifica la lógica de conjugación, datos, ejercicios, buscador, progreso
 - `search.js` contiene una única implementación del buscador global.
 - Todas las páginas HTML cargan `search.js` una sola vez.
 - El buscador mantiene el mismo índice y comportamiento de V43.
+
+
+## Fase 3A — separar datos de conjugación
+- Extraídos los datos de `conjugations`, `verbGroups` y `verbMeta` de `conjugaison.html` a `data/verbs/conjugations.js`.
+- Se mantiene el contenido de datos sin cambios.
+- `conjugaison.html` consume `window.COQ_VERB_DATA`; la lógica de conjugación permanece en la página en esta fase.
+- No se modifican CSS, ejercicios, progreso, buscador, navegación ni audio.
+
+
+## Correcciones de Conjugación antes de cerrar Fase 3A
+- Aceptar la respuesta completa con el sujeto `j'` (por ejemplo, `j'ai`) en el ejercicio, manteniendo también válida la forma conjugada sola (`ai`).
+- Ordenar la vista de `Todos los tiempos` comenzando por `présent de l'indicatif`, seguido del orden pedagógico definido, sin modificar los datos de conjugación.
+- Adaptar la ventana y el resumen final a móvil/tablet para eliminar el scroll horizontal de la tabla.
