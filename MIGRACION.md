@@ -64,3 +64,9 @@ No se modifica la lógica de conjugación, datos, ejercicios, buscador, progreso
 - Aceptar la respuesta completa con el sujeto `j'` (por ejemplo, `j'ai`) en el ejercicio, manteniendo también válida la forma conjugada sola (`ai`).
 - Ordenar la vista de `Todos los tiempos` comenzando por `présent de l'indicatif`, seguido del orden pedagógico definido, sin modificar los datos de conjugación.
 - Adaptar la ventana y el resumen final a móvil/tablet para eliminar el scroll horizontal de la tabla.
+
+
+## Fase 3B — separación de lógica de Conjugación
+- Extraída la lógica inline de `conjugaison.html`.
+- Separada por responsabilidad en `js/conjugaison/utils.js`, `lookup.js`, `practice.js` y `app.js`.
+- Sin cambios pedagógicos ni de base de datos en esta fase.
