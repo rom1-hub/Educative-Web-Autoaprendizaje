@@ -1,4 +1,4 @@
-# COQ — FASE 2B · Separar audio global
+# COQ — Registro de migración y arquitectura
 
 ## Objetivo
 Extraer la pronunciación global de `script.js` a un servicio reutilizable, manteniendo el comportamiento actual de los botones `[data-say]`.
@@ -70,3 +70,33 @@ No se modifica la lógica de conjugación, datos, ejercicios, buscador, progreso
 - Extraída la lógica inline de `conjugaison.html`.
 - Separada por responsabilidad en `js/conjugaison/utils.js`, `lookup.js`, `practice.js` y `app.js`.
 - Sin cambios pedagógicos ni de base de datos en esta fase.
+
+
+## Fase 3E — estructura real de datos
+- Sustituido `data/verbs/conjugations.js` por `data/verbs/verbs.js`, `patterns.js` y `tense-rules.js`.
+- `verbs.js` conserva una capa de compatibilidad para la lógica actual.
+- No se modificaron las formas de conjugación existentes ni las reglas de cálculo.
+
+
+## Fase 3E — revisión arquitectónica antes del registro (versión corregida)
+- El modelo distingue ahora el **verbo base** de la **construcción** que se está conjugando.
+- Una forma pronominal se relaciona con su verbo base mediante `verbeBase` y `formesAssociees`; no se considera un verbo completamente independiente.
+- La estructura admite que un verbo tenga o no una construcción pronominal válida. No se inventan automáticamente formas como `se être` o `se avoir`; una construcción pronominal solo se registra cuando sea lingüísticamente pertinente y validada.
+- Se añadió `data/verbs/constructions.js` como catálogo común de construcciones.
+- Todos los tiempos compuestos apuntan al mismo catálogo de filtros de construcción (`avec-avoir`, `avec-etre`, `avec-avoir-et-etre`, `verbes-pronominaux`). La interfaz de entrenamiento se cambiará posteriormente; en esta fase solo se prepara el modelo.
+- Se deja explícitamente fuera de esta fase la implementación completa de las reglas de concordancia del participe passé. Estas reglas se desarrollarán posteriormente como motor independiente.
+- La futura búsqueda de conjugación deberá aceptar tanto la forma no pronominal como la forma pronominal y permitir alternar entre ambas en la misma vista. La relación se guarda a nivel de verbo base + construcción; esta fase prepara los datos, sin modificar todavía la interfaz.
+
+### Protección de esta fase
+- No se rediseña la interfaz de `conjugaison`.
+- No se implementa todavía el motor completo de conjugación ni la concordancia del participe passé.
+- No se modifica el comportamiento actual de la consulta ni de los ejercicios.
+- Se conserva la capa `COQ_VERB_DATA` para compatibilidad con la lógica actual.
+
+
+### Decisiones añadidas antes del registro
+- `parler` conserva su identidad como verbo base y registra `se parler` como construcción pronominal futura (`statut: a_construire`), sin inventar todavía sus tablas de conjugación.
+- `se lever` conserva sus datos actuales como construcción pronominal relacionada con el verbo base `lever`.
+- La base no presupone que todos los verbos admitan automáticamente una forma pronominal válida; el catálogo podrá registrar esa relación cuando corresponda.
+- El selector de entrenamiento de los tiempos compuestos se modela una sola vez y será reutilizado por passé composé, plus-que-parfait, conditionnel passé, futur antérieur y subjonctif passé.
+- La implementación de la búsqueda `se parler` ↔ `parler` y del botón contextual queda para una fase posterior del motor/lookup.

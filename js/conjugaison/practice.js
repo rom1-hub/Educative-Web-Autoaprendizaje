@@ -14,7 +14,7 @@
       ts.forEach(t=>{
         if(!conjugations[v][t])return;
         U.expandPracticeRows(conjugations[v][t]).forEach(r=>{
-          if(t==='passé composé'&&(verbMeta[v]||{}).auxiliaire==='être'){
+          if(['passé composé','plus-que-parfait','conditionnel passé','futur antérieur','subjonctif passé'].includes(t)&&(verbMeta[v]||{}).auxiliaire==='être'){
             const agree=(answer,gender,number)=>answer.replace(/\(e\)\(s\)/g,()=>number==='pluriel'?(gender==='féminin'?'es':'s'):(gender==='féminin'?'e':'')).replace(/\(e\)s/g,()=>number==='pluriel'?(gender==='féminin'?'es':'s'):(gender==='féminin'?'e':'')).replace(/\(e\)/g,()=>gender==='féminin'?'e':'');
             const variants={
               je:[['je (féminin singulier)',agree(r.answer,'féminin','singulier')],['je (masculin singulier)',agree(r.answer,'masculin','singulier')]],
@@ -49,17 +49,20 @@
     while(selected.length<20&&reusable.length&&guard<200){const last=selected[selected.length-1]?.subject;const idx=reusable.findIndex(q=>q.subject!==last);const pick=idx>=0?reusable.splice(idx,1)[0]:reusable.shift();selected.push({...pick});guard++;if(!reusable.length)reusable.push(...U.shuffleArray(pool));}
     return selected.slice(0,20);
   }
-  function matchesPracticeMode(v,tense,mode){const m=verbMeta[v]||{};if(mode==='pronominal')return m.pronominal===true;if(mode==='pc-avoir')return tense==='passé composé'&&m.auxiliaire==='avoir'&&!m.pronominal;if(mode==='pc-etre')return tense==='passé composé'&&m.auxiliaire==='être';if(mode==='pc-both')return tense==='passé composé'&&(m.auxiliaire==='avoir'||m.auxiliaire==='être');return true;}
+  function matchesPracticeMode(v,tense,mode){const m=verbMeta[v]||{};const compound=['passé composé','plus-que-parfait','conditionnel passé','futur antérieur','subjonctif passé'].includes(tense);if(!compound||!mode)return true;if(mode==='pronominal')return m.pronominal===true;if(mode==='avec-avoir')return m.auxiliaire==='avoir'&&!m.pronominal;if(mode==='avec-etre')return m.auxiliaire==='être'&&!m.pronominal;if(mode==='avec-avoir-et-etre')return m.auxiliaire==='avoir'||m.auxiliaire==='être';return true;}
 
   function updatePracticeModeOptions(){
     const tense=document.querySelector('#practiceTense')?.value,mode=document.querySelector('#practiceMode'),help=document.querySelector('#practiceModeHelp');if(!mode)return;
     const verb=U.normalizeVerb(document.querySelector('#practiceVerb')?.value);mode.innerHTML='';
+    const compound=['passé composé','plus-que-parfait','conditionnel passé','futur antérieur','subjonctif passé'].includes(tense);
     if(!tense){mode.disabled=true;mode.innerHTML='<option value="" selected>-seleccionar un tiempo primero-</option>';if(help)help.textContent='Elige primero un tiempo verbal.';return;}
     if(verb){mode.disabled=true;const o=document.createElement('option');o.value='';o.textContent='No necesario: verbo concreto';o.selected=true;mode.appendChild(o);if(help)help.textContent='Con un verbo concreto no necesitas seleccionar un entrenamiento.';return;}
-    mode.disabled=false;const opts=tense==='passé composé'?[['','-seleccionar-'],['pc-avoir','Passé composé — avec AVOIR'],['pc-etre','Passé composé — avec ÊTRE'],['pc-both','Passé composé — AVOIR + ÊTRE'],['pronominal','Verbes pronominaux']]:[['','-seleccionar-'],['all','Tous les verbes'],['pronominal','Verbes pronominaux']];
-    opts.forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;mode.appendChild(o);});
-    if(help)help.textContent=tense==='passé composé'?'Practica al azar con AVOIR, ÊTRE o ambos.':'Practica al azar con todos los verbos o solo con los verbes pronominaux.';
+    if(!compound){mode.disabled=true;const o=document.createElement('option');o.value='';o.textContent='No aplica a este tiempo';o.selected=true;mode.appendChild(o);if(help)help.textContent='Estas opciones se aplican a todos los tiempos compuestos.';return;}
+    mode.disabled=false;const opts=[['','-seleccionar-'],['avec-avoir','Con verbo auxiliar AVOIR'],['avec-etre','Con verbo auxiliar ÊTRE'],['avec-avoir-et-etre','Con verbo auxiliar AVOIR y ÊTRE'],['pronominal','Verbes pronominaux']];
+    opts.forEach(([value,label])=>{const o=document.createElement('option');o.value=value;o.textContent=label;mode.appendChild(o);});
+    if(help)help.textContent='Estas mismas opciones se utilizan en todos los tiempos compuestos.';
   }
+
   function updatePracticeGroupState(){
     const verb=U.normalizeVerb(document.querySelector('#practiceVerb')?.value),group=document.querySelector('#practiceGroup'),help=document.querySelector('#practiceGroupHelp');if(!group)return;
     if(verb){group.disabled=true;group.innerHTML='<option value="" selected>No necesario: verbo concreto</option>';if(help)help.textContent='';}
