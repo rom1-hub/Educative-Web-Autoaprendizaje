@@ -100,3 +100,17 @@ No se modifica la lógica de conjugación, datos, ejercicios, buscador, progreso
 - La base no presupone que todos los verbos admitan automáticamente una forma pronominal válida; el catálogo podrá registrar esa relación cuando corresponda.
 - El selector de entrenamiento de los tiempos compuestos se modela una sola vez y será reutilizado por passé composé, plus-que-parfait, conditionnel passé, futur antérieur y subjonctif passé.
 - La implementación de la búsqueda `se parler` ↔ `parler` y del botón contextual queda para una fase posterior del motor/lookup.
+
+## Fase 3F1 — Motor de tiempos simples
+- Añadidos `js/conjugaison/engine.js` y `js/conjugaison/pronouns.js`.
+- El motor genera tiempos simples a partir del patrón para los patrones regulares actualmente disponibles y conserva compatibilidad con formas explícitas para patrones aún no migrados.
+- La consulta y la práctica utilizan el motor para los tiempos simples.
+- La construcción pronominal reutiliza la conjugación del verbo base y aplica el pronombre correspondiente.
+- No se modifica todavía la lógica completa de tiempos compuestos ni la concordancia avanzada.
+- No se realizan cambios estéticos.
+
+
+## 3F1 — filtros de entrenamiento
+- `Construction` es independiente del tiempo verbal y permite practicar verbos no pronominales o pronominales también en tiempos simples.
+- `Verbe auxiliaire` sustituye el antiguo selector de entrenamiento y solo se habilita para tiempos compuestos. Para tiempos simples muestra un mensaje de bloqueo contextual.
+- Los filtros `Construction` y `Verbe auxiliaire` son independientes.

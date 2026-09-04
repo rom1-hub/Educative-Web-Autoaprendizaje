@@ -3,6 +3,7 @@
   const U=window.COQ_CONJ_UTILS;
   const conjugations=U.conjugations;
   const verbMeta=U.verbMeta;
+  const engine=window.COQ_CONJ_ENGINE;
   const displayOrder=["présent de l'indicatif",'impératif présent','passé composé','imparfait','futur simple','conditionnel présent','plus-que-parfait','conditionnel passé','futur antérieur','subjonctif présent','subjonctif passé'];
 
   function counterpart(verb){
@@ -25,10 +26,12 @@
     html+=`<button class="btn secondary" type="button" id="speakVerb" aria-label="Escuchar el verbo">🔊 Escuchar el verbo</button><button class="btn tiny secondary" type="button" id="practiceThisVerb">Practicar este verbo</button></div></div></div>`;
     if(data && selectedTense){
       const orderIndex=t=>{const i=displayOrder.indexOf(t);return i===-1?displayOrder.length:i;};
-      const timesToShow=selectedTense==='Todos los tiempos' ? Object.entries(data).sort((a,b)=>orderIndex(a[0])-orderIndex(b[0])) : Object.entries(data).filter(([t])=>t===selectedTense);
+      const sourceEntries=Object.entries(data);
+      const timesToShow=selectedTense==='Todos los tiempos' ? sourceEntries.sort((a,b)=>orderIndex(a[0])-orderIndex(b[0])) : sourceEntries.filter(([t])=>t===selectedTense);
+      const generatedTimes=timesToShow.map(([t,rows])=>[t,(engine&&engine.rowsFor?engine.rowsFor(verb,t):rows)]);
       html+=`<div class="conj-toolbar"><span class="muted">${selectedTense==='Todos los tiempos'?'Todos los tiempos':'Tiempo seleccionado'}</span></div>`;
       if(!timesToShow.length) html+=`<div class="callout">Todavía no hay una conjugación disponible para <strong>${U.escapeHtml(verb)}</strong> en el tiempo «${U.escapeHtml(selectedTense)}».</div>`;
-      else { html+=`<div class="conj-times" id="conjTimes">`; timesToShow.forEach(([t,rows])=>{ html+=`<div class="tense-block"><div class="tense-head"><h3>${U.escapeHtml(t)}</h3><button class="btn tiny secondary" type="button" data-speak-tense="${U.escapeHtml(t)}">🔊</button></div><table class="tense-table"><tbody>`; rows.forEach(r=>html+=`<tr><td>${U.escapeHtml(r[0])}</td><td>${U.escapeHtml(r[1])}</td></tr>`); html+=`</tbody></table></div>`; }); html+=`</div>`; }
+      else { html+=`<div class="conj-times" id="conjTimes">`; generatedTimes.forEach(([t,rows])=>{ html+=`<div class="tense-block"><div class="tense-head"><h3>${U.escapeHtml(t)}</h3><button class="btn tiny secondary" type="button" data-speak-tense="${U.escapeHtml(t)}">🔊</button></div><table class="tense-table"><tbody>`; rows.forEach(r=>html+=`<tr><td>${U.escapeHtml(r[0])}</td><td>${U.escapeHtml(r[1])}</td></tr>`); html+=`</tbody></table></div>`; }); html+=`</div>`; }
     } else if(data && !selectedTense) html+=`<div class="callout">Selecciona un tiempo verbal para mostrar la conjugación.</div>`;
     else html+=`<div class="callout"><strong>Verbo introducido:</strong> ${U.escapeHtml(verb)}.</div>`;
     result.innerHTML=html;

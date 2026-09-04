@@ -112,7 +112,8 @@
 <div class="row">
 <div><label for="practiceTense">Tiempo verbal <span class="required">*</span></label><select id="practiceTense"><option value="" selected disabled>-seleccionar-</option><option>Todos los tiempos</option><option>présent de l'indicatif</option><option>impératif présent</option><option>passé composé</option><option>imparfait</option><option>futur simple</option><option>conditionnel présent</option><option>plus-que-parfait</option><option>conditionnel passé</option><option>futur antérieur</option><option>subjonctif présent</option><option>subjonctif passé</option></select></div>
 <div><label for="practiceGroup">Grupo verbal</label><select id="practiceGroup"><option value="" selected>-seleccionar-</option><option value="Todos">Todos</option><option>Premier groupe normal</option><option>Premier groupe verbes en -ELER</option><option>Premier groupe verbes en -ETER</option><option>Premier groupe verbes en -GER</option><option>Premier groupe verbe en -CER</option><option>Premier groupe verbes en -YER</option><option>Premier groupe verbe en -E (È) + consonne + ER</option><option>Deuxième groupe</option><option>Verbes du troisième groupe</option></select><div class="field-help" id="practiceGroupHelp"></div></div>
-<div><label for="practiceMode">Entraînement <span class="required">*</span></label><select id="practiceMode" disabled><option value="" selected>-seleccionar un tiempo primero-</option></select><div class="field-help" id="practiceModeHelp">Elige primero un tiempo verbal.</div></div>
+<div><label for="practiceConstruction">Construction</label><select id="practiceConstruction"><option value="" selected>-seleccionar-</option><option value="non-pronominale">Verbes non pronominaux</option><option value="pronominale">Verbes pronominaux</option></select><div class="field-help" id="practiceConstructionHelp">Puedes elegir una construcción para afinar el ejercicio.</div></div>
+<div><label for="practiceAuxiliary">Verbe auxiliaire</label><select id="practiceAuxiliary" disabled><option value="" selected>Non disponible pour un temps simple</option></select><div class="field-help" id="practiceAuxiliaryHelp">Disponible uniquement avec un temps composé.</div></div>
 </div>
 <div id="practiceMessage" class="form-message"></div>
 <button class="btn blue" id="startPractice" type="button">Commencer les 20 questions →</button>
@@ -159,6 +160,8 @@
 <script src="data/verbs/constructions.js"></script>
 <script src="data/verbs/tense-rules.js"></script>
 <script src="js/conjugaison/utils.js"></script>
+<script src="js/conjugaison/pronouns.js"></script>
+<script src="js/conjugaison/engine.js"></script>
 <script src="js/conjugaison/lookup.js"></script>
 <script src="js/conjugaison/practice.js"></script>
 <script src="js/conjugaison/app.js"></script>
