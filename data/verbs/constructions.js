@@ -5,6 +5,13 @@ window.COQ_CONSTRUCTIONS = {
   'pronominale': { id: 'pronominale', label: 'Forme pronominale', pronom: true }
 };
 
+// Règles de construction pronominale utiles à Conjugaison.
+// Les cas complexes (COD antérieur/postérieur, etc.) seront traités dans une leçon dédiée.
+window.COQ_PRONOMINAL_RULES = {
+  'lever': { fonctionDeSe: 'COD', accord: 'sujet' },
+  'parler': { fonctionDeSe: 'COI', accord: 'aucun' }
+};
+
 // Filtros comunes reutilizables por TODOS los tiempos composés.
 // 'avec-avoir-et-etre' significa que el conjunto de práctica acepta verbos con uno u otro auxiliaire;
 // no significa que un mismo verbo utilice ambos auxiliaires simultáneamente.

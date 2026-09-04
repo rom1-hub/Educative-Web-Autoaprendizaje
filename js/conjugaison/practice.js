@@ -18,19 +18,24 @@
         let rows=(engine&&engine.rowsFor)?engine.rowsFor(v,t):conjugations[v][t];
         if(engine&&engine.rowsForConstruction&&construction) rows=engine.rowsForConstruction(v,t,construction);
         U.expandPracticeRows(rows).forEach(r=>{
-          if(['passé composé','plus-que-parfait','conditionnel passé','futur antérieur','subjonctif passé'].includes(t)&&(verbMeta[v]||{}).auxiliaire==='être'){
-            const agree=(answer,gender,number)=>answer.replace(/\(e\)\(s\)/g,()=>number==='pluriel'?(gender==='féminin'?'es':'s'):(gender==='féminin'?'e':'')).replace(/\(e\)s/g,()=>number==='pluriel'?(gender==='féminin'?'es':'s'):(gender==='féminin'?'e':'')).replace(/\(e\)/g,()=>gender==='féminin'?'e':'');
-            const variants={
-              je:[['je (féminin singulier)',agree(r.answer,'féminin','singulier')],['je (masculin singulier)',agree(r.answer,'masculin','singulier')]],
-              tu:[['tu (féminin singulier)',agree(r.answer,'féminin','singulier')],['tu (masculin singulier)',agree(r.answer,'masculin','singulier')]],
-              nous:[['nous (féminin pluriel)',agree(r.answer,'féminin','pluriel')],['nous (masculin pluriel)',agree(r.answer,'masculin','pluriel')]],
-              vous:[['vous (féminin singulier)',agree(r.answer,'féminin','singulier')],['vous (masculin singulier)',agree(r.answer,'masculin','singulier')],['vous (féminin pluriel)',agree(r.answer,'féminin','pluriel')],['vous (masculin pluriel)',agree(r.answer,'masculin','pluriel')]],
-              il:[['il',agree(r.answer,'masculin','singulier')]],elle:[['elle',agree(r.answer,'féminin','singulier')]],
-              ils:[['ils',agree(r.answer,'masculin','pluriel')]],elles:[['elles',agree(r.answer,'féminin','pluriel')]]
-            };
-            if(variants[r.subject])variants[r.subject].forEach(([subject,answer])=>pool.push({verb:v,tense:t,subject,answer}));
-            else pool.push({verb:v,tense:t,subject:r.subject,answer:agree(r.answer,'masculin','singulier')});
-          }else pool.push({verb:v,tense:t,subject:r.subject,answer:r.answer});
+          const isCompound=compoundTenses.includes(t);
+          const baseSubject=String(r.subject||'').split(' (')[0].trim();
+          const variants={
+            je:['je (féminin singulier)','je (masculin singulier)'],
+            tu:['tu (féminin singulier)','tu (masculin singulier)'],
+            on:['on (féminin pluriel)','on (masculin pluriel)','on (masculin singulier)'],
+            nous:['nous (féminin pluriel)','nous (masculin pluriel)'],
+            vous:['vous (féminin singulier)','vous (masculin singulier)','vous (féminin pluriel)','vous (masculin pluriel)']
+          };
+          if(isCompound && variants[baseSubject] && engine&&engine.conjugate){
+            variants[baseSubject].forEach(subject=>{
+              const answer=engine.conjugate(v,t,subject,construction||((verbMeta[v]||{}).pronominal?'pronominale':'non-pronominale'));
+              if(answer!=null) pool.push({verb:v,tense:t,subject,answer});
+            });
+          }else{
+            const answer=(engine&&engine.conjugate)?engine.conjugate(v,t,r.subject,construction||((verbMeta[v]||{}).pronominal?'pronominale':'non-pronominale')):r.answer;
+            pool.push({verb:v,tense:t,subject:r.subject,answer:answer==null?r.answer:answer});
+          }
         });
       });
     };

@@ -19,6 +19,7 @@
   function pronounFor(label){return subjectPronouns[baseSubject(label)]||null;}
   function contractPronoun(pronoun, nextWord){
     if(!pronoun || !nextWord) return pronoun;
+    if(!['me','te','se'].includes(pronoun)) return pronoun;
     return /^[aeiouyàâäéèêëîïôöùûüÿh]/i.test(nextWord) ? pronoun.charAt(0)+"'" : pronoun;
   }
   function apply(subjectLabel, verbForm){

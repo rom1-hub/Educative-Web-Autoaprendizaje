@@ -6,6 +6,8 @@
 (function(){
   const U=window.COQ_CONJ_UTILS;
   const P=window.COQ_CONJ_PRONOUNS;
+  const C=window.COQ_CONJ_COMPOUND;
+  const A=window.COQ_CONJ_AGREEMENT;
   const verbs=window.COQ_VERBS||{};
   const patterns=window.COQ_VERB_PATTERNS||{};
   const simpleTenses=new Set([
@@ -138,10 +140,54 @@
     const base=baseKey(verb);
     return generateBaseSimple(base,tense,subject) || explicitForm(base,tense,subject) || explicitForm(verb,tense,subject);
   }
+  function subjectInfo(subject){
+    const label=String(subject||'').trim();
+    const base=P.baseSubject(label);
+    const match=label.match(/\(([^)]+)\)/);
+    let gender='masculin', number='singulier';
+    if(match){
+      const parts=match[1].toLowerCase();
+      if(parts.includes('féminin')) gender='féminin';
+      if(parts.includes('pluriel')) number='pluriel';
+    }else if(base==='elle') gender='féminin';
+    else if(base==='ils') {gender='masculin';number='pluriel';}
+    else if(base==='elles') {gender='féminin';number='pluriel';}
+    else if(base==='nous') number='pluriel';
+    else if(base==='vous') number='pluriel';
+    else if(base==='on'){ number='singulier'; }
+    return {label,base,gender,number};
+  }
+
+  function participle(verb){
+    const r=record(baseKey(verb));
+    return r&&r.participePasse ? r.participePasse : null;
+  }
+
+  function compoundForm(verb,tense,subject,construction){
+    if(!C || !C.isCompound(tense)) return null;
+    const r=record(verb); if(!r) return null;
+    const base=baseKey(verb);
+    const info=subjectInfo(subject);
+    const isPronominal=construction==='pronominale' || r.pronominal===true || r.construction==='pronominale';
+    const auxiliary=isPronominal ? 'être' : r.auxiliaire;
+    if(!auxiliary) return null;
+    const auxForm=simpleForm(auxiliary,C.auxiliaryTense(tense),info.base);
+    if(!auxForm) return null;
+    let pp=participle(base); if(!pp) return null;
+    if(A) pp=A.agree(pp,{gender:info.gender,number:info.number},{type:isPronominal?'pronominale':'non-pronominale',baseVerb:base,auxiliaire:auxiliary});
+    if(isPronominal){
+      const pron=P.pronounFor(info.base);
+      if(!pron) return null;
+      const cp=P.contractPronoun(pron,auxForm);
+      return cp+(cp.endsWith("'")?'':' ')+auxForm+' '+pp;
+    }
+    return auxForm+' '+pp;
+  }
   function conjugate(verb,tense,subject,construction){
     const r=record(verb); if(!r) return null;
     const isPronominal=construction==='pronominale' || r.pronominal===true || (r.construction==='pronominale' && construction!== 'non-pronominale');
-    const target=isPronominal ? baseKey(verb) : baseKey(verb);
+    if(C && C.isCompound(tense)) return compoundForm(verb,tense,subject,isPronominal?'pronominale':'non-pronominale');
+    const target=baseKey(verb);
     let form=simpleForm(target,tense,subject);
     if(form==null) form=explicitForm(verb,tense,subject);
     if(form==null) return null;
@@ -150,9 +196,21 @@
   }
   function rowsFor(verb,tense){
     const r=record(verb); if(!r)return [];
-    const source=(r.formes||{})[tense]||[];
-    if(!simpleTenses.has(tense)) return source.map(x=>[x[0],x[1]]);
+    let source=(r.formes||{})[tense]||[];
+    const isSimple=simpleTenses.has(tense), isCompound=C&&C.isCompound(tense);
+    if(!isSimple && !isCompound) return source.map(x=>[x[0],x[1]]);
     const construction=r.pronominal?'pronominale':(r.construction||'non-pronominale');
+    const out=[];
+    if(isCompound){
+      const canonical=tense==='subjonctif passé' ? ['que je','que tu',"qu'il/elle/on",'que nous','que vous',"qu'ils/elles"] : ['je','tu','il/elle/on','nous','vous','ils/elles'];
+      if(!source.length) source=canonical.map(s=>[s,'']);
+      source.forEach(row=>{
+        const subject=row[0].split('/').map(x=>x.trim()).filter(Boolean)[0];
+        const generated=conjugate(verb,tense,subject,construction);
+        if(generated!=null) out.push([row[0],generated]);
+      });
+      if(out.length)return out;
+    }
     return source.map(row=>{
       const subjectsIn=row[0].split('/').map(x=>x.trim()).filter(Boolean);
       const subject=subjectsIn[0];
@@ -162,12 +220,12 @@
   }
   function rowsForConstruction(verb,tense,construction){
     const r=record(verb); if(!r)return [];
-    const subjectsForTense=(r.formes||{})[tense]||[];
-    if(!simpleTenses.has(tense)||!construction)return subjectsForTense.map(x=>[x[0],x[1]]);
+    const source=(r.formes||{})[tense]||[];
+    const isSimple=simpleTenses.has(tense), isCompound=C&&C.isCompound(tense);
+    if(!isSimple && !isCompound)return source.map(x=>[x[0],x[1]]);
     const out=[];
-    subjectsForTense.forEach(row=>{
-      const subjectsIn=row[0].split('/').map(x=>x.trim()).filter(Boolean);
-      subjectsIn.forEach(subject=>{
+    source.forEach(row=>{
+      row[0].split('/').map(x=>x.trim()).filter(Boolean).forEach(subject=>{
         const generated=conjugate(verb,tense,subject,construction);
         if(generated!=null) out.push([subject,generated]);
       });
@@ -177,5 +235,5 @@
   function canGenerate(verb,tense){
     return !!record(verb)&&simpleTenses.has(tense)&&(!!generateBaseSimple(baseKey(verb),tense,'je') || !!explicitForm(verb,tense,'je'));
   }
-  window.COQ_CONJ_ENGINE={conjugate,rowsFor,rowsForConstruction,canGenerate,baseKey,subjects,simpleTenses};
+  window.COQ_CONJ_ENGINE={conjugate,rowsFor,rowsForConstruction,canGenerate,baseKey,subjects,simpleTenses,compoundTenses:C?C.compoundTenses:[]};
 })();

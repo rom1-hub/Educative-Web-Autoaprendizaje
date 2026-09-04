@@ -114,3 +114,26 @@ No se modifica la lógica de conjugación, datos, ejercicios, buscador, progreso
 - `Construction` es independiente del tiempo verbal y permite practicar verbos no pronominales o pronominales también en tiempos simples.
 - `Verbe auxiliaire` sustituye el antiguo selector de entrenamiento y solo se habilita para tiempos compuestos. Para tiempos simples muestra un mensaje de bloqueo contextual.
 - Los filtros `Construction` y `Verbe auxiliaire` son independientes.
+
+## Fase 3F2 — Motor de tiempos compuestos
+
+- Se añadió `js/conjugaison/compound-tenses.js` con una única correspondencia para todos los tiempos compuestos:
+  - passé composé → présent de l'auxiliaire
+  - plus-que-parfait → imparfait
+  - conditionnel passé → conditionnel présent
+  - futur antérieur → futur simple
+  - subjonctif passé → subjonctif présent
+- Se añadió `js/conjugaison/agreement.js` para las reglas de concordancia básicas usadas en `Conjugaison`.
+- `engine.js` genera ahora tiempos compuestos a partir de auxiliar + tiempo del auxiliar + participio pasado + regla de concordancia.
+- La construcción pronominal utiliza `être` y los pronombres pronominales comunes.
+- Para las construcciones pronominales incluidas en esta fase:
+  - `se lever` → concordancia con el sujeto.
+  - `se parler` → `se` COI, sin concordancia.
+- Se ampliaron los datos de `être` y `avoir` con las formas auxiliares necesarias para conditionnel présent y subjonctif présent.
+- Se añadió `se parler` como caso de prueba de concordancia COI.
+- Los ejercicios de tiempos compuestos especifican género/número para `je`, `tu`, `on`, `nous` y `vous`, incluyendo las tres variantes de `on` aprobadas:
+  - on (masculin singulier)
+  - on (masculin pluriel)
+  - on (féminin pluriel)
+- Los casos complejos de COD y la elección contextual AVOIR/ÊTRE quedan fuera de `Conjugaison` y se reservarán para unidades pedagógicas independientes.
+- No se modificó la estética.
