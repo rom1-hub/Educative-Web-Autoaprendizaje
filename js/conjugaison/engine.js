@@ -372,9 +372,10 @@ function subjEAccent(inf,s){
     if(generated!=null) out.push([row[0],generated]);
   });
 
-  if(out.length)return out;
+   if(out.length)return out;
 }
-    }
+  return out;
+}
   function rowsForConstruction(verb,tense,construction){
     const r=record(verb); if(!r)return [];
     const source=(r.formes||{})[tense]||[];
