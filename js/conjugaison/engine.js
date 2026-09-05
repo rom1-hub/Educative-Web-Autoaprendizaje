@@ -62,11 +62,32 @@
     return base.replace(/(er)(ai|as|a|ons|ez|ont)$/,'er'+({je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'}[s]));
   }
   function imparfaitFromPresent(inf,s,pattern){
-    const pres=pattern==='regular-ir'?presentRegularIr(inf,'nous'):pattern==='regular-re'?presentRegularRe(inf,'nous'):presentRegularEr(inf,'nous');
-    const stem=pres.replace(/ons$/,'');
-    const end={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'}[s];
-    return stem+end;
+  const pres=pattern==='regular-ir'
+    ? presentRegularIr(inf,'nous')
+    : pattern==='regular-re'
+      ? presentRegularRe(inf,'nous')
+      : presentRegularEr(inf,'nous');
+
+  let stem=pres.replace(/ons$/,'');
+  
+  if(pattern==='er-ger' && (s==='nous' || s==='vous')){
+    stem=stem.replace(/e$/,'');
   }
+
+  const end={
+    je:'ais',
+    tu:'ais',
+    il:'ait',
+    elle:'ait',
+    on:'ait',
+    nous:'ions',
+    vous:'iez',
+    ils:'aient',
+    elles:'aient'
+  }[s];
+
+  return stem+end;
+}
   function futurFromInfinitive(inf,s){
     const end={je:'ai',tu:'as',il:'a',elle:'a',on:'a',nous:'ons',vous:'ez',ils:'ont',elles:'ont'}[s];
     return inf+end;
