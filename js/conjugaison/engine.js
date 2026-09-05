@@ -320,60 +320,118 @@ function subjEAccent(inf,s){
     }
     return form;
   }
-  function rowsFor(verb,tense){
-    const r=record(verb); if(!r)return [];
-    let source=(r.formes||{})[tense]||[];
-    const isSimple=simpleTenses.has(tense), isCompound=C&&C.isCompound(tense);
-    if(!isSimple && !isCompound) return source.map(x=>[x[0],x[1]]);
-    const construction=r.pronominal?'pronominale':(r.construction||'non-pronominale');
-    const out=[];
-    if(isSimple && !source.length){
-      if(tense==='impératif présent') source=[['tu',''],['nous',''],['vous','']];
-      else if(tense==='subjonctif présent') source=[['que je',''],['que tu',''],["qu'il/elle/on",''],['que nous',''],['que vous',''],["qu'ils/elles",'']];
-      else source=[['je',''],['tu',''],['il/elle/on',''],['nous',''],['vous',''],['ils/elles','']];
-    }
-  if(isCompound){
-  if(tense==='subjonctif passé'){
-    const variants=[
-      'que je (masculin singulier)',
-      'que je (féminin singulier)',
-      'que tu (masculin singulier)',
-      'que tu (féminin singulier)',
-      "qu'il",
-      "qu'elle",
-      "qu'on (masculin singulier)",
-      "qu'on (masculin pluriel)",
-      "qu'on (féminin pluriel)",
-      'que nous (masculin pluriel)',
-      'que nous (féminin pluriel)',
-      'que vous (masculin singulier)',
-      'que vous (féminin singulier)',
-      'que vous (masculin pluriel)',
-      'que vous (féminin pluriel)',
-      "qu'ils",
-      "qu'elles"
-    ];
+ function rowsFor(verb,tense){
+  const r=record(verb);
+  if(!r)return [];
 
-    variants.forEach(subject=>{
-      const generated=conjugate(verb,tense,subject,construction);
-      if(generated!=null) out.push([subject,generated]);
-    });
+  let source=(r.formes||{})[tense]||[];
+  const isSimple=simpleTenses.has(tense);
+  const isCompound=C&&C.isCompound(tense);
 
-    if(out.length)return out;
+  if(!isSimple && !isCompound){
+    return source.map(x=>[x[0],x[1]]);
   }
- }
-  const canonical=['je','tu','il/elle/on','nous','vous','ils/elles'];
 
-  if(!source.length) source=canonical.map(s=>[s,'']);
+  const construction=r.pronominal
+    ? 'pronominale'
+    : (r.construction||'non-pronominale');
+
+  const out=[];
+
+  if(isSimple && !source.length){
+    if(tense==='impératif présent'){
+      source=[['tu',''],['nous',''],['vous','']];
+    }else if(tense==='subjonctif présent'){
+      source=[
+        ['que je',''],
+        ['que tu',''],
+        ["qu'il/elle/on",''],
+        ['que nous',''],
+        ['que vous',''],
+        ["qu'ils/elles",'']
+      ];
+    }else{
+      source=[
+        ['je',''],
+        ['tu',''],
+        ['il/elle/on',''],
+        ['nous',''],
+        ['vous',''],
+        ['ils/elles','']
+      ];
+    }
+  }
+
+  if(isCompound){
+    if(tense==='subjonctif passé'){
+      const variants=[
+        'que je (masculin singulier)',
+        'que je (féminin singulier)',
+        'que tu (masculin singulier)',
+        'que tu (féminin singulier)',
+        "qu'il",
+        "qu'elle",
+        "qu'on (masculin singulier)",
+        "qu'on (masculin pluriel)",
+        "qu'on (féminin pluriel)",
+        'que nous (masculin pluriel)',
+        'que nous (féminin pluriel)',
+        'que vous (masculin singulier)',
+        'que vous (féminin singulier)',
+        'que vous (masculin pluriel)',
+        'que vous (féminin pluriel)',
+        "qu'ils",
+        "qu'elles"
+      ];
+
+      variants.forEach(subject=>{
+        const generated=conjugate(
+          verb,
+          tense,
+          subject,
+          construction
+        );
+
+        if(generated!=null){
+          out.push([subject,generated]);
+        }
+      });
+
+      if(out.length)return out;
+    }
+  }
+
+  const canonical=[
+    'je',
+    'tu',
+    'il/elle/on',
+    'nous',
+    'vous',
+    'ils/elles'
+  ];
+
+  if(!source.length){
+    source=canonical.map(s=>[s,'']);
+  }
 
   source.forEach(row=>{
-    const subject=row[0].split('/').map(x=>x.trim()).filter(Boolean)[0];
-    const generated=conjugate(verb,tense,subject,construction);
-    if(generated!=null) out.push([row[0],generated]);
+    const subject=row[0]
+      .split('/')
+      .map(x=>x.trim())
+      .filter(Boolean)[0];
+
+    const generated=conjugate(
+      verb,
+      tense,
+      subject,
+      construction
+    );
+
+    if(generated!=null){
+      out.push([row[0],generated]);
+    }
   });
 
-   if(out.length)return out;
-}
   return out;
 }
   function rowsForConstruction(verb,tense,construction){
