@@ -31,53 +31,13 @@
     });
   }
 
-  function initSubjonctifPasseLabels(){
-    const lookup=window.COQ_CONJ_LOOKUP;
-    const engine=window.COQ_CONJ_ENGINE;
-    const utils=window.COQ_CONJ_UTILS;
-    if(!lookup||!engine||typeof lookup.renderConjugation!=='function')return;
-    const originalRender=lookup.renderConjugation;
-    const variants={
-      je:['je (masculin singulier)','je (féminin singulier)'],
-      tu:['tu (masculin singulier)','tu (féminin singulier)'],
-      il:['il'],
-      elle:['elle'],
-      on:['on (masculin singulier)','on (masculin pluriel)','on (féminin pluriel)'],
-      nous:['nous (masculin pluriel)','nous (féminin pluriel)'],
-      vous:['vous (masculin singulier)','vous (féminin singulier)','vous (masculin pluriel)','vous (féminin pluriel)'],
-      ils:['ils'],
-      elles:['elles']
-    };
-    const orderedBases=['je','tu','il','elle','on','nous','vous','ils','elles'];
-    lookup.renderConjugation=function(verb){
-      originalRender(verb);
-      const selected=document.querySelector('#lookupTense')?.value||'';
-      if(selected!=='subjonctif passé'&&selected!=='Todos los tiempos')return;
-      const blocks=[...document.querySelectorAll('#conjTimes .tense-block')];
-      const block=blocks.find(b=>b.querySelector('.tense-head h3')?.textContent.trim()==='subjonctif passé');
-      if(!block)return;
-      const tbody=block.querySelector('tbody');
-      if(!tbody)return;
-      const record=window.COQ_VERBS?.[verb]||{};
-      const construction=record.pronominal?'pronominale':(record.construction||'non-pronominale');
-      const rows=[];
-      orderedBases.forEach(base=>{
-        (variants[base]||[base]).forEach(label=>{
-          const form=engine.conjugate(verb,'subjonctif passé',label,construction);
-          if(form!=null&&String(form).trim()!=='')rows.push([label,form]);
-        });
-      });
-      if(!rows.length)return;
-      const escape=utils&&utils.escapeHtml?utils.escapeHtml:(value=>String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])));
-      tbody.innerHTML=rows.map(([subject,form])=>`<tr><td>${escape(subject)}</td><td>${escape(form)}</td></tr>`).join('');
-    };
-  }
+ 
 
   function init(){
     initTabs();
     window.COQ_CONJ_LOOKUP.init();
     window.COQ_CONJ_PRACTICE.init();
-    initSubjonctifPasseLabels();
+
     initLookupStatus();
     initPracticeShortcut();
   }
