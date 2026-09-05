@@ -185,12 +185,120 @@
 
       }
 
-      const generatedTimes=timesToShow
-        .map(([t,rows])=>[
-          t,
-          rowsForTense(verb,t)
-        ])
-        .filter(([,rows])=>rows&&rows.length);
+function lookupSubjectLabel(label){
+  return String(label||'')
+    .replace(/\s*\([^)]*\)/g,'')
+    .trim();
+}
+
+function commonPrefix(values){
+  if(!values.length)return '';
+
+  let prefix=String(values[0]||'');
+
+  for(let i=1;i<values.length;i++){
+    const value=String(values[i]||'');
+    let j=0;
+
+    while(
+      j<prefix.length &&
+      j<value.length &&
+      prefix[j]===value[j]
+    ){
+      j++;
+    }
+
+    prefix=prefix.slice(0,j);
+
+    if(!prefix)break;
+  }
+
+  return prefix;
+}
+
+function mergeAgreementForms(rows,tense){
+  const isCompound=!!(
+    window.COQ_CONJ_COMPOUND &&
+    window.COQ_CONJ_COMPOUND.isCompound(tense)
+  );
+
+  if(!isCompound)return rows;
+
+  const groups=new Map();
+
+  rows.forEach(row=>{
+    const subject=lookupSubjectLabel(row[0]);
+
+    if(!groups.has(subject)){
+      groups.set(subject,[]);
+    }
+
+    groups.get(subject).push(row);
+  });
+
+  const result=[];
+
+  groups.forEach(group=>{
+    const subject=lookupSubjectLabel(group[0][0]);
+    const answers=group.map(
+      row=>String(row[1]||'')
+    );
+
+    /*
+     * Si todas las formas son idénticas,
+     * no hay que mostrar ninguna marca de acuerdo.
+     *
+     * Ejemplo con AVOIR:
+     * je masculin singulier → ai promené
+     * je féminin singulier → ai promené
+     *
+     * Resultado:
+     * je → ai promené
+     */
+    const allSame=answers.every(
+      answer=>answer===answers[0]
+    );
+
+    if(allSame){
+      result.push([
+        subject,
+        answers[0]
+      ]);
+
+      return;
+    }
+
+    /*
+     * Si las formas cambian según género/número,
+     * mostramos una forma compacta.
+     */
+    const stem=commonPrefix(answers);
+
+    let marker='';
+
+    if(subject==='je' || subject==='tu'){
+      marker='(e)';
+    }else if(subject==='nous'){
+      marker='(e)s';
+    }else if(subject==='on' || subject==='vous'){
+      marker='(e)(s)';
+    }
+
+    result.push([
+      subject,
+      stem+marker
+    ]);
+  });
+
+  return result;
+}
+
+const generatedTimes=timesToShow
+  .map(([t,rows])=>[
+    t,
+    mergeAgreementForms(rowsForTense(verb,t),t)
+  ])
+  .filter(([,rows])=>rows&&rows.length);
 
       html+=`
         <div class="conj-toolbar">
