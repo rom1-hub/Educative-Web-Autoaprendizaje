@@ -61,12 +61,16 @@
   }
 
   function rowsForTense(verb,tense){
-    if(engine&&typeof engine.rowsFor==='function'){
-      return engine.rowsFor(verb,tense)||[];
-    }
-
-    return (conjugations[verb]||{})[tense]||[];
+  if(engine&&typeof engine.rowsForLookup==='function'){
+    return engine.rowsForLookup(verb,tense)||[];
   }
+
+  if(engine&&typeof engine.rowsFor==='function'){
+    return engine.rowsFor(verb,tense)||[];
+  }
+
+  return (conjugations[verb]||{})[tense]||[];
+}
 
   function renderConjugation(verb){
     const result=document.querySelector('#conjResult');
@@ -227,72 +231,97 @@ function mergeAgreementForms(rows,tense){
   const groups=new Map();
 
   rows.forEach(row=>{
-    const subject=lookupSubjectLabel(row[0]);
+    const rawSubject=String(row[0]||'').trim();
 
-    if(!groups.has(subject)){
-      groups.set(subject,[]);
-    }
+    // Para la visualización eliminamos únicamente
+    // las indicaciones pedagógicas de género/número.
+    const subject=rawSubject
+      .replace(/\s*\([^)]*\)/g,'')
+      .trim();
 
+    if(!groups.has(subject))groups.set(subject,[]);
     groups.get(subject).push(row);
   });
 
   const result=[];
 
   groups.forEach(group=>{
-    const subject=lookupSubjectLabel(group[0][0]);
-    const answers=group.map(
-      row=>String(row[1]||'')
-    );
+    const subject=String(group[0][0]||'')
+      .replace(/\s*\([^)]*\)/g,'')
+      .trim();
 
-    /*
-     * Si todas las formas son idénticas,
-     * no hay que mostrar ninguna marca de acuerdo.
-     *
-     * Ejemplo con AVOIR:
-     * je masculin singulier → ai promené
-     * je féminin singulier → ai promené
-     *
-     * Resultado:
-     * je → ai promené
-     */
-    const allSame=answers.every(
-      answer=>answer===answers[0]
-    );
+    const answers=group.map(row=>String(row[1]||''));
+
+    // Si todas las formas son iguales, no necesitamos marcador.
+    const allSame=answers.every(answer=>answer===answers[0]);
 
     if(allSame){
-      result.push([
-        subject,
-        answers[0]
-      ]);
-
+      result.push([subject,answers[0]]);
       return;
     }
 
     /*
-     * Si las formas cambian según género/número,
-     * mostramos una forma compacta.
+     * Las variantes ya vienen correctamente generadas
+     * por el motor:
+     *
+     * masculin singulier
+     * féminin singulier
+     * masculin pluriel
+     * féminin pluriel
+     *
+     * Aquí solamente las convertimos en la notación
+     * compacta utilizada en "Ver un verbo".
      */
-    const stem=commonPrefix(answers);
 
-    let marker='';
+    const unique=[...new Set(answers)];
 
     if(subject==='je' || subject==='tu'){
-      marker='(e)';
-    }else if(subject==='nous'){
-      marker='(e)s';
-    }else if(subject==='on' || subject==='vous'){
-      marker='(e)(s)';
+      if(unique.length>1){
+        const base=unique[0].replace(/e$/,'');
+        result.push([subject,base+'(e)']);
+      }else{
+        result.push([subject,unique[0]]);
+      }
+      return;
     }
 
-    result.push([
-      subject,
-      stem+marker
-    ]);
+    if(subject==='on'){
+      if(unique.length>1){
+        const base=unique[0].replace(/e?s$/,'');
+        result.push([subject,base+'(e)(s)']);
+      }else{
+        result.push([subject,unique[0]]);
+      }
+      return;
+    }
+
+    if(subject==='nous'){
+      if(unique.length>1){
+        const base=unique[0].replace(/es$/,'').replace(/s$/,'');
+        result.push([subject,base+'(e)s']);
+      }else{
+        result.push([subject,unique[0]]);
+      }
+      return;
+    }
+
+    if(subject==='vous'){
+      if(unique.length>1){
+        const base=unique[0].replace(/e?s$/,'');
+        result.push([subject,base+'(e)(s)']);
+      }else{
+        result.push([subject,unique[0]]);
+      }
+      return;
+    }
+
+    // il / elle / ils / elles permanecen separados
+    // y muestran su forma gramatical real.
+    result.push([subject,answers[0]]);
   });
 
   return result;
 }
-
 const generatedTimes=timesToShow
   .map(([t,rows])=>[
     t,
