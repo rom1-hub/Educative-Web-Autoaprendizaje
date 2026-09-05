@@ -25,7 +25,7 @@
         }
         U.expandPracticeRows(rows).forEach(r=>{
           const isCompound=compoundTenses.includes(t);
-          const baseSubject=String(r.subject||'').split(' (')[0].trim();
+          const baseSubject=PSubject(String(r.subject||'').split(' (')[0].trim());
           const variants={
             je:['je (féminin singulier)','je (masculin singulier)'],
             tu:['tu (féminin singulier)','tu (masculin singulier)'],
