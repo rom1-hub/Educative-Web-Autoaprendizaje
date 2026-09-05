@@ -318,7 +318,7 @@ if(baseSubject==='vous'){
   }
   return;
 }
-    }
+    
 
     // il / elle / ils / elles permanecen separados
     // y muestran su forma gramatical real.
