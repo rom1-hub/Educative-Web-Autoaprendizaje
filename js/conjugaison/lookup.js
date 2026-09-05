@@ -275,44 +275,49 @@ function mergeAgreementForms(rows,tense){
 
     const unique=[...new Set(answers)];
 
-    if(subject==='je' || subject==='tu'){
-      if(unique.length>1){
-        const base=unique[0].replace(/e$/,'');
-        result.push([subject,base+'(e)']);
-      }else{
-        result.push([subject,unique[0]]);
-      }
-      return;
-    }
+   const baseSubject=subject
+  .replace(/^que\s+/,'')
+  .replace(/^qu['’]/,'');
 
-    if(subject==='on'){
-      if(unique.length>1){
-        const base=unique[0].replace(/e?s$/,'');
-        result.push([subject,base+'(e)(s)']);
-      }else{
-        result.push([subject,unique[0]]);
-      }
-      return;
-    }
+if(baseSubject==='je' || baseSubject==='tu'){
+  if(unique.length>1){
+    const base=unique[0].replace(/e$/,'');
+    result.push([subject,base+'(e)']);
+  }else{
+    result.push([subject,unique[0]]);
+  }
+  return;
+}
 
-    if(subject==='nous'){
-      if(unique.length>1){
-        const base=unique[0].replace(/es$/,'').replace(/s$/,'');
-        result.push([subject,base+'(e)s']);
-      }else{
-        result.push([subject,unique[0]]);
-      }
-      return;
-    }
+if(baseSubject==='on'){
+  if(unique.length>1){
+    const base=unique[0].replace(/e?s$/,'');
+    result.push([subject,base+'(e)(s)']);
+  }else{
+    result.push([subject,unique[0]]);
+  }
+  return;
+}
 
-    if(subject==='vous'){
-      if(unique.length>1){
-        const base=unique[0].replace(/e?s$/,'');
-        result.push([subject,base+'(e)(s)']);
-      }else{
-        result.push([subject,unique[0]]);
-      }
-      return;
+if(baseSubject==='nous'){
+  if(unique.length>1){
+    const base=unique[0].replace(/es$/,'').replace(/s$/,'');
+    result.push([subject,base+'(e)s']);
+  }else{
+    result.push([subject,unique[0]]);
+  }
+  return;
+}
+
+if(baseSubject==='vous'){
+  if(unique.length>1){
+    const base=unique[0].replace(/e?s$/,'');
+    result.push([subject,base+'(e)(s)']);
+  }else{
+    result.push([subject,unique[0]]);
+  }
+  return;
+}
     }
 
     // il / elle / ils / elles permanecen separados
