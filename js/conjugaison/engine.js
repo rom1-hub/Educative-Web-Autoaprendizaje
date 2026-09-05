@@ -44,6 +44,88 @@
     if(['je','tu','il','elle','on','ils','elles'].includes(s)) return accented+({je:'e',tu:'es',il:'e',elle:'e',on:'e',ils:'ent',elles:'ent'}[s]);
     return stem+({nous:'ons',vous:'ez'}[s]);
   }
+
+  function presentEAccent(inf,s){
+  const stem=stemEr(inf);
+  const accented=stem.replace(/e([^e]*)$/,'è$1');
+
+  if(['je','tu','il','elle','on','ils','elles'].includes(s)){
+    const end={
+      je:'e',
+      tu:'es',
+      il:'e',
+      elle:'e',
+      on:'e',
+      ils:'ent',
+      elles:'ent'
+    }[s];
+    return accented+end;
+  }
+
+  return stem+({nous:'ons',vous:'ez'}[s]);
+}
+
+function futureEAccent(inf,s){
+  const base=inf.replace(/er$/,'');
+  const stem=base.replace(/e([^e]*)$/,'è$1');
+
+  const end={
+    je:'ai',
+    tu:'as',
+    il:'a',
+    elle:'a',
+    on:'a',
+    nous:'ons',
+    vous:'ez',
+    ils:'ont',
+    elles:'ont'
+  }[s];
+
+  return stem+'er'+end;
+}
+
+function conditionalEAccent(inf,s){
+  const base=inf.replace(/er$/,'');
+  const stem=base.replace(/e([^e]*)$/,'è$1');
+
+  const end={
+    je:'ais',
+    tu:'ais',
+    il:'ait',
+    elle:'ait',
+    on:'ait',
+    nous:'ions',
+    vous:'iez',
+    ils:'aient',
+    elles:'aient'
+  }[s];
+
+  return stem+'er'+end;
+}
+
+function subjEAccent(inf,s){
+  const stem=stemEr(inf);
+  const accented=stem.replace(/e([^e]*)$/,'è$1');
+
+  if(['je','tu','il','elle','on'].includes(s)){
+    const end={
+      je:'e',
+      tu:'es',
+      il:'e',
+      elle:'e',
+      on:'e'
+    }[s];
+
+    return accented+end;
+  }
+
+  if(s==='nous') return stem+'ions';
+  if(s==='vous') return stem+'iez';
+
+  return accented+'ent';
+}
+
+
   function subjErEAccent(inf,s){
     const stem=stemEr(inf);
     const singular=stem.replace(/e([^e]*)$/,'è$1');
@@ -128,6 +210,19 @@
       if(tense==='subjonctif présent') return subjErEAccent(inf,s);
       if(tense==='impératif présent') return s==='tu'?presentErEAccent(inf,s).replace(/s$/,''):presentErEAccent(inf,s);
     }
+
+    if(pattern==='e-accent'){
+  if(tense==="présent de l'indicatif") return presentEAccent(inf,s);
+  if(tense==='imparfait') return imparfaitFromPresent(inf,s,pattern);
+  if(tense==='futur simple') return futureEAccent(inf,s);
+  if(tense==='conditionnel présent') return conditionalEAccent(inf,s);
+  if(tense==='subjonctif présent') return subjEAccent(inf,s);
+  if(tense==='impératif présent'){
+    return s==='tu'
+      ? presentEAccent(inf,s).replace(/s$/,'')
+      : presentEAccent(inf,s);
+  }
+}
     if(pattern==='regular-er'||pattern==='er-ger'||pattern==='er-cer'){
       if(tense==="présent de l'indicatif") return presentRegularEr(inf,s);
       if(tense==='imparfait') return imparfaitFromPresent(inf,s,pattern);
