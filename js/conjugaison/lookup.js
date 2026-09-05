@@ -42,7 +42,7 @@
       const generatedTimes=timesToShow.map(([t,rows])=>[t,(engine&&engine.rowsFor?engine.rowsFor(verb,t):rows)]).filter(([,rows])=>rows&&rows.length);
       html+=`<div class="conj-toolbar"><span class="muted">${selectedTense==='Todos los tiempos'?'Todos los tiempos':'Tiempo seleccionado'}</span></div>`;
       if(!timesToShow.length) html+=`<div class="callout">Todavía no hay una conjugación disponible para <strong>${U.escapeHtml(verb)}</strong> en el tiempo «${U.escapeHtml(selectedTense)}».</div>`;
-      else { html+=`<div class="conj-times" id="conjTimes">`; generatedTimes.forEach(([t,rows])=>{ html+=`<div class="tense-block"><div class="tense-head"><h3>${U.escapeHtml(t)}</h3><button class="btn tiny secondary" type="button" data-speak-tense="${U.escapeHtml(t)}">🔊</button></div><table class="tense-table"><tbody>`; rows.forEach(r=>html+=`<tr><td>${U.escapeHtml(r[0])}</td><td>${U.escapeHtml(r[1])}</td></tr>`); html+=`</tbody></table></div>`); }); html+=`</div>`; }
+      else { html+=`<div class="conj-times" id="conjTimes">`; generatedTimes.forEach(([t,rows])=>{ html+=`<div class="tense-block"><div class="tense-head"><h3>${U.escapeHtml(t)}</h3><button class="btn tiny secondary" type="button" data-speak-tense="${U.escapeHtml(t)}">🔊</button></div><table class="tense-table"><tbody>`; rows.forEach(r=>html+=`<tr><td>${U.escapeHtml(r[0])}</td><td>${U.escapeHtml(r[1])}</td></tr>`); html+=`</tbody></table></div>`; }); html+=`</div>`; }
     } else if(data && !selectedTense) html+=`<div class="callout">Selecciona un tiempo verbal para mostrar la conjugación.</div>`;
     else html+=`<div class="callout"><strong>Verbo introducido:</strong> ${U.escapeHtml(verb)}.</div>`;
     result.innerHTML=html;
