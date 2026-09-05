@@ -255,6 +255,7 @@
 
   if(out.length)return out;
 }
+    }
   function rowsForConstruction(verb,tense,construction){
     const r=record(verb); if(!r)return [];
     const source=(r.formes||{})[tense]||[];
