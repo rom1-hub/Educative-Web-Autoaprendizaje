@@ -27,8 +27,19 @@
     if(data && selectedTense){
       const orderIndex=t=>{const i=displayOrder.indexOf(t);return i===-1?displayOrder.length:i;};
       const sourceEntries=Object.entries(data);
-      const timesToShow=selectedTense==='Todos los tiempos' ? sourceEntries.sort((a,b)=>orderIndex(a[0])-orderIndex(b[0])) : sourceEntries.filter(([t])=>t===selectedTense);
-      const generatedTimes=timesToShow.map(([t,rows])=>[t,(engine&&engine.rowsFor?engine.rowsFor(verb,t):rows)]);
+      const isCompound=t=>!!(window.COQ_CONJ_COMPOUND&&window.COQ_CONJ_COMPOUND.isCompound(t));
+      let timesToShow;
+      if(selectedTense==='Todos los tiempos'){
+        const allTimes=Array.from(new Set([...Object.keys(data),...displayOrder]));
+        timesToShow=allTimes.sort((a,b)=>orderIndex(a)-orderIndex(b)).map(t=>[t,data[t]||[]]);
+      }else if(sourceEntries.some(([t])=>t===selectedTense)){
+        timesToShow=sourceEntries.filter(([t])=>t===selectedTense);
+      }else if(isCompound(selectedTense)){
+        timesToShow=[[selectedTense,[]]];
+      }else{
+        timesToShow=[];
+      }
+      const generatedTimes=timesToShow.map(([t,rows])=>[t,(engine&&engine.rowsFor?engine.rowsFor(verb,t):rows)]).filter(([,rows])=>rows&&rows.length);
       html+=`<div class="conj-toolbar"><span class="muted">${selectedTense==='Todos los tiempos'?'Todos los tiempos':'Tiempo seleccionado'}</span></div>`;
       if(!timesToShow.length) html+=`<div class="callout">Todavía no hay una conjugación disponible para <strong>${U.escapeHtml(verb)}</strong> en el tiempo «${U.escapeHtml(selectedTense)}».</div>`;
       else { html+=`<div class="conj-times" id="conjTimes">`; generatedTimes.forEach(([t,rows])=>{ html+=`<div class="tense-block"><div class="tense-head"><h3>${U.escapeHtml(t)}</h3><button class="btn tiny secondary" type="button" data-speak-tense="${U.escapeHtml(t)}">🔊</button></div><table class="tense-table"><tbody>`; rows.forEach(r=>html+=`<tr><td>${U.escapeHtml(r[0])}</td><td>${U.escapeHtml(r[1])}</td></tr>`); html+=`</tbody></table></div>`; }); html+=`</div>`; }

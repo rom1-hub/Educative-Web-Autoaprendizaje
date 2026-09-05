@@ -137,3 +137,23 @@ No se modifica la lógica de conjugación, datos, ejercicios, buscador, progreso
   - on (féminin pluriel)
 - Los casos complejos de COD y la elección contextual AVOIR/ÊTRE quedan fuera de `Conjugaison` y se reservarán para unidades pedagógicas independientes.
 - No se modificó la estética.
+
+
+## Fase 3F3 — disponibilidad de tiempos compuestos generables
+
+- Se corrigió la práctica para que los tiempos compuestos no dependan de que exista una fila explícita en `formes`.
+- `conditionnel passé`, `plus-que-parfait`, `futur antérieur` y `subjonctif passé` pueden generarse desde el motor cuando el verbo ya está registrado y dispone de auxiliar + participio.
+- `Todos los tiempos` incorpora también los tiempos compuestos generables, aunque todavía no tengan una entrada explícita en los datos.
+- La consulta de conjugación puede mostrar un tiempo compuesto generado aunque no exista todavía una fila almacenada para ese tiempo.
+- No se modifican las reglas pedagógicas de auxiliares: cada verbo mantiene un único auxiliar principal en esta sección.
+- No se implementan excepciones de auxiliar ni casos complejos de acuerdo pronominal; permanecen fuera de esta sección.
+
+## Fase 3F3b — Corrección de práctica y generación sin datos explícitos
+
+- Corregida la generación de `subjonctif passé` para las variantes de sujeto `je`, `tu`, `nous` y `vous`. La búsqueda del auxiliar reconoce correctamente las filas `que je`, `que tu`, etc.
+- La práctica ya no crea preguntas cuyo `answer` esté vacío cuando un tiempo todavía no está registrado y el motor tampoco puede generarlo.
+- `Todos los tiempos` considera tanto los tiempos registrados como los tiempos que el motor sabe generar mediante reglas.
+- Cuando un tiempo simple no está registrado pero su patrón permite generarlo, se crea automáticamente la conjugación y puede utilizarse en la práctica.
+- Cuando un tiempo todavía no está registrado y el motor no sabe generarlo (por ejemplo, una irregularidad aún no migrada), ese tiempo queda fuera de la sesión en lugar de generar una pregunta bloqueada.
+- Se añadió la formación correcta del imperativo pronominal básico (`lève-toi`, `levons-nous`, `levez-vous`) para evitar respuestas incorrectas al utilizar `Todos los tiempos`.
+

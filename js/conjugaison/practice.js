@@ -12,29 +12,46 @@
       if(!verb&&group&&group!=='Todos'&&verbGroups[v]!==group)return;
       if(!matchesConstruction(v,construction))return;
       if(!matchesAuxiliary(v,tense,auxiliary))return;
-      const ts=tense==='Todos los tiempos'?Object.keys(conjugations[v]):[tense];
+      const ts=tense==='Todos los tiempos'?Array.from(new Set([...Object.keys(conjugations[v]),...simpleTenses,...compoundTenses])):[tense];
       ts.forEach(t=>{
-        if(!conjugations[v][t])return;
+        const hasExplicit=!!conjugations[v][t];
+        const isSimple=simpleTenses.includes(t);
+        const isCompound=compoundTenses.includes(t);
+        if(!hasExplicit && !isSimple && !isCompound)return;
         let rows=(engine&&engine.rowsFor)?engine.rowsFor(v,t):conjugations[v][t];
-        if(engine&&engine.rowsForConstruction&&construction) rows=engine.rowsForConstruction(v,t,construction);
+        if(engine&&engine.rowsForConstruction&&construction){
+          const constructionRows=engine.rowsForConstruction(v,t,construction);
+          rows=constructionRows.length?constructionRows:rows;
+        }
         U.expandPracticeRows(rows).forEach(r=>{
           const isCompound=compoundTenses.includes(t);
           const baseSubject=String(r.subject||'').split(' (')[0].trim();
           const variants={
             je:['je (féminin singulier)','je (masculin singulier)'],
             tu:['tu (féminin singulier)','tu (masculin singulier)'],
-            on:['on (féminin pluriel)','on (masculin pluriel)','on (masculin singulier)'],
-            nous:['nous (féminin pluriel)','nous (masculin pluriel)'],
-            vous:['vous (féminin singulier)','vous (masculin singulier)','vous (féminin pluriel)','vous (masculin pluriel)']
+            il:['il'],
+            elle:['elle'],
+            on:['on (masculin singulier)','on (masculin pluriel)','on (féminin pluriel)'],
+            nous:['nous (masculin pluriel)','nous (féminin pluriel)'],
+            vous:['vous (masculin singulier)','vous (féminin singulier)','vous (masculin pluriel)','vous (féminin pluriel)'],
+            ils:['ils'],
+            elles:['elles']
           };
           if(isCompound && variants[baseSubject] && engine&&engine.conjugate){
             variants[baseSubject].forEach(subject=>{
               const answer=engine.conjugate(v,t,subject,construction||((verbMeta[v]||{}).pronominal?'pronominale':'non-pronominale'));
-              if(answer!=null) pool.push({verb:v,tense:t,subject,answer});
+              if(answer!=null){
+                const displaySubject=formatPracticeSubject(subject,t,isCompound);
+                pool.push({verb:v,tense:t,subject:displaySubject,answer});
+              }
             });
           }else{
             const answer=(engine&&engine.conjugate)?engine.conjugate(v,t,r.subject,construction||((verbMeta[v]||{}).pronominal?'pronominale':'non-pronominale')):r.answer;
-            pool.push({verb:v,tense:t,subject:r.subject,answer:answer==null?r.answer:answer});
+            const finalAnswer=answer==null?r.answer:answer;
+            if(finalAnswer!=null && String(finalAnswer).trim()!==''){
+              const displaySubject=formatPracticeSubject(r.subject,t,false);
+              pool.push({verb:v,tense:t,subject:displaySubject,answer:finalAnswer});
+            }
           }
         });
       });
@@ -60,6 +77,52 @@
   }
   const compoundTenses=['passé composé','plus-que-parfait','conditionnel passé','futur antérieur','subjonctif passé'];
   const simpleTenses=["présent de l'indicatif",'impératif présent','imparfait','futur simple','conditionnel présent','subjonctif présent'];
+
+  function formatPracticeSubject(subject,tense,isCompound){
+    const raw=String(subject||'').trim();
+    const base=PSubject(raw);
+    const compound=!!isCompound;
+    const isSubjonctif=tense==='subjonctif présent'||tense==='subjonctif passé';
+    let variants={};
+    if(compound){
+      variants={
+        je:['je (féminin singulier)','je (masculin singulier)'],
+        tu:['tu (féminin singulier)','tu (masculin singulier)'],
+        il:['il'], elle:['elle'],
+        on:['on (masculin singulier)','on (masculin pluriel)','on (féminin pluriel)'],
+        nous:['nous (masculin pluriel)','nous (féminin pluriel)'],
+        vous:['vous (masculin singulier)','vous (féminin singulier)','vous (masculin pluriel)','vous (féminin pluriel)'],
+        ils:['ils'], elles:['elles']
+      };
+    }
+    const cleanBase=base||raw;
+    const suffix=raw.match(/\s*(\([^)]*\))\s*$/)?.[1]||'';
+    if(isSubjonctif){
+      const prefix={je:'que je',tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"}[cleanBase];
+      return prefix?prefix+suffix:raw;
+    }
+    return variants[cleanBase]?.includes(raw)?raw:(variants[cleanBase]?.[0]&&compound?variants[cleanBase][0]:raw);
+  }
+
+  function PSubject(subject){
+    let raw=String(subject||'').trim().replace(/\s*\([^)]*\)\s*$/,'').trim().toLowerCase();
+    raw=raw.replace(/^qu['’]/,'').replace(/^que\s+/,'');
+    if(raw==="j'")return 'je';
+    return raw;
+  }
+
+  function formatSubjonctifSubject(subject){
+    const raw=String(subject||'').trim();
+    const match=raw.match(/^([^\s(]+)(.*)$/);
+    if(!match)return raw;
+    const base=match[1].toLowerCase();
+    const suffix=match[2]||'';
+    const prefix={
+      "j'":"que j'", je:'que je', tu:'que tu', il:"qu'il", elle:"qu'elle", on:"qu'on",
+      nous:'que nous', vous:'que vous', ils:"qu'ils", elles:"qu'elles"
+    }[base];
+    return prefix?prefix+suffix:raw;
+  }
 
   function matchesConstruction(v,construction){
     if(!construction)return true;

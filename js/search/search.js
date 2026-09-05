@@ -1,5 +1,6 @@
 /* Global search service */
 const input=document.querySelector("#searchInput"),results=document.querySelector("#searchResults");
+const pagePrefix=location.pathname.includes("/pages/")?"":"pages/";
 if(input){
  input.addEventListener("input",()=>{
   const t=input.value.trim().toLowerCase();
@@ -13,7 +14,7 @@ if(input){
   ];
   const hits=data.filter(x=>x[0].toLowerCase().includes(t));
   results.innerHTML=(hits.length?hits:[["Aún no hay resultados para esta búsqueda","Coq · búsqueda global",""]])
-   .map(x=>`<a class="result" href="${x[2]}">${x[0]}<small>${x[1]}</small></a>`).join("");
+   .map(x=>`<a class="result" href="${x[2]?pagePrefix+x[2]:""}">${x[0]}<small>${x[1]}</small></a>`).join("");
   results.classList.add("open");
  });
  document.addEventListener("click",e=>{if(!e.target.closest(".search-wrap"))results.classList.remove("open")});

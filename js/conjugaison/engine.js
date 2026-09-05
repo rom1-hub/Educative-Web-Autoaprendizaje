@@ -133,7 +133,7 @@
     const exact=rows.find(r=>r[0]===subject);
     if(exact) return exact[1];
     const base=P.baseSubject(subject);
-    const grouped=rows.find(r=>r[0].split('/').map(x=>x.trim()).includes(base));
+    const grouped=rows.find(r=>r[0].split('/').map(x=>x.trim()).some(label=>P.baseSubject(label)===base));
     return grouped?grouped[1]:null;
   }
   function simpleForm(verb,tense,subject){
@@ -191,7 +191,14 @@
     let form=simpleForm(target,tense,subject);
     if(form==null) form=explicitForm(verb,tense,subject);
     if(form==null) return null;
-    if(isPronominal) form=P.apply(subject,form);
+    if(isPronominal){
+      if(tense==='impératif présent'){
+        const imperativePronoun={tu:'toi',nous:'nous',vous:'vous'}[P.baseSubject(subject)];
+        if(!imperativePronoun) return form;
+        return form+'-'+imperativePronoun;
+      }
+      form=P.apply(subject,form);
+    }
     return form;
   }
   function rowsFor(verb,tense){
@@ -201,6 +208,11 @@
     if(!isSimple && !isCompound) return source.map(x=>[x[0],x[1]]);
     const construction=r.pronominal?'pronominale':(r.construction||'non-pronominale');
     const out=[];
+    if(isSimple && !source.length){
+      if(tense==='impératif présent') source=[['tu',''],['nous',''],['vous','']];
+      else if(tense==='subjonctif présent') source=[['que je',''],['que tu',''],["qu'il/elle/on",''],['que nous',''],['que vous',''],["qu'ils/elles",'']];
+      else source=[['je',''],['tu',''],['il/elle/on',''],['nous',''],['vous',''],['ils/elles','']];
+    }
     if(isCompound){
       const canonical=tense==='subjonctif passé' ? ['que je','que tu',"qu'il/elle/on",'que nous','que vous',"qu'ils/elles"] : ['je','tu','il/elle/on','nous','vous','ils/elles'];
       if(!source.length) source=canonical.map(s=>[s,'']);
@@ -216,7 +228,7 @@
       const subject=subjectsIn[0];
       const generated=conjugate(verb,tense,subject,construction);
       return [row[0],generated==null?row[1]:generated];
-    });
+    }).filter(row=>row[1]!=null && String(row[1]).trim()!=='');
   }
   function rowsForConstruction(verb,tense,construction){
     const r=record(verb); if(!r)return [];
@@ -230,7 +242,7 @@
         if(generated!=null) out.push([subject,generated]);
       });
     });
-    return out;
+    return out.filter(row=>row[1]!=null && String(row[1]).trim()!=='');
   }
   function canGenerate(verb,tense){
     return !!record(verb)&&simpleTenses.has(tense)&&(!!generateBaseSimple(baseKey(verb),tense,'je') || !!explicitForm(verb,tense,'je'));

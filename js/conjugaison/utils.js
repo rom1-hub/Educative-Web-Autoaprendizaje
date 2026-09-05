@@ -15,21 +15,45 @@
   api.answerVariants=function(q){
     const expected=api.normalizeAnswerText(q.answer);
     const variants=new Set([expected]);
-    const subject=(q.subject||'').split(' (')[0].trim();
-    if(!subject)return variants;
-    const isPronominalStart=/^(me |m\'|te |t\'|se |s\'|nous |vous )/.test(expected);
-    let withSubject='';
-    if(subject==='je'){
-      if(/^((me )|(m\'))/.test(expected)) withSubject='je '+expected;
-      else if(/^[aeiouyàâäéèêëîïôöùûüÿh]/i.test(expected)) withSubject="j'"+expected;
-      else withSubject='je '+expected;
-    }else if(subject==="j'"){
-      withSubject="j'"+expected;
-    }else{
-      withSubject=subject+' '+expected;
+    const rawSubject=String(q.subject||'').trim();
+    if(!rawSubject)return variants;
+
+    // El sujeto mostrado puede incluir "que" y/o una indicación de género/número.
+    // Para validar, trabajamos siempre con el sujeto gramatical de base.
+    const withoutGender=rawSubject.replace(/\s*\([^)]*\)\s*$/,'').trim();
+    const subject=(withoutGender.split(' ').pop()||withoutGender).trim();
+    const baseMap={
+      "j'":'je', je:'je', tu:'tu', il:'il', elle:'elle', on:'on',
+      nous:'nous', vous:'vous', ils:'ils', elles:'elles'
+    };
+    let base=withoutGender.toLowerCase();
+    if(/^qu['’]il$/.test(base))base='il';
+    else if(/^qu['’]elle$/.test(base))base='elle';
+    else if(/^qu['’]on$/.test(base))base='on';
+    else if(/^qu['’]ils$/.test(base))base='ils';
+    else if(/^qu['’]elles$/.test(base))base='elles';
+    else if(/^que\s+j['’]$/.test(base))base='je';
+    else if(/^que\s+je$/.test(base))base='je';
+    else if(/^que\s+tu$/.test(base))base='tu';
+    else if(/^que\s+nous$/.test(base))base='nous';
+    else if(/^que\s+vous$/.test(base))base='vous';
+    else base=baseMap[base]||base;
+    if(!baseMap[base])return variants;
+
+    // 1) verbo solamente (forma canónica).
+    // 2) sujeto + verbo.
+    if(base==='je')variants.add(api.normalizeAnswerText('je '+expected));
+    else variants.add(api.normalizeAnswerText(base+' '+expected));
+
+    // 3) En ambos subjuntivos, también aceptamos "que + sujeto + verbo".
+    const isSubjonctif=/^subjonctif\s+(présent|passé)$/i.test(String(q.tense||''));
+    if(isSubjonctif){
+      const queSubject={
+        je:"que je", tu:'que tu', il:"qu'il", elle:"qu'elle", on:"qu'on",
+        nous:'que nous', vous:'que vous', ils:"qu'ils", elles:"qu'elles"
+      }[base];
+      if(queSubject)variants.add(api.normalizeAnswerText(queSubject+' '+expected));
     }
-    variants.add(api.normalizeAnswerText(withSubject));
-    if(isPronominalStart) variants.add(api.normalizeAnswerText(subject+' '+expected));
     return variants;
   };
   api.sameAnswer=function(a,q){return api.answerVariants(q).has(api.normalizeAnswerText(a));};
