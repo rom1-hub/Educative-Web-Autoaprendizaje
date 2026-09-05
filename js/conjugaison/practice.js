@@ -99,7 +99,7 @@
     const suffix=raw.match(/\s*(\([^)]*\))\s*$/)?.[1]||'';
     if(isSubjonctif){
       const prefix={je:'que je',tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"}[cleanBase];
-      return prefix?prefix+suffix:raw;
+      return prefix ? prefix + (suffix ? ' ' + suffix : '') : raw;
     }
     return variants[cleanBase]?.includes(raw)?raw:(variants[cleanBase]?.[0]&&compound?variants[cleanBase][0]:raw);
   }
