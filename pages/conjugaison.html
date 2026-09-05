@@ -110,7 +110,21 @@
 <div class="exercise-config">
 <div><label for="practiceVerb">BUSCAR UN VERBO</label><div class="conj-search"><input id="practiceVerb" type="text" placeholder="Escribe un verbo concreto…"><button class="btn secondary" id="clearVerb" type="button">Borrar</button></div><div class="field-help">Campo libre: la base de datos definitiva podrá contener cientos o miles de verbos.</div></div>
 <div class="row">
-<div><label for="practiceTense">Tiempo verbal <span class="required">*</span></label><select id="practiceTense"><option value="" selected disabled>-seleccionar-</option><option>Todos los tiempos</option><option>Présent de l'indicatif</option><option>Impératif présent</option><option>Passé composé</option><option>Imparfait</option><option>Futur simple</option><option>Conditionnel présent</option><option>Plus-que-parfait</option><option>Conditionnel passé</option><option>Futur antérieur</option><option>Subjonctif présent</option><option>Subjonctif passé</option></select></div>
+<div><label for="practiceTense">Tiempo verbal <span class="required">*</span></label><select id="practiceTense">
+  <option value="" selected disabled>-seleccionar-</option>
+  <option value="Todos los tiempos">Todos los tiempos</option>
+  <option value="présent de l'indicatif">Présent de l'indicatif</option>
+  <option value="impératif présent">Impératif présent</option>
+  <option value="passé composé">Passé composé</option>
+  <option value="imparfait">Imparfait</option>
+  <option value="futur simple">Futur simple</option>
+  <option value="conditionnel présent">Conditionnel présent</option>
+  <option value="plus-que-parfait">Plus-que-parfait</option>
+  <option value="conditionnel passé">Conditionnel passé</option>
+  <option value="futur antérieur">Futur antérieur</option>
+  <option value="subjonctif présent">Subjonctif présent</option>
+  <option value="subjonctif passé">Subjonctif passé</option>
+</select></div>
 <div><label for="practiceGroup">Grupo verbal</label><select id="practiceGroup"><option value="" selected>-seleccionar-</option><option value="Todos">Todos</option><option>Premier groupe normal</option><option>Premier groupe verbes en -ELER</option><option>Premier groupe verbes en -ETER</option><option>Premier groupe verbes en -GER</option><option>Premier groupe verbe en -CER</option><option>Premier groupe verbes en -YER</option><option>Premier groupe verbe en -E (È) + consonne + ER</option><option>Deuxième groupe</option><option>Verbes du troisième groupe</option></select><div class="field-help" id="practiceGroupHelp"></div></div>
 <div><label for="practiceConstruction">Construction</label><select id="practiceConstruction"><option value="" selected>-seleccionar-</option><option value="non-pronominale">Verbes non pronominaux</option><option value="pronominale">Verbes pronominaux</option></select><div class="field-help" id="practiceConstructionHelp">Puedes elegir una construcción para afinar el ejercicio.</div></div>
 <div><label for="practiceAuxiliary">Verbe auxiliaire</label><select id="practiceAuxiliary" disabled><option value="" selected>Non disponible pour un temps simple</option></select><div class="field-help" id="practiceAuxiliaryHelp">Disponible uniquement avec un temps composé.</div></div>
