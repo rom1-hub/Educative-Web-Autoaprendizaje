@@ -320,6 +320,83 @@ function subjEAccent(inf,s){
     }
     return form;
   }
+
+function lookupCompoundSubjects(tense){
+  if(tense==='subjonctif passé'){
+    return [
+      'que je (masculin singulier)',
+      'que je (féminin singulier)',
+      'que tu (masculin singulier)',
+      'que tu (féminin singulier)',
+      "qu'il",
+      "qu'elle",
+      "qu'on (masculin singulier)",
+      "qu'on (masculin pluriel)",
+      "qu'on (féminin pluriel)",
+      'que nous (masculin pluriel)',
+      'que nous (féminin pluriel)',
+      'que vous (masculin singulier)',
+      'que vous (féminin singulier)',
+      'que vous (masculin pluriel)',
+      'que vous (féminin pluriel)',
+      "qu'ils",
+      "qu'elles"
+    ];
+  }
+
+  return [
+    'je (masculin singulier)',
+    'je (féminin singulier)',
+    'tu (masculin singulier)',
+    'tu (féminin singulier)',
+    'il',
+    'elle',
+    'on (masculin singulier)',
+    'on (masculin pluriel)',
+    'on (féminin pluriel)',
+    'nous (masculin pluriel)',
+    'nous (féminin pluriel)',
+    'vous (masculin singulier)',
+    'vous (féminin singulier)',
+    'vous (masculin pluriel)',
+    'vous (féminin pluriel)',
+    'ils',
+    'elles'
+  ];
+}
+
+function rowsForLookup(verb,tense){
+  const r=record(verb);
+  if(!r)return [];
+
+  const isCompound=C&&C.isCompound(tense);
+
+  if(!isCompound){
+    return rowsFor(verb,tense);
+  }
+
+  const construction=r.pronominal
+    ? 'pronominale'
+    : (r.construction||'non-pronominale');
+
+  const out=[];
+
+  lookupCompoundSubjects(tense).forEach(subject=>{
+    const generated=conjugate(
+      verb,
+      tense,
+      subject,
+      construction
+    );
+
+    if(generated!=null){
+      out.push([subject,generated]);
+    }
+  });
+
+  return out;
+}
+  
  function rowsFor(verb,tense){
   const r=record(verb);
   if(!r)return [];
@@ -451,5 +528,15 @@ function subjEAccent(inf,s){
   function canGenerate(verb,tense){
     return !!record(verb)&&simpleTenses.has(tense)&&(!!generateBaseSimple(baseKey(verb),tense,'je') || !!explicitForm(verb,tense,'je'));
   }
-  window.COQ_CONJ_ENGINE={conjugate,rowsFor,rowsForConstruction,canGenerate,baseKey,subjects,simpleTenses,compoundTenses:C?C.compoundTenses:[]};
+  window.COQ_CONJ_ENGINE={
+  conjugate,
+  rowsFor,
+  rowsForLookup,
+  rowsForConstruction,
+  canGenerate,
+  baseKey,
+  subjects,
+  simpleTenses,
+  compoundTenses:C?C.compoundTenses:[]
+};
 })();
