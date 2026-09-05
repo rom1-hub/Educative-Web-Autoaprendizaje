@@ -73,6 +73,9 @@
   if(pattern==='er-ger' && (s==='nous' || s==='vous')){
     stem=stem.replace(/e$/,'');
   }
+  if(pattern==='er-cer' && (s==='nous' || s==='vous')){
+  stem=stem.replace(/ç$/,'c');
+}
 
   const end={
     je:'ais',
