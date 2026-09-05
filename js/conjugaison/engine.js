@@ -361,7 +361,7 @@ function subjEAccent(inf,s){
 
     if(out.length)return out;
   }
-
+ }
   const canonical=['je','tu','il/elle/on','nous','vous','ils/elles'];
 
   if(!source.length) source=canonical.map(s=>[s,'']);
