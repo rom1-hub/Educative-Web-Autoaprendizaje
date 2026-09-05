@@ -124,13 +124,21 @@
     return prefix?prefix+suffix:raw;
   }
 
-  function matchesConstruction(v,construction){
-    if(!construction)return true;
-    const m=verbMeta[v]||{};
-    if(construction==='pronominale') return m.pronominal===true || !!m.formePronominale || !!(m.verbeBase&&m.verbeBase!==v);
-    if(construction==='non-pronominale') return !m.pronominal;
-    return true;
+ function matchesConstruction(v,construction){
+  if(!construction)return true;
+
+  const m=verbMeta[v]||{};
+
+  if(construction==='pronominale'){
+    return m.pronominal===true;
   }
+
+  if(construction==='non-pronominale'){
+    return m.pronominal!==true;
+  }
+
+  return true;
+}
   function matchesAuxiliary(v,tense,auxiliary){
     if(!auxiliary)return true;
     if(!compoundTenses.includes(tense))return true;
