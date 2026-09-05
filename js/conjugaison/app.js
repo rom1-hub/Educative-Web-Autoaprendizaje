@@ -52,7 +52,7 @@
     lookup.renderConjugation=function(verb){
       originalRender(verb);
       const selected=document.querySelector('#lookupTense')?.value||'';
-      if(selected!=='subjonctif passé'&&selected!=='Tous los tiempos')return;
+      if(selected!=='subjonctif passé'&&selected!=='Todos los tiempos')return;
       const blocks=[...document.querySelectorAll('#conjTimes .tense-block')];
       const block=blocks.find(b=>b.querySelector('.tense-head h3')?.textContent.trim()==='subjonctif passé');
       if(!block)return;
