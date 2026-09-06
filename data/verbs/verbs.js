@@ -12,8 +12,72 @@ window.COQ_VERBS = {"être":{"id":"être","infinitif":"être","infinitif_base":"
   participePasse: "promené",
   construction: "non-pronominale",
   verbeBase: "promener",
-  formePronominale: null
+ formePronominale: {
+  infinitif: "se promener",
+  statut: "disponible"
 }
+
+"se promener": {
+  id: "se-promener",
+  infinitif: "se promener",
+  infinitif_base: "promener",
+  groupe: 1,
+  pattern: "e-accent",
+  auxiliaire: "être",
+  pronominal: true,
+  participePasse: "promené",
+  formes: {
+    "présent de l'indicatif": [
+      ["je", "me promène"],
+      ["tu", "te promènes"],
+      ["il/elle/on", "se promène"],
+      ["nous", "nous promenons"],
+      ["vous", "vous promenez"],
+      ["ils/elles", "se promènent"]
+    ],
+    "impératif présent": [
+      ["tu", "promène-toi"],
+      ["nous", "promenons-nous"],
+      ["vous", "promenez-vous"]
+    ],
+    "imparfait": [
+      ["je", "me promenais"],
+      ["tu", "te promenais"],
+      ["il/elle/on", "se promenait"],
+      ["nous", "nous promenions"],
+      ["vous", "vous promeniez"],
+      ["ils/elles", "se promenaient"]
+    ],
+    "futur simple": [
+      ["je", "me promènerai"],
+      ["tu", "te promèneras"],
+      ["il/elle/on", "se promènera"],
+      ["nous", "nous promènerons"],
+      ["vous", "vous promènerez"],
+      ["ils/elles", "se promèneront"]
+    ],
+    "conditionnel présent": [
+      ["je", "me promènerais"],
+      ["tu", "te promènerais"],
+      ["il/elle/on", "se promènerait"],
+      ["nous", "nous promènerions"],
+      ["vous", "vous promèneriez"],
+      ["ils/elles", "se promèneraient"]
+    ],
+    "subjonctif présent": [
+      ["que je", "me promène"],
+      ["que tu", "te promènes"],
+      ["qu'il/elle/on", "se promène"],
+      ["que nous", "nous promenions"],
+      ["que vous", "vous promeniez"],
+      ["qu'ils/elles", "se promènent"]
+    ]
+  },
+  construction: "pronominale",
+  verbeBase: "promener",
+  formeNonPronominale: "promener"
+}
+  
 };
 
 // Compatibilidad// Compatibilidad temporal con la lógica existente de Conjugación.
