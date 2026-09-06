@@ -453,19 +453,37 @@ const generatedTimes=timesToShow
       });
 
     document
-      .querySelectorAll('[data-speak-tense]')
-      .forEach(button=>{
-        button.addEventListener('click',()=>{
-          const tense=button.dataset.speakTense;
-          const rows=rowsForTense(verb,tense);
+  .querySelectorAll('[data-speak-tense]')
+  .forEach(button=>{
+    button.addEventListener('click',()=>{
+      const tense=button.dataset.speakTense;
+      const rows=rowsForTense(verb,tense);
 
-          speak(
-            rows
-              .map(r=>(r[0]+' '+r[1]).trim())
-              .join('. ')
-          );
-        });
+      const speechRows=rows.map(r=>{
+        const subject=String(r[0]||'').trim();
+        const form=String(r[1]||'').trim();
+
+        // Impératif : ne pas prononcer le sujet
+        if(tense==='impératif présent'){
+          return form;
+        }
+
+        // Temps composés : ne pas prononcer les indications
+        // de genre et de nombre.
+        const cleanSubject=subject
+          .replace(/\s*\([^)]*\)\s*/g,'')
+          .trim();
+
+        return (cleanSubject+' '+form).trim();
       });
+
+      speak(
+        speechRows
+          .filter(Boolean)
+          .join('. ')
+      );
+    });
+  });
   }
 
   function setLookupMessage(message,kind){
