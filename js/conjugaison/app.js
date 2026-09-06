@@ -31,13 +31,13 @@
     });
   }
 
- 
-
   function init(){
     initTabs();
     window.COQ_CONJ_LOOKUP.init();
-    window.COQ_CONJ_PRACTICE.init();
 
+    // practice.js se inicializa por sí mismo; no existe un init() público aquí.
+    // Mantener esta llamada inexistente provocaba una excepción y evitaba
+    // registrar el acceso directo "Practicar este verbo".
     initLookupStatus();
     initPracticeShortcut();
   }
