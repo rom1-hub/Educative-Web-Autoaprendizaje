@@ -3,10 +3,16 @@
  */
 (function(){
   const data=window.COQ_VERB_DATA||{};
+  const catalog=window.COQ_VERBS||{};
+
+  // La fuente actual de la página es COQ_VERBS. Si existe un adaptador
+  // legacy (COQ_VERB_DATA), lo conservamos y añadimos el catálogo actual.
+  // Así los verbos registrados por patterns.js quedan disponibles para
+  // lookup/engine sin duplicar la base de datos.
   const api={
-    conjugations:data.conjugations||{},
+    conjugations:{...(data.conjugations||{}),...catalog},
     verbGroups:data.verbGroups||{},
-    verbMeta:data.verbMeta||{}
+    verbMeta:{...(data.verbMeta||{}),...catalog}
   };
 
   api.normalizeVerb=function(v){return String(v||'').trim().toLowerCase();};
