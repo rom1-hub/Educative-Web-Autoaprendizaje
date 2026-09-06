@@ -459,29 +459,72 @@ const generatedTimes=timesToShow
       const tense=button.dataset.speakTense;
       const rows=rowsForTense(verb,tense);
 
-      const speechRows=rows.map(r=>{
-        const subject=String(r[0]||'').trim();
-        const form=String(r[1]||'').trim();
+    const speechRows=[];
 
-        // Impératif : ne pas prononcer le sujet
-        if(tense==='impératif présent'){
-          return form;
-        }
+if(tense==='impératif présent'){
 
-        // Temps composés : ne pas prononcer les indications
-        // de genre et de nombre.
-        const cleanSubject=subject
-          .replace(/\s*\([^)]*\)\s*/g,'')
-          .trim();
+  // Impératif : ne pas prononcer le sujet.
+  rows.forEach(r=>{
+    const form=String(r[1]||'').trim();
 
-        return (cleanSubject+' '+form).trim();
-      });
+    if(form){
+      speechRows.push(form);
+    }
+  });
 
-      speak(
-        speechRows
-          .filter(Boolean)
-          .join('. ')
-      );
+}else{
+
+  const isCompound=!!(
+    window.COQ_CONJ_COMPOUND &&
+    window.COQ_CONJ_COMPOUND.isCompound(tense)
+  );
+
+  if(isCompound){
+
+    // Temps composés :
+    // on supprime les indications de genre/nombre
+    // et on ne prononce qu'une seule variante par sujet.
+    const seenSubjects=new Set();
+
+    rows.forEach(r=>{
+      const subject=String(r[0]||'')
+        .replace(/\s*\([^)]*\)\s*/g,'')
+        .trim();
+
+      const form=String(r[1]||'').trim();
+
+      if(!subject || !form)return;
+      if(seenSubjects.has(subject))return;
+
+      seenSubjects.add(subject);
+      speechRows.push((subject+' '+form).trim());
+    });
+
+  }else{
+
+    // Temps simples :
+    // on conserve toutes les formes normalement.
+    rows.forEach(r=>{
+      const subject=String(r[0]||'')
+        .replace(/\s*\([^)]*\)\s*/g,'')
+        .trim();
+
+      const form=String(r[1]||'').trim();
+
+      if(!subject || !form)return;
+
+      speechRows.push((subject+' '+form).trim());
+    });
+
+  }
+
+}
+
+speak(
+  speechRows
+    .filter(Boolean)
+    .join('. ')
+);
     });
   });
   }
