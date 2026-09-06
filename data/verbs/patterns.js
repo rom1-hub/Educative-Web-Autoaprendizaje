@@ -75,28 +75,6 @@ window.COQ_VERB_PATTERNS = {
     applyToDatabase
   };
 
-  // Verbos adicionales de regresión: no declaran pattern a propósito.
-  // El resolver debe clasificarlos automáticamente. Se mantienen como datos
-  // reales y mínimos para poder probar lookup y generación en la página.
-  const regressionVerbs = {
-    'changer': {id:'changer', infinitif:'changer', infinitif_base:'changer', groupe:1, auxiliaire:'avoir', pronominal:false, participePasse:'changé', construction:'non-pronominale', verbeBase:'changer'},
-    'voyager': {id:'voyager', infinitif:'voyager', infinitif_base:'voyager', groupe:1, auxiliaire:'avoir', pronominal:false, participePasse:'voyagé', construction:'non-pronominale', verbeBase:'voyager'},
-    'nager': {id:'nager', infinitif:'nager', infinitif_base:'nager', groupe:1, auxiliaire:'avoir', pronominal:false, participePasse:'nagé', construction:'non-pronominale', verbeBase:'nager'},
-    'partager': {id:'partager', infinitif:'partager', infinitif_base:'partager', groupe:1, auxiliaire:'avoir', pronominal:false, participePasse:'partagé', construction:'non-pronominale', verbeBase:'partager'},
-    'ranger': {id:'ranger', infinitif:'ranger', infinitif_base:'ranger', groupe:1, auxiliaire:'avoir', pronominal:false, participePasse:'rangé', construction:'non-pronominale', verbeBase:'ranger'},
-    'corriger': {id:'corriger', infinitif:'corriger', infinitif_base:'corriger', groupe:1, auxiliaire:'avoir', pronominal:false, participePasse:'corrigé', construction:'non-pronominale', verbeBase:'corriger'},
-    'placer': {id:'placer', infinitif:'placer', infinitif_base:'placer', groupe:1, auxiliaire:'avoir', pronominal:false, participePasse:'placé', construction:'non-pronominale', verbeBase:'placer'},
-    'annoncer': {id:'annoncer', infinitif:'annoncer', infinitif_base:'annoncer', groupe:1, auxiliaire:'avoir', pronominal:false, participePasse:'annoncé', construction:'non-pronominale', verbeBase:'annoncer'},
-    'avancer': {id:'avancer', infinitif:'avancer', infinitif_base:'avancer', groupe:1, auxiliaire:'avoir', pronominal:false, participePasse:'avancé', construction:'non-pronominale', verbeBase:'avancer'},
-    'prononcer': {id:'prononcer', infinitif:'prononcer', infinitif_base:'prononcer', groupe:1, auxiliaire:'avoir', pronominal:false, participePasse:'prononcé', construction:'non-pronominale', verbeBase:'prononcer'},
-    'remplacer': {id:'remplacer', infinitif:'remplacer', infinitif_base:'remplacer', groupe:1, auxiliaire:'avoir', pronominal:false, participePasse:'remplacé', construction:'non-pronominale', verbeBase:'remplacer'},
-    'lancer': {id:'lancer', infinitif:'lancer', infinitif_base:'lancer', groupe:1, auxiliaire:'avoir', pronominal:false, participePasse:'lancé', construction:'non-pronominale', verbeBase:'lancer'}
-  };
-
-  Object.keys(regressionVerbs).forEach(key=>{
-    if(!verbs[key]) verbs[key]=regressionVerbs[key];
-  });
-
   // Asigna automáticamente solo los patrones productivos ya validados.
   applyToDatabase();
 
@@ -122,4 +100,15 @@ window.COQ_VERB_PATTERNS = {
       ok: resolvePattern(verb) === cases[verb]
     }));
   };
+})();
+
+// Carga el CSS responsive específico de conjugación sin mezclar estilos
+// de interfaz con la lógica del motor de patrones.
+(function(){
+  if(document.querySelector('link[data-coq-conjugaison-mobile]')) return;
+  const link=document.createElement('link');
+  link.rel='stylesheet';
+  link.href='../css/conjugaison-mobile.css';
+  link.dataset.coqConjugaisonMobile='';
+  document.head.appendChild(link);
 })();
