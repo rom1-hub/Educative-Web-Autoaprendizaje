@@ -51,6 +51,7 @@ window.COQ_VERB_PATTERNS = {
 
     if(/ger$/.test(base)) return 'er-ger';
     if(/cer$/.test(base)) return 'er-cer';
+    if(/yer$/.test(base)) return 'yer';
     if(/er$/.test(base)) return 'regular-er';
 
     return null;
@@ -100,11 +101,13 @@ window.COQ_VERB_PATTERNS = {
   window.COQ_PATTERN_REGRESSION = {
     ger: ['manger','changer','voyager','nager','partager','ranger','corriger'],
     cer: ['commencer','placer','annoncer','avancer','prononcer','remplacer','lancer'],
+    yer: ['payer','nettoyer','essayer'],
     expected: {
       'manger':'er-ger','changer':'er-ger','voyager':'er-ger','nager':'er-ger',
       'partager':'er-ger','ranger':'er-ger','corriger':'er-ger',
       'commencer':'er-cer','placer':'er-cer','annoncer':'er-cer','avancer':'er-cer',
-      'prononcer':'er-cer','remplacer':'er-cer','lancer':'er-cer'
+      'prononcer':'er-cer','remplacer':'er-cer','lancer':'er-cer',
+      'payer':'yer','nettoyer':'yer','essayer':'yer'
     }
   };
 
