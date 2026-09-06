@@ -17,7 +17,7 @@ window.COQ_VERBS = {"être":{"id":"être","infinitif":"être","infinitif_base":"
   statut: "disponible"
 }
 
-"se promener": {
+,"se promener": {
   id: "se-promener",
   infinitif: "se promener",
   infinitif_base: "promener",
