@@ -5,11 +5,29 @@
   const engine=window.COQ_CONJ_ENGINE;
   let session={questions:[],index:0,correct:0,results:[],locked:false};
 
+  function matchesGroup(v,group){
+    if(!group || group==='Todos')return true;
+    const m=verbMeta[v]||{};
+    const pattern=m.pattern || (window.COQ_PATTERN_RESOLVER&&window.COQ_PATTERN_RESOLVER.resolvePattern?window.COQ_PATTERN_RESOLVER.resolvePattern(v):null);
+    const legacy=verbGroups[v];
+    if(group==='Premier groupe verbes en -GER' || group==='Premier groupe verbes en GER') return pattern==='er-ger';
+    if(group==='Premier groupe verbe en -CER' || group==='Premier groupe verbes en CER' || group==='Premier groupe verbe en CER') return pattern==='er-cer';
+    if(group==='Premier groupe verbes en -ELER') return pattern==='er-eler';
+    if(group==='Premier groupe verbes en -ETER') return pattern==='er-eter';
+    if(group==='Premier groupe verbes en -YER') return pattern==='yer';
+    if(group==='Premier groupe verbe en -E (È) + consonne + ER') return pattern==='er-e-accent';
+    if(group==='Premier groupe normal') return pattern==='regular-er';
+    if(group==='Deuxième groupe') return Number(m.groupe)===2 || legacy==='Deuxième groupe';
+    if(group==='Verbes du troisième groupe') return Number(m.groupe)===3 || legacy==='Verbes du troisième groupe';
+    return legacy===group || String(m.groupe)===String(group);
+  }
+
   function buildQuestions(verb,tense,group,construction,auxiliary){
     let pool=[];
     const add=v=>{
       if(!conjugations[v])return;
-      if(!verb&&group&&group!=='Todos'&&verbGroups[v]!==group)return;
+      if(!verb&&!matchesGroup(v,group))return;
+      if(matchesGroup(v,group)===false)return;
       if(!matchesConstruction(v,construction))return;
       if(!matchesAuxiliary(v,tense,auxiliary))return;
       const ts=tense==='Todos los tiempos'?Array.from(new Set([...Object.keys(conjugations[v]),...simpleTenses,...compoundTenses])):[tense];
@@ -117,26 +135,15 @@
     if(!match)return raw;
     const base=match[1].toLowerCase();
     const suffix=match[2]||'';
-    const prefix={
-      "j'":"que j'", je:'que je', tu:'que tu', il:"qu'il", elle:"qu'elle", on:"qu'on",
-      nous:'que nous', vous:'que vous', ils:"qu'ils", elles:"qu'elles"
-    }[base];
+    const prefix={"j'":"que j'",je:'que je',tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"}[base];
     return prefix?prefix+suffix:raw;
   }
 
  function matchesConstruction(v,construction){
   if(!construction)return true;
-
   const m=verbMeta[v]||{};
-
-  if(construction==='pronominale'){
-    return m.pronominal===true;
-  }
-
-  if(construction==='non-pronominale'){
-    return m.pronominal!==true;
-  }
-
+  if(construction==='pronominale')return m.pronominal===true;
+  if(construction==='non-pronominale')return m.pronominal!==true;
   return true;
 }
   function matchesAuxiliary(v,tense,auxiliary){
@@ -157,29 +164,16 @@
     const help=document.querySelector('#practiceAuxiliaryHelp');
     if(!aux)return;
     aux.innerHTML='';
-
     let disabledReason='';
-    if(verb){
-      disabledReason='Déterminé par le verbe sélectionné';
-    }else if(construction==='pronominale'){
-      disabledReason='Non disponible pour les verbes pronominaux';
-    }else if(!tense || !compoundTenses.includes(tense)){
-      disabledReason=tense==='Todos los tiempos'?'Disponible uniquement lorsqu’un temps composé est sélectionné.':'Non disponible pour un temps simple';
-    }
-
+    if(verb)disabledReason='Déterminé par le verbe sélectionné';
+    else if(construction==='pronominale')disabledReason='Non disponible pour les verbes pronominaux';
+    else if(!tense || !compoundTenses.includes(tense))disabledReason=tense==='Todos los tiempos'?'Disponible uniquement lorsqu’un temps composé est sélectionné.':'Non disponible pour un temps simple';
     if(disabledReason){
       aux.disabled=true;
-      const o=document.createElement('option');
-      o.value=''; o.selected=true; o.textContent=disabledReason;
-      aux.appendChild(o);
-      if(help){
-        if(verb) help.textContent='Le verbe sélectionné détermine déjà le verbe auxiliaire dans Conjugaison.';
-        else if(construction==='pronominale') help.textContent='La construction pronominale détermine l’auxiliaire dans Conjugaison.';
-        else help.textContent=tense==='Todos los tiempos'?'Disponible uniquement lorsqu’un temps composé est sélectionné.':'Disponible uniquement avec un temps composé.';
-      }
+      const o=document.createElement('option');o.value='';o.selected=true;o.textContent=disabledReason;aux.appendChild(o);
+      if(help){if(verb)help.textContent='Le verbe sélectionné détermine déjà le verbe auxiliaire dans Conjugaison.';else if(construction==='pronominale')help.textContent='La construction pronominale détermine l’auxiliaire dans Conjugaison.';else help.textContent=tense==='Todos los tiempos'?'Disponible uniquement lorsqu’un temps composé est sélectionné.':'Disponible uniquement avec un temps composé.';}
       return;
     }
-
     aux.disabled=false;
     [['','- sélectionner -'],['avec-avoir','Avec auxiliaire AVOIR'],['avec-etre','Avec auxiliaire ÊTRE'],['avec-avoir-et-etre','Avec auxiliaire AVOIR et ÊTRE']].forEach(([value,label])=>{const o=document.createElement('option');o.value=value;o.textContent=label;aux.appendChild(o);});
     if(help)help.textContent='Este filtro se aplica a todos los tiempos compuestos.';
@@ -190,7 +184,6 @@
     const help=document.querySelector('#practiceConstructionHelp');
     const verb=U.normalizeVerb(document.querySelector('#practiceVerb')?.value);
     if(!construction)return;
-
     if(verb){
       const meta=verbMeta[verb]||{};
       const isPronominal=meta.pronominal===true || meta.construction==='pronominale' || /^se\s/.test(verb);
@@ -199,7 +192,6 @@
       if(help)help.textContent='Déterminée par le verbe sélectionné.';
       return;
     }
-
     construction.disabled=false;
     construction.innerHTML='<option value="" selected>-seleccionar-</option><option value="non-pronominale">Verbes non pronominaux</option><option value="pronominale">Verbes pronominaux</option>';
     if(help)help.textContent='Puedes elegir una construcción para afinar el ejercicio.';
@@ -208,7 +200,7 @@
   function updatePracticeGroupState(){
     const verb=U.normalizeVerb(document.querySelector('#practiceVerb')?.value),group=document.querySelector('#practiceGroup'),help=document.querySelector('#practiceGroupHelp');if(!group)return;
     if(verb){group.disabled=true;group.innerHTML='<option value="" selected>No necesario: verbo concreto</option>';if(help)help.textContent='';}
-    else{group.disabled=false;group.innerHTML='<option value="" selected>-seleccionar-</option><option value="Todos">Todos</option><option>Premier groupe normal</option><option>Premier groupe verbes en -ELER</option><option>Premier groupe verbes en -ETER</option><option>Premier groupe verbes en -GER</option><option>Premier groupe verbe en -CER</option><option>Premier groupe verbes en -YER</option><option>Premier groupe verbe en -E (È) + consonne + ER</option><option>Deuxième groupe</option><option>Verbes du troisième groupe</option>';if(help)help.textContent='';}
+    else{group.disabled=false;group.innerHTML='<option value="" selected>-seleccionar-</option><option value="Todos">Todos</option><option>Premier groupe normal</option><option>Premier groupe verbes en GER</option><option>Premier groupe verbes en CER</option><option>Premier groupe verbes en -ELER</option><option>Premier groupe verbes en -ETER</option><option>Premier groupe verbes en -YER</option><option>Premier groupe verbe en -E (È) + consonne + ER</option><option>Deuxième groupe</option><option>Verbes du troisième groupe</option>';if(help)help.textContent='';}
   }
   function startSession(){
     const verb=U.normalizeVerb(document.querySelector('#practiceVerb')?.value),tense=document.querySelector('#practiceTense')?.value,group=document.querySelector('#practiceGroup')?.value,construction=document.querySelector('#practiceConstruction')?.value,auxiliary=document.querySelector('#practiceAuxiliary')?.value,msg=document.querySelector('#practiceMessage');if(!msg)return;
@@ -224,26 +216,20 @@
   function validateAnswer(){
     if(session.locked)return;const q=session.questions[session.index],input=document.querySelector('#answerInput'),value=input.value.trim();if(!value)return;q.attempts++;
     if(U.sameAnswer(value,q)){input.className='success';session.correct++;let outcome;if(q.attempts===1)outcome='correct-first';else if(q.attempts===2)outcome='correct-after-first-error';else outcome='correct-after-help';session.results.push({question:q,finalAnswer:value,outcome});session.locked=true;const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box ok';fb.textContent='✓ Correcto. Pasamos a la siguiente pregunta.';document.querySelector('#practiceProgressBar').style.width=`${((session.index+1)/20)*100}%`;setTimeout(()=>{session.index++;session.index>=20?finishSession():showQuestion()},650);
-    }else if(q.attempts===1){q.firstError=value;input.className='error-first';const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box warn';fb.textContent='⚠ Cuidado, hay una falta. Corrige tu respuesta y vuelve a validar.';}
-    else{q.secondError=value;input.className='error-help';const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box help';fb.innerHTML=`Te ayudamos: es <span class="help-answer">${U.escapeHtml(q.answer)}</span>. Escríbela en la barra de respuesta y valida para continuar.`;}
+    }else if(q.attempts===1){q.firstError=value;input.className='error-first';const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box warn';fb.textContent='Réponse incorrecte. Essaie encore.';
+    }else{q.secondError=value;input.className='error-second';const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box error';fb.innerHTML='Réponse incorrecte.<br><strong>Réponse correcte : '+U.escapeHtml(q.answer)+'</strong>';session.results.push({question:q,finalAnswer:value,outcome:'incorrect-twice'});session.locked=true;const next=document.querySelector('#nextQuestion');if(next)next.classList.remove('hidden');}
   }
+  function nextQuestion(){document.querySelector('#nextQuestion')?.classList.add('hidden');session.index++;session.index>=20?finishSession():showQuestion();}
   function finishSession(){
-    document.querySelector('#practiceProgressBar').style.width='100%';document.querySelector('#practiceProgressText').textContent='Session terminée · 20 / 20';const firstCorrect=session.results.filter(r=>r.outcome==='correct-first').length;const withErrors=session.results.filter(r=>r.outcome!=='correct-first').length;const score=session.results.reduce((sum,r)=>sum+(r.outcome==='correct-first'?1:r.outcome==='correct-after-first-error'?.5:0),0);document.querySelector('#finalCorrect').textContent=firstCorrect;document.querySelector('#finalWrong').textContent=withErrors;document.querySelector('#finalScore').textContent=score.toFixed(1).replace('.0','')+' / 20';const tbody=document.querySelector('#resultRows');tbody.innerHTML='';session.results.forEach((r,i)=>{const q=r.question;let user='',outcome='';if(r.outcome==='correct-after-first-error'){user=`<span class="error-first-cell">${U.escapeHtml(q.firstError)}</span><div class="attempt-detail">→ corregida: <span class="correct-cell">${U.escapeHtml(r.finalAnswer)}</span></div>`;outcome=`<span class="error-first-cell">↺ Primer error · corregida sola</span>`;}else if(r.outcome==='correct-after-help'){user=`<span class="error-first-cell">${U.escapeHtml(q.firstError)}</span><div class="attempt-detail">→ 2.º intento: <span class="error-help-cell">${U.escapeHtml(q.secondError)}</span></div><div class="attempt-detail">→ con ayuda: <span class="correct-cell">${U.escapeHtml(r.finalAnswer)}</span></div>`;outcome=`<span class="error-help-cell">✗ Ayuda necesaria</span>`;}else user=`<span class="correct-cell">${U.escapeHtml(r.finalAnswer)}</span>`;const tr=document.createElement('tr');tr.innerHTML=`<td data-label="#">${i+1}</td><td data-label="Verbe">${U.escapeHtml(q.verb)}</td><td data-label="Sujet">${U.escapeHtml(q.subject)}</td><td data-label="Temps">${U.escapeHtml(q.tense)}</td><td data-label="Ta réponse">${user}</td><td data-label="Réponse correcte" class="correct-answer">${U.escapeHtml(q.answer)}</td><td data-label="Résultat">${outcome}</td>`;tbody.appendChild(tr);});const modal=document.querySelector('#resultModal');modal.classList.add('open');modal.setAttribute('aria-hidden','false');
+    const score=session.results.reduce((sum,r)=>sum+(r.outcome==='correct-first'?1:r.outcome==='correct-after-first-error'?0.5:0),0);const total=session.results.length||20;const correct=session.results.filter(r=>r.outcome!=='incorrect-twice').length;const errors=total-correct;const note=score.toFixed(1).replace('.0','');document.querySelector('#practiceScore').textContent=`${note}/20`;document.querySelector('#practiceSummary').classList.remove('hidden');document.querySelector('#practiceSummaryText').textContent=`${correct} correct, ${errors} errors, ${note} note(s).`;const tbody=document.querySelector('#practiceResultsBody');if(tbody){tbody.innerHTML='';session.results.forEach((r,i)=>{const tr=document.createElement('tr');const outcome=r.outcome==='correct-first'?'Correct':r.outcome==='correct-after-first-error'?'Correct après erreur':'Erreur après 2 essais';tr.innerHTML=`<td>${i+1}</td><td>${U.escapeHtml(r.question.verb)}</td><td>${U.escapeHtml(r.question.tense)}</td><td>${U.escapeHtml(r.question.subject)}</td><td>${U.escapeHtml(r.question.answer)}</td><td>${outcome}</td>`;tbody.appendChild(tr);});}
   }
-  function resetPractice(){const verbInput=document.querySelector('#practiceVerb');if(!verbInput)return;verbInput.value='';document.querySelector('#practiceTense').value='';document.querySelector('#practiceConstruction').value='';updatePracticeGroupState();updatePracticeAuxiliaryOptions();updatePracticeConstructionOptions();const msg=document.querySelector('#practiceMessage');msg.className='form-message';msg.textContent='';verbInput.focus();}
-  function init(){
-    updatePracticeGroupState();
-    updatePracticeAuxiliaryOptions();
-    updatePracticeConstructionOptions();
-    document.querySelector('#practiceTense')?.addEventListener('change',()=>{updatePracticeAuxiliaryOptions();const m=document.querySelector('#practiceMessage');m.className='form-message';m.textContent='';});
-    document.querySelector('#practiceVerb')?.addEventListener('input',()=>{updatePracticeGroupState();updatePracticeConstructionOptions();updatePracticeAuxiliaryOptions();const m=document.querySelector('#practiceMessage');m.className='form-message';m.textContent='';});
-    document.querySelector('#practiceConstruction')?.addEventListener('change',()=>{updatePracticeAuxiliaryOptions();const m=document.querySelector('#practiceMessage');m.className='form-message';m.textContent='';});
-    document.querySelector('#practiceAuxiliary')?.addEventListener('change',()=>{const m=document.querySelector('#practiceMessage');m.className='form-message';m.textContent='';});
-    document.querySelector('#validateAnswer')?.addEventListener('click',validateAnswer);
-    document.querySelector('#answerInput')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();validateAnswer();}});
-    document.querySelector('#reviewDone')?.addEventListener('click',()=>{document.querySelector('#resultModal').classList.remove('open');document.querySelector('#resultModal').setAttribute('aria-hidden','true');document.querySelector('#practiceSession').classList.add('hidden');document.querySelector('#practiceVerb').focus();});
-    document.querySelector('#startPractice')?.addEventListener('click',startSession);
-    document.querySelector('#clearVerb')?.addEventListener('click',resetPractice);
+  function bind(){
+    document.querySelector('#startPractice')?.addEventListener('click',startSession);document.querySelector('#validateAnswer')?.addEventListener('click',validateAnswer);document.querySelector('#nextQuestion')?.addEventListener('click',nextQuestion);document.querySelector('#answerInput')?.addEventListener('keydown',e=>{if(e.key==='Enter')validateAnswer();});
+    document.querySelector('#practiceVerb')?.addEventListener('input',()=>{updatePracticeGroupState();updatePracticeConstructionOptions();updatePracticeAuxiliaryOptions();});
+    document.querySelector('#practiceTense')?.addEventListener('change',updatePracticeAuxiliaryOptions);
+    document.querySelector('#practiceConstruction')?.addEventListener('change',updatePracticeAuxiliaryOptions);
+    updatePracticeGroupState();updatePracticeConstructionOptions();updatePracticeAuxiliaryOptions();
   }
-  window.COQ_CONJ_PRACTICE={init,updatePracticeGroupState,updatePracticeAuxiliaryOptions,updatePracticeConstructionOptions,startSession};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
+  window.COQ_CONJ_PRACTICE={buildQuestions,updatePracticeGroupState};
 })();
