@@ -9,6 +9,7 @@ window.COQ_CONSTRUCTIONS = {
 // Les cas complexes (COD antérieur/postérieur, etc.) seront traités dans une leçon dédiée.
 window.COQ_PRONOMINAL_RULES = {
   'lever': { fonctionDeSe: 'COD', accord: 'sujet' },
+  'promener': { fonctionDeSe: 'COD', accord: 'sujet' },
   'parler': { fonctionDeSe: 'COI', accord: 'aucun' }
 };
 
