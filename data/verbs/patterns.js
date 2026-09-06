@@ -45,13 +45,10 @@ window.COQ_VERB_PATTERNS = {
     const base = baseVerb(key);
     const record = verbs[key] || verbs[base];
 
-    // La BD peut forzar explícitamente un patrón para una excepción léxica.
     if(record && record.pattern && patterns[record.pattern]){
       return record.pattern;
     }
 
-    // Solo detectamos automáticamente familias productivas que el motor
-    // ya sabe generar de forma transversal y que hemos validado.
     if(/ger$/.test(base)) return 'er-ger';
     if(/cer$/.test(base)) return 'er-cer';
     if(/er$/.test(base)) return 'regular-er';
@@ -75,11 +72,31 @@ window.COQ_VERB_PATTERNS = {
     applyToDatabase
   };
 
-  // Asigna automáticamente solo los patrones productivos ya validados.
   applyToDatabase();
 
-  // Batería de regresión mínima para comprobar que la prioridad específica
-  // funciona antes de ampliar la base de datos.
+  // Verbos de regresión: forman parte del catálogo mínimo usado para validar
+  // que las familias -GER y -CER siguen disponibles para búsqueda/conjugación.
+  // Se mantienen aquí temporalmente hasta incorporarlos al catálogo pedagógico.
+  const regressionVerbs = {
+    changer: { id:'changer', infinitif:'changer', infinitif_base:'changer', groupe:1, pattern:'er-ger', auxiliaire:'avoir', pronominal:false, participePasse:'changé', construction:'non-pronominale', verbeBase:'changer' },
+    voyager: { id:'voyager', infinitif:'voyager', infinitif_base:'voyager', groupe:1, pattern:'er-ger', auxiliaire:'avoir', pronominal:false, participePasse:'voyagé', construction:'non-pronominale', verbeBase:'voyager' },
+    nager: { id:'nager', infinitif:'nager', infinitif_base:'nager', groupe:1, pattern:'er-ger', auxiliaire:'avoir', pronominal:false, participePasse:'nagé', construction:'non-pronominale', verbeBase:'nager' },
+    partager: { id:'partager', infinitif:'partager', infinitif_base:'partager', groupe:1, pattern:'er-ger', auxiliaire:'avoir', pronominal:false, participePasse:'partagé', construction:'non-pronominale', verbeBase:'partager' },
+    ranger: { id:'ranger', infinitif:'ranger', infinitif_base:'ranger', groupe:1, pattern:'er-ger', auxiliaire:'avoir', pronominal:false, participePasse:'rangé', construction:'non-pronominale', verbeBase:'ranger' },
+    corriger: { id:'corriger', infinitif:'corriger', infinitif_base:'corriger', groupe:1, pattern:'er-ger', auxiliaire:'avoir', pronominal:false, participePasse:'corrigé', construction:'non-pronominale', verbeBase:'corriger' },
+    placer: { id:'placer', infinitif:'placer', infinitif_base:'placer', groupe:1, pattern:'er-cer', auxiliaire:'avoir', pronominal:false, participePasse:'placé', construction:'non-pronominale', verbeBase:'placer' },
+    annoncer: { id:'annoncer', infinitif:'annoncer', infinitif_base:'annoncer', groupe:1, pattern:'er-cer', auxiliaire:'avoir', pronominal:false, participePasse:'annoncé', construction:'non-pronominale', verbeBase:'annoncer' },
+    avancer: { id:'avancer', infinitif:'avancer', infinitif_base:'avancer', groupe:1, pattern:'er-cer', auxiliaire:'avoir', pronominal:false, participePasse:'avancé', construction:'non-pronominale', verbeBase:'avancer' },
+    prononcer: { id:'prononcer', infinitif:'prononcer', infinitif_base:'prononcer', groupe:1, pattern:'er-cer', auxiliaire:'avoir', pronominal:false, participePasse:'prononcé', construction:'non-pronominale', verbeBase:'prononcer' },
+    remplacer: { id:'remplacer', infinitif:'remplacer', infinitif_base:'remplacer', groupe:1, pattern:'er-cer', auxiliaire:'avoir', pronominal:false, participePasse:'remplacé', construction:'non-pronominale', verbeBase:'remplacer' },
+    lancer: { id:'lancer', infinitif:'lancer', infinitif_base:'lancer', groupe:1, pattern:'er-cer', auxiliaire:'avoir', pronominal:false, participePasse:'lancé', construction:'non-pronominale', verbeBase:'lancer' }
+  };
+
+  window.COQ_VERBS = window.COQ_VERBS || {};
+  Object.keys(regressionVerbs).forEach(key=>{
+    if(!window.COQ_VERBS[key]) window.COQ_VERBS[key] = regressionVerbs[key];
+  });
+
   window.COQ_PATTERN_REGRESSION = {
     ger: ['manger','changer','voyager','nager','partager','ranger','corriger'],
     cer: ['commencer','placer','annoncer','avancer','prononcer','remplacer','lancer'],
@@ -102,8 +119,6 @@ window.COQ_VERB_PATTERNS = {
   };
 })();
 
-// Carga el CSS responsive específico de conjugación sin mezclar estilos
-// de interfaz con la lógica del motor de patrones.
 (function(){
   if(document.querySelector('link[data-coq-conjugaison-mobile]')) return;
   const link=document.createElement('link');
