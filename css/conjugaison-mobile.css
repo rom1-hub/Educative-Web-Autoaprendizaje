@@ -1,0 +1,28 @@
+/* COQ — Ajuste responsive de las tablas de conjugación.
+ * Solo afecta a la vista "Ver una conjugación" en pantallas pequeñas.
+ */
+@media (max-width:700px){
+  .tense-table{
+    min-width:0;
+    width:100%;
+    table-layout:auto;
+  }
+
+  .tense-table td{
+    padding:8px 5px;
+    white-space:nowrap;
+  }
+
+  .tense-table td:first-child{
+    width:1%;
+    padding-right:10px;
+  }
+
+  .tense-table td:last-child{
+    width:auto;
+  }
+
+  .tense-block{
+    overflow-x:hidden;
+  }
+}
