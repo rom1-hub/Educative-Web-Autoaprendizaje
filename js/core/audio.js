@@ -18,6 +18,23 @@
       button.addEventListener("click",function(){speak(button.dataset.say);});
     });
   }
-  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",initAudio);
-  else initAudio();
+  function fixConjugaisonResponsive(){
+    if(!/conjugaison\.html$/i.test(window.location.pathname)) return;
+    const style=document.createElement("style");
+    style.id="conjugaison-responsive-fix";
+    style.textContent=`
+      @media (max-width:900px){
+        .tense-block{overflow-x:hidden!important;min-width:0!important}
+        .tense-table{width:100%!important;min-width:0!important;table-layout:fixed!important}
+        .tense-table td,.tense-table th{overflow-wrap:anywhere;word-break:break-word}
+        .result-table-wrap{overflow-x:hidden!important}
+        .result-table{width:100%!important;min-width:0!important;table-layout:fixed!important}
+        .result-table td,.result-table th{overflow-wrap:anywhere;word-break:break-word}
+        .verb-summary #practiceThisVerb{min-width:0!important;white-space:normal!important}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",function(){initAudio();fixConjugaisonResponsive();});
+  else { initAudio(); fixConjugaisonResponsive(); }
 })();
