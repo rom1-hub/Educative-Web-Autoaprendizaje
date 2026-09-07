@@ -19,9 +19,7 @@
     const variants=new Set(expectedVariants);
     const rawSubject=String(q.subject||'').trim();
     if(!rawSubject)return variants;
-
     if(String(q.tense||'').trim()==='impératif présent')return variants;
-
     const withoutGender=rawSubject.replace(/\s*\([^)]*\)\s*$/,'').trim();
     const baseMap={"j'":'je',je:'je',tu:'tu',il:'il',elle:'elle',on:'on',nous:'nous',vous:'vous',ils:'ils',elles:'elles'};
     let base=withoutGender.toLowerCase();
@@ -37,28 +35,20 @@
     else if(/^que\s+vous$/.test(base))base='vous';
     else base=baseMap[base]||base;
     if(!baseMap[base])return variants;
-
     expectedVariants.forEach(function(form){
       const startsWithVowel=/^[aeiouyàâäéèêëîïôöùûüÿœæ]/i.test(form);
       if(base==='je'){
         if(!startsWithVowel) variants.add(api.normalizeAnswerText('je '+form));
-        if(!/^j['’]/.test(form) && startsWithVowel){
-          variants.add(api.normalizeAnswerText("j'"+form));
-        }
+        if(!/^j['’]/.test(form) && startsWithVowel) variants.add(api.normalizeAnswerText("j'"+form));
       }else{
         variants.add(api.normalizeAnswerText(base+' '+form));
       }
-
       const isSubjonctif=/^subjonctif\s+(présent|passé)$/i.test(String(q.tense||''));
       if(isSubjonctif){
         const queSubject={je:"que je",tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"}[base];
         if(queSubject){
-          if(!(base==='je' && startsWithVowel)){
-            variants.add(api.normalizeAnswerText(queSubject+' '+form));
-          }
-          if(base==='je' && !/^j['’]/.test(form) && startsWithVowel){
-            variants.add(api.normalizeAnswerText("que j'"+form));
-          }
+          if(!(base==='je' && startsWithVowel)) variants.add(api.normalizeAnswerText(queSubject+' '+form));
+          if(base==='je' && !/^j['’]/.test(form) && startsWithVowel) variants.add(api.normalizeAnswerText("que j'"+form));
         }
       }
     });
@@ -171,7 +161,8 @@
       if(tense==='subjonctif présent')return(s==='nous'||s==='vous'?yStem:iStem)+(ends.subjonctif[s]||'');
       if(tense==='impératif présent'){
         if(!['tu','nous','vous'].includes(s))return null;
-        return(s==='nous'||s==='vous'?yStem:iStem)+(ends.present[s]||'').replace(/s$/,'');
+        if(s==='tu')return iStem+(ends.present[s]||'').replace(/s$/,'');
+        return yStem+(ends.present[s]||'');
       }
       return null;
     }
