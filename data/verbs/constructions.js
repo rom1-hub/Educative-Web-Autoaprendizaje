@@ -166,4 +166,31 @@ document.addEventListener('DOMContentLoaded', function(){
 
     return result;
   };
+
+  // La práctica muestra el sujeto separado del campo de respuesta.
+  // Aplicamos la misma contracción que en la consulta para los tiempos compuestos.
+  const practiceSubject = document.querySelector('#questionSubject');
+  const practiceVerb = document.querySelector('#questionVerb');
+  if(practiceSubject && practiceVerb){
+    const observer = new MutationObserver(function(){
+      const subject = practiceSubject.textContent.trim();
+      const parts = practiceVerb.textContent.split(' · ');
+      const verb = (parts[0] || '').trim().toLowerCase();
+      const tense = (parts[1] || '').trim();
+      if(!window.COQ_CONJ_COMPOUND || !window.COQ_CONJ_COMPOUND.isCompound(tense)) return;
+
+      const base = subject.replace(/\s*\([^)]*\)\s*$/, '').trim().toLowerCase();
+      if(base !== 'je' && base !== 'que je') return;
+
+      const suffix = subject.match(/\s*(\([^)]*\))\s*$/)?.[1] || '';
+      const meta = verbs[verb] || {};
+      const construction = meta.pronominal === true || meta.construction === 'pronominale' ? 'pronominale' : 'non-pronominale';
+      const generated = engine.conjugate ? engine.conjugate(verb, tense, subject, construction) : null;
+
+      if(/^[aeiouyàâäéèêëîïôöùûüÿœæ]/i.test(String(generated || '').trim())){
+        practiceSubject.textContent = (base === 'que je' ? "que j'" : "j'") + (suffix ? ' ' + suffix : '');
+      }
+    });
+    observer.observe(practiceSubject, {childList:true, characterData:true, subtree:true});
+  }
 });
