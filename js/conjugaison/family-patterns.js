@@ -95,6 +95,15 @@
       const x=family[key];
       verbs[key]={id:key,infinitif:key,infinitif_base:key,groupe:3,pattern:x.pattern,auxiliaire:x.auxiliaire,pronominal:false,participePasse:x.pp,construction:'non-pronominale',verbeBase:key};
     });
+
+    // utils.js crea una instantánea del catálogo al cargarse.
+    // Como estas familias se incorporan después, sincronizamos aquí
+    // los registros nuevos para que lookup.js pueda encontrarlos.
+    const utils=window.COQ_CONJ_UTILS;
+    if(utils){
+      Object.assign(utils.conjugations,verbs);
+      Object.assign(utils.verbMeta,verbs);
+    }
   }
 
   function install(){
