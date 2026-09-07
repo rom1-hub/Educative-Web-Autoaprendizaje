@@ -216,15 +216,12 @@
   function renderSecondErrorFeedback(q){
     const fb=document.querySelector('#practiceFeedback');
     fb.className='feedback-box warn';
-    fb.innerHTML='Réponse incorrecte.<br>Réponse correcte : <strong>'+U.escapeHtml(q.answer)+'</strong><br>Escribe la respuesta correcta para continuar.';
+    fb.innerHTML='Réponse incorrecte.<br>Réponse correcte : <strong>'+U.escapeHtml(q.answer)+'</strong><br>Escribe la réponse correcte pour continuer.';
   }
   function validateAnswer(){
     if(session.locked)return;
     const q=session.questions[session.index],input=document.querySelector('#answerInput'),value=input.value.trim();
     if(!value)return;
-
-    // Tras dos errores, la respuesta correcta ya fue mostrada. El alumno debe
-    // escribirla obligatoriamente; esta tercera fase no suma puntos.
     if(q.mustTypeCorrect){
       if(U.sameAnswer(value,q)){
         input.className='success';
@@ -240,15 +237,13 @@
       }
       return;
     }
-
     q.attempts++;
     if(U.sameAnswer(value,q)){
-      input.className='success';session.correct++;let outcome;if(q.attempts===1)outcome='correct-first';else if(q.attempts===2)outcome='correct-after-first-error';else outcome='correct-after-help';session.results.push({question:q,finalAnswer:value,outcome});session.locked=true;const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box ok';fb.textContent='✓ Correcto. Pasamos a la siguiente pregunta.';document.querySelector('#practiceProgressBar').style.width=`${((session.index+1)/20)*100}%`;setTimeout(()=>{session.index++;session.index>=20?finishSession():showQuestion()},650);
+      input.className='success';session.correct++;let outcome;if(q.attempts===1)outcome='correct-first';else if(q.attempts===2)outcome='correct-after-first-error';else outcome='correct-after-help';session.results.push({question:q,finalAnswer:value,outcome});session.locked=true;const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box ok';fb.textContent='✓ Correcto. Pasamos a la siguiente question.';document.querySelector('#practiceProgressBar').style.width=`${((session.index+1)/20)*100}%`;setTimeout(()=>{session.index++;session.index>=20?finishSession():showQuestion()},650);
     }else if(q.attempts===1){q.firstError=value;input.className='error-first';const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box warn';fb.textContent='Réponse incorrecte. Essaie encore.';
     }else{q.secondError=value;input.className='error-second';renderSecondErrorFeedback(q);q.mustTypeCorrect=true;session.results.push({question:q,finalAnswer:value,outcome:'incorrect-twice'});session.locked=false;input.value='';input.disabled=false;input.focus();const next=document.querySelector('#nextQuestion');if(next)next.classList.add('hidden');}
   }
   function nextQuestion(){
-    // El botón Siguiente no debe saltarse una respuesta que aún deba escribirse.
     const q=session.questions[session.index];
     if(q&&q.mustTypeCorrect)return;
     document.querySelector('#nextQuestion')?.classList.add('hidden');session.index++;session.index>=20?finishSession():showQuestion();
@@ -296,5 +291,5 @@
     updatePracticeGroupState();updatePracticeConstructionOptions();updatePracticeAuxiliaryOptions();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
-  window.COQ_CONJ_PRACTICE={buildQuestions,updatePracticeGroupState};
+  window.COQ_CONJ_PRACTICE={buildQuestions,updatePracticeGroupState,resetPracticeForm};
 })();
