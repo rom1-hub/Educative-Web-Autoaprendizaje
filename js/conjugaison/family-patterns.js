@@ -113,7 +113,14 @@
   }
   function familyRows(verb,tense){
     const subjects=tense==='impératif présent'?IMPERATIVE_SUBJECTS:STANDARD_SUBJECTS;
-    return subjects.map(function(subject){return [displaySubject(verb,subject),familyForm(verb,tense,subject)];}).filter(function(row){return row[1]!==null&&row[1]!==undefined;});
+    return subjects.map(function(subject){
+      const form=familyForm(verb,tense,subject);
+      if(form===null||form===undefined)return null;
+      const displayedSubject=displaySubject(verb,subject);
+      // En français, j' fait corps avec le verbe : j'ouvre, j'offre, j'ouvrais, etc.
+      if(displayedSubject==="j'")return ['',"j'"+form];
+      return [displayedSubject,form];
+    }).filter(Boolean);
   }
   function ensureRecords(){
     const verbs=window.COQ_VERBS||(window.COQ_VERBS={});
