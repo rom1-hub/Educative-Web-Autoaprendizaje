@@ -4,16 +4,21 @@
 (function(){
   function normalizeFrenchSpeech(text){
     return String(text||'')
-      // La voz francesa de algunos navegadores verbaliza la apostrophe
-      // de "j'aie" como "j apostrophe". Para audio sustituimos únicamente
-      // la representación fonética; el texto visible conserva "j'aie".
-      .replace(/\bque\s+j['’]aie\b/gi,'que jè')
-      .replace(/\bj['’]aie\b/gi,'jè')
-      .replace(/\bque\s+je\s+([aeiouyàâäéèêëîïôöùûüœæ])/gi,"que j'$1")
-      .replace(/\bje\s+([aeiouyàâäéèêëîïôöùûüœæ])/gi,"j'$1")
-      .replace(/\bque\s+il\b/gi,"qu'il")
-      .replace(/\bque\s+elle\b/gi,"qu'elle")
-      .replace(/\bque\s+on\b/gi,"qu'on");
+      // SpeechSynthesis/Chrome puede verbalizar la apostrophe francesa.
+      // El texto visible conserva la ortografía correcta; para audio
+      // usamos una grafía fonética sin apostrophe.
+      .replace(/\bj['’]a(?:i|ie)\b/gi,'jè')
+      .replace(/\bj['’]e/gi,'jè')
+      .replace(/\bj['’]o/gi,'jo')
+      .replace(/\bj['’]u/gi,'ju')
+      .replace(/\bj['’]y/gi,'ji')
+      .replace(/\bj['’]([aeiouyàâäéèêëîïôöùûüœæ])/gi,'j$1')
+      .replace(/\bque\s+j['’]/gi,'que j')
+      .replace(/\bqu['’]il\b/gi,'quil')
+      .replace(/\bqu['’]elle\b/gi,'quelle')
+      .replace(/\bqu['’]on\b/gi,'quon')
+      .replace(/\bqu['’]ils\b/gi,'quils')
+      .replace(/\bqu['’]elles\b/gi,'quelles');
   }
 
   function speak(text){
