@@ -29,12 +29,12 @@ window.COQ_VERB_PATTERNS={
   }
   function resolvePattern(verb){
     const key=normalize(verb),base=baseVerb(key),r=verbs[key]||verbs[base];
-    if(r&&r.pattern&&patterns[r.pattern])return r.pattern;
     if(/ger$/.test(base))return'er-ger';
     if(/cer$/.test(base))return'er-cer';
     if(/yer$/.test(base))return'yer';
     if(/eler$/.test(base))return'er-eler';
     if(/eter$/.test(base))return'er-eter';
+    if(r&&r.pattern&&patterns[r.pattern])return r.pattern;
     if(/er$/.test(base))return'regular-er';
     return null;
   }
