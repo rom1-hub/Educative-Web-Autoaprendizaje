@@ -45,7 +45,8 @@
     const singular=radical.slice(0,-1);
     if(tense==="présent de l'indicatif"){
       if(s==='je'||s==='tu')return singular+END.present[s];
-      return radical;
+      if(s==='il'||s==='elle'||s==='on')return radical;
+      return radical+END.present[s];
     }
     if(tense==='imparfait')return radical+END.imparfait[s];
     if(tense==='futur simple')return inf+END.futur[s];
@@ -61,8 +62,7 @@
     const radical=inf.replace(/ir$/,'');
     const singular=radical.slice(0,-1);
     if(tense==="présent de l'indicatif"){
-      if(s==='je'||s==='tu')return singular+END.present[s];
-      if(s==='il'||s==='elle'||s==='on')return singular+END.present[s];
+      if(s==='je'||s==='tu'||s==='il'||s==='elle'||s==='on')return singular+END.present[s];
       return radical+END.present[s];
     }
     if(tense==='imparfait')return radical+END.imparfait[s];
