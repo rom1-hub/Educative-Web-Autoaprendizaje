@@ -5,10 +5,13 @@
   function loadConjugaisonExpansion(){
     if(!/\/conjugaison\.html$/i.test(window.location.pathname) || window.__coqVerbExpansionRequested) return;
     window.__coqVerbExpansionRequested=true;
-    const script=document.createElement('script');
-    script.src='../js/conjugaison/data-expansion.js';
-    script.defer=true;
-    document.head.appendChild(script);
+    const scripts=['../js/conjugaison/data-expansion.js','../js/conjugaison/family-patterns.js'];
+    scripts.forEach(function(src){
+      const script=document.createElement('script');
+      script.src=src;
+      script.defer=true;
+      document.head.appendChild(script);
+    });
   }
   function initCoqMenu(){
     document.querySelectorAll('.nav').forEach(function(nav){
