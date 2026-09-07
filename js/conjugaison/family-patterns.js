@@ -8,18 +8,9 @@
     'suivre-type':{groupe:3,description:'Famille suivre : radical suiv- au présent et à l’imparfait/subjonctif'}
   };
   window.COQ_VERB_PATTERNS=window.COQ_VERB_PATTERNS||{};
-  Object.keys(FAMILY_PATTERNS).forEach(function(key){
-    window.COQ_VERB_PATTERNS[key]=FAMILY_PATTERNS[key];
-  });
+  Object.keys(FAMILY_PATTERNS).forEach(function(key){window.COQ_VERB_PATTERNS[key]=FAMILY_PATTERNS[key];});
 
-  const SIMPLE=new Set([
-    "présent de l'indicatif",
-    'imparfait',
-    'futur simple',
-    'conditionnel présent',
-    'subjonctif présent',
-    'impératif présent'
-  ]);
+  const SIMPLE=new Set(["présent de l'indicatif",'imparfait','futur simple','conditionnel présent','subjonctif présent','impératif présent']);
   const END={
     present:{je:'s',tu:'s',il:'t',elle:'t',on:'t',nous:'ons',vous:'ez',ils:'ent',elles:'ent'},
     imparfait:{je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'},
@@ -46,17 +37,15 @@
     return key.startsWith('se ')?key.slice(3).trim():key;
   }
   function familyOf(verb){
-    const verbs=window.COQ_VERBS||{};
-    const base=baseVerb(verb),r=verbs[base];
+    const verbs=window.COQ_VERBS||{},base=baseVerb(verb),r=verbs[base];
     return r&&r.pattern;
   }
   function partirType(inf,s,tense){
     const radical=inf.replace(/ir$/,'');
     const singular=radical.slice(0,-1);
     if(tense==="présent de l'indicatif"){
-      if(['je','tu'].includes(s))return singular+END.present[s];
-      if(['il','elle','on'].includes(s))return radical+END.present[s];
-      return radical+END.present[s];
+      if(s==='je'||s==='tu')return singular+END.present[s];
+      return radical;
     }
     if(tense==='imparfait')return radical+END.imparfait[s];
     if(tense==='futur simple')return inf+END.futur[s];
@@ -70,20 +59,24 @@
   }
   function suivreType(inf,s,tense){
     const radical=inf.replace(/ir$/,'');
-    if(tense==="présent de l'indicatif")return radical+END.present[s];
+    const singular=radical.slice(0,-1);
+    if(tense==="présent de l'indicatif"){
+      if(s==='je'||s==='tu')return singular+END.present[s];
+      if(s==='il'||s==='elle'||s==='on')return singular+END.present[s];
+      return radical+END.present[s];
+    }
     if(tense==='imparfait')return radical+END.imparfait[s];
     if(tense==='futur simple')return inf+END.futur[s];
     if(tense==='conditionnel présent')return inf+END.conditionnel[s];
     if(tense==='subjonctif présent')return radical+END.subjonctif[s];
     if(tense==='impératif présent'){
       if(!['tu','nous','vous'].includes(s))return null;
-      return radical+END.present[s];
+      return s==='tu' ? singular+END.present[s] : radical+END.present[s];
     }
     return null;
   }
   function familyForm(verb,tense,subject){
-    const verbs=window.COQ_VERBS||{};
-    const base=baseVerb(verb),r=verbs[base];
+    const verbs=window.COQ_VERBS||{},base=baseVerb(verb),r=verbs[base];
     if(!r||!SIMPLE.has(tense))return null;
     const s=baseSubject(subject),inf=r.infinitif_base||r.infinitif||base;
     if(r.pattern==='partir-type')return partirType(inf,s,tense);
@@ -96,9 +89,7 @@
       servir:{pattern:'partir-type',auxiliaire:'avoir',pp:'servi'},
       suivre:{pattern:'suivre-type',auxiliaire:'avoir',pp:'suivi'}
     };
-    ['partir','sortir','dormir'].forEach(function(key){
-      if(verbs[key])verbs[key].pattern='partir-type';
-    });
+    ['partir','sortir','dormir'].forEach(function(key){if(verbs[key])verbs[key].pattern='partir-type';});
     Object.keys(family).forEach(function(key){
       if(verbs[key])return;
       const x=family[key];
