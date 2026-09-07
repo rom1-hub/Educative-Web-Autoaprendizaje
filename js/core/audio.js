@@ -4,10 +4,11 @@
 (function(){
   function normalizeFrenchSpeech(text){
     return String(text||'')
-      // SpeechSynthesis/Chrome puede verbalizar la apostrophe de "j'aie"
-      // como "j apostrophe". En francés "j'aie" y "j'ai" son homófonos;
-      // para audio usamos la segunda grafía sin modificar el texto visible.
-      .replace(/\bque\s+j['’]aie\b/gi,"que j'ai")
+      // La voz francesa de algunos navegadores verbaliza la apostrophe
+      // de "j'aie" como "j apostrophe". Para audio sustituimos únicamente
+      // la representación fonética; el texto visible conserva "j'aie".
+      .replace(/\bque\s+j['’]aie\b/gi,'que jè')
+      .replace(/\bj['’]aie\b/gi,'jè')
       .replace(/\bque\s+je\s+([aeiouyàâäéèêëîïôöùûüœæ])/gi,"que j'$1")
       .replace(/\bje\s+([aeiouyàâäéèêëîïôöùûüœæ])/gi,"j'$1")
       .replace(/\bque\s+il\b/gi,"qu'il")
