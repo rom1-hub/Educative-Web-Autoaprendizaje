@@ -15,11 +15,14 @@
   api.normalizeAnswerText=function(v){return String(v||'').trim().toLocaleLowerCase().replace(/\s+/g,' ');};
   api.answerVariants=function(q){
     const expected=api.normalizeAnswerText(q.answer);
-    const variants=new Set([expected]);
+    // Algunas familias ortográficas (p. ej. -ETER) muestran dos formas válidas
+    // separadas por " / ". En el ejercicio cada una debe ser aceptada por separado.
+    const expectedVariants=expected.split(/\s+\/\s+/).map(v=>v.trim()).filter(Boolean);
+    const variants=new Set(expectedVariants);
     const rawSubject=String(q.subject||'').trim();
     if(!rawSubject)return variants;
 
-    // En impératif, le sujet no hace parte de la respuesta escrita.
+    // En impératif, el sujeto no hace parte de la respuesta escrita.
     // La única respuesta válida es la forma verbal sola: parle, prends, sois, etc.
     if(String(q.tense||'').trim()==='impératif présent')return variants;
 
@@ -39,32 +42,35 @@
     else base=baseMap[base]||base;
     if(!baseMap[base])return variants;
 
-    const startsWithVowel=/^[aeiouyàâäéèêëîïôöùûüÿœæ]/i.test(expected);
-    if(base==='je'){
-      // Para una forma que empieza por vocal, la forma escrita debe llevar la
-      // elisión: "j'ai", nunca "je ai". Para consonantes se conserva "je ...".
-      if(!startsWithVowel) variants.add(api.normalizeAnswerText('je '+expected));
-      if(!/^j['’]/.test(expected) && startsWithVowel){
-        variants.add(api.normalizeAnswerText("j'"+expected));
+    const startsWithVowel=/^[aeiouyàâäéèêëîïôöùûüÿœæ]/i;
+    expectedVariants.forEach(function(form){
+      const startsWithVowel=/^[aeiouyàâäéèêëîïôöùûüÿœæ]/i.test(form);
+      if(base==='je'){
+        // Para una forma que empieza por vocal, la forma escrita debe llevar la
+        // elisión: "j'ai", nunca "je ai". Para consonantes se conserva "je ...".
+        if(!startsWithVowel) variants.add(api.normalizeAnswerText('je '+form));
+        if(!/^j['’]/.test(form) && startsWithVowel){
+          variants.add(api.normalizeAnswerText("j'"+form));
+        }
+      }else{
+        variants.add(api.normalizeAnswerText(base+' '+form));
       }
-    }else{
-      variants.add(api.normalizeAnswerText(base+' '+expected));
-    }
 
-    const isSubjonctif=/^subjonctif\s+(présent|passé)$/i.test(String(q.tense||''));
-    if(isSubjonctif){
-      const queSubject={je:"que je",tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"}[base];
-      if(queSubject){
-        // En subjonctif, "que je aie" / "que je sois" es incorrecto:
-        // delante de vocal se exige la elisión "que j'aie" / "que je sois".
-        if(!(base==='je' && startsWithVowel)){
-          variants.add(api.normalizeAnswerText(queSubject+' '+expected));
-        }
-        if(base==='je' && !/^j['’]/.test(expected) && startsWithVowel){
-          variants.add(api.normalizeAnswerText("que j'"+expected));
+      const isSubjonctif=/^subjonctif\s+(présent|passé)$/i.test(String(q.tense||''));
+      if(isSubjonctif){
+        const queSubject={je:"que je",tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"}[base];
+        if(queSubject){
+          // En subjonctif, "que je aie" / "que je sois" es incorrecto:
+          // delante de vocal se exige la elisión "que j'aie" / "que je sois".
+          if(!(base==='je' && startsWithVowel)){
+            variants.add(api.normalizeAnswerText(queSubject+' '+form));
+          }
+          if(base==='je' && !/^j['’]/.test(form) && startsWithVowel){
+            variants.add(api.normalizeAnswerText("que j'"+form));
+          }
         }
       }
-    }
+    });
     return variants;
   };
   api.sameAnswer=function(a,q){return api.answerVariants(q).has(api.normalizeAnswerText(a));};
