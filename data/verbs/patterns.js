@@ -138,7 +138,6 @@ window.COQ_VERB_PATTERNS = {
     if(!engine || typeof engine.conjugate!=='function' || engine.__yerPatch) return;
 
     const originalConjugate=engine.conjugate.bind(engine);
-    const subjects=['je','tu','il','elle','on','nous','vous','ils','elles'];
     const simple=new Set(["présent de l'indicatif",'imparfait','futur simple','conditionnel présent','subjonctif présent','impératif présent']);
 
     function baseSubject(subject){
@@ -151,19 +150,6 @@ window.COQ_VERB_PATTERNS = {
       if(/^qu['’]ils$/.test(clean)||/^que\s+ils$/.test(clean)) return 'ils';
       if(/^qu['’]elles$/.test(clean)||/^que\s+elles$/.test(clean)) return 'elles';
       return clean;
-    }
-
-    function forms(inf,s){
-      const stem=inf.slice(0,-3); // elimina -yer
-      const iStem=stem+'i';
-      const yStem=stem+'y';
-      const presentEnd={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ons',vous:'ez',ils:'ent',elles:'ent'};
-      const impEnd={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'};
-      const futEnd={je:'ai',tu:'as',il:'a',elle:'a',on:'a',nous:'ons',vous:'ez',ils:'ont',elles:'ont'};
-      const condEnd={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'};
-      const subjEnd={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ions',vous:'iez',ils:'ent',elles:'ent'};
-      if(['nous','vous'].includes(s)) return yStem+presentEnd[s];
-      return iStem+presentEnd[s];
     }
 
     function generate(verb,tense,subject){
@@ -189,7 +175,7 @@ window.COQ_VERB_PATTERNS = {
       if(tense==='subjonctif présent') return (s==='nous'||s==='vous'?yStem:iStem)+subjEnd[s];
       if(tense==='impératif présent'){
         if(!['tu','nous','vous'].includes(s)) return null;
-        return (s==='nous'||s==='vous'?yStem:iStem)+presentEnd[s].replace(/^s$/,'');
+        return (s==='nous'||s==='vous'?yStem:iStem)+presentEnd[s].replace(/s$/,'');
       }
       return null;
     }
@@ -199,10 +185,21 @@ window.COQ_VERB_PATTERNS = {
       if(generated!=null) return generated;
       return originalConjugate(verb,tense,subject,construction);
     };
+
+    // lookup.js usa canGenerate para decidir si debe crear una tabla cuando
+    // el tiempo todavía no existe de forma explícita en la BD. Como -YER se
+    // genera de forma productiva por este parche, también debe declararse
+    // generable aquí.
+    if(typeof engine.canGenerate==='function'){
+      const originalCanGenerate=engine.canGenerate.bind(engine);
+      engine.canGenerate=function(verb,tense){
+        if(resolvePattern(verb)==='yer' && simple.has(tense)) return true;
+        return originalCanGenerate(verb,tense);
+      };
+    }
+
     engine.__yerPatch=true;
 
-    // Variantes normativas para payer/essayer: Larousse admite y o i delante
-    // de e muda. La forma principal generada por el motor es la variante en i.
     if(window.COQ_CONJ_UTILS && typeof window.COQ_CONJ_UTILS.sameAnswer==='function'){
       const originalSameAnswer=window.COQ_CONJ_UTILS.sameAnswer.bind(window.COQ_CONJ_UTILS);
       window.COQ_CONJ_UTILS.sameAnswer=function(answer,q){
