@@ -171,6 +171,118 @@ window.COQ_VERB_PATTERNS={
   });
 })();
 
+/* COQ — patrón -ELER: appeler (doble l) y el resto según modelo geler/promener.
+   Por defecto se aceptan las dos grafías rectificadas/tradicionales para los -ELER
+   que no pertenecen a la lista estable de modelo geler. */
+(function(){
+  const verbs=window.COQ_VERBS||{};
+  const resolver=window.COQ_PATTERN_RESOLVER;
+  const normalize=v=>String(v||'').trim().toLowerCase();
+  const baseVerb=v=>{
+    const k=normalize(v),r=verbs[k];
+    if(r&&r.verbeBase)return normalize(r.verbeBase);
+    return k.startsWith('se ')?k.slice(3).trim():k;
+  };
+  const gelerOnly=new Set(['agneler','celer','déceler','receler','ciseler','démanteler','écarteler','encasteler','geler','dégeler','congeler','surgeler','marteler','modeler','peler']);
+  const regression={
+    appeler:{participePasse:'appelé',type:'appeler'},
+    rappeler:{participePasse:'rappelé',type:'appeler'},
+    ficeler:{participePasse:'ficelé',type:'double'},
+    agneler:{participePasse:'agnelé',type:'geler'},
+    celer:{participePasse:'celé',type:'geler'},
+    déceler:{participePasse:'décelé',type:'geler'},
+    receler:{participePasse:'recelé',type:'geler'},
+    ciseler:{participePasse:'ciselé',type:'geler'},
+    démanteler:{participePasse:'démantelé',type:'geler'},
+    écarteler:{participePasse:'écartelé',type:'geler'},
+    encasteler:{participePasse:'encastelé',type:'geler'},
+    geler:{participePasse:'gelé',type:'geler'},
+    dégeler:{participePasse:'dégelé',type:'geler'},
+    congeler:{participePasse:'congelé',type:'geler'},
+    surgeler:{participePasse:'surgelé',type:'geler'},
+    marteler:{participePasse:'martelé',type:'geler'},
+    modeler:{participePasse:'modelé',type:'geler'},
+    peler:{participePasse:'pelé',type:'geler'}
+  };
+  Object.keys(regression).forEach(k=>{
+    if(!verbs[k])verbs[k]={id:k,infinitif:k,infinitif_base:k,groupe:1,pattern:'er-eler',auxiliaire:'avoir',pronominal:false,participePasse:regression[k].participePasse,construction:'non-pronominale',verbeBase:k,elerType:regression[k].type};
+    else {verbs[k].pattern='er-eler';if(!verbs[k].elerType)verbs[k].elerType=regression[k].type;}
+  });
+  Object.keys(verbs).forEach(k=>{
+    const base=baseVerb(k);
+    if(/eler$/.test(base)){
+      const r=verbs[k]||{};
+      if(!r.pattern||r.pattern==='regular-er')r.pattern='er-eler';
+      if(!r.elerType)r.elerType=(base==='appeler'||/appeler$/.test(base))?'appeler':(gelerOnly.has(base)?'geler':'double');
+    }
+  });
+  const originalResolve=resolver.resolvePattern;
+  resolver.resolvePattern=function(verb){const base=baseVerb(verb);if(/eler$/.test(base))return'er-eler';return originalResolve(verb);};
+  resolver.applyToDatabase();
+  const simple=new Set(["présent de l'indicatif",'imparfait','futur simple','conditionnel présent','subjonctif présent','impératif présent']);
+  const subjects=['je','tu','il','elle','on','nous','vous','ils','elles'];
+  function subjectBase(s){const x=String(s||'').toLowerCase().trim().replace(/\s*\([^)]*\)\s*$/,'');return x.replace(/^que\s+/,'').replace(/^qu['’]/,'').replace(/^je['’]$/,'je');}
+  function typeOf(verb){const b=baseVerb(verb);const r=verbs[b]||verbs[normalize(verb)];return(r&&r.elerType)||(/appeler$/.test(b)?'appeler':(gelerOnly.has(b)?'geler':'double'));}
+  function formsFor(verb,tense,subject){
+    const b=baseVerb(verb),r=verbs[b]||verbs[normalize(verb)];
+    if(!r||!(/eler$/.test(b))||!simple.has(tense))return null;
+    const s=subjectBase(subject),type=typeOf(b),stem=b.slice(0,-2);
+    const present={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ons',vous:'ez',ils:'ent',elles:'ent'};
+    const imp={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'};
+    const future={je:'ai',tu:'as',il:'a',elle:'a',on:'a',nous:'ons',vous:'ez',ils:'ont',elles:'ont'};
+    const subj={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ions',vous:'iez',ils:'ent',elles:'ent'};
+    const mute=s==='je'||s==='tu'||s==='il'||s==='elle'||s==='on'||s==='ils'||s==='elles';
+    if(tense==='imparfait')return stem+imp[s];
+    if(tense==='présent de l\'indicatif'||tense==='subjonctif présent'){
+      if(!mute)return stem+present[s];
+      if(type==='appeler')return stem+'l'+present[s];
+      const grave=stem.slice(0,-1)+'è'+present[s];
+      if(type==='geler')return grave;
+      const double=stem+'l'+present[s];
+      return grave+' / '+double;
+    }
+    if(tense==='futur simple'||tense==='conditionnel présent'){
+      const ending=tense==='futur simple'?future[s]:imp[s];
+      if(type==='appeler')return stem+'l'+ending;
+      const grave=stem.slice(0,-1)+'è'+ending;
+      if(type==='geler')return grave;
+      return grave+' / '+stem+'l'+ending;
+    }
+    if(tense==='impératif présent'){
+      if(!['tu','nous','vous'].includes(s))return null;
+      if(s==='nous'||s==='vous')return stem+present[s];
+      if(type==='appeler')return stem+'l'+present[s].replace(/s$/,'');
+      const grave=stem.slice(0,-1)+'è'+present[s].replace(/s$/,'');
+      if(type==='geler')return grave;
+      return grave+' / '+stem+'l'+present[s].replace(/s$/,'');
+    }
+    return null;
+  }
+  function patch(){
+    const engine=window.COQ_CONJ_ENGINE;
+    if(!engine||typeof engine.conjugate!=='function'||engine.__elerPatch)return;
+    const original=engine.conjugate.bind(engine);
+    engine.conjugate=function(verb,tense,subject,construction){const f=formsFor(verb,tense,subject);return f!=null?f:original(verb,tense,subject,construction);};
+    if(typeof engine.canGenerate==='function'){
+      const old=engine.canGenerate.bind(engine);
+      engine.canGenerate=function(verb,tense){if(/eler$/.test(baseVerb(verb))&&simple.has(tense))return true;return old(verb,tense);};
+    }
+    function rows(verb,tense){if(!/eler$/.test(baseVerb(verb))||!simple.has(tense))return null;const list=tense==='impératif présent'?['tu','nous','vous']:subjects;return list.map(s=>[s,engine.conjugate(verb,tense,s)]).filter(x=>x[1]!=null);}
+    const oldRows=engine.rowsFor.bind(engine);
+    engine.rowsFor=function(verb,tense){const r=rows(verb,tense);return r||oldRows(verb,tense);};
+    if(typeof engine.rowsForLookup==='function'){
+      const oldLookup=engine.rowsForLookup.bind(engine);
+      engine.rowsForLookup=function(verb,tense){const r=rows(verb,tense);return r||oldLookup(verb,tense);};
+    }
+    engine.__elerPatch=true;
+    if(window.COQ_CONJ_UTILS&&typeof window.COQ_CONJ_UTILS.sameAnswer==='function'){
+      const oldSame=window.COQ_CONJ_UTILS.sameAnswer.bind(window.COQ_CONJ_UTILS);
+      window.COQ_CONJ_UTILS.sameAnswer=function(answer,q){if(q&&q.verb&&/eler$/.test(baseVerb(q.verb))){const a=String(answer||'').trim().toLowerCase(),c=String(q.answer||'').trim().toLowerCase();if(c.split(' / ').includes(a))return true;}return oldSame(answer,q);};
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',patch);else patch();
+})();
+
 (function(){
   if(document.querySelector('link[data-coq-conjugaison-mobile]'))return;
   const link=document.createElement('link');link.rel='stylesheet';link.href='../css/conjugaison-mobile.css';link.dataset.coqConjugaisonMobile='';document.head.appendChild(link);
