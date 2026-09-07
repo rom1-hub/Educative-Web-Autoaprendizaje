@@ -6,8 +6,6 @@
     const voices=window.speechSynthesis.getVoices()||[];
     const fr=voices.filter(function(v){ return /^fr(?:-|_)/i.test(v.lang||''); });
     if(!fr.length) return null;
-
-    // Priorizar voces francesas que suelen resolver correctamente la elisión.
     const preferred=[
       function(v){ return /google/i.test(v.name||''); },
       function(v){ return /hortense|denise|thomas|amelie|aurelie|audrey|fran[cç]ais/i.test(v.name||''); }
@@ -20,16 +18,12 @@
   }
 
   function normalizeFrenchSpeech(text){
-    // Mantener la ortografía visible intacta. La síntesis recibe el texto
-    // francés natural: el problema de j' depende de la voz TTS, no de la
-    // escritura pedagógica mostrada al alumno.
     return String(text||'')
       .replace(/\bj['’]a(?:i|ie)\b/gi,"j'ai")
       .replace(/\bj['’]étais\b/gi,"j'étais")
       .replace(/\bj['’]était\b/gi,"j'étais")
       .replace(/\bj['’]aurais\b/gi,"j'aurais")
       .replace(/\bj['’]aurai\b/gi,"j'aurai")
-      .replace(/\bj['’]avais\b/gi,"j'avais")
       .replace(/\bj['’]avais\b/gi,"j'avais")
       .replace(/\bj['’]\b/gi,"j'")
       .replace(/\bque\s+j['’]\b/gi,"que j'")
@@ -61,24 +55,6 @@
     });
   }
 
-  function fixConjugaisonResponsive(){
-    if(!/conjugaison\.html$/i.test(window.location.pathname)) return;
-    const style=document.createElement('style');
-    style.id='conjugaison-responsive-fix';
-    style.textContent=`
-      @media (max-width:900px){
-        .tense-block{overflow-x:hidden!important;min-width:0!important}
-        .tense-table{width:100%!important;min-width:0!important;table-layout:fixed!important}
-        .tense-table td,.tense-table th{overflow-wrap:anywhere;word-break:break-word}
-        .result-table-wrap{overflow-x:hidden!important}
-        .result-table{width:100%!important;min-width:0!important;table-layout:fixed!important}
-        .result-table td,.result-table th{overflow-wrap:anywhere;word-break:break-word}
-        .verb-summary #practiceThisVerb{min-width:0!important;white-space:normal!important}
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){initAudio();fixConjugaisonResponsive();});
-  else { initAudio(); fixConjugaisonResponsive(); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initAudio);
+  else initAudio();
 })();
