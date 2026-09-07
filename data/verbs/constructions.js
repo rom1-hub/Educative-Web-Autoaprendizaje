@@ -36,6 +36,21 @@ window.COQ_COMPOUND_CONSTRUCTION_FILTERS = {
     const item = elerVerbs[key];
     verbs[key] = {id:key, infinitif:item[0], infinitif_base:item[0], groupe:1, pattern:'er-eler', auxiliaire:'avoir', pronominal:false, participePasse:item[1], construction:'non-pronominale', verbeBase:key};
   });
+
+  // -ETER : les trois familles demandées pour COQ.
+  // 1. JETER et ses dérivés : doublement obligatoire du T.
+  // 2. Liste fermée : alternance E/È uniquement.
+  // 3. Tous les autres -ETER : les deux orthographes sont acceptées.
+  const eterVerbs = {
+    'jeter': 'jeté', 'projeter': 'projeté', 'rejeter': 'rejeté', 'déjeter': 'déjeté', 'surjeter': 'surjeté',
+    'acheter': 'acheté', 'racheter': 'racheté',
+    'bégueter': 'bégueté', 'corseter': 'corseté', 'crocheter': 'crocheté', 'fileter': 'fileté', 'fureter': 'fureté', 'haleter': 'haleté',
+    'feuilleter': 'feuilleté'
+  };
+  Object.keys(eterVerbs).forEach(function(key){
+    if(verbs[key]){ verbs[key].pattern = 'er-eter'; return; }
+    verbs[key] = {id:key, infinitif:key, infinitif_base:key, groupe:1, pattern:'er-eter', auxiliaire:'avoir', pronominal:false, participePasse:eterVerbs[key], construction:'non-pronominale', verbeBase:key};
+  });
 })();
 
 document.addEventListener('DOMContentLoaded', function(){
@@ -94,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function(){
       const form=String(row[1]||'').trim().toLowerCase();
       const annotated=subject.match(/^(que\s+)?je\s*(\([^)]*\))?$/i);
       if(annotated && /^[aeiouyàâäéèêëîïôöùûüÿœæ]/.test(form)){
-        subject=(annotated[1]?'que j\'':"j'")+(annotated[2]?' '+annotated[2]:'');
+        subject=(annotated[1]?"que j'":"j'")+(annotated[2]?' '+annotated[2]:'');
       }
       return [subject,row[1]];
     });
@@ -113,6 +128,131 @@ document.addEventListener('DOMContentLoaded', function(){
     if(groupedIl.length){const answers=groupedIl.map(row=>String(row[1]||''));const same=answers.every(answer=>answer===answers[0]);if(same)result.splice(2,0,['il/elle/on',answers[0]]);else groupedIl.forEach(row=>result.push(row));}
     if(groupedIls.length){const answers=groupedIls.map(row=>String(row[1]||''));const same=answers.every(answer=>answer===answers[0]);if(same)result.push(['ils/elles',answers[0]]);else groupedIls.forEach(row=>result.push(row));}
     return result;
+  };
+
+  // -------------------- PATTERN -ETER --------------------
+  const eterAccentOnly = new Set(['acheter','racheter','bégueter','corseter','crocheter','fileter','fureter','haleter']);
+  const eterJeterFamily = /jeter$/;
+  const eterTenses = new Set(["présent de l'indicatif",'imparfait','futur simple','conditionnel présent','subjonctif présent','impératif présent']);
+
+  function eterBase(verb){
+    const key=String(verb||'').trim().toLowerCase();
+    const r=verbs[key];
+    if(r&&r.verbeBase) return String(r.verbeBase).trim().toLowerCase();
+    if(key.indexOf('se ')===0) return key.slice(3).trim();
+    return key;
+  }
+
+  function eterType(verb){
+    const base=eterBase(verb);
+    if(!/eter$/.test(base)) return null;
+    if(eterJeterFamily.test(base)) return 'jeter';
+    if(eterAccentOnly.has(base)) return 'accent';
+    return 'double';
+  }
+
+  function eterSubject(subject){
+    const raw=String(subject||'').trim().toLowerCase().replace(/\s*\([^)]*\)\s*$/,'').trim();
+    if(/^que\s+j['’]$/.test(raw)||/^que\s+je$/.test(raw)) return 'je';
+    if(/^qu['’]il$/.test(raw)||/^que\s+il$/.test(raw)) return 'il';
+    if(/^qu['’]elle$/.test(raw)||/^que\s+elle$/.test(raw)) return 'elle';
+    if(/^qu['’]on$/.test(raw)||/^que\s+on$/.test(raw)) return 'on';
+    if(/^qu['’]ils$/.test(raw)||/^que\s+ils$/.test(raw)) return 'ils';
+    if(/^qu['’]elles$/.test(raw)||/^que\s+elles$/.test(raw)) return 'elles';
+    return raw;
+  }
+
+  function eterForms(verb,tense,subject){
+    const type=eterType(verb);
+    if(!type||!eterTenses.has(tense)) return null;
+    const base=eterBase(verb);
+    const stem=base.replace(/er$/,'');
+    const s=eterSubject(subject);
+    const presentEnd={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];
+    const imperfectEnd={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'}[s];
+    const futureEnd={je:'ai',tu:'as',il:'a',elle:'a',on:'a',nous:'ons',vous:'ez',ils:'ont',elles:'ont'}[s];
+    const conditionalEnd={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'}[s];
+    const subjEnd={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ions',vous:'iez',ils:'ent',elles:'ent'}[s];
+    const accentStem=stem.replace(/e([^e]*)$/,'è$1');
+    const doubleStem=stem+'t';
+    const variant=(accent,double)=>accent===double?accent:accent+' / '+double;
+
+    if(tense==="présent de l'indicatif"){
+      if(s==='nous'||s==='vous') return stem+presentEnd;
+      const accent=accentStem+presentEnd;
+      const doubled=doubleStem+presentEnd;
+      if(type==='accent') return accent;
+      if(type==='jeter') return doubled;
+      return variant(accent,doubled);
+    }
+    if(tense==='imparfait') return stem+imperfectEnd;
+    if(tense==='futur simple'){
+      if(type==='accent') return accentStem+'er'+futureEnd;
+      if(type==='jeter') return stem+'ter'+futureEnd;
+      return variant(accentStem+'er'+futureEnd,stem+'ter'+futureEnd);
+    }
+    if(tense==='conditionnel présent'){
+      if(type==='accent') return accentStem+'er'+conditionalEnd;
+      if(type==='jeter') return stem+'ter'+conditionalEnd;
+      return variant(accentStem+'er'+conditionalEnd,stem+'ter'+conditionalEnd);
+    }
+    if(tense==='subjonctif présent'){
+      if(s==='nous'||s==='vous') return stem+subjEnd;
+      const accent=accentStem+subjEnd;
+      const doubled=doubleStem+subjEnd;
+      if(type==='accent') return accent;
+      if(type==='jeter') return doubled;
+      return variant(accent,doubled);
+    }
+    if(tense==='impératif présent'){
+      if(!['tu','nous','vous'].includes(s)) return null;
+      if(s==='nous'||s==='vous') return stem+presentEnd;
+      const accent=accentStem+'e';
+      const doubled=doubleStem+'e';
+      if(type==='accent') return accent;
+      if(type==='jeter') return doubled;
+      return variant(accent,doubled);
+    }
+    return null;
+  }
+
+  const originalConjugate=engine.conjugate.bind(engine);
+  if(!engine.__eterPatternPatchInstalled){
+    engine.conjugate=function(verb,tense,subject,construction){
+      const generated=eterForms(verb,tense,subject);
+      if(generated!=null){
+        const base=eterBase(verb);
+        const r=verbs[base]||verbs[verb]||{};
+        const isPronominal=construction==='pronominale'||r.pronominal===true||r.construction==='pronominale';
+        if(isPronominal && window.COQ_CONJ_PRONOUNS){
+          const s=window.COQ_CONJ_PRONOUNS.baseSubject(subject);
+          if(tense==='impératif présent'){
+            const pronoun={tu:'toi',nous:'nous',vous:'vous'}[s];
+            if(pronoun) return generated+'-'+pronoun;
+          }else{
+            const pron=window.COQ_CONJ_PRONOUNS.pronounFor(s);
+            if(pron) return window.COQ_CONJ_PRONOUNS.apply(subject,generated);
+          }
+        }
+        return generated;
+      }
+      return originalConjugate(verb,tense,subject,construction);
+    };
+    engine.__eterPatternPatchInstalled=true;
+  }
+
+  const previousRowsForLookup=engine.rowsForLookup.bind(engine);
+  engine.rowsForLookup=function(verb,tense,construction){
+    return previousRowsForLookup(verb,tense,construction);
+  };
+
+  window.COQ_ETER_PATTERN={
+    type:eterType,
+    base:eterBase,
+    forms:eterForms,
+    accentOnly:Array.from(eterAccentOnly),
+    jeterFamily:'jeter et ses dérivés',
+    orthographicVariants:'accent / double consonne'
   };
 
   const practiceSubject=document.querySelector('#questionSubject');
