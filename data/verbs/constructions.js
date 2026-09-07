@@ -76,7 +76,7 @@ window.COQ_COMPOUND_CONSTRUCTION_FILTERS = {
 })();
 
 // Affichage de consultation : pour les temps simples des verbes -ELER,
-// regrouper il / elle / on sur une seule ligne, comme le reste du catalogue.
+// regrouper il / elle / on e ils / elles sur una sola línea, como el resto del catálogo.
 document.addEventListener('DOMContentLoaded', function(){
   const engine = window.COQ_CONJ_ENGINE;
   const verbs = window.COQ_VERBS || {};
@@ -103,25 +103,39 @@ document.addEventListener('DOMContentLoaded', function(){
     if(!isEler(verb) || !simpleTenses.has(tense)) return rows;
 
     const result = [];
-    let grouped = [];
+    let groupedIl = [];
+    let groupedIls = [];
 
     rows.forEach(function(row){
       const subject = String(row[0] || '').trim().toLowerCase();
       if(subject === 'il' || subject === 'elle' || subject === 'on'){
-        grouped.push(row);
+        groupedIl.push(row);
+        return;
+      }
+      if(subject === 'ils' || subject === 'elles'){
+        groupedIls.push(row);
         return;
       }
       result.push(row);
     });
 
-    if(grouped.length){
-      const answers = grouped.map(row => String(row[1] || ''));
+    if(groupedIl.length){
+      const answers = groupedIl.map(row => String(row[1] || ''));
       const same = answers.every(answer => answer === answers[0]);
       if(same){
         result.splice(2, 0, ['il/elle/on', answers[0]]);
       }else{
-        // Aunque normalmente son idénticas, no ocultamos diferencias reales.
-        grouped.forEach(row => result.push(row));
+        groupedIl.forEach(row => result.push(row));
+      }
+    }
+
+    if(groupedIls.length){
+      const answers = groupedIls.map(row => String(row[1] || ''));
+      const same = answers.every(answer => answer === answers[0]);
+      if(same){
+        result.push(['ils/elles', answers[0]]);
+      }else{
+        groupedIls.forEach(row => result.push(row));
       }
     }
 
