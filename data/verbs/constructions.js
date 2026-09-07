@@ -45,29 +45,37 @@ document.addEventListener('DOMContentLoaded', function(){
 
   const U = window.COQ_CONJ_UTILS;
 
-  // En práctica, la respuesta puede escribirse con o sin el sujeto.
-  // Para "je" contraído solo se aceptan las dos formas gramaticales válidas:
-  // "j'ai appelé" y "ai appelé". Nunca "je ai appelé".
+  // Validación de j' en tiempos compuestos.
+  // La pregunta conserva internamente "je (...)" aunque la interfaz muestre "j' (...)".
+  // Por eso la regla debe basarse en q.subject + q.tense y no únicamente en el DOM.
   if(U && typeof U.sameAnswer === 'function' && !U.__coqCompoundContractionPatched){
     const originalSameAnswer = U.sameAnswer.bind(U);
     U.sameAnswer = function(value, q){
-      const subject = String(q && q.subject || '').trim();
+      const rawSubject = String(q && q.subject || '').trim();
       const expected = String(q && q.answer || '').trim();
       const normalizedValue = String(value || '').trim().toLocaleLowerCase();
       const normalizedExpected = expected.toLocaleLowerCase();
-      const base = subject.replace(/\s*\([^)]*\)\s*$/, '').trim().toLowerCase();
+      const base = rawSubject.replace(/\s*\([^)]*\)\s*$/, '').trim().toLowerCase();
+      const tense = String(q && q.tense || '').trim();
+      const isCompound = !!window.COQ_CONJ_COMPOUND && window.COQ_CONJ_COMPOUND.isCompound(tense);
       const startsWithVowel = /^[aeiouyàâäéèêëîïôöùûüÿœæ]/i.test(expected);
 
-      // Caso específico: sujeto mostrado como j' / que j'.
-      // Sustituimos la validación genérica para impedir "je + auxiliaire".
-      if(startsWithVowel && base === "j'"){
-        return normalizedValue === ("j'" + normalizedExpected) || normalizedValue === normalizedExpected;
-      }
-      if(startsWithVowel && base === "que j'"){
-        return normalizedValue === ("que j'" + normalizedExpected) || normalizedValue === normalizedExpected;
+      if(isCompound && startsWithVowel && (base === 'je' || base === "j'")){
+        // AVOIR: "j'ai appelé" o "ai appelé".
+        // Nunca: "je ai appelé".
+        if(normalizedValue === normalizedExpected) return true;
+        if(normalizedValue === ("j'" + normalizedExpected)) return true;
+        return false;
       }
 
-      // Para cualquier otro caso mantenemos exactamente las reglas existentes.
+      if(isCompound && startsWithVowel && (base === 'que je' || base === "que j'")){
+        // Subjonctif passé: "que j'aie appelé" o "aie appelé".
+        // Nunca: "que je aie appelé".
+        if(normalizedValue === normalizedExpected) return true;
+        if(normalizedValue === ("que j'" + normalizedExpected)) return true;
+        return false;
+      }
+
       return originalSameAnswer(value, q);
     };
     U.__coqCompoundContractionPatched = true;
