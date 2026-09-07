@@ -86,14 +86,43 @@ window.COQ_VERB_PATTERNS={
     function applyJeContraction(rows,verb){return(rows||[]).map(row=>{let subject=row[0],form=row[1];if(baseSubject(subject)==='je'&&shouldContractJe(verb,form))subject=String(subject).replace(/^je$/,"j'").replace(/^que je$/,"que j'");return[subject,form];});}
     function elerType(verb){const base=baseVerb(verb);if(!/eler$/.test(base))return null;const single=new Set(['agneler','celer','déceler','receler','ciseler','démanteler','écarteler','encasteler','geler','dégeler','congeler','surgeler','marteler','modeler','peler']);const appelerFamily=new Set(['appeler','rappeler']);if(appelerFamily.has(base))return'appeler';if(single.has(base))return'eler';return'double';}
     function elerForms(verb,tense,subject){const type=elerType(verb);if(!type||!simple.has(tense))return null;const base=baseVerb(verb),inf=verbs[base]?.infinitif_base||verbs[base]?.infinitif||base,s=baseSubject(subject),stem=inf.replace(/er$/,'');const pe={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ons',vous:'ez',ils:'ent',elles:'ent'},ie={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'},fe={je:'ai',tu:'as',il:'a',elle:'a',on:'a',nous:'ons',vous:'ez',ils:'ont',elles:'ont'},ce={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'},se={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ions',vous:'iez',ils:'ent',elles:'ent'};const presentAccent=stem.replace(/e([^e]*)$/,'è$1'),presentDouble=stem+'l',futureAccent=presentAccent+'er',futureDouble=presentDouble+'er',make=(a,b)=>a===b?a:a+' / '+b;if(tense==="présent de l'indicatif"){if(['nous','vous'].includes(s))return stem+pe[s];if(type==='appeler')return presentDouble+pe[s];if(type==='eler')return presentAccent+pe[s];return make(presentAccent+pe[s],presentDouble+pe[s]);}if(tense==='imparfait')return stem+ie[s];if(tense==='futur simple'){const end=fe[s];if(type==='appeler')return futureDouble+end;if(type==='eler')return futureAccent+end;return make(futureAccent+end,futureDouble+end);}if(tense==='conditionnel présent'){const end=ce[s];if(type==='appeler')return futureDouble+end;if(type==='eler')return futureAccent+end;return make(futureAccent+end,futureDouble+end);}if(tense==='subjonctif présent'){if(['nous','vous'].includes(s))return stem+se[s];if(type==='appeler')return presentDouble+se[s];if(type==='eler')return presentAccent+se[s];return make(presentAccent+se[s],presentDouble+se[s]);}if(tense==='impératif présent'){if(!['tu','nous','vous'].includes(s))return null;if(s==='nous'||s==='vous')return stem+pe[s];const end=pe[s].replace(/s$/,'');if(type==='appeler')return presentDouble+end;if(type==='eler')return presentAccent+end;return make(presentAccent+end,presentDouble+end);}return null;}
-    function yerForms(verb,tense,subject){const key=normalize(verb),base=baseVerb(key),r=verbs[base]||verbs[key];if(!r||r.pattern!=='yer'||!simple.has(tense))return null;const inf=r.infinitif_base||r.infinitif||base,s=baseSubject(subject),stem=inf.slice(0,-3),yStem=stem+'y',iStem=stem+'i';const pe={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ons',vous:'ez',ils:'ent',elles:'ent'},ie={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'},fe={je:'ai',tu:'as',il:'a',elle:'a',on:'a',nous:'ons',vous:'ez',ils:'ont',elles:'ont'},ce={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'},se={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ions',vous:'iez',ils:'ent',elles:'ent'};if(tense==="présent de l'indicatif")return(s==='nous'||s==='vous'?yStem:iStem)+pe[s];if(tense==='imparfait')return yStem+ie[s];if(tense==='futur simple')return iStem+'er'+fe[s];if(tense==='conditionnel présent')return iStem+'er'+ce[s];if(tense==='subjonctif présent')return(s==='nous'||s==='vous'?yStem:iStem)+se[s];if(tense==='impératif présent'){if(!['tu','nous','vous'].includes(s))return null;if(s==='tu')return iStem+pe[s].replace(/s$/,'');return yStem+pe[s];}return null;}
+    function yerForms(verb,tense,subject){const key=normalize(verb),base=baseVerb(key),r=verbs[base]||verbs[key];if(!r||r.pattern!=='yer'||!simple.has(tense))return null;const inf=r.infinitif_base||r.infinitif||base,s=baseSubject(subject),stem=inf.slice(0,-3),yStem=stem+'y',iStem=stem+'i';const pe={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ons',vous:'ez',ils:'ent',elles:'ent'},ie={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'},fe={je:'ai',tu:'as',il:'a',elle:'a',on:'a',nous:'ons',vous:'ez',ils:'ont',elles:'ont'},ce={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'},se={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ions',vous:'iez',ils:'ent'};if(tense==="présent de l'indicatif")return(s==='nous'||s==='vous'?yStem:iStem)+pe[s];if(tense==='imparfait')return yStem+ie[s];if(tense==='futur simple')return iStem+'er'+fe[s];if(tense==='conditionnel présent')return iStem+'er'+ce[s];if(tense==='subjonctif présent')return(s==='nous'||s==='vous'?yStem:iStem)+se[s];if(tense==='impératif présent'){if(!['tu','nous','vous'].includes(s))return null;if(s==='tu')return iStem+pe[s].replace(/s$/,'');return yStem+pe[s];}return null;}
     function generated(verb,tense,subject){return elerForms(verb,tense,subject)??yerForms(verb,tense,subject);}
     function variantsForAnswer(form){return String(form||'').split(' / ').map(v=>v.trim()).filter(Boolean);}
     engine.conjugate=function(verb,tense,subject,construction){const form=generated(verb,tense,subject);return form!=null?form:originalConjugate(verb,tense,subject,construction);};
     if(originalCanGenerate)engine.canGenerate=function(verb,tense){if((elerType(verb)||resolvePattern(verb)==='yer')&&simple.has(tense))return true;return originalCanGenerate(verb,tense);};
     function rowsFor(verb,tense,construction){if(!simple.has(tense))return null;if(!elerType(verb)&&resolvePattern(verb)!=='yer')return null;const subjects=tense==='impératif présent'?['tu','nous','vous']:['je','tu','il','elle','on','nous','vous','ils','elles'];return subjects.map(subject=>[subject,engine.conjugate(verb,tense,subject,construction)]).filter(r=>r[1]!=null&&String(r[1]).trim()!=='');}
+    function groupYerLookupRows(rows,verb,tense){
+      if(resolvePattern(verb)!=='yer'||tense==='impératif présent')return rows;
+      const bySubject=new Map(rows.map(row=>[row[0],row[1]]));
+      const result=[];
+      const used=new Set();
+      rows.forEach(row=>{
+        const subject=row[0];
+        if(used.has(subject))return;
+        if(['il','elle','on'].includes(subject)){
+          const forms=['il','elle','on'].map(s=>bySubject.get(s));
+          if(forms.every(form=>form!=null&&form===forms[0])){
+            result.push(['il/elle/on',forms[0]]);
+            ['il','elle','on'].forEach(s=>used.add(s));
+            return;
+          }
+        }
+        if(['ils','elles'].includes(subject)){
+          const forms=['ils','elles'].map(s=>bySubject.get(s));
+          if(forms.every(form=>form!=null&&form===forms[0])){
+            result.push(['ils/elles',forms[0]]);
+            ['ils','elles'].forEach(s=>used.add(s));
+            return;
+          }
+        }
+        result.push(row);
+        used.add(subject);
+      });
+      return result;
+    }
     if(originalRowsFor)engine.rowsFor=function(verb,tense,construction){const rows=rowsFor(verb,tense,construction);return applyJeContraction(rows!==null?rows:originalRowsFor(verb,tense,construction),verb);};
-    if(originalRowsForLookup)engine.rowsForLookup=function(verb,tense,construction){const rows=rowsFor(verb,tense,construction);return applyJeContraction(rows!==null?rows:originalRowsForLookup(verb,tense,construction),verb);};
+    if(originalRowsForLookup)engine.rowsForLookup=function(verb,tense,construction){const rows=rowsFor(verb,tense,construction);const lookupRows=rows!==null?rows:originalRowsForLookup(verb,tense,construction);return groupYerLookupRows(applyJeContraction(lookupRows,verb),verb,tense);};
     if(window.COQ_CONJ_UTILS&&typeof window.COQ_CONJ_UTILS.sameAnswer==='function'){const originalSameAnswer=window.COQ_CONJ_UTILS.sameAnswer.bind(window.COQ_CONJ_UTILS);window.COQ_CONJ_UTILS.sameAnswer=function(answer,q){if(q&&q.verb){const pattern=resolvePattern(q.verb);if(pattern==='er-eler'||pattern==='yer'){const normalized=String(answer||'').trim().toLocaleLowerCase(),alternatives=new Set(variantsForAnswer(q.answer).map(v=>v.toLocaleLowerCase()));if(alternatives.has(normalized))return true;}}return originalSameAnswer(answer,q);};}
     engine.__patternPatchInstalled=true;
   });
