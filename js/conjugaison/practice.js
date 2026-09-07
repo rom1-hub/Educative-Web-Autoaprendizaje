@@ -223,8 +223,40 @@
   function finishSession(){
     const score=session.results.reduce((sum,r)=>sum+(r.outcome==='correct-first'?1:r.outcome==='correct-after-first-error'?0.5:0),0);const total=session.results.length||20;const correct=session.results.filter(r=>r.outcome!=='incorrect-twice').length;const errors=total-correct;const note=score.toFixed(1).replace('.0','');document.querySelector('#practiceScore').textContent=`${note}/20`;document.querySelector('#practiceSummary').classList.remove('hidden');document.querySelector('#practiceSummaryText').textContent=`${correct} correct, ${errors} errors, ${note} note(s).`;const tbody=document.querySelector('#practiceResultsBody');if(tbody){tbody.innerHTML='';session.results.forEach((r,i)=>{const tr=document.createElement('tr');const outcome=r.outcome==='correct-first'?'Correct':r.outcome==='correct-after-first-error'?'Correct après erreur':'Erreur après 2 essais';tr.innerHTML=`<td>${i+1}</td><td>${U.escapeHtml(r.question.verb)}</td><td>${U.escapeHtml(r.question.tense)}</td><td>${U.escapeHtml(r.question.subject)}</td><td>${U.escapeHtml(r.question.answer)}</td><td>${outcome}</td>`;tbody.appendChild(tr);});}
   }
+  function resetPracticeForm(){
+    session={questions:[],index:0,correct:0,results:[],locked:false};
+    const verb=document.querySelector('#practiceVerb');
+    const tense=document.querySelector('#practiceTense');
+    const group=document.querySelector('#practiceGroup');
+    const construction=document.querySelector('#practiceConstruction');
+    const auxiliary=document.querySelector('#practiceAuxiliary');
+    const message=document.querySelector('#practiceMessage');
+    if(verb)verb.value='';
+    if(tense){tense.value='';tense.selectedIndex=0;}
+    if(group){group.value='';group.selectedIndex=0;}
+    if(construction){construction.value='';construction.selectedIndex=0;}
+    if(auxiliary){auxiliary.value='';auxiliary.selectedIndex=0;}
+    if(message){message.textContent='';message.className='form-message';}
+    document.querySelector('#practiceSession')?.classList.add('hidden');
+    document.querySelector('#practiceFeedback')?.replaceChildren();
+    const answer=document.querySelector('#answerInput');
+    if(answer){answer.value='';answer.className='';answer.disabled=false;}
+    document.querySelector('#questionVerb')?.replaceChildren();
+    document.querySelector('#questionSubject')?.replaceChildren();
+    document.querySelector('#practiceProgressText')?.replaceChildren();
+    document.querySelector('#practiceCriteria')?.replaceChildren();
+    const progress=document.querySelector('#practiceProgressBar');
+    if(progress)progress.style.width='0%';
+    document.querySelector('#nextQuestion')?.classList.add('hidden');
+    document.querySelector('#practiceSummary')?.classList.add('hidden');
+    document.querySelector('#practiceResultsBody')?.replaceChildren();
+    updatePracticeGroupState();
+    updatePracticeConstructionOptions();
+    updatePracticeAuxiliaryOptions();
+  }
   function bind(){
     document.querySelector('#startPractice')?.addEventListener('click',startSession);document.querySelector('#validateAnswer')?.addEventListener('click',validateAnswer);document.querySelector('#nextQuestion')?.addEventListener('click',nextQuestion);document.querySelector('#answerInput')?.addEventListener('keydown',e=>{if(e.key==='Enter')validateAnswer();});
+    document.querySelector('#clearVerb')?.addEventListener('click',resetPracticeForm);
     document.querySelector('#practiceVerb')?.addEventListener('input',()=>{updatePracticeGroupState();updatePracticeConstructionOptions();updatePracticeAuxiliaryOptions();});
     document.querySelector('#practiceTense')?.addEventListener('change',updatePracticeAuxiliaryOptions);
     document.querySelector('#practiceConstruction')?.addEventListener('change',updatePracticeAuxiliaryOptions);
