@@ -164,7 +164,7 @@
       return familyRows(verb,tense);
     };
     engine.__familyPatternsInstalled=true;
-    window.COQ_FAMILY_PATTERN_REGRESSION={patterns:{partir:['partir','sortir','dormir','servir'],suivre:['suivre'],ouvrir:['ouvrir','rouvrir','couvrir','découvrir','recouvrir','offrir','souffrir']},expected:{partir:{je:'pars',nous:'partons',ils:'partent'},sortir:{je:'sors',nous:'sortons',ils:'sortent'},dormir:{je:'dors',nous:'dormons',ils:'dorment'},servir:{je:'sers',nous:'servons',ils:'servent'},suivre:{je:'suis',nous:'suivons',ils:'suivent'},ouvrir:{je:"j'ouvre",nous:'ouvrons',ils:'ouvrent'},offrir:{je:"j'offre",nous:'offrons',ils:'offrent'},souffrir:{je:"j'offre",nous:'souffrons',ils:'souffrent'}}};
+    window.COQ_FAMILY_PATTERN_REGRESSION={patterns:{partir:['partir','sortir','dormir','servir'],suivre:['suivre'],ouvrir:['ouvrir','rouvrir','couvrir','découvrir','recouvrir','offrir','souffrir']},expected:{partir:{je:'pars',nous:'partons',ils:'partent'},sortir:{je:'sors',nous:'sortons',ils:'sortent'},dormir:{je:'dors',nous:'dormons',ils:'dorment'},servir:{je:'sers',nous:'servons',ils:'servent'},suivre:{je:'suis',nous:'suivons',ils:'suivent'},ouvrir:{je:"j'ouvre",nous:'ouvrons',ils:'ouvrent'},offrir:{je:"j'offre",nous:'offrons',ils:'offrent'},souffrir:{je:'je souffre',nous:'souffrons',ils:'souffrent'}}};
     return true;
   }
   function waitForEngine(attempt){ensureRecords();if(install())return;if((attempt||0)<100)setTimeout(function(){waitForEngine((attempt||0)+1);},25);}
