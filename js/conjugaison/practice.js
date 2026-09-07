@@ -211,15 +211,45 @@
     session={questions,index:0,correct:0,results:[],locked:false};document.querySelector('#practiceSession')?.classList.remove('hidden');document.querySelector('#practiceCriteria').textContent=[verb||'grupo',tense,group||'',construction||'',auxiliary||''].filter(Boolean).join(' · ');showQuestion();document.querySelector('#practiceSession')?.scrollIntoView({behavior:'smooth',block:'start'});
   }
   function showQuestion(){
-    const q=session.questions[session.index];session.locked=false;q.attempts=0;q.firstError='';q.secondError='';document.querySelector('#questionVerb').textContent=`${q.verb} · ${q.tense}`;document.querySelector('#questionSubject').textContent=q.subject;const input=document.querySelector('#answerInput');input.value='';input.className='';input.disabled=false;const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box';fb.textContent='';document.querySelector('#practiceProgressText').textContent=`Question ${session.index+1} / 20`;document.querySelector('#practiceProgressBar').style.width=`${(session.index/20)*100}%`;setTimeout(()=>input.focus(),80);
+    const q=session.questions[session.index];session.locked=false;q.attempts=0;q.firstError='';q.secondError='';q.mustTypeCorrect=false;document.querySelector('#questionVerb').textContent=`${q.verb} · ${q.tense}`;document.querySelector('#questionSubject').textContent=q.subject;const input=document.querySelector('#answerInput');input.value='';input.className='';input.disabled=false;const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box';fb.textContent='';document.querySelector('#practiceProgressText').textContent=`Question ${session.index+1} / 20`;document.querySelector('#practiceProgressBar').style.width=`${(session.index/20)*100}%`;setTimeout(()=>input.focus(),80);
   }
   function validateAnswer(){
-    if(session.locked)return;const q=session.questions[session.index],input=document.querySelector('#answerInput'),value=input.value.trim();if(!value)return;q.attempts++;
-    if(U.sameAnswer(value,q)){input.className='success';session.correct++;let outcome;if(q.attempts===1)outcome='correct-first';else if(q.attempts===2)outcome='correct-after-first-error';else outcome='correct-after-help';session.results.push({question:q,finalAnswer:value,outcome});session.locked=true;const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box ok';fb.textContent='✓ Correcto. Pasamos a la siguiente pregunta.';document.querySelector('#practiceProgressBar').style.width=`${((session.index+1)/20)*100}%`;setTimeout(()=>{session.index++;session.index>=20?finishSession():showQuestion()},650);
+    if(session.locked)return;
+    const q=session.questions[session.index],input=document.querySelector('#answerInput'),value=input.value.trim();
+    if(!value)return;
+
+    // Tras dos errores, la respuesta correcta ya fue mostrada. El alumno debe
+    // escribirla obligatoriamente; esta tercera fase no suma puntos.
+    if(q.mustTypeCorrect){
+      if(U.sameAnswer(value,q)){
+        input.className='success';
+        const fb=document.querySelector('#practiceFeedback');
+        fb.className='feedback-box ok';
+        fb.textContent='✓ Correcto. Pasamos a la siguiente pregunta.';
+        session.locked=true;
+        setTimeout(()=>{session.index++;session.index>=20?finishSession():showQuestion()},650);
+      }else{
+        input.className='error-second';
+        const fb=document.querySelector('#practiceFeedback');
+        fb.className='feedback-box error';
+        fb.innerHTML='Réponse incorrecte.<br><strong>Réponse correcte : '+U.escapeHtml(q.answer)+'</strong><br>Écris la réponse correcte pour continuer.';
+        input.focus();
+      }
+      return;
+    }
+
+    q.attempts++;
+    if(U.sameAnswer(value,q)){
+      input.className='success';session.correct++;let outcome;if(q.attempts===1)outcome='correct-first';else if(q.attempts===2)outcome='correct-after-first-error';else outcome='correct-after-help';session.results.push({question:q,finalAnswer:value,outcome});session.locked=true;const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box ok';fb.textContent='✓ Correcto. Pasamos a la siguiente pregunta.';document.querySelector('#practiceProgressBar').style.width=`${((session.index+1)/20)*100}%`;setTimeout(()=>{session.index++;session.index>=20?finishSession():showQuestion()},650);
     }else if(q.attempts===1){q.firstError=value;input.className='error-first';const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box warn';fb.textContent='Réponse incorrecte. Essaie encore.';
-    }else{q.secondError=value;input.className='error-second';const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box error';fb.innerHTML='Réponse incorrecte.<br><strong>Réponse correcte : '+U.escapeHtml(q.answer)+'</strong>';session.results.push({question:q,finalAnswer:value,outcome:'incorrect-twice'});session.locked=true;const next=document.querySelector('#nextQuestion');if(next)next.classList.remove('hidden');}
+    }else{q.secondError=value;input.className='error-second';const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box error';fb.innerHTML='Réponse incorrecte.<br><strong>Réponse correcte : '+U.escapeHtml(q.answer)+'</strong><br>Escribe la respuesta correcta para continuar.';q.mustTypeCorrect=true;session.results.push({question:q,finalAnswer:value,outcome:'incorrect-twice'});session.locked=false;input.value='';input.disabled=false;input.focus();const next=document.querySelector('#nextQuestion');if(next)next.classList.add('hidden');}
   }
-  function nextQuestion(){document.querySelector('#nextQuestion')?.classList.add('hidden');session.index++;session.index>=20?finishSession():showQuestion();}
+  function nextQuestion(){
+    // El botón Siguiente no debe saltarse una respuesta que aún deba escribirse.
+    const q=session.questions[session.index];
+    if(q&&q.mustTypeCorrect)return;
+    document.querySelector('#nextQuestion')?.classList.add('hidden');session.index++;session.index>=20?finishSession():showQuestion();
+  }
   function finishSession(){
     const score=session.results.reduce((sum,r)=>sum+(r.outcome==='correct-first'?1:r.outcome==='correct-after-first-error'?0.5:0),0);const total=session.results.length||20;const correct=session.results.filter(r=>r.outcome!=='incorrect-twice').length;const errors=total-correct;const note=score.toFixed(1).replace('.0','');document.querySelector('#practiceScore').textContent=`${note}/20`;document.querySelector('#practiceSummary').classList.remove('hidden');document.querySelector('#practiceSummaryText').textContent=`${correct} correct, ${errors} errors, ${note} note(s).`;const tbody=document.querySelector('#practiceResultsBody');if(tbody){tbody.innerHTML='';session.results.forEach((r,i)=>{const tr=document.createElement('tr');const outcome=r.outcome==='correct-first'?'Correct':r.outcome==='correct-after-first-error'?'Correct après erreur':'Erreur après 2 essais';tr.innerHTML=`<td>${i+1}</td><td>${U.escapeHtml(r.question.verb)}</td><td>${U.escapeHtml(r.question.tense)}</td><td>${U.escapeHtml(r.question.subject)}</td><td>${U.escapeHtml(r.question.answer)}</td><td>${outcome}</td>`;tbody.appendChild(tr);});}
   }
