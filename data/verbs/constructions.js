@@ -61,16 +61,12 @@ document.addEventListener('DOMContentLoaded', function(){
       const startsWithVowel = /^[aeiouyàâäéèêëîïôöùûüÿœæ]/i.test(expected);
 
       if(isCompound && startsWithVowel && (base === 'je' || base === "j'")){
-        // AVOIR: "j'ai appelé" o "ai appelé".
-        // Nunca: "je ai appelé".
         if(normalizedValue === normalizedExpected) return true;
         if(normalizedValue === ("j'" + normalizedExpected)) return true;
         return false;
       }
 
       if(isCompound && startsWithVowel && (base === 'que je' || base === "que j'")){
-        // Subjonctif passé: "que j'aie appelé" o "aie appelé".
-        // Nunca: "que je aie appelé".
         if(normalizedValue === normalizedExpected) return true;
         if(normalizedValue === ("que j'" + normalizedExpected)) return true;
         return false;
@@ -140,95 +136,4 @@ document.addEventListener('DOMContentLoaded', function(){
     });
     observer.observe(practiceSubject,{childList:true,characterData:true,subtree:true});
   }
-});
-
-// Corrección del flujo tras el segundo error:
-// el alumno ve la respuesta correcta, pero debe escribirla él mismo para poder continuar.
-document.addEventListener('DOMContentLoaded', function(){
-  const button=document.querySelector('#validateAnswer');
-  const input=document.querySelector('#answerInput');
-  const feedback=document.querySelector('#practiceFeedback');
-  const next=document.querySelector('#nextQuestion');
-  const questionVerb=document.querySelector('#questionVerb');
-  const questionSubject=document.querySelector('#questionSubject');
-  const U=window.COQ_CONJ_UTILS;
-  if(!button||!input||!feedback||!questionVerb||!questionSubject||!U)return;
-
-  let questionKey='';
-  let attempts=0;
-
-  function currentKey(){
-    return questionVerb.textContent.trim()+'|'+questionSubject.textContent.trim();
-  }
-
-  function syncQuestion(){
-    const key=currentKey();
-    if(key!==questionKey){
-      questionKey=key;
-      attempts=0;
-    }
-  }
-
-  const observer=new MutationObserver(syncQuestion);
-  observer.observe(questionVerb,{childList:true,characterData:true,subtree:true});
-  observer.observe(questionSubject,{childList:true,characterData:true,subtree:true});
-  syncQuestion();
-
-  button.addEventListener('click', function(event){
-    syncQuestion();
-    attempts++;
-
-    // Primer intento: lo gestiona normalmente practice.js.
-    if(attempts===1)return;
-
-    // Segundo intento: dejamos que practice.js registre el segundo error.
-    // Después retiramos "Siguiente" y obligamos a escribir la respuesta.
-    if(attempts===2){
-      setTimeout(function(){
-        if(next && !next.classList.contains('hidden')){
-          next.classList.add('hidden');
-          input.value='';
-          input.disabled=false;
-          input.className='error-second';
-          input.focus();
-        }
-      },0);
-      return;
-    }
-
-    // Desde aquí practice.js dejó la sesión bloqueada después del segundo error.
-    // Interceptamos el clic y solo permitimos continuar cuando el alumno
-    // escribe correctamente la respuesta que ya fue mostrada.
-    event.preventDefault();
-    event.stopImmediatePropagation();
-
-    const correctNode=feedback.querySelector('strong');
-    const correctText=correctNode
-      ? correctNode.textContent.replace(/^Réponse correcte\s*:\s*/i,'').trim()
-      : '';
-
-    if(!correctText)return;
-
-    const q={
-      subject:questionSubject.textContent.trim(),
-      answer:correctText,
-      tense:(questionVerb.textContent.split(' · ')[1]||'').trim()
-    };
-
-    if(U.sameAnswer(input.value.trim(),q)){
-      input.className='success';
-      feedback.className='feedback-box ok';
-      feedback.textContent='✓ Correcto. Pasamos a la siguiente pregunta.';
-      // nextQuestion() no depende de session.locked, por lo que puede avanzar
-      // y conserva el resultado "incorrect-twice" que practice.js ya registró.
-      setTimeout(function(){
-        if(next)next.click();
-      },650);
-    }else{
-      input.className='error-second';
-      feedback.className='feedback-box error';
-      feedback.innerHTML='Réponse incorrecte.<br><strong>Réponse correcte : '+U.escapeHtml(correctText)+'</strong><br>Écris la réponse correcte pour continuer.';
-      input.focus();
-    }
-  },true);
 });
