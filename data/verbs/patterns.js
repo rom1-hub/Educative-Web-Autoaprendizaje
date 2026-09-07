@@ -97,7 +97,7 @@ window.COQ_VERB_PATTERNS = {
     appuyer: { id:'appuyer', infinitif:'appuyer', infinitif_base:'appuyer', groupe:1, pattern:'yer', auxiliaire:'avoir', pronominal:false, participePasse:'appuyé', construction:'non-pronominale', verbeBase:'appuyer' },
     ennuyer: { id:'ennuyer', infinitif:'ennuyer', infinitif_base:'ennuyer', groupe:1, pattern:'yer', auxiliaire:'avoir', pronominal:false, participePasse:'ennuyé', construction:'non-pronominale', verbeBase:'ennuyer' },
     nettoyer: { id:'nettoyer', infinitif:'nettoyer', infinitif_base:'nettoyer', groupe:1, pattern:'yer', auxiliaire:'avoir', pronominal:false, participePasse:'nettoyé', construction:'non-pronominale', verbeBase:'nettoyer' },
-    payer: { id:'payer', infinitif:'payer', infinitif_base:'payer', groupe:1, pattern:'yer', auxiliaire:'avoir', pronominal:false, participePasse:'payé', construction:'non-pronominale', verbeBase:'payer' },
+    payer: { id:'payer', infinitif:'payer', infinitif_base:'payer', groupe:1, pattern:'yer', auxiliaire:'avoir', pronominal:false, participe:'payé', construction:'non-pronominale', verbeBase:'payer' },
     essayer: { id:'essayer', infinitif:'essayer', infinitif_base:'essayer', groupe:1, pattern:'yer', auxiliaire:'avoir', pronominal:false, participePasse:'essayé', construction:'non-pronominale', verbeBase:'essayer' }
   };
 
@@ -195,6 +195,39 @@ window.COQ_VERB_PATTERNS = {
       engine.canGenerate=function(verb,tense){
         if(resolvePattern(verb)==='yer' && simple.has(tense)) return true;
         return originalCanGenerate(verb,tense);
+      };
+    }
+
+    // rowsFor/rowsForLookup del motor usan el conjugate() interno del módulo,
+    // por lo que reemplazar únicamente engine.conjugate no alcanza a la tabla
+    // de consulta. Envolvemos esos dos puntos públicos para que -YER tenga
+    // también filas generadas cuando los tiempos simples no están en la BD.
+    function yerRows(verb,tense,construction){
+      if(resolvePattern(verb)!=='yer' || !simple.has(tense)) return null;
+      const subjects=tense==='impératif présent'
+        ? ['tu','nous','vous']
+        : ['je','tu','il','elle','on','nous','vous','ils','elles'];
+      const rows=[];
+      subjects.forEach(subject=>{
+        const form=engine.conjugate(verb,tense,subject,construction);
+        if(form!=null && String(form).trim()!=='') rows.push([subject,form]);
+      });
+      return rows;
+    }
+
+    if(typeof engine.rowsFor==='function'){
+      const originalRowsFor=engine.rowsFor.bind(engine);
+      engine.rowsFor=function(verb,tense){
+        const generated=yerRows(verb,tense);
+        return generated!==null ? generated : originalRowsFor(verb,tense);
+      };
+    }
+
+    if(typeof engine.rowsForLookup==='function'){
+      const originalRowsForLookup=engine.rowsForLookup.bind(engine);
+      engine.rowsForLookup=function(verb,tense){
+        const generated=yerRows(verb,tense);
+        return generated!==null ? generated : originalRowsForLookup(verb,tense);
       };
     }
 
