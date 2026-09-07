@@ -4,11 +4,6 @@
 (function(){
   const data=window.COQ_VERB_DATA||{};
   const catalog=window.COQ_VERBS||{};
-
-  // La fuente actual de la página es COQ_VERBS. Si existe un adaptador
-  // legacy (COQ_VERB_DATA), lo conservamos y añadimos el catálogo actual.
-  // Así los verbos registrados por patterns.js quedan disponibles para
-  // lookup/engine sin duplicar la base de datos.
   const api={
     conjugations:{...(data.conjugations||{}),...catalog},
     verbGroups:data.verbGroups||{},
@@ -16,22 +11,15 @@
   };
 
   api.normalizeVerb=function(v){return String(v||'').trim().toLowerCase();};
-  api.escapeHtml=function(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));};
+  api.escapeHtml=function(v){return String(v).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#039;'}[c]));};
   api.normalizeAnswerText=function(v){return String(v||'').trim().toLocaleLowerCase().replace(/\s+/g,' ');};
   api.answerVariants=function(q){
     const expected=api.normalizeAnswerText(q.answer);
     const variants=new Set([expected]);
     const rawSubject=String(q.subject||'').trim();
     if(!rawSubject)return variants;
-
-    // El sujeto mostrado puede incluir "que" y/o una indicación de género/número.
-    // Para validar, trabajamos siempre con el sujeto gramatical de base.
     const withoutGender=rawSubject.replace(/\s*\([^)]*\)\s*$/,'').trim();
-    const subject=(withoutGender.split(' ').pop()||withoutGender).trim();
-    const baseMap={
-      "j'":'je', je:'je', tu:'tu', il:'il', elle:'elle', on:'on',
-      nous:'nous', vous:'vous', ils:'ils', elles:'elles'
-    };
+    const baseMap={"j'":'je',je:'je',tu:'tu',il:'il',elle:'elle',on:'on',nous:'nous',vous:'vous',ils:'ils',elles:'elles'};
     let base=withoutGender.toLowerCase();
     if(/^qu['’]il$/.test(base))base='il';
     else if(/^qu['’]elle$/.test(base))base='elle';
@@ -46,19 +34,25 @@
     else base=baseMap[base]||base;
     if(!baseMap[base])return variants;
 
-    // 1) verbo solamente (forma canónica).
-    // 2) sujeto + verbo.
-    if(base==='je')variants.add(api.normalizeAnswerText('je '+expected));
-    else variants.add(api.normalizeAnswerText(base+' '+expected));
+    if(base==='je'){
+      variants.add(api.normalizeAnswerText('je '+expected));
+      // Cuando la forma empieza por vocal, también se acepta la contracción "j'".
+      if(!/^j['’]/.test(expected) && /^[aeiouyàâäéèêëîïôöùûüÿœæ]/i.test(expected)){
+        variants.add(api.normalizeAnswerText("j'"+expected));
+      }
+    }else{
+      variants.add(api.normalizeAnswerText(base+' '+expected));
+    }
 
-    // 3) En ambos subjuntivos, también aceptamos "que + sujeto + verbo".
     const isSubjonctif=/^subjonctif\s+(présent|passé)$/i.test(String(q.tense||''));
     if(isSubjonctif){
-      const queSubject={
-        je:"que je", tu:'que tu', il:"qu'il", elle:"qu'elle", on:"qu'on",
-        nous:'que nous', vous:'que vous', ils:"qu'ils", elles:"qu'elles"
-      }[base];
-      if(queSubject)variants.add(api.normalizeAnswerText(queSubject+' '+expected));
+      const queSubject={je:"que je",tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"}[base];
+      if(queSubject){
+        variants.add(api.normalizeAnswerText(queSubject+' '+expected));
+        if(base==='je' && !/^j['’]/.test(expected) && /^[aeiouyàâäéèêëîïôöùûüÿœæ]/i.test(expected)){
+          variants.add(api.normalizeAnswerText("que j'"+expected));
+        }
+      }
     }
     return variants;
   };
