@@ -42,14 +42,13 @@
     const verbs=window.COQ_VERBS||{},base=baseVerb(verb),r=verbs[base];
     return r&&r.pattern;
   }
+
   function partirType(inf,s,tense){
     const radical=inf.replace(/ir$/,'');
-    // La famille partir alterne entre un radical court au singulier
-    // (par-/dor-/ser-) et le radical complet au pluriel (part-/dorm-/serv-).
     const singular=radical.slice(0,-1);
     if(tense==="présent de l'indicatif"){
       if(s==='je'||s==='tu')return singular+END.present[s];
-      if(s==='il'||s==='elle'||s==='on')return singular+END.present[s];
+      if(s==='il'||s==='elle'||s==='on')return singular;
       return radical+END.present[s];
     }
     if(tense==='imparfait')return radical+END.imparfait[s];
@@ -62,23 +61,27 @@
     }
     return null;
   }
+
+  // suivre est une famille distincte : son présent est sui-/suiv-,
+  // tandis que l'imparfait et le subjonctif partent de suiv-.
   function suivreType(inf,s,tense){
-    const radical=inf.replace(/ir$/,'');
-    const singular=radical.slice(0,-1);
+    const singularStem='sui';
+    const pluralStem='suiv';
     if(tense==="présent de l'indicatif"){
-      if(s==='je'||s==='tu'||s==='il'||s==='elle'||s==='on')return singular+END.present[s];
-      return radical+END.present[s];
+      const end={je:'s',tu:'s',il:'t',elle:'t',on:'t',nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];
+      return (['je','tu','il','elle','on'].includes(s)?singularStem:pluralStem)+end;
     }
-    if(tense==='imparfait')return radical+END.imparfait[s];
+    if(tense==='imparfait')return pluralStem+END.imparfait[s];
     if(tense==='futur simple')return inf+END.futur[s];
     if(tense==='conditionnel présent')return inf+END.conditionnel[s];
-    if(tense==='subjonctif présent')return radical+END.subjonctif[s];
+    if(tense==='subjonctif présent')return pluralStem+END.subjonctif[s];
     if(tense==='impératif présent'){
       if(!IMPERATIVE_SUBJECTS.includes(s))return null;
-      return s==='tu' ? singular+END.present[s] : radical+END.present[s];
+      return s==='tu'?'suis':pluralStem+END.present[s];
     }
     return null;
   }
+
   function familyForm(verb,tense,subject){
     const verbs=window.COQ_VERBS||{},base=baseVerb(verb),r=verbs[base];
     if(!r||!SIMPLE.has(tense))return null;
@@ -116,7 +119,6 @@
       }
       return originalConjugate(verb,tense,subject,construction);
     };
-    function subjectFromRow(label){return baseSubject(label);}
     engine.rowsFor=function(verb,tense){
       if(!isFamilyVerb(verb)||!SIMPLE.has(tense))return originalRowsFor(verb,tense);
       return familyRows(verb,tense);
