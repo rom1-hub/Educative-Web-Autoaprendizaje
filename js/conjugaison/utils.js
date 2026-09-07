@@ -18,6 +18,11 @@
     const variants=new Set([expected]);
     const rawSubject=String(q.subject||'').trim();
     if(!rawSubject)return variants;
+
+    // En impératif, le sujet ne fait jamais partie de la réponse écrite.
+    // La única respuesta válida es la forma verbal sola: parle, prends, sois, etc.
+    if(String(q.tense||'').trim()==='impératif présent')return variants;
+
     const withoutGender=rawSubject.replace(/\s*\([^)]*\)\s*$/,'').trim();
     const baseMap={"j'":'je',je:'je',tu:'tu',il:'il',elle:'elle',on:'on',nous:'nous',vous:'vous',ils:'ils',elles:'elles'};
     let base=withoutGender.toLowerCase();
