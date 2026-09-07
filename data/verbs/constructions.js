@@ -75,8 +75,8 @@ window.COQ_COMPOUND_CONSTRUCTION_FILTERS = {
   });
 })();
 
-// Affichage de consultation : pour les temps simples des verbes -ELER,
-// regrouper il / elle / on e ils / elles sur una sola línea, como el resto del catálogo.
+// Afichage de consulta : para los tiempos simples de los verbos -ELER,
+// agrupar il / elle / on e ils / elles en una sola línea, como el resto del catálogo.
 document.addEventListener('DOMContentLoaded', function(){
   const engine = window.COQ_CONJ_ENGINE;
   const verbs = window.COQ_VERBS || {};
@@ -98,8 +98,33 @@ document.addEventListener('DOMContentLoaded', function(){
     return /eler$/.test(base);
   }
 
+  // Les temps composés utilisent les mêmes règles de contraction que les temps simples.
+  // Le moteur de patterns contracte déjà "je" sans annotation ; ici on traite également
+  // les variantes pédagogiques "je (masculin singulier)" / "que je (...)".
+  function applyCompoundJeContraction(rows, tense){
+    if(!window.COQ_CONJ_COMPOUND || !window.COQ_CONJ_COMPOUND.isCompound(tense)) return rows;
+
+    return (rows || []).map(function(row){
+      let subject = String(row[0] || '').trim();
+      const form = String(row[1] || '').trim().toLowerCase();
+      const annotated = subject.match(/^(que\s+)?je\s*(\([^)]*\))?$/i);
+      const startsWithVowel = /^[aeiouyàâäéèêëîïôöùûüÿœæ]/.test(form);
+
+      if(annotated && startsWithVowel){
+        const prefix = annotated[1] ? 'que j\'' : "j'";
+        subject = prefix + (annotated[2] ? ' ' + annotated[2] : '');
+      }
+
+      return [subject, row[1]];
+    });
+  }
+
   engine.rowsForLookup = function(verb, tense, construction){
-    const rows = originalRowsForLookup(verb, tense, construction) || [];
+    const rows = applyCompoundJeContraction(
+      originalRowsForLookup(verb, tense, construction) || [],
+      tense
+    );
+
     if(!isEler(verb) || !simpleTenses.has(tense)) return rows;
 
     const result = [];
