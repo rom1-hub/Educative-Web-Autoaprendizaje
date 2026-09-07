@@ -18,6 +18,8 @@
     conditionnel:{je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'},
     subjonctif:{je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ions',vous:'iez',ils:'ent',elles:'ent'}
   };
+  const STANDARD_SUBJECTS=['je','tu','il','elle','on','nous','vous','ils','elles'];
+  const IMPERATIVE_SUBJECTS=['tu','nous','vous'];
 
   function normalize(value){return String(value||'').trim().toLowerCase();}
   function baseSubject(subject){
@@ -53,7 +55,7 @@
     if(tense==='conditionnel présent')return inf+END.conditionnel[s];
     if(tense==='subjonctif présent')return radical+END.subjonctif[s];
     if(tense==='impératif présent'){
-      if(!['tu','nous','vous'].includes(s))return null;
+      if(!IMPERATIVE_SUBJECTS.includes(s))return null;
       return s==='tu' ? singular+'s' : radical+END.present[s];
     }
     return null;
@@ -70,7 +72,7 @@
     if(tense==='conditionnel présent')return inf+END.conditionnel[s];
     if(tense==='subjonctif présent')return radical+END.subjonctif[s];
     if(tense==='impératif présent'){
-      if(!['tu','nous','vous'].includes(s))return null;
+      if(!IMPERATIVE_SUBJECTS.includes(s))return null;
       return s==='tu' ? singular+END.present[s] : radical+END.present[s];
     }
     return null;
@@ -83,6 +85,12 @@
     if(r.pattern==='suivre-type')return suivreType(inf,s,tense);
     return null;
   }
+  function familyRows(verb,tense){
+    const subjects=tense==='impératif présent'?IMPERATIVE_SUBJECTS:STANDARD_SUBJECTS;
+    return subjects.map(function(subject){
+      return [subject,familyForm(verb,tense,subject)];
+    }).filter(function(row){return row[1]!==null&&row[1]!==undefined;});
+  }
   function ensureRecords(){
     const verbs=window.COQ_VERBS||(window.COQ_VERBS={});
     const family={
@@ -91,14 +99,15 @@
     };
     ['partir','sortir','dormir'].forEach(function(key){if(verbs[key])verbs[key].pattern='partir-type';});
     Object.keys(family).forEach(function(key){
-      if(verbs[key])return;
+      if(verbs[key]){
+        verbs[key].pattern=family[key].pattern;
+        verbs[key].auxiliaire=family[key].auxiliaire;
+        verbs[key].participePasse=family[key].pp;
+        return;
+      }
       const x=family[key];
       verbs[key]={id:key,infinitif:key,infinitif_base:key,groupe:3,pattern:x.pattern,auxiliaire:x.auxiliaire,pronominal:false,participePasse:x.pp,construction:'non-pronominale',verbeBase:key};
     });
-
-    // utils.js crea una instantánea del catálogo al cargarse.
-    // Como estas familias se incorporan después, sincronizamos aquí
-    // los registros nuevos para que lookup.js pueda encontrarlos.
     const utils=window.COQ_CONJ_UTILS;
     if(utils){
       Object.assign(utils.conjugations,verbs);
@@ -123,22 +132,18 @@
       }
       return originalConjugate(verb,tense,subject,construction);
     };
-    function subjectFromRow(label){return baseSubject(label);}
     engine.rowsFor=function(verb,tense){
       if(!isFamilyVerb(verb)||!SIMPLE.has(tense))return originalRowsFor(verb,tense);
-      const source=originalRowsFor(verb,tense);
-      return source.map(function(row){return [row[0],engine.conjugate(verb,tense,subjectFromRow(row[0]),'non-pronominale')];});
+      return familyRows(verb,tense);
     };
     engine.rowsForLookup=function(verb,tense){
       if(!isFamilyVerb(verb)||!SIMPLE.has(tense))return originalRowsForLookup(verb,tense);
-      const source=originalRowsForLookup(verb,tense);
-      return source.map(function(row){return [row[0],engine.conjugate(verb,tense,subjectFromRow(row[0]),'non-pronominale')];});
+      return familyRows(verb,tense);
     };
     engine.rowsForConstruction=function(verb,tense,construction){
       if(!isFamilyVerb(verb)||!SIMPLE.has(tense))return originalRowsForConstruction(verb,tense,construction);
       if(construction==='pronominale')return originalRowsForConstruction(verb,tense,construction);
-      const source=originalRowsForConstruction(verb,tense,construction);
-      return source.map(function(row){return [row[0],engine.conjugate(verb,tense,subjectFromRow(row[0]),construction)];});
+      return familyRows(verb,tense);
     };
     engine.__familyPatternsInstalled=true;
     window.COQ_FAMILY_PATTERN_REGRESSION={
@@ -153,7 +158,6 @@
     };
     return true;
   }
-
   function waitForEngine(attempt){
     ensureRecords();
     if(install())return;
