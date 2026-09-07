@@ -15,31 +15,50 @@ window.COQ_TENSE_RULES = {
 };
 
 /*
- * Compatibilidad post-carga: el motor conserva toda su lógica existente,
- * pero una construcción pronominal compuesta no debe duplicar el pronombre.
- * Se corrige únicamente el artefacto "me me suis..." producido por la
- * combinación de contractPronoun() + concatenación del auxiliar.
+ * Compatibilidad post-carga.
+ *
+ * El motor actual conserva una implementación histórica en compoundForm()
+ * que puede producir temporalmente "me me suis..." en una construcción
+ * pronominal compuesta. Esta capa corrige únicamente ese artefacto y lo hace
+ * de forma independiente de que el caller haya enviado explícitamente la
+ * construcción o de que esta venga determinada por los metadatos del verbo.
+ *
+ * Es una capa transitoria: la lógica definitiva deberá integrarse en engine.js
+ * cuando se complete la migración morfológica.
  */
 document.addEventListener('DOMContentLoaded',function(){
   const engine=window.COQ_CONJ_ENGINE;
   const P=window.COQ_CONJ_PRONOUNS;
   const C=window.COQ_CONJ_COMPOUND;
+  const verbs=window.COQ_VERBS||{};
   if(!engine||typeof engine.conjugate!=='function'||!P||!C||engine.__compoundCompatibilityPatch)return;
 
   const original=engine.conjugate.bind(engine);
   const compounds=new Set(C.compoundTenses||Object.keys(C.mapping||{}));
 
-  engine.conjugate=function(verb,tense,subject,construction){
-    const result=original(verb,tense,subject,construction);
-    if(result==null||!compounds.has(tense)||construction!=='pronominale')return result;
+  function isPronominal(verb,construction){
+    if(construction==='pronominale')return true;
+    if(construction==='non-pronominale')return false;
+    const record=verbs[String(verb||'').trim().toLowerCase()]||{};
+    return record.pronominal===true || record.construction==='pronominale';
+  }
 
+  function normalizeDuplicatePronoun(result,subject){
+    if(result==null)return result;
     const pronoun=P.pronounFor(subject);
     if(!pronoun)return result;
 
-    const first=String(result).trim();
+    const value=String(result).trim();
     const escaped=pronoun.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-    const duplicate=new RegExp('^'+escaped+'\\s+'+escaped+'\\s+','i');
-    return first.replace(duplicate,pronoun+' ');
+    const duplicate=new RegExp('^'+escaped+'(?:\\s+|\\s*\\u2019?)'+escaped+'\\s+','i');
+
+    return value.replace(duplicate,pronoun+' ');
+  }
+
+  engine.conjugate=function(verb,tense,subject,construction){
+    const result=original(verb,tense,subject,construction);
+    if(result==null||!compounds.has(tense)||!isPronominal(verb,construction))return result;
+    return normalizeDuplicatePronoun(result,subject);
   };
 
   engine.__compoundCompatibilityPatch=true;
