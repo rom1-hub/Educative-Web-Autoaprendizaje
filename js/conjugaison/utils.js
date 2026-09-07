@@ -19,7 +19,9 @@
     const variants=new Set(expectedVariants);
     const rawSubject=String(q.subject||'').trim();
     if(!rawSubject)return variants;
+
     if(String(q.tense||'').trim()==='impératif présent')return variants;
+
     const withoutGender=rawSubject.replace(/\s*\([^)]*\)\s*$/,'').trim();
     const baseMap={"j'":'je',je:'je',tu:'tu',il:'il',elle:'elle',on:'on',nous:'nous',vous:'vous',ils:'ils',elles:'elles'};
     let base=withoutGender.toLowerCase();
@@ -35,20 +37,28 @@
     else if(/^que\s+vous$/.test(base))base='vous';
     else base=baseMap[base]||base;
     if(!baseMap[base])return variants;
+
     expectedVariants.forEach(function(form){
       const startsWithVowel=/^[aeiouyàâäéèêëîïôöùûüÿœæ]/i.test(form);
       if(base==='je'){
         if(!startsWithVowel) variants.add(api.normalizeAnswerText('je '+form));
-        if(!/^j['’]/.test(form) && startsWithVowel) variants.add(api.normalizeAnswerText("j'"+form));
+        if(!/^j['’]/.test(form) && startsWithVowel){
+          variants.add(api.normalizeAnswerText("j'"+form));
+        }
       }else{
         variants.add(api.normalizeAnswerText(base+' '+form));
       }
+
       const isSubjonctif=/^subjonctif\s+(présent|passé)$/i.test(String(q.tense||''));
       if(isSubjonctif){
         const queSubject={je:"que je",tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"}[base];
         if(queSubject){
-          if(!(base==='je' && startsWithVowel)) variants.add(api.normalizeAnswerText(queSubject+' '+form));
-          if(base==='je' && !/^j['’]/.test(form) && startsWithVowel) variants.add(api.normalizeAnswerText("que j'"+form));
+          if(!(base==='je' && startsWithVowel)){
+            variants.add(api.normalizeAnswerText(queSubject+' '+form));
+          }
+          if(base==='je' && !/^j['’]/.test(form) && startsWithVowel){
+            variants.add(api.normalizeAnswerText("que j'"+form));
+          }
         }
       }
     });
@@ -96,11 +106,43 @@
     });
   }
 
-  function initImperativeLookupDecorator(){
+  function groupYerLookup(){
+    const result=document.querySelector('#conjResult');
+    if(!result)return;
+    const verb=api.normalizeVerb(document.querySelector('#verbSearch')?.value||document.querySelector('#verbInput')?.value||'');
+    const resolver=window.COQ_PATTERN_RESOLVER;
+    if(!verb||!resolver||typeof resolver.resolvePattern!=='function'||resolver.resolvePattern(verb)!=='yer')return;
+    const simple=new Set(["présent de l'indicatif",'imparfait','futur simple','conditionnel présent','subjonctif présent']);
+    result.querySelectorAll('.tense-block').forEach(block=>{
+      const title=block.querySelector('.tense-head h3');
+      const table=block.querySelector('.tense-table');
+      if(!title||!table||!simple.has(title.textContent.trim()))return;
+      if(table.dataset.yerGrouped==='true')return;
+      const rows=[...table.querySelectorAll('tbody tr')];
+      const mergeGroup=function(subjects,label){
+        const matches=rows.filter(row=>subjects.includes(row.querySelector('td:first-child')?.textContent.trim()));
+        if(matches.length!==subjects.length)return;
+        const forms=matches.map(row=>row.querySelector('td:nth-child(2)')?.textContent.trim());
+        if(new Set(forms).size!==1)return;
+        const first=matches[0];
+        first.querySelector('td:first-child').textContent=label;
+        matches.slice(1).forEach(row=>row.remove());
+      };
+      mergeGroup(['il','elle','on'],'il/elle/on');
+      mergeGroup(['ils','elles'],'ils/elles');
+      table.dataset.yerGrouped='true';
+    });
+  }
+
+  function initLookupDecorators(){
     const result=document.querySelector('#conjResult');
     if(!result)return;
     decorateImperativeLookup();
-    new MutationObserver(decorateImperativeLookup).observe(result,{childList:true,subtree:true});
+    groupYerLookup();
+    new MutationObserver(function(){
+      decorateImperativeLookup();
+      groupYerLookup();
+    }).observe(result,{childList:true,subtree:true});
   }
 
   const faire=window.COQ_VERBS&&window.COQ_VERBS['faire'];
@@ -115,8 +157,6 @@
     });
   }
 
-  // Defensa central del patrón -YER: las formas de nous/vous conservan
-  // la terminación completa, especialmente la "s" final de -ons/-ez.
   function installYerIntegrityPatch(){
     const engine=window.COQ_CONJ_ENGINE;
     if(!engine||typeof engine.conjugate!=='function')return;
@@ -127,7 +167,7 @@
     const ends={
       present:{je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ons',vous:'ez',ils:'ent',elles:'ent'},
       imparfait:{je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'},
-      futur:{je:'ai',tu:'as',il:'a',elle:'a',on:'ons',nous:'ons',vous:'ez',ils:'ont',elles:'ont'},
+      futur:{je:'ai',tu:'as',il:'a',elle:'a',on:'a',nous:'ons',vous:'ez',ils:'ont',elles:'ont'},
       conditionnel:{je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'},
       subjonctif:{je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ions',vous:'iez',ils:'ent',elles:'ent'}
     };
@@ -161,8 +201,8 @@
       if(tense==='subjonctif présent')return(s==='nous'||s==='vous'?yStem:iStem)+(ends.subjonctif[s]||'');
       if(tense==='impératif présent'){
         if(!['tu','nous','vous'].includes(s))return null;
-        if(s==='tu')return iStem+(ends.present[s]||'').replace(/s$/,'');
-        return yStem+(ends.present[s]||'');
+        if(s==='tu')return iStem+ends.present[s].replace(/s$/,'');
+        return yStem+ends.present[s];
       }
       return null;
     }
@@ -193,9 +233,9 @@
   }
 
   if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',function(){initImperativeLookupDecorator();installYerIntegrityPatch();});
+    document.addEventListener('DOMContentLoaded',function(){initLookupDecorators();installYerIntegrityPatch();});
   }else{
-    initImperativeLookupDecorator();
+    initLookupDecorators();
     installYerIntegrityPatch();
   }
 
