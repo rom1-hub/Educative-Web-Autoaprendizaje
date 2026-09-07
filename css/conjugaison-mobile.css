@@ -39,6 +39,15 @@
     overflow-x:hidden;
   }
 
+  /* La nota del imperativo debe ocupar toda la tabla y adaptarse a la pantalla. */
+  .tense-table tr:has(td[colspan]) td{
+    white-space:normal;
+    overflow-wrap:anywhere;
+    word-break:normal;
+    line-height:1.4;
+    text-align:left;
+  }
+
   .conj-actions{
     flex-direction:column;
     align-items:stretch;
