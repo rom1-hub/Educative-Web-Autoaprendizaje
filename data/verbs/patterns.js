@@ -1,51 +1,43 @@
 // COQ — catálogo y resolución de patrones de conjugación.
-//
-// Regla arquitectónica:
-// 1) Un patrón explícito de la BD siempre tiene prioridad.
-// 2) Si falta, se intenta detectar un patrón productivo ya implementado.
-// 3) Los patrones todavía no migrados al motor no se asignan automáticamente.
-window.COQ_VERB_PATTERNS = {
-  "regular-er": { groupe: 1, description: "Premier groupe régulier en -ER" },
-  "regular-ir": { groupe: 2, description: "Deuxième groupe régulier en -IR" },
-  "regular-re": { groupe: 3, description: "Verbes réguliers en -RE" },
-  "er-ger": { groupe: 1, description: "Premier groupe avec terminaison -GER" },
-  "er-cer": { groupe: 1, description: "Premier groupe avec terminaison -CER" },
-  "er-eler": { groupe: 1, description: "Premier groupe avec alternance en -ELER" },
-  "er-eter": { groupe: 1, description: "Premier groupe avec alternance en -ETER" },
-  "yer": { groupe: 1, description: "Premier groupe en -YER" },
-  "er-e-accent": { groupe: 1, description: "Premier groupe avec alternance E/È + consonne + ER" },
-  "avoir": { groupe: 3, description: "Verbe irrégulier avoir" },
-  "être": { groupe: 3, description: "Verbe irrégulier être" },
-  "aller": { groupe: 3, description: "Verbe irrégulier aller" },
-  "prendre": { groupe: 3, description: "Famille prendre" },
-  "venir": { groupe: 3, description: "Famille venir" },
-  "faire": { groupe: 3, description: "Verbe irrégulier faire" }
+window.COQ_VERB_PATTERNS={
+  "regular-er":{groupe:1,description:"Premier groupe régulier en -ER"},
+  "regular-ir":{groupe:2,description:"Deuxième groupe régulier en -IR"},
+  "regular-re":{groupe:3,description:"Verbes réguliers en -RE"},
+  "er-ger":{groupe:1,description:"Premier groupe avec terminaison -GER"},
+  "er-cer":{groupe:1,description:"Premier groupe avec terminaison -CER"},
+  "er-eler":{groupe:1,description:"Premier groupe avec alternance en -ELER"},
+  "er-eter":{groupe:1,description:"Premier groupe avec alternance en -ETER"},
+  "yer":{groupe:1,description:"Premier groupe en -YER"},
+  "er-e-accent":{groupe:1,description:"Premier groupe avec alternance E/È + consonne + ER"},
+  "avoir":{groupe:3,description:"Verbe irrégulier avoir"},
+  "être":{groupe:3,description:"Verbe irrégulier être"},
+  "aller":{groupe:3,description:"Verbe irrégulier aller"},
+  "prendre":{groupe:3,description:"Famille prendre"},
+  "venir":{groupe:3,description:"Famille venir"},
+  "faire":{groupe:3,description:"Verbe irrégulier faire"}
 };
 
 (function(){
-  const verbs = window.COQ_VERBS || {};
-  const patterns = window.COQ_VERB_PATTERNS;
-  function normalize(v){ return String(v || '').trim().toLowerCase(); }
+  const verbs=window.COQ_VERBS||{};
+  const patterns=window.COQ_VERB_PATTERNS;
+  function normalize(v){return String(v||'').trim().toLowerCase();}
   function baseVerb(verb){
-    const key = normalize(verb), record = verbs[key];
-    if(record && record.verbeBase && verbs[normalize(record.verbeBase)]) return normalize(record.verbeBase);
-    if(key.startsWith('se ')) return key.slice(3).trim();
+    const key=normalize(verb),r=verbs[key];
+    if(r&&r.verbeBase&&verbs[normalize(r.verbeBase)])return normalize(r.verbeBase);
+    if(key.startsWith('se '))return key.slice(3).trim();
     return key;
   }
   function resolvePattern(verb){
-    const key=normalize(verb), base=baseVerb(key), record=verbs[key]||verbs[base];
-    if(record && record.pattern && patterns[record.pattern]) return record.pattern;
-    if(/ger$/.test(base)) return 'er-ger';
-    if(/cer$/.test(base)) return 'er-cer';
-    if(/yer$/.test(base)) return 'yer';
-    if(/er$/.test(base)) return 'regular-er';
+    const key=normalize(verb),base=baseVerb(key),r=verbs[key]||verbs[base];
+    if(r&&r.pattern&&patterns[r.pattern])return r.pattern;
+    if(/ger$/.test(base))return'er-ger';
+    if(/cer$/.test(base))return'er-cer';
+    if(/yer$/.test(base))return'yer';
+    if(/er$/.test(base))return'regular-er';
     return null;
   }
   function applyToDatabase(){
-    Object.keys(verbs).forEach(key=>{
-      const record=verbs[key]; if(!record || record.pattern) return;
-      const resolved=resolvePattern(key); if(resolved) record.pattern=resolved;
-    });
+    Object.keys(verbs).forEach(k=>{const r=verbs[k];if(!r||r.pattern)return;const p=resolvePattern(k);if(p)r.pattern=p;});
   }
   window.COQ_PATTERN_RESOLVER={normalize,baseVerb,resolvePattern,applyToDatabase};
   applyToDatabase();
@@ -70,8 +62,7 @@ window.COQ_VERB_PATTERNS = {
     payer:{id:'payer',infinitif:'payer',infinitif_base:'payer',groupe:1,pattern:'yer',auxiliaire:'avoir',pronominal:false,participePasse:'payé',construction:'non-pronominale',verbeBase:'payer'},
     essayer:{id:'essayer',infinitif:'essayer',infinitif_base:'essayer',groupe:1,pattern:'yer',auxiliaire:'avoir',pronominal:false,participePasse:'essayé',construction:'non-pronominale',verbeBase:'essayer'}
   };
-  window.COQ_VERBS=window.COQ_VERBS||{};
-  Object.keys(regressionVerbs).forEach(key=>{if(!window.COQ_VERBS[key]) window.COQ_VERBS[key]=regressionVerbs[key];});
+  Object.keys(regressionVerbs).forEach(k=>{if(!window.COQ_VERBS[k])window.COQ_VERBS[k]=regressionVerbs[k];});
   window.COQ_PATTERN_REGRESSION={
     ger:['manger','changer','voyager','nager','partager','ranger','corriger'],
     cer:['commencer','placer','annoncer','avancer','prononcer','remplacer','lancer'],
@@ -99,20 +90,30 @@ window.COQ_VERB_PATTERNS = {
       const key=normalize(verb),base=baseVerb(key),r=verbs[base]||verbs[key];
       if(!r||r.pattern!=='yer'||!simple.has(tense))return null;
       const inf=r.infinitif_base||r.infinitif||base,s=baseSubject(subject),stem=inf.slice(0,-3),yStem=stem+'y',iStem=stem+'i';
-      const presentEnd={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ons',vous:'ez',ils:'ent',elles:'ent'};
-      const impEnd={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'};
-      const futEnd={je:'ai',tu:'as',il:'a',elle:'a',on:'a',nous:'ons',vous:'ez',ils:'ont',elles:'ont'};
-      const condEnd={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'};
-      const subjEnd={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ions',vous:'iez',ils:'ent',elles:'ent'};
-      if(tense==="présent de l'indicatif")return(s==='nous'||s==='vous'?yStem:iStem)+presentEnd[s];
-      if(tense==='imparfait')return yStem+impEnd[s];
-      if(tense==='futur simple')return iStem+'er'+futEnd[s];
-      if(tense==='conditionnel présent')return iStem+'er'+condEnd[s];
-      if(tense==='subjonctif présent')return(s==='nous'||s==='vous'?yStem:iStem)+subjEnd[s];
-      if(tense==='impératif présent'){if(!['tu','nous','vous'].includes(s))return null;return(s==='nous'||s==='vous'?yStem:iStem)+presentEnd[s].replace(/s$/,'');}
+      const pe={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ons',vous:'ez',ils:'ent',elles:'ent'};
+      const ie={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'};
+      const fe={je:'ai',tu:'as',il:'a',elle:'a',on:'a',nous:'ons',vous:'ez',ils:'ont',elles:'ont'};
+      const ce={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'};
+      const se={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ions',vous:'iez',ils:'ent',elles:'ent'};
+      if(tense==="présent de l'indicatif")return(s==='nous'||s==='vous'?yStem:iStem)+pe[s];
+      if(tense==='imparfait')return yStem+ie[s];
+      if(tense==='futur simple')return iStem+'er'+fe[s];
+      if(tense==='conditionnel présent')return iStem+'er'+ce[s];
+      if(tense==='subjonctif présent')return(s==='nous'||s==='vous'?yStem:iStem)+se[s];
+      if(tense==='impératif présent'){if(!['tu','nous','vous'].includes(s))return null;return(s==='nous'||s==='vous'?yStem:iStem)+pe[s].replace(/s$/,'');}
       return null;
     }
-    engine.conjugate=function(verb,tense,subject,construction){const generated=generate(verb,tense,subject);return generated!=null?generated:originalConjugate(verb,tense,subject,construction);};
+    function payerVariant(form,tense,verb){
+      if(normalize(verb)!=='payer')return form;
+      const f=String(form||'');
+      if(tense==="présent de l'indicatif"){
+        const map={paie:'paye',paies:'payes',paient:'payent'};
+        return map[f]?f+' / '+map[f]:f;
+      }
+      if(tense==='futur simple')return f.replace(/^pai(er)(.+)$/,'pai$1$2 / payer$2');
+      return f;
+    }
+    engine.conjugate=function(verb,tense,subject,construction){const generated=generate(verb,tense,subject);return generated!=null?payerVariant(generated,tense,verb):originalConjugate(verb,tense,subject,construction);};
     if(typeof engine.canGenerate==='function'){
       const originalCanGenerate=engine.canGenerate.bind(engine);
       engine.canGenerate=function(verb,tense){if(resolvePattern(verb)==='yer'&&simple.has(tense))return true;return originalCanGenerate(verb,tense);};
@@ -120,16 +121,36 @@ window.COQ_VERB_PATTERNS = {
     function yerRows(verb,tense,construction){
       if(resolvePattern(verb)!=='yer'||!simple.has(tense))return null;
       const subjects=tense==='impératif présent'?['tu','nous','vous']:['je','tu','il','elle','on','nous','vous','ils','elles'];
-      const rows=[];subjects.forEach(subject=>{const form=engine.conjugate(verb,tense,subject,construction);if(form!=null&&String(form).trim()!=='')rows.push([subject,form]);});
+      const rows=[];
+      subjects.forEach(subject=>{const form=engine.conjugate(verb,tense,subject,construction);if(form!=null&&String(form).trim()!=='')rows.push([subject,form]);});
       return rows;
     }
-    if(typeof engine.rowsFor==='function'){
-      const originalRowsFor=engine.rowsFor.bind(engine);
-      engine.rowsFor=function(verb,tense){const generated=yerRows(verb,tense);return generated!==null?generated:originalRowsFor(verb,tense);};
+    function isHMuet(record,verb){return !!(record&&record.hMuet) || !!(window.COQ_H_MUET&&window.COQ_H_MUET[normalize(verb)]);}
+    function shouldContractJe(verb,form){
+      const r=verbs[baseVerb(verb)]||verbs[normalize(verb)];
+      const f=String(form||'').trim().toLowerCase();
+      return /^[aeiouyàâäéèêëîïôöùûüÿœæ]/.test(f)||isHMuet(r,verb);
     }
-    if(typeof engine.rowsForLookup==='function'){
-      const originalRowsForLookup=engine.rowsForLookup.bind(engine);
-      engine.rowsForLookup=function(verb,tense){const generated=yerRows(verb,tense);return generated!==null?generated:originalRowsForLookup(verb,tense);};
+    function applyJeContraction(rows,verb,tense){
+      return (rows||[]).map(row=>{
+        let subject=row[0],form=row[1];
+        if(baseSubject(subject)==='je'&&shouldContractJe(verb,form))subject=String(subject).replace(/^je$/,'j\'').replace(/^que je$/,'que j\'');
+        return [subject,form];
+      });
+    }
+    const originalRowsFor=engine.rowsFor.bind(engine);
+    engine.rowsFor=function(verb,tense){
+      const generated=yerRows(verb,tense); 
+      const rows=generated!==null?generated:originalRowsFor(verb,tense);
+      return applyJeContraction(rows,verb,tense);
+    };
+    const originalRowsForLookup=engine.rowsForLookup&&engine.rowsForLookup.bind(engine);
+    if(originalRowsForLookup){
+      engine.rowsForLookup=function(verb,tense){
+        const generated=yerRows(verb,tense);
+        const rows=generated!==null?generated:originalRowsForLookup(verb,tense);
+        return applyJeContraction(rows,verb,tense);
+      };
     }
     engine.__yerPatch=true;
     if(window.COQ_CONJ_UTILS&&typeof window.COQ_CONJ_UTILS.sameAnswer==='function'){
@@ -137,6 +158,7 @@ window.COQ_VERB_PATTERNS = {
       window.COQ_CONJ_UTILS.sameAnswer=function(answer,q){
         if(q&&q.verb&&resolvePattern(q.verb)==='yer'){
           const normalized=String(answer||'').trim().toLocaleLowerCase(),canonical=String(q.answer||'').trim().toLocaleLowerCase(),alternatives=new Set([canonical]);
+          canonical.split(' / ').forEach(v=>alternatives.add(v));
           if(/(?:pa|essa)y/.test(canonical))alternatives.add(canonical.replace(/i/g,'y'));
           if(/^p(?:a|)ie/.test(canonical))alternatives.add(canonical.replace(/ie/,'ye'));
           if(/^essaie/.test(canonical))alternatives.add(canonical.replace(/^essaie/,'essaye'));
