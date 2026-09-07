@@ -31,15 +31,168 @@
     });
   }
 
+  /*
+   * El HTML actual de Conjugación ya contiene la ventana #resultModal.
+   * practice.js conserva el motor de puntuación, pero su antigua ventana
+   * #practiceSummary ya no forma parte del marcado. Este adaptador recoge
+   * el resultado visible de cada pregunta y alimenta la ventana existente.
+   */
+  function initPracticeSummary(){
+    const validate=document.getElementById('validateAnswer');
+    const input=document.getElementById('answerInput');
+    const progress=document.getElementById('practiceProgressText');
+    const modal=document.getElementById('resultModal');
+    if(!validate||!input||!progress||!modal)return;
+
+    const rows=new Map();
+    let currentNumber=0;
+    let currentAttempts=0;
+
+    function readQuestion(){
+      const text=progress.textContent||'';
+      const m=text.match(/Question\s+(\d+)\s*\/\s*20/i);
+      currentNumber=m?Number(m[1]):0;
+      currentAttempts=0;
+    }
+
+    function questionData(){
+      return {
+        number:currentNumber,
+        verb:(document.getElementById('questionVerb')?.textContent||'').split(' · ')[0].trim(),
+        tense:(document.getElementById('questionVerb')?.textContent||'').split(' · ').slice(1).join(' · ').trim(),
+        subject:document.getElementById('questionSubject')?.textContent||''
+      };
+    }
+
+    function extractCorrectAnswer(){
+      const feedback=document.getElementById('practiceFeedback');
+      if(!feedback)return '';
+      const strong=feedback.querySelector('strong');
+      if(strong)return strong.textContent.replace(/^Réponse correcte\s*:\s*/i,'').trim();
+      const text=feedback.textContent||'';
+      const m=text.match(/Réponse correcte\s*:\s*(.+?)(?:\s+Escribe|$)/i);
+      return m?m[1].trim():'';
+    }
+
+    function recordAfterValidation(){
+      const number=currentNumber;
+      if(!number)return;
+      const data=questionData();
+      const cls=input.className||'';
+      if(cls.includes('error-first')){
+        currentAttempts=1;
+        const row=rows.get(number)||{...data,firstError:input.value,finalAnswer:'',correctAnswer:'',outcome:'error-first'};
+        row.firstError=input.value;
+        rows.set(number,row);
+        return;
+      }
+      if(cls.includes('error-second')){
+        currentAttempts=2;
+        const row=rows.get(number)||{...data,firstError:'',finalAnswer:'',correctAnswer:'',outcome:'incorrect-twice'};
+        row.correctAnswer=extractCorrectAnswer();
+        row.outcome='incorrect-twice';
+        rows.set(number,row);
+        return;
+      }
+      if(cls.includes('success')){
+        const row=rows.get(number)||{...data,firstError:'',finalAnswer:'',correctAnswer:'',outcome:'correct-first'};
+        if(currentAttempts===0){
+          row.outcome='correct-first';
+          row.finalAnswer=input.value.trim();
+          row.correctAnswer=input.value.trim();
+        }else if(currentAttempts===1){
+          row.outcome='correct-after-first-error';
+          row.finalAnswer=input.value.trim();
+          row.correctAnswer=input.value.trim();
+        }else{
+          row.outcome='incorrect-twice';
+          row.finalAnswer=input.value.trim();
+          if(!row.correctAnswer)row.correctAnswer=input.value.trim();
+        }
+        rows.set(number,row);
+        if(number===20)setTimeout(renderSummary,750);
+      }
+    }
+
+    function renderSummary(){
+      const ordered=[...rows.values()].sort((a,b)=>a.number-b.number);
+      if(ordered.length<20)return;
+      const correct=ordered.filter(r=>r.outcome!=='incorrect-twice').length;
+      const errors=20-correct;
+      const score=ordered.reduce((sum,r)=>sum+(r.outcome==='correct-first'?1:r.outcome==='correct-after-first-error'?.5:0),0);
+      const note=Number.isInteger(score)?String(score):score.toFixed(1);
+
+      const finalCorrect=document.getElementById('finalCorrect');
+      const finalWrong=document.getElementById('finalWrong');
+      const finalScore=document.getElementById('finalScore');
+      if(finalCorrect)finalCorrect.textContent=String(correct);
+      if(finalWrong)finalWrong.textContent=String(errors);
+      if(finalScore)finalScore.textContent=`${note} / 20`;
+
+      const tbody=document.getElementById('resultRows');
+      if(tbody){
+        tbody.innerHTML='';
+        ordered.forEach(r=>{
+          const tr=document.createElement('tr');
+          const result=r.outcome==='correct-first'?'Correct':r.outcome==='correct-after-first-error'?'Correct après erreur':'Erreur après 2 essais';
+          const values=[r.number,r.verb,r.subject,r.tense,r.finalAnswer||'—',r.correctAnswer||'—',result];
+          values.forEach((value,i)=>{
+            const td=document.createElement('td');
+            td.textContent=value;
+            if(i===0)td.setAttribute('data-label','#');
+            if(i===1)td.setAttribute('data-label','Verbe');
+            if(i===2)td.setAttribute('data-label','Sujet');
+            if(i===3)td.setAttribute('data-label','Temps');
+            if(i===4)td.setAttribute('data-label','Ta réponse');
+            if(i===5)td.setAttribute('data-label','Réponse correcte');
+            if(i===6)td.setAttribute('data-label','Résultat');
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+      }
+
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
+      modal.style.display='flex';
+    }
+
+    function closeSummary(){
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden','true');
+      modal.style.display='none';
+    }
+
+    validate.addEventListener('click',()=>{
+      if(!currentNumber)readQuestion();
+      setTimeout(recordAfterValidation,30);
+    });
+    input.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){
+        if(!currentNumber)readQuestion();
+        setTimeout(recordAfterValidation,30);
+      }
+    });
+
+    const observer=new MutationObserver(()=>{
+      const text=progress.textContent||'';
+      const m=text.match(/Question\s+(\d+)\s*\/\s*20/i);
+      const n=m?Number(m[1]):0;
+      if(n&&n!==currentNumber){currentNumber=n;currentAttempts=0;}
+    });
+    observer.observe(progress,{childList:true,characterData:true,subtree:true});
+
+    document.getElementById('reviewDone')?.addEventListener('click',closeSummary);
+    modal.addEventListener('click',e=>{if(e.target===modal)closeSummary();});
+  }
+
   function init(){
     initTabs();
     window.COQ_CONJ_LOOKUP.init();
-
     // practice.js se inicializa por sí mismo; no existe un init() público aquí.
-    // Mantener esta llamada inexistente provocaba una excepción y evitaba
-    // registrar el acceso directo "Practicar este verbo".
     initLookupStatus();
     initPracticeShortcut();
+    initPracticeSummary();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
