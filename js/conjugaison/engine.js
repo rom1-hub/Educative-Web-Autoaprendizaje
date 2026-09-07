@@ -46,85 +46,40 @@
   }
 
   function presentEAccent(inf,s){
-  const stem=stemEr(inf);
-  const accented=stem.replace(/e([^e]*)$/,'è$1');
-
-  if(['je','tu','il','elle','on','ils','elles'].includes(s)){
-    const end={
-      je:'e',
-      tu:'es',
-      il:'e',
-      elle:'e',
-      on:'e',
-      ils:'ent',
-      elles:'ent'
-    }[s];
-    return accented+end;
+    const stem=stemEr(inf);
+    const accented=stem.replace(/e([^e]*)$/,'è$1');
+    if(['je','tu','il','elle','on','ils','elles'].includes(s)){
+      const end={je:'e',tu:'es',il:'e',elle:'e',on:'e',ils:'ent',elles:'ent'}[s];
+      return accented+end;
+    }
+    return stem+({nous:'ons',vous:'ez'}[s]);
   }
 
-  return stem+({nous:'ons',vous:'ez'}[s]);
-}
-
-function futureEAccent(inf,s){
-  const base=inf.replace(/er$/,'');
-  const stem=base.replace(/e([^e]*)$/,'è$1');
-
-  const end={
-    je:'ai',
-    tu:'as',
-    il:'a',
-    elle:'a',
-    on:'a',
-    nous:'ons',
-    vous:'ez',
-    ils:'ont',
-    elles:'ont'
-  }[s];
-
-  return stem+'er'+end;
-}
-
-function conditionalEAccent(inf,s){
-  const base=inf.replace(/er$/,'');
-  const stem=base.replace(/e([^e]*)$/,'è$1');
-
-  const end={
-    je:'ais',
-    tu:'ais',
-    il:'ait',
-    elle:'ait',
-    on:'ait',
-    nous:'ions',
-    vous:'iez',
-    ils:'aient',
-    elles:'aient'
-  }[s];
-
-  return stem+'er'+end;
-}
-
-function subjEAccent(inf,s){
-  const stem=stemEr(inf);
-  const accented=stem.replace(/e([^e]*)$/,'è$1');
-
-  if(['je','tu','il','elle','on'].includes(s)){
-    const end={
-      je:'e',
-      tu:'es',
-      il:'e',
-      elle:'e',
-      on:'e'
-    }[s];
-
-    return accented+end;
+  function futureEAccent(inf,s){
+    const base=inf.replace(/er$/,'');
+    const stem=base.replace(/e([^e]*)$/,'è$1');
+    const end={je:'ai',tu:'as',il:'a',elle:'a',on:'a',nous:'ons',vous:'ez',ils:'ont',elles:'ont'}[s];
+    return stem+'er'+end;
   }
 
-  if(s==='nous') return stem+'ions';
-  if(s==='vous') return stem+'iez';
+  function conditionalEAccent(inf,s){
+    const base=inf.replace(/er$/,'');
+    const stem=base.replace(/e([^e]*)$/,'è$1');
+    const end={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'}[s];
+    return stem+'er'+end;
+  }
 
-  return accented+'ent';
-}
-
+  function subjEAccent(inf,s){
+    const stem=stemEr(inf);
+    const accented=stem.replace(/e([^e]*)$/,'è$1');
+    if(['je','tu','il','elle','on'].includes(s)){
+      const end={je:'e',tu:'es',il:'e',elle:'e',on:'e'}[s];
+      return accented+end;
+    }
+    if(s==='nous') return stem+'ions';
+    if(s==='vous') return stem+'iez';
+    return accented+'ent';
+  }
 
   function subjErEAccent(inf,s){
     const stem=stemEr(inf);
@@ -144,35 +99,17 @@ function subjEAccent(inf,s){
     return base.replace(/(er)(ai|as|a|ons|ez|ont)$/,'er'+({je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'}[s]));
   }
   function imparfaitFromPresent(inf,s,pattern){
-  const pres=pattern==='regular-ir'
-    ? presentRegularIr(inf,'nous')
-    : pattern==='regular-re'
-      ? presentRegularRe(inf,'nous')
-      : presentRegularEr(inf,'nous');
-
-  let stem=pres.replace(/ons$/,'');
-  
-  if(pattern==='er-ger' && (s==='nous' || s==='vous')){
-    stem=stem.replace(/e$/,'');
+    const pres=pattern==='regular-ir'
+      ? presentRegularIr(inf,'nous')
+      : pattern==='regular-re'
+        ? presentRegularRe(inf,'nous')
+        : presentRegularEr(inf,'nous');
+    let stem=pres.replace(/ons$/,'');
+    if(pattern==='er-ger' && (s==='nous' || s==='vous')) stem=stem.replace(/e$/,'');
+    if(pattern==='er-cer' && (s==='nous' || s==='vous')) stem=stem.replace(/ç$/,'c');
+    const end={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'}[s];
+    return stem+end;
   }
-  if(pattern==='er-cer' && (s==='nous' || s==='vous')){
-  stem=stem.replace(/ç$/,'c');
-}
-
-  const end={
-    je:'ais',
-    tu:'ais',
-    il:'ait',
-    elle:'ait',
-    on:'ait',
-    nous:'ions',
-    vous:'iez',
-    ils:'aient',
-    elles:'aient'
-  }[s];
-
-  return stem+end;
-}
   function futurFromInfinitive(inf,s){
     const end={je:'ai',tu:'as',il:'a',elle:'a',on:'a',nous:'ons',vous:'ez',ils:'ont',elles:'ont'}[s];
     return inf+end;
@@ -197,11 +134,26 @@ function subjEAccent(inf,s){
     if(s==='tu' && /er$/.test(inf) && !/aller$/.test(inf)) form=form.replace(/s$/,'');
     return form;
   }
+  function imperativeIrregular(inf,s){
+    if(!['tu','nous','vous'].includes(s)) return null;
+    const forms={
+      'être':{tu:'sois',nous:'soyons',vous:'soyez'},
+      'avoir':{tu:'aie',nous:'ayons',vous:'ayez'},
+      'prendre':{tu:'prends',nous:'prenons',vous:'prenez'},
+      'aller':{tu:'va',nous:'allons',vous:'allez'},
+      'venir':{tu:'viens',nous:'venons',vous:'venez'}
+    }[inf];
+    return forms ? forms[s] : null;
+  }
   function generateBaseSimple(verb,tense,subject){
     const r=record(verb); if(!r) return null;
     const s=P.baseSubject(subject);
     const pattern=r.pattern;
     const inf=r.infinitif_base||r.infinitif;
+    if(tense==='impératif présent'){
+      const irregular=imperativeIrregular(inf,s);
+      if(irregular)return irregular;
+    }
     if(pattern==='er-e-accent'){
       if(tense==="présent de l'indicatif") return presentErEAccent(inf,s);
       if(tense==='imparfait') return imparfaitFromPresent(inf,s,pattern);
@@ -210,19 +162,14 @@ function subjEAccent(inf,s){
       if(tense==='subjonctif présent') return subjErEAccent(inf,s);
       if(tense==='impératif présent') return s==='tu'?presentErEAccent(inf,s).replace(/s$/,''):presentErEAccent(inf,s);
     }
-
     if(pattern==='e-accent'){
-  if(tense==="présent de l'indicatif") return presentEAccent(inf,s);
-  if(tense==='imparfait') return imparfaitFromPresent(inf,s,pattern);
-  if(tense==='futur simple') return futureEAccent(inf,s);
-  if(tense==='conditionnel présent') return conditionalEAccent(inf,s);
-  if(tense==='subjonctif présent') return subjEAccent(inf,s);
-  if(tense==='impératif présent'){
-    return s==='tu'
-      ? presentEAccent(inf,s).replace(/s$/,'')
-      : presentEAccent(inf,s);
-  }
-}
+      if(tense==="présent de l'indicatif") return presentEAccent(inf,s);
+      if(tense==='imparfait') return imparfaitFromPresent(inf,s,pattern);
+      if(tense==='futur simple') return futureEAccent(inf,s);
+      if(tense==='conditionnel présent') return conditionalEAccent(inf,s);
+      if(tense==='subjonctif présent') return subjEAccent(inf,s);
+      if(tense==='impératif présent') return s==='tu' ? presentEAccent(inf,s).replace(/s$/,'') : presentEAccent(inf,s);
+    }
     if(pattern==='regular-er'||pattern==='er-ger'||pattern==='er-cer'){
       if(tense==="présent de l'indicatif") return presentRegularEr(inf,s);
       if(tense==='imparfait') return imparfaitFromPresent(inf,s,pattern);
@@ -237,7 +184,7 @@ function subjEAccent(inf,s){
       if(tense==='futur simple') return futurFromInfinitive(inf,s);
       if(tense==='conditionnel présent') return conditionalFromFuture(inf,s);
       if(tense==='subjonctif présent') return subjRegularIr(inf,s);
-      if(tense==='impératif présent') return s==='tu'?presentRegularIr(inf,s):presentRegularIr(inf,s);
+      if(tense==='impératif présent') return presentRegularIr(inf,s);
     }
     if(pattern==='regular-re'){
       if(tense==="présent de l'indicatif") return presentRegularRe(inf,s);
@@ -273,15 +220,13 @@ function subjEAccent(inf,s){
     else if(base==='elles') {gender='féminin';number='pluriel';}
     else if(base==='nous') number='pluriel';
     else if(base==='vous') number='pluriel';
-    else if(base==='on'){ number='singulier'; }
+    else if(base==='on') number='singulier';
     return {label,base,gender,number};
   }
-
   function participle(verb){
     const r=record(baseKey(verb));
     return r&&r.participePasse ? r.participePasse : null;
   }
-
   function compoundForm(verb,tense,subject,construction){
     if(!C || !C.isCompound(tense)) return null;
     const r=record(verb); if(!r) return null;
@@ -324,219 +269,82 @@ function subjEAccent(inf,s){
 function lookupCompoundSubjects(tense){
   if(tense==='subjonctif passé'){
     return [
-      'que je (masculin singulier)',
-      'que je (féminin singulier)',
-      'que tu (masculin singulier)',
-      'que tu (féminin singulier)',
-      "qu'il",
-      "qu'elle",
-      "qu'on (masculin singulier)",
-      "qu'on (masculin pluriel)",
-      "qu'on (féminin pluriel)",
-      'que nous (masculin pluriel)',
-      'que nous (féminin pluriel)',
-      'que vous (masculin singulier)',
-      'que vous (féminin singulier)',
-      'que vous (masculin pluriel)',
-      'que vous (féminin pluriel)',
-      "qu'ils",
-      "qu'elles"
+      'que je (masculin singulier)','que je (féminin singulier)','que tu (masculin singulier)','que tu (féminin singulier)',"qu'il","qu'elle","qu'on (masculin singulier)","qu'on (masculin pluriel)","qu'on (féminin pluriel)",'que nous (masculin pluriel)','que nous (féminin pluriel)','que vous (masculin singulier)','que vous (féminin singulier)','que vous (masculin pluriel)','que vous (féminin pluriel)',"qu'ils","qu'elles"
     ];
   }
-
   return [
-    'je (masculin singulier)',
-    'je (féminin singulier)',
-    'tu (masculin singulier)',
-    'tu (féminin singulier)',
-    'il',
-    'elle',
-    'on (masculin singulier)',
-    'on (masculin pluriel)',
-    'on (féminin pluriel)',
-    'nous (masculin pluriel)',
-    'nous (féminin pluriel)',
-    'vous (masculin singulier)',
-    'vous (féminin singulier)',
-    'vous (masculin pluriel)',
-    'vous (féminin pluriel)',
-    'ils',
-    'elles'
+    'je (masculin singulier)','je (féminin singulier)','tu (masculin singulier)','tu (féminin singulier)','il','elle','on (masculin singulier)','on (masculin pluriel)','on (féminin pluriel)','nous (masculin pluriel)','nous (féminin pluriel)','vous (masculin singulier)','vous (féminin singulier)','vous (masculin pluriel)','vous (féminin pluriel)','ils','elles'
   ];
 }
 
 function rowsForLookup(verb,tense){
-  const r=record(verb);
-  if(!r)return [];
-
+  const r=record(verb); if(!r)return [];
   const isCompound=C&&C.isCompound(tense);
-
-  if(!isCompound){
-    return rowsFor(verb,tense);
-  }
-
-  const construction=r.pronominal
-    ? 'pronominale'
-    : (r.construction||'non-pronominale');
-
+  if(!isCompound)return rowsFor(verb,tense);
+  const construction=r.pronominal?'pronominale':(r.construction||'non-pronominale');
   const out=[];
-
   lookupCompoundSubjects(tense).forEach(subject=>{
-    const generated=conjugate(
-      verb,
-      tense,
-      subject,
-      construction
-    );
-
-    if(generated!=null){
-      out.push([subject,generated]);
-    }
+    const generated=conjugate(verb,tense,subject,construction);
+    if(generated!=null)out.push([subject,generated]);
   });
-
   return out;
 }
-  
- function rowsFor(verb,tense){
-  const r=record(verb);
-  if(!r)return [];
 
+function rowsFor(verb,tense){
+  const r=record(verb); if(!r)return [];
   let source=(r.formes||{})[tense]||[];
   const isSimple=simpleTenses.has(tense);
   const isCompound=C&&C.isCompound(tense);
-
-  if(!isSimple && !isCompound){
-    return source.map(x=>[x[0],x[1]]);
-  }
-
-  const construction=r.pronominal
-    ? 'pronominale'
-    : (r.construction||'non-pronominale');
-
+  if(!isSimple&&!isCompound)return source.map(x=>[x[0],x[1]]);
+  const construction=r.pronominal?'pronominale':(r.construction||'non-pronominale');
   const out=[];
-
-  if(isSimple && !source.length){
-    if(tense==='impératif présent'){
-      source=[['tu',''],['nous',''],['vous','']];
-    }else if(tense==='subjonctif présent'){
-      source=[
-        ['que je',''],
-        ['que tu',''],
-        ["qu'il/elle/on",''],
-        ['que nous',''],
-        ['que vous',''],
-        ["qu'ils/elles",'']
-      ];
-    }else{
-      source=[
-        ['je',''],
-        ['tu',''],
-        ['il/elle/on',''],
-        ['nous',''],
-        ['vous',''],
-        ['ils/elles','']
-      ];
-    }
+  if(isSimple&&!source.length){
+    if(tense==='impératif présent')source=[['tu',''],['nous',''],['vous','']];
+    else if(tense==='subjonctif présent')source=[['que je',''],['que tu','',[...[]]],["qu'il/elle/on",''],['que nous',''],['que vous',''],["qu'ils/elles",'']];
+    else source=[['je',''],['tu',''],['il/elle/on',''],['nous',''],['vous',''],['ils/elles','']];
   }
-
-  if(isCompound){
-    if(tense==='subjonctif passé'){
-      const variants=[
-        'que je (masculin singulier)',
-        'que je (féminin singulier)',
-        'que tu (masculin singulier)',
-        'que tu (féminin singulier)',
-        "qu'il",
-        "qu'elle",
-        "qu'on (masculin singulier)",
-        "qu'on (masculin pluriel)",
-        "qu'on (féminin pluriel)",
-        'que nous (masculin pluriel)',
-        'que nous (féminin pluriel)',
-        'que vous (masculin singulier)',
-        'que vous (féminin singulier)',
-        'que vous (masculin pluriel)',
-        'que vous (féminin pluriel)',
-        "qu'ils",
-        "qu'elles"
-      ];
-
-      variants.forEach(subject=>{
-        const generated=conjugate(
-          verb,
-          tense,
-          subject,
-          construction
-        );
-
-        if(generated!=null){
-          out.push([subject,generated]);
-        }
-      });
-
-      if(out.length)return out;
-    }
+  if(isCompound&&tense==='subjonctif passé'){
+    lookupCompoundSubjects(tense).forEach(subject=>{
+      const generated=conjugate(verb,tense,subject,construction);
+      if(generated!=null)out.push([subject,generated]);
+    });
+    if(out.length)return out;
   }
-
-  const canonical=[
-    'je',
-    'tu',
-    'il/elle/on',
-    'nous',
-    'vous',
-    'ils/elles'
-  ];
-
-  if(!source.length){
-    source=canonical.map(s=>[s,'']);
-  }
-
+  const canonical=['je','tu','il/elle/on','nous','vous','ils/elles'];
+  if(!source.length)source=canonical.map(s=>[s,'']);
   source.forEach(row=>{
-    const subject=row[0]
-      .split('/')
-      .map(x=>x.trim())
-      .filter(Boolean)[0];
-
-    const generated=conjugate(
-      verb,
-      tense,
-      subject,
-      construction
-    );
-
-    if(generated!=null){
-      out.push([row[0],generated]);
-    }
+    const subject=row[0].split('/').map(x=>x.trim()).filter(Boolean)[0];
+    const generated=conjugate(verb,tense,subject,construction);
+    if(generated!=null)out.push([row[0],generated]);
   });
-
   return out;
 }
-  function rowsForConstruction(verb,tense,construction){
-    const r=record(verb); if(!r)return [];
-    const source=(r.formes||{})[tense]||[];
-    const isSimple=simpleTenses.has(tense), isCompound=C&&C.isCompound(tense);
-    if(!isSimple && !isCompound)return source.map(x=>[x[0],x[1]]);
-    const out=[];
-    source.forEach(row=>{
-      row[0].split('/').map(x=>x.trim()).filter(Boolean).forEach(subject=>{
-        const generated=conjugate(verb,tense,subject,construction);
-        if(generated!=null) out.push([subject,generated]);
-      });
-    });
-    return out.filter(row=>row[1]!=null && String(row[1]).trim()!=='');
-  }
+
+function rowsForConstruction(verb,tense,construction){
+  const r=record(verb); if(!r)return [];
+  const source=(r.formes||{})[tense]||[];
+  const isSimple=simpleTenses.has(tense),isCompound=C&&C.isCompound(tense);
+  if(!isSimple&&!isCompound)return source.map(x=>[x[0],x[1]]);
+  const out=[];
+  source.forEach(row=>{
+    const subject=row[0].split('/').map(x=>x.trim()).filter(Boolean)[0];
+    const generated=conjugate(verb,tense,subject,construction);
+    if(generated!=null)out.push([row[0],generated]);
+  });
+  return out;
+}
+
   function canGenerate(verb,tense){
-    return !!record(verb)&&simpleTenses.has(tense)&&(!!generateBaseSimple(baseKey(verb),tense,'je') || !!explicitForm(verb,tense,'je'));
+    const r=record(verb); if(!r)return false;
+    if(C&&C.isCompound(tense))return !!r.auxiliaire;
+    return simpleTenses.has(tense);
   }
+
   window.COQ_CONJ_ENGINE={
-  conjugate,
-  rowsFor,
-  rowsForLookup,
-  rowsForConstruction,
-  canGenerate,
-  baseKey,
-  subjects,
-  simpleTenses,
-  compoundTenses:C?C.compoundTenses:[]
-};
+    conjugate,
+    rowsFor,
+    rowsForLookup,
+    rowsForConstruction,
+    canGenerate
+  };
 })();
