@@ -18,7 +18,7 @@
   .tense-table{
     min-width:0;
     width:100%;
-    table-layout:auto;
+    table-layout:fixed;
   }
 
   .tense-table td{
@@ -26,13 +26,16 @@
     white-space:nowrap;
   }
 
+  /* Mantener siempre dos columnas visibles: sujeto | conjugación. */
   .tense-table td:first-child{
-    width:1%;
+    width:35%;
     padding-right:10px;
+    text-align:left;
   }
 
   .tense-table td:last-child{
-    width:auto;
+    width:65%;
+    text-align:left;
   }
 
   .tense-block{
