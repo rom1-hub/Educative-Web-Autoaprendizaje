@@ -2,6 +2,14 @@
  * Fuente única de verdad para el menú de navegación en todas las páginas.
  */
 (function(){
+  function loadConjugaisonExpansion(){
+    if(!/\/conjugaison\.html$/i.test(window.location.pathname) || window.__coqVerbExpansionRequested) return;
+    window.__coqVerbExpansionRequested=true;
+    const script=document.createElement('script');
+    script.src='../js/conjugaison/data-expansion.js';
+    script.defer=true;
+    document.head.appendChild(script);
+  }
   function initCoqMenu(){
     document.querySelectorAll('.nav').forEach(function(nav){
       const button=nav.querySelector('.menu');
@@ -55,7 +63,6 @@
       });
     });
   }
-
   function initBlogFilters(){
     const filterBar=document.querySelector('.blog-cats');
     const grid=document.querySelector('.blog-grid');
@@ -82,8 +89,8 @@
       });
     });
   }
-
   function init(){
+    loadConjugaisonExpansion();
     initCoqMenu();
     initBlogFilters();
   }
