@@ -103,17 +103,16 @@ window.COQ_VERB_PATTERNS={
       if(tense==='impératif présent'){if(!['tu','nous','vous'].includes(s))return null;return(s==='nous'||s==='vous'?yStem:iStem)+pe[s].replace(/s$/,'');}
       return null;
     }
-    function payerVariant(form,tense,verb){
-      if(normalize(verb)!=='payer')return form;
+    function ayERVariant(form,tense,verb){
+      if(!/ayer$/.test(baseVerb(verb)))return form;
       const f=String(form||'');
-      if(tense==="présent de l'indicatif"){
-        const map={paie:'paye',paies:'payes',paient:'payent'};
-        return map[f]?f+' / '+map[f]:f;
+      if(tense==="présent de l'indicatif"||tense==='futur simple'){
+        const variant=f.replace('i','y');
+        return variant!==f?f+' / '+variant:f;
       }
-      if(tense==='futur simple')return f.replace(/^pai(er)(.+)$/,'pai$1$2 / payer$2');
       return f;
     }
-    engine.conjugate=function(verb,tense,subject,construction){const generated=generate(verb,tense,subject);return generated!=null?payerVariant(generated,tense,verb):originalConjugate(verb,tense,subject,construction);};
+    engine.conjugate=function(verb,tense,subject,construction){const generated=generate(verb,tense,subject);return generated!=null?ayERVariant(generated,tense,verb):originalConjugate(verb,tense,subject,construction);};
     if(typeof engine.canGenerate==='function'){
       const originalCanGenerate=engine.canGenerate.bind(engine);
       engine.canGenerate=function(verb,tense){if(resolvePattern(verb)==='yer'&&simple.has(tense))return true;return originalCanGenerate(verb,tense);};
@@ -125,22 +124,22 @@ window.COQ_VERB_PATTERNS={
       subjects.forEach(subject=>{const form=engine.conjugate(verb,tense,subject,construction);if(form!=null&&String(form).trim()!=='')rows.push([subject,form]);});
       return rows;
     }
-    function isHMuet(record,verb){return !!(record&&record.hMuet) || !!(window.COQ_H_MUET&&window.COQ_H_MUET[normalize(verb)]);}
+    function isHMuet(record,verb){return !!(record&&record.hMuet)||!!(window.COQ_H_MUET&&window.COQ_H_MUET[normalize(verb)]);}
     function shouldContractJe(verb,form){
       const r=verbs[baseVerb(verb)]||verbs[normalize(verb)];
       const f=String(form||'').trim().toLowerCase();
       return /^[aeiouyàâäéèêëîïôöùûüÿœæ]/.test(f)||isHMuet(r,verb);
     }
     function applyJeContraction(rows,verb,tense){
-      return (rows||[]).map(row=>{
+      return(rows||[]).map(row=>{
         let subject=row[0],form=row[1];
-        if(baseSubject(subject)==='je'&&shouldContractJe(verb,form))subject=String(subject).replace(/^je$/,'j\'').replace(/^que je$/,'que j\'');
-        return [subject,form];
+        if(baseSubject(subject)==='je'&&shouldContractJe(verb,form))subject=String(subject).replace(/^je$/,"j'").replace(/^que je$/,"que j'");
+        return[subject,form];
       });
     }
     const originalRowsFor=engine.rowsFor.bind(engine);
     engine.rowsFor=function(verb,tense){
-      const generated=yerRows(verb,tense); 
+      const generated=yerRows(verb,tense);
       const rows=generated!==null?generated:originalRowsFor(verb,tense);
       return applyJeContraction(rows,verb,tense);
     };
