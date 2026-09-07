@@ -5,7 +5,8 @@
 (function(){
   const FAMILY_PATTERNS={
     'partir-type':{groupe:3,description:'Famille partir : alternance du radical au présent'},
-    'suivre-type':{groupe:3,description:'Famille suivre : radical suiv- au présent et à l’imparfait/subjonctif'}
+    'suivre-type':{groupe:3,description:'Famille suivre : radical suiv- au présent et à l’imparfait/subjonctif'},
+    'ouvrir-type':{groupe:3,description:'Famille ouvrir : présent en -e/-es/-e, pluriel en -ons/-ez/-ent'}
   };
   window.COQ_VERB_PATTERNS=window.COQ_VERB_PATTERNS||{};
   Object.keys(FAMILY_PATTERNS).forEach(function(key){window.COQ_VERB_PATTERNS[key]=FAMILY_PATTERNS[key];});
@@ -20,6 +21,7 @@
   };
   const STANDARD_SUBJECTS=['je','tu','il','elle','on','nous','vous','ils','elles'];
   const IMPERATIVE_SUBJECTS=['tu','nous','vous'];
+  const OUVRIR_FAMILY=new Set(['ouvrir','rouvrir','couvrir','découvrir','recouvrir','offrir','souffrir']);
 
   function normalize(value){return String(value||'').trim().toLowerCase();}
   function baseSubject(subject){
@@ -62,8 +64,6 @@
     return null;
   }
 
-  // suivre est une famille distincte : son présent est sui-/suiv-,
-  // tandis que l'imparfait et le subjonctif partent de suiv-.
   function suivreType(inf,s,tense){
     const singularStem='sui';
     const pluralStem='suiv';
@@ -82,26 +82,56 @@
     return null;
   }
 
+  function ouvrirType(inf,s,tense){
+    const stem=inf.replace(/ir$/,'');
+    if(tense==="présent de l'indicatif")return stem+END.present[s].replace(/^s/,'');
+    if(tense==='imparfait')return stem+END.imparfait[s];
+    if(tense==='futur simple')return inf+END.futur[s];
+    if(tense==='conditionnel présent')return inf+END.conditionnel[s];
+    if(tense==='subjonctif présent')return stem+END.subjonctif[s];
+    if(tense==='impératif présent'){
+      if(!IMPERATIVE_SUBJECTS.includes(s))return null;
+      return stem+END.present[s].replace(/^s/,'');
+    }
+    return null;
+  }
+
   function familyForm(verb,tense,subject){
     const verbs=window.COQ_VERBS||{},base=baseVerb(verb),r=verbs[base];
     if(!r||!SIMPLE.has(tense))return null;
     const s=baseSubject(subject),inf=r.infinitif_base||r.infinitif||base;
     if(r.pattern==='partir-type')return partirType(inf,s,tense);
     if(r.pattern==='suivre-type')return suivreType(inf,s,tense);
+    if(r.pattern==='ouvrir-type')return ouvrirType(inf,s,tense);
     return null;
+  }
+  function displaySubject(verb,subject){
+    const base=baseSubject(subject);
+    if(base==='je' && OUVRIR_FAMILY.has(baseVerb(verb)))return "j'";
+    return subject;
   }
   function familyRows(verb,tense){
     const subjects=tense==='impératif présent'?IMPERATIVE_SUBJECTS:STANDARD_SUBJECTS;
-    return subjects.map(function(subject){return [subject,familyForm(verb,tense,subject)];}).filter(function(row){return row[1]!==null&&row[1]!==undefined;});
+    return subjects.map(function(subject){return [displaySubject(verb,subject),familyForm(verb,tense,subject)];}).filter(function(row){return row[1]!==null&&row[1]!==undefined;});
   }
   function ensureRecords(){
     const verbs=window.COQ_VERBS||(window.COQ_VERBS={});
-    const family={servir:{pattern:'partir-type',auxiliaire:'avoir',pp:'servi'},suivre:{pattern:'suivre-type',auxiliaire:'avoir',pp:'suivi'}};
+    const family={
+      servir:{pattern:'partir-type',auxiliaire:'avoir',pp:'servi'},
+      suivre:{pattern:'suivre-type',auxiliaire:'avoir',pp:'suivi'},
+      ouvrir:{pattern:'ouvrir-type',auxiliaire:'avoir',pp:'ouvert'},
+      rouvrir:{pattern:'ouvrir-type',auxiliaire:'avoir',pp:'rouvert'},
+      couvrir:{pattern:'ouvrir-type',auxiliaire:'avoir',pp:'couvert'},
+      découvrir:{pattern:'ouvrir-type',auxiliaire:'avoir',pp:'découvert'},
+      recouvrir:{pattern:'ouvrir-type',auxiliaire:'avoir',pp:'recouvert'},
+      offrir:{pattern:'ouvrir-type',auxiliaire:'avoir',pp:'offert'},
+      souffrir:{pattern:'ouvrir-type',auxiliaire:'avoir',pp:'souffert'}
+    };
     ['partir','sortir','dormir'].forEach(function(key){if(verbs[key])verbs[key].pattern='partir-type';});
     Object.keys(family).forEach(function(key){
-      if(verbs[key]){verbs[key].pattern=family[key].pattern;verbs[key].auxiliaire=family[key].auxiliaire;verbs[key].participePasse=family[key].pp;return;}
       const x=family[key];
-      verbs[key]={id:key,infinitif:key,infinitif_base:key,groupe:3,pattern:x.pattern,auxiliaire:x.auxiliaire,pronominal:false,participePasse:x.pp,construction:'non-pronominale',verbeBase:key};
+      if(verbs[key]){verbs[key].pattern=x.pattern;verbs[key].auxiliaire=x.auxiliaire;verbs[key].participePasse=x.pp;}
+      else verbs[key]={id:key,infinitif:key,infinitif_base:key,groupe:3,pattern:x.pattern,auxiliaire:x.auxiliaire,pronominal:false,participePasse:x.pp,construction:'non-pronominale',verbeBase:key};
     });
     const utils=window.COQ_CONJ_UTILS;
     if(utils){Object.assign(utils.conjugations,verbs);Object.assign(utils.verbMeta,verbs);}
@@ -111,7 +141,7 @@
     const engine=window.COQ_CONJ_ENGINE;
     if(!engine||engine.__familyPatternsInstalled)return false;
     const originalConjugate=engine.conjugate,originalRowsFor=engine.rowsFor,originalRowsForLookup=engine.rowsForLookup,originalRowsForConstruction=engine.rowsForConstruction;
-    function isFamilyVerb(verb){return ['partir-type','suivre-type'].includes(familyOf(verb));}
+    function isFamilyVerb(verb){return ['partir-type','suivre-type','ouvrir-type'].includes(familyOf(verb));}
     engine.conjugate=function(verb,tense,subject,construction){
       const r=(window.COQ_VERBS||{})[baseVerb(verb)];
       if(r&&isFamilyVerb(verb)&&SIMPLE.has(tense)&&construction!=='pronominale'){
@@ -133,7 +163,7 @@
       return familyRows(verb,tense);
     };
     engine.__familyPatternsInstalled=true;
-    window.COQ_FAMILY_PATTERN_REGRESSION={patterns:{partir:['partir','sortir','dormir','servir'],suivre:['suivre']},expected:{partir:{je:'pars',nous:'partons',ils:'partent'},sortir:{je:'sors',nous:'sortons',ils:'sortent'},dormir:{je:'dors',nous:'dormons',ils:'dorment'},servir:{je:'sers',nous:'servons',ils:'servent'},suivre:{je:'suis',nous:'suivons',ils:'suivent'}}};
+    window.COQ_FAMILY_PATTERN_REGRESSION={patterns:{partir:['partir','sortir','dormir','servir'],suivre:['suivre'],ouvrir:['ouvrir','rouvrir','couvrir','découvrir','recouvrir','offrir','souffrir']},expected:{partir:{je:'pars',nous:'partons',ils:'partent'},sortir:{je:'sors',nous:'sortons',ils:'sortent'},dormir:{je:'dors',nous:'dormons',ils:'dorment'},servir:{je:'sers',nous:'servons',ils:'servent'},suivre:{je:'suis',nous:'suivons',ils:'suivent'},ouvrir:{je:"j'ouvre",nous:'ouvrons',ils:'ouvrent'},offrir:{je:"j'offre",nous:'offrons',ils:'offrent'},souffrir:{je:"je souffre",nous:'souffrons',ils:'souffrent'}}};
     return true;
   }
   function waitForEngine(attempt){ensureRecords();if(install())return;if((attempt||0)<100)setTimeout(function(){waitForEngine((attempt||0)+1);},25);}
