@@ -6,7 +6,7 @@ window.COQ_CONSTRUCTIONS = {
 };
 
 // Règles de construction pronominale utiles à Conjugaison.
-// Les cas complexes (COD antérieur/postérieur, etc.) serán tratados dans une leçon dédiée.
+// Les cas complexes (COD antérieur/postérieur, etc.) seront traités dans une leçon dédiée.
 window.COQ_PRONOMINAL_RULES = {
   'lever': { fonctionDeSe: 'COD', accord: 'sujet' },
   'promener': { fonctionDeSe: 'COD', accord: 'sujet' },
@@ -74,3 +74,57 @@ window.COQ_COMPOUND_CONSTRUCTION_FILTERS = {
     };
   });
 })();
+
+// Affichage de consultation : pour les temps simples des verbes -ELER,
+// regrouper il / elle / on sur une seule ligne, comme le reste du catalogue.
+document.addEventListener('DOMContentLoaded', function(){
+  const engine = window.COQ_CONJ_ENGINE;
+  const verbs = window.COQ_VERBS || {};
+  if(!engine || typeof engine.rowsForLookup !== 'function') return;
+
+  const originalRowsForLookup = engine.rowsForLookup.bind(engine);
+  const simpleTenses = new Set([
+    "présent de l'indicatif",
+    'imparfait',
+    'futur simple',
+    'conditionnel présent',
+    'subjonctif présent'
+  ]);
+
+  function isEler(verb){
+    const key = String(verb || '').trim().toLowerCase();
+    const record = verbs[key];
+    const base = record && record.verbeBase ? String(record.verbeBase).toLowerCase() : key;
+    return /eler$/.test(base);
+  }
+
+  engine.rowsForLookup = function(verb, tense, construction){
+    const rows = originalRowsForLookup(verb, tense, construction) || [];
+    if(!isEler(verb) || !simpleTenses.has(tense)) return rows;
+
+    const result = [];
+    let grouped = [];
+
+    rows.forEach(function(row){
+      const subject = String(row[0] || '').trim().toLowerCase();
+      if(subject === 'il' || subject === 'elle' || subject === 'on'){
+        grouped.push(row);
+        return;
+      }
+      result.push(row);
+    });
+
+    if(grouped.length){
+      const answers = grouped.map(row => String(row[1] || ''));
+      const same = answers.every(answer => answer === answers[0]);
+      if(same){
+        result.splice(2, 0, ['il/elle/on', answers[0]]);
+      }else{
+        // Aunque normalmente son idénticas, no ocultamos diferencias reales.
+        grouped.forEach(row => result.push(row));
+      }
+    }
+
+    return result;
+  };
+});
