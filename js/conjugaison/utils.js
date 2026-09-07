@@ -19,7 +19,7 @@
     const rawSubject=String(q.subject||'').trim();
     if(!rawSubject)return variants;
 
-    // En impératif, le sujet ne fait jamais partie de la réponse écrite.
+    // En impératif, le sujet no hace parte de la respuesta escrita.
     // La única respuesta válida es la forma verbal sola: parle, prends, sois, etc.
     if(String(q.tense||'').trim()==='impératif présent')return variants;
 
@@ -55,7 +55,7 @@
     if(isSubjonctif){
       const queSubject={je:"que je",tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"}[base];
       if(queSubject){
-        // En subjonctif, "que je aie" / "que je sois" est incorrecto:
+        // En subjonctif, "que je aie" / "que je sois" es incorrecto:
         // delante de vocal se exige la elisión "que j'aie" / "que je sois".
         if(!(base==='je' && startsWithVowel)){
           variants.add(api.normalizeAnswerText(queSubject+' '+expected));
@@ -120,6 +120,23 @@
     if(!result)return;
     decorateImperativeLookup();
     new MutationObserver(decorateImperativeLookup).observe(result,{childList:true,subtree:true});
+  }
+
+  // faire: completar los tiempos simples que faltaban en el catálogo.
+  // Los cinco tiempos compuestos se generan automáticamente a partir de
+  // passé composé → présent, plus-que-parfait → imparfait,
+  // conditionnel passé → conditionnel présent, futur antérieur → futur simple
+  // y subjonctif passé → subjonctif présent.
+  const faire=window.COQ_VERBS&&window.COQ_VERBS['faire'];
+  if(faire){
+    faire.formes=faire.formes||{};
+    Object.assign(faire.formes,{
+      "imparfait":[["je","faisais"],["tu","faisais"],["il/elle/on","faisait"],["nous","faisions"],["vous","faisiez"],["ils/elles","faisaient"]],
+      "futur simple":[["je","ferai"],["tu","feras"],["il/elle/on","fera"],["nous","ferons"],["vous","ferez"],["ils/elles","feront"]],
+      "conditionnel présent":[["je","ferais"],["tu","ferais"],["il/elle/on","ferait"],["nous","ferions"],["vous","feriez"],["ils/elles","feraient"]],
+      "subjonctif présent":[["que je","fasse"],["que tu","fasses"],["qu'il/elle/on","fasse"],["que nous","fassions"],["que vous","fassiez"],["qu'ils/elles","fassent"]],
+      "impératif présent":[["tu","fais"],["nous","faisons"],["vous","faites"]]
+    });
   }
 
   if(document.readyState==='loading'){
