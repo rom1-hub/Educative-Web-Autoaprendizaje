@@ -78,5 +78,50 @@
     for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
     return a;
   };
+
+  // "Ver un verbo": marca los sujetos del imperativo y añade la nota explicativa.
+  function decorateImperativeLookup(){
+    document.querySelectorAll('#conjResult .tense-block').forEach(block=>{
+      const title=block.querySelector('.tense-head h3');
+      const table=block.querySelector('.tense-table');
+      if(!title||!table||title.textContent.trim()!=='impératif présent')return;
+      if(table.dataset.imperativeDecorated==='true')return;
+
+      table.querySelectorAll('tbody tr').forEach(row=>{
+        const subjectCell=row.querySelector('td:first-child');
+        if(!subjectCell)return;
+        const subject=subjectCell.textContent.trim();
+        if(subject==='tu'||subject==='nous'||subject==='vous'){
+          subjectCell.textContent=subject+'*';
+        }
+      });
+
+      const tbody=table.querySelector('tbody');
+      if(tbody){
+        const noteRow=document.createElement('tr');
+        const noteCell=document.createElement('td');
+        noteCell.colSpan=2;
+        noteCell.textContent='* En el imperativo los sujetos desaparecen. No se pronuncian, ni se escriben.';
+        noteRow.appendChild(noteCell);
+        tbody.appendChild(noteRow);
+      }
+
+      table.dataset.imperativeDecorated='true';
+    });
+  }
+
+  function initImperativeLookupDecorator(){
+    const result=document.querySelector('#conjResult');
+    if(!result)return;
+    decorateImperativeLookup();
+    new MutationObserver(decorateImperativeLookup).observe(result,{childList:true,subtree:true});
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',initImperativeLookupDecorator);
+  }else{
+    initImperativeLookupDecorator();
+  }
+
   window.COQ_CONJ_UTILS=api;
 })();
