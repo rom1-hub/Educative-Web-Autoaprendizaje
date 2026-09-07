@@ -5,7 +5,7 @@
   function loadConjugaisonExpansion(){
     if(!/\/conjugaison\.html$/i.test(window.location.pathname) || window.__coqVerbExpansionRequested) return;
     window.__coqVerbExpansionRequested=true;
-    const scripts=['../js/conjugaison/data-expansion.js','../js/conjugaison/family-patterns.js','../js/conjugaison/family-patterns-ouvrir.js'];
+    const scripts=['../js/conjugaison/data-expansion.js','../js/conjugaison/family-patterns.js','../js/conjugaison/elision-display.js'];
     scripts.forEach(function(src){
       const script=document.createElement('script');
       script.src=src;
