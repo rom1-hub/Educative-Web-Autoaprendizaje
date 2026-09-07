@@ -15,51 +15,7 @@ window.COQ_TENSE_RULES = {
 };
 
 /*
- * Compatibilidad post-carga.
- *
- * El motor actual conserva una implementación histórica en compoundForm()
- * que puede producir temporalmente "me me suis..." en una construcción
- * pronominal compuesta. Esta capa corrige únicamente ese artefacto y lo hace
- * de forma independiente de que el caller haya enviado explícitamente la
- * construcción o de que esta venga determinada por los metadatos del verbo.
- *
- * Es una capa transitoria: la lógica definitiva deberá integrarse en engine.js
- * cuando se complete la migración morfológica.
+ * La generación de las formas compuestas pertenece al motor de conjugación.
+ * Este archivo solo declara las reglas de relación entre cada tiempo compuesto
+ * y el tiempo que debe usar su auxiliar.
  */
-document.addEventListener('DOMContentLoaded',function(){
-  const engine=window.COQ_CONJ_ENGINE;
-  const P=window.COQ_CONJ_PRONOUNS;
-  const C=window.COQ_CONJ_COMPOUND;
-  const verbs=window.COQ_VERBS||{};
-  if(!engine||typeof engine.conjugate!=='function'||!P||!C||engine.__compoundCompatibilityPatch)return;
-
-  const original=engine.conjugate.bind(engine);
-  const compounds=new Set(C.compoundTenses||Object.keys(C.mapping||{}));
-
-  function isPronominal(verb,construction){
-    if(construction==='pronominale')return true;
-    if(construction==='non-pronominale')return false;
-    const record=verbs[String(verb||'').trim().toLowerCase()]||{};
-    return record.pronominal===true || record.construction==='pronominale';
-  }
-
-  function normalizeDuplicatePronoun(result,subject){
-    if(result==null)return result;
-    const pronoun=P.pronounFor(subject);
-    if(!pronoun)return result;
-
-    const value=String(result).trim();
-    const escaped=pronoun.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-    const duplicate=new RegExp('^'+escaped+'(?:\\s+|\\s*\\u2019?)'+escaped+'\\s+','i');
-
-    return value.replace(duplicate,pronoun+' ');
-  }
-
-  engine.conjugate=function(verb,tense,subject,construction){
-    const result=original(verb,tense,subject,construction);
-    if(result==null||!compounds.has(tense)||!isPronominal(verb,construction))return result;
-    return normalizeDuplicatePronoun(result,subject);
-  };
-
-  engine.__compoundCompatibilityPatch=true;
-});
