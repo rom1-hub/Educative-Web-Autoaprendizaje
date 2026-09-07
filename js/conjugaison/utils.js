@@ -34,10 +34,12 @@
     else base=baseMap[base]||base;
     if(!baseMap[base])return variants;
 
+    const startsWithVowel=/^[aeiouyàâäéèêëîïôöùûüÿœæ]/i.test(expected);
     if(base==='je'){
-      variants.add(api.normalizeAnswerText('je '+expected));
-      // Cuando la forma empieza por vocal, también se acepta la contracción "j'".
-      if(!/^j['’]/.test(expected) && /^[aeiouyàâäéèêëîïôöùûüÿœæ]/i.test(expected)){
+      // Para una forma que empieza por vocal, la forma escrita debe llevar la
+      // elisión: "j'ai", nunca "je ai". Para consonantes se conserva "je ...".
+      if(!startsWithVowel) variants.add(api.normalizeAnswerText('je '+expected));
+      if(!/^j['’]/.test(expected) && startsWithVowel){
         variants.add(api.normalizeAnswerText("j'"+expected));
       }
     }else{
@@ -48,8 +50,12 @@
     if(isSubjonctif){
       const queSubject={je:"que je",tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"}[base];
       if(queSubject){
-        variants.add(api.normalizeAnswerText(queSubject+' '+expected));
-        if(base==='je' && !/^j['’]/.test(expected) && /^[aeiouyàâäéèêëîïôöùûüÿœæ]/i.test(expected)){
+        // En subjonctif, "que je aie" / "que je sois" est incorrecto:
+        // delante de vocal se exige la elisión "que j'aie" / "que je sois".
+        if(!(base==='je' && startsWithVowel)){
+          variants.add(api.normalizeAnswerText(queSubject+' '+expected));
+        }
+        if(base==='je' && !/^j['’]/.test(expected) && startsWithVowel){
           variants.add(api.normalizeAnswerText("que j'"+expected));
         }
       }
