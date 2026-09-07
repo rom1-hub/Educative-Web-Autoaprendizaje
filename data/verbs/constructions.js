@@ -37,10 +37,10 @@ window.COQ_COMPOUND_CONSTRUCTION_FILTERS = {
     verbs[key] = {id:key, infinitif:item[0], infinitif_base:item[0], groupe:1, pattern:'er-eler', auxiliaire:'avoir', pronominal:false, participePasse:item[1], construction:'non-pronominale', verbeBase:key};
   });
 
-  // -ETER : les trois familles demandées pour COQ.
-  // 1. JETER et ses dérivés : doublement obligatoire du T.
-  // 2. Liste fermée : alternance E/È uniquement.
-  // 3. Tous les autres -ETER : les deux orthographes sont acceptées.
+  // -ETER : tres familias.
+  // 1) jeter y sus derivados: -tt obligatorio.
+  // 2) acheter, racheter, bégueter, corseter, crocheter, fileter, fureter, haleter: solo -ète.
+  // 3) el resto de los -eter: dos ortografías, -ète / -ette.
   const eterVerbs = {
     'jeter': 'jeté', 'projeter': 'projeté', 'rejeter': 'rejeté', 'déjeter': 'déjeté', 'surjeter': 'surjeté',
     'acheter': 'acheté', 'racheter': 'racheté',
@@ -60,9 +60,6 @@ document.addEventListener('DOMContentLoaded', function(){
 
   const U = window.COQ_CONJ_UTILS;
 
-  // Validación de j' en tiempos compuestos.
-  // La pregunta conserva internamente "je (...)" aunque la interfaz muestre "j' (...)".
-  // Por eso la regla debe basarse en q.subject + q.tense y no únicamente en el DOM.
   if(U && typeof U.sameAnswer === 'function' && !U.__coqCompoundContractionPatched){
     const originalSameAnswer = U.sameAnswer.bind(U);
     U.sameAnswer = function(value, q){
@@ -74,19 +71,16 @@ document.addEventListener('DOMContentLoaded', function(){
       const tense = String(q && q.tense || '').trim();
       const isCompound = !!window.COQ_CONJ_COMPOUND && window.COQ_CONJ_COMPOUND.isCompound(tense);
       const startsWithVowel = /^[aeiouyàâäéèêëîïôöùûüÿœæ]/i.test(expected);
-
       if(isCompound && startsWithVowel && (base === 'je' || base === "j'")){
         if(normalizedValue === normalizedExpected) return true;
         if(normalizedValue === ("j'" + normalizedExpected)) return true;
         return false;
       }
-
       if(isCompound && startsWithVowel && (base === 'que je' || base === "que j'")){
         if(normalizedValue === normalizedExpected) return true;
         if(normalizedValue === ("que j'" + normalizedExpected)) return true;
         return false;
       }
-
       return originalSameAnswer(value, q);
     };
     U.__coqCompoundContractionPatched = true;
@@ -108,9 +102,7 @@ document.addEventListener('DOMContentLoaded', function(){
       let subject=String(row[0]||'').trim();
       const form=String(row[1]||'').trim().toLowerCase();
       const annotated=subject.match(/^(que\s+)?je\s*(\([^)]*\))?$/i);
-      if(annotated && /^[aeiouyàâäéèêëîïôöùûüÿœæ]/.test(form)){
-        subject=(annotated[1]?"que j'":"j'")+(annotated[2]?' '+annotated[2]:'');
-      }
+      if(annotated && /^[aeiouyàâäéèêëîïôöùûüÿœæ]/.test(form)) subject=(annotated[1]?"que j'":"j'")+(annotated[2]?' '+annotated[2]:'');
       return [subject,row[1]];
     });
   }
@@ -130,10 +122,11 @@ document.addEventListener('DOMContentLoaded', function(){
     return result;
   };
 
-  // -------------------- PATTERN -ETER --------------------
   const eterAccentOnly = new Set(['acheter','racheter','bégueter','corseter','crocheter','fileter','fureter','haleter']);
   const eterJeterFamily = /jeter$/;
   const eterTenses = new Set(["présent de l'indicatif",'imparfait','futur simple','conditionnel présent','subjonctif présent','impératif présent']);
+  const eterSubjects=['je','tu','il/elle/on','nous','vous','ils/elles'];
+  const eterImperativeSubjects=['tu','nous','vous'];
 
   function eterBase(verb){
     const key=String(verb||'').trim().toLowerCase();
@@ -142,7 +135,6 @@ document.addEventListener('DOMContentLoaded', function(){
     if(key.indexOf('se ')===0) return key.slice(3).trim();
     return key;
   }
-
   function eterType(verb){
     const base=eterBase(verb);
     if(!/eter$/.test(base)) return null;
@@ -150,7 +142,6 @@ document.addEventListener('DOMContentLoaded', function(){
     if(eterAccentOnly.has(base)) return 'accent';
     return 'double';
   }
-
   function eterSubject(subject){
     const raw=String(subject||'').trim().toLowerCase().replace(/\s*\([^)]*\)\s*$/,'').trim();
     if(/^que\s+j['’]$/.test(raw)||/^que\s+je$/.test(raw)) return 'je';
@@ -161,26 +152,20 @@ document.addEventListener('DOMContentLoaded', function(){
     if(/^qu['’]elles$/.test(raw)||/^que\s+elles$/.test(raw)) return 'elles';
     return raw;
   }
-
   function eterForms(verb,tense,subject){
     const type=eterType(verb);
     if(!type||!eterTenses.has(tense)) return null;
-    const base=eterBase(verb);
-    const stem=base.replace(/er$/,'');
-    const s=eterSubject(subject);
+    const base=eterBase(verb),stem=base.replace(/er$/,''),s=eterSubject(subject);
     const presentEnd={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];
     const imperfectEnd={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'}[s];
     const futureEnd={je:'ai',tu:'as',il:'a',elle:'a',on:'a',nous:'ons',vous:'ez',ils:'ont',elles:'ont'}[s];
     const conditionalEnd={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'}[s];
     const subjEnd={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ions',vous:'iez',ils:'ent',elles:'ent'}[s];
-    const accentStem=stem.replace(/e([^e]*)$/,'è$1');
-    const doubleStem=stem+'t';
+    const accentStem=stem.replace(/e([^e]*)$/,'è$1'),doubleStem=stem+'t';
     const variant=(accent,double)=>accent===double?accent:accent+' / '+double;
-
     if(tense==="présent de l'indicatif"){
       if(s==='nous'||s==='vous') return stem+presentEnd;
-      const accent=accentStem+presentEnd;
-      const doubled=doubleStem+presentEnd;
+      const accent=accentStem+presentEnd,doubled=doubleStem+presentEnd;
       if(type==='accent') return accent;
       if(type==='jeter') return doubled;
       return variant(accent,doubled);
@@ -198,8 +183,7 @@ document.addEventListener('DOMContentLoaded', function(){
     }
     if(tense==='subjonctif présent'){
       if(s==='nous'||s==='vous') return stem+subjEnd;
-      const accent=accentStem+subjEnd;
-      const doubled=doubleStem+subjEnd;
+      const accent=accentStem+subjEnd,doubled=doubleStem+subjEnd;
       if(type==='accent') return accent;
       if(type==='jeter') return doubled;
       return variant(accent,doubled);
@@ -207,8 +191,7 @@ document.addEventListener('DOMContentLoaded', function(){
     if(tense==='impératif présent'){
       if(!['tu','nous','vous'].includes(s)) return null;
       if(s==='nous'||s==='vous') return stem+presentEnd;
-      const accent=accentStem+'e';
-      const doubled=doubleStem+'e';
+      const accent=accentStem+'e',doubled=doubleStem+'e';
       if(type==='accent') return accent;
       if(type==='jeter') return doubled;
       return variant(accent,doubled);
@@ -217,12 +200,12 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 
   const originalConjugate=engine.conjugate.bind(engine);
+  const originalRowsFor=typeof engine.rowsFor==='function'?engine.rowsFor.bind(engine):null;
   if(!engine.__eterPatternPatchInstalled){
     engine.conjugate=function(verb,tense,subject,construction){
       const generated=eterForms(verb,tense,subject);
       if(generated!=null){
-        const base=eterBase(verb);
-        const r=verbs[base]||verbs[verb]||{};
+        const base=eterBase(verb),r=verbs[base]||verbs[verb]||{};
         const isPronominal=construction==='pronominale'||r.pronominal===true||r.construction==='pronominale';
         if(isPronominal && window.COQ_CONJ_PRONOUNS){
           const s=window.COQ_CONJ_PRONOUNS.baseSubject(subject);
@@ -230,8 +213,7 @@ document.addEventListener('DOMContentLoaded', function(){
             const pronoun={tu:'toi',nous:'nous',vous:'vous'}[s];
             if(pronoun) return generated+'-'+pronoun;
           }else{
-            const pron=window.COQ_CONJ_PRONOUNS.pronounFor(s);
-            if(pron) return window.COQ_CONJ_PRONOUNS.apply(subject,generated);
+            return window.COQ_CONJ_PRONOUNS.apply(subject,generated);
           }
         }
         return generated;
@@ -241,8 +223,29 @@ document.addEventListener('DOMContentLoaded', function(){
     engine.__eterPatternPatchInstalled=true;
   }
 
+  // rowsFor y rowsForLookup del motor original llaman a su cierre interno de conjugate.
+  // Para -ETER los reemplazamos solo en tiempos simples para que lookup y práctica utilicen
+  // exactamente el mismo generador que acabamos de instalar.
+  if(originalRowsFor){
+    engine.rowsFor=function(verb,tense,construction){
+      if(!eterType(verb)||!eterTenses.has(tense)) return originalRowsFor(verb,tense,construction);
+      const labels=tense==='impératif présent'?eterImperativeSubjects:eterSubjects;
+      const out=[];
+      labels.forEach(function(label){
+        const subject=label.indexOf('/')>=0?label.split('/')[0].trim():label;
+        const form=engine.conjugate(verb,tense,subject,construction);
+        if(form!=null) out.push([label,form]);
+      });
+      return out;
+    };
+  }
+
   const previousRowsForLookup=engine.rowsForLookup.bind(engine);
   engine.rowsForLookup=function(verb,tense,construction){
+    if(eterType(verb)&&eterTenses.has(tense)){
+      const rows=engine.rowsFor(verb,tense,construction);
+      return rows;
+    }
     return previousRowsForLookup(verb,tense,construction);
   };
 
@@ -252,7 +255,7 @@ document.addEventListener('DOMContentLoaded', function(){
     forms:eterForms,
     accentOnly:Array.from(eterAccentOnly),
     jeterFamily:'jeter et ses dérivés',
-    orthographicVariants:'accent / double consonne'
+    orthographicVariants:'-ète / -ette'
   };
 
   const practiceSubject=document.querySelector('#questionSubject');
