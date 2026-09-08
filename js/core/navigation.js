@@ -2,17 +2,6 @@
  * Fuente única de verdad para el menú de navegación en todas las páginas.
  */
 (function(){
-  function loadConjugaisonExpansion(){
-    if(!/\/conjugaison\.html$/i.test(window.location.pathname) || window.__coqVerbExpansionRequested) return;
-    window.__coqVerbExpansionRequested=true;
-    const scripts=['../js/conjugaison/data-expansion.js','../js/conjugaison/family-patterns.js','../js/conjugaison/table-presentation.js','../js/conjugaison/elision-display.js','../js/conjugaison/additional-family-patterns.js','../js/conjugaison/next-family-patterns.js'];
-    scripts.forEach(function(src){
-      const script=document.createElement('script');
-      script.src=src;
-      script.defer=true;
-      document.head.appendChild(script);
-    });
-  }
   function initCoqMenu(){
     document.querySelectorAll('.nav').forEach(function(nav){
       const button=nav.querySelector('.menu');
@@ -34,6 +23,6 @@
     });
   }
   function initBlogFilters(){const filterBar=document.querySelector('.blog-cats');const grid=document.querySelector('.blog-grid');if(!filterBar||!grid||filterBar.dataset.coqFiltersReady==='1')return;filterBar.dataset.coqFiltersReady='1';const buttons=Array.from(filterBar.querySelectorAll('.blog-cat'));const cards=Array.from(grid.querySelectorAll('.blog-card'));if(!buttons.length||!cards.length)return;buttons.forEach(function(button){button.setAttribute('aria-pressed',button.classList.contains('active')?'true':'false');button.addEventListener('click',function(){const category=button.textContent.trim().toLowerCase();buttons.forEach(function(item){const active=item===button;item.classList.toggle('active',active);item.setAttribute('aria-pressed',active?'true':'false');});cards.forEach(function(card){const label=card.querySelector('.blog-cover');const text=label?label.textContent.trim().toLowerCase():'';card.hidden=!(category==='todos'||text.indexOf(category)!==-1);});});});}
-  function init(){loadConjugaisonExpansion();initCoqMenu();initBlogFilters();}
+  function init(){initCoqMenu();initBlogFilters();}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
