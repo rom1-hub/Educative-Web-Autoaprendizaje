@@ -108,7 +108,7 @@
   function venirType(inf,s,tense){
     const stem=inf.replace(/ir$/,''),singular=stem.replace(/ven$/,'vien'),subjSingular=stem.replace(/ven$/,'vienn'),future=inf.replace(/enir$/,'iendr');
     if(tense==="présent de l'indicatif"){
-      if(['je','tu','il','elle','on','ils','elles'].includes(s))return singular+{je:'s',tu:'s',il:'t',elle:'t',on:'t',nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];
+      if(['je','tu','il','elle','on','ils','elles'].includes(s))return singular+{je:'s',tu:'s',il:'t',elle:'t',on:'t',ils:'ent',elles:'ent'}[s];
       return stem+{nous:'ons',vous:'ez'}[s];
     }
     if(tense==='imparfait')return stem+imparfait[s];
