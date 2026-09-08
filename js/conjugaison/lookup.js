@@ -3,7 +3,7 @@
  */
 (function(){
   const U=window.COQ_CONJ_UTILS,conjugations=U.conjugations,resolver=window.COQ_PATTERN_RESOLVER,engine=window.COQ_CONJ_ENGINE,C=window.COQ_CONJ_COMPOUND,A=window.COQ_CONJ_AGREEMENT;
-  const SUBJECT_GROUPS={'il/elle/on':['il','elle','on'],'ils/elles':['ils','elles']},VOWELS=/^[aeiouàâäéèêëîïôöùûüÿœæ]/i;
+  const VOWELS=/^[aeiouàâäéèêëîïôöùûüÿœæ]/i;
   const record=v=>((resolver&&typeof resolver.resolveRecord==='function')?resolver.resolveRecord(v):null)||conjugations[v]||null;
   const meta=v=>record(v)||{},verbExists=verb=>!!record(verb),isCompound=tense=>!!C?.isCompound?.(tense);
   function counterpart(verb){const m=meta(verb);if(m.pronominal&&m.verbeBase&&record(m.verbeBase))return m.verbeBase;if(!m.pronominal&&m.formePronominale?.infinitif&&record(m.formePronominale.infinitif))return m.formePronominale.infinitif;if(!m.pronominal&&m.verbeBase&&record('se '+m.verbeBase))return 'se '+m.verbeBase;return null;}
@@ -14,8 +14,11 @@
   function baseSubject(value){return stripMetadata(value).replace(/^que\s+/i,'').replace(/^qu['’]/i,'').trim().toLowerCase();}
   function elideJe(label,form){const subject=normalizeSubject(label),value=String(form||'').trim();if(subject==='je'&&VOWELS.test(value))return "j'";if(subject==='que je'&&VOWELS.test(value))return "que j'";return label;}
   function addSubjonctifPrefix(label,form){const raw=String(label||'').trim(),base=baseSubject(raw),prefix={je:'que je',tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"}[base];if(!prefix)return raw;if(/^que\s|^qu['’]/i.test(raw))return elideJe(raw,form);return elideJe(prefix,form);}
-  function groupedSubject(label,form,tense){const raw=String(label||'').trim(),base=baseSubject(raw);if(base==='il/elle/on')return tense==='subjonctif présent'?"qu'il/elle/on":raw;if(base==='ils/elles')return tense==='subjonctif présent'?"qu'ils/elles":raw;return tense==='subjonctif présent'?addSubjonctifPrefix(raw,form):elideJe(raw,form);}
-  function displaySubject(label,form,tense){const raw=String(label||'').trim(),base=baseSubject(raw),group=SUBJECT_GROUPS[base];if(group)return [groupedSubject(raw,form,tense)];return [tense==='subjonctif présent'?addSubjonctifPrefix(raw,form):elideJe(raw,form)];}
+  function expandSubjects(label,form,tense){
+    const raw=String(label||'').trim(),base=baseSubject(raw);
+    const subjects=base==='il/elle/on'?['il','elle','on']:base==='ils/elles'?['ils','elles']:[raw];
+    return subjects.map(subject=>tense==='subjonctif présent'||tense==='subjonctif passé'?addSubjonctifPrefix(subject,form):elideJe(subject,form));
+  }
   function agreementSensitive(verb){const m=meta(verb);return m.pronominal===true||m.construction==='pronominale'||m.auxiliaire==='être';}
   function compoundDisplayForm(form,subject,verb){
     if(!agreementSensitive(verb))return form;
@@ -32,21 +35,17 @@
     const base=baseSubject(subject);
     let notation='(e)';
     if(base==='nous'||base==='ils'||base==='elles'||base==='ils/elles')notation='(e)s';
-    else if(base==='vous'||base==='il/elle/on')notation='(e)(s)';
+    else if(base==='vous')notation='(e)(s)';
+    else if(base==='on')notation='(e)(s)';
     return value.slice(0,-matched.length)+pp+notation;
   }
   function normalizedRows(rows,tense,verb){
     const output=[];
     (rows||[]).forEach(row=>{
       const form=String(row?.[1]??'').trim();if(!form)return;
-      if(isCompound(tense)){const subject=String(row?.[0]||'').trim();output.push([groupedSubject(subject,form,tense),compoundDisplayForm(form,subject,verb)]);}
-      else displaySubject(row?.[0],form,tense).forEach(subject=>output.push([subject,form]));
+      const rawSubject=String(row?.[0]||'').trim();
+      expandSubjects(rawSubject,form,tense).forEach(subject=>output.push([subject,isCompound(tense)?compoundDisplayForm(form,subject,verb):form]));
     });
-    const pattern=resolver&&typeof resolver.resolvePattern==='function'?resolver.resolvePattern(verb):null;
-    if(C?.isSimple?.(tense)&&pattern==='yer'){
-      const merge=(subjects,label)=>{const matches=output.filter(row=>subjects.includes(row[0]));if(matches.length!==subjects.length||new Set(matches.map(row=>row[1])).size!==1)return;const first=output.indexOf(matches[0]);output.splice(first,matches.length,[label,matches[0][1]]);};
-      merge(['il','elle','on'],'il/elle/on');merge(['ils','elles'],'ils/elles');
-    }
     return output;
   }
   function addFormAudioButtons(table){const speak=window.Coqaudio&&typeof window.Coqaudio.speak==='function'?window.Coqaudio.speak:null;if(!speak)return;table.querySelectorAll('tbody tr').forEach(row=>{const cells=row.querySelectorAll('td');if(cells.length<2||cells[1].querySelector('[data-speak-form]'))return;const form=cells[1].textContent.trim(),spoken=speechForm(form);if(!spoken)return;const button=document.createElement('button');button.type='button';button.className='btn tiny secondary';button.dataset.speakForm=spoken;button.setAttribute('aria-label','Écouter la forme « '+spoken+' »');button.textContent='🔊';button.style.marginLeft='8px';button.addEventListener('click',()=>speak(spoken));cells[1].appendChild(button);});}
