@@ -1,25 +1,17 @@
 const fs=require('fs');
 const path=require('path');
 const vm=require('vm');
-
 const root=path.resolve(__dirname,'..');
 const context=vm.createContext({window:{},console,Set,Map,Object,Array,Math,String,Number,Boolean,RegExp,JSON});
-const files=[
-  'data/verbs/verbs.js','data/verbs/family-catalog.js','data/verbs/patterns.js','data/verbs/constructions.js','data/verbs/tense-rules.js',
-  'js/conjugaison/utils.js','js/conjugaison/pronouns.js','js/conjugaison/compound-tenses.js','js/conjugaison/agreement.js','js/conjugaison/pattern-registry.js','js/conjugaison/engine.js'
-];
+const files=['data/verbs/verbs.js','data/verbs/family-catalog.js','data/verbs/patterns.js','data/verbs/constructions.js','data/verbs/tense-rules.js','js/conjugaison/utils.js','js/conjugaison/pronouns.js','js/conjugaison/compound-tenses.js','js/conjugaison/agreement.js','js/conjugaison/pattern-registry.js','js/conjugaison/engine.js'];
 files.forEach(file=>vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),context,{filename:file}));
-
-const w=context.window;
-const engine=w.COQ_CONJ_ENGINE;
+const w=context.window,engine=w.COQ_CONJ_ENGINE;
 const assert=(condition,message)=>{if(!condition)throw new Error(message);};
-const expect=(actual,expected,label)=>{assert(actual===expected,`${label}: esperado «${expected}», obtenido «${actual}»`);};
-
-assert(w.COQ_VERBS['partir'], 'Los datos base deben seguir intactos tras cargar el catálogo.');
-assert(!Object.prototype.hasOwnProperty.call(w.COQ_VERBS,'sortir'), 'El catálogo familiar no debe mutar COQ_VERBS.');
-assert(Object.isFrozen(w.COQ_VERB_FAMILY_CATALOG), 'El catálogo familiar debe ser inmutable.');
-assert(Object.isFrozen(w.COQ_VERB_REGISTRY), 'El registro unificado debe ser inmutable.');
-
+const expect=(actual,expected,label)=>assert(actual===expected,`${label}: esperado «${expected}», obtenido «${actual}»`);
+assert(w.COQ_VERBS['partir'],'Los datos base deben seguir intactos tras cargar el catálogo.');
+assert(!Object.prototype.hasOwnProperty.call(w.COQ_VERBS,'sortir'),'El catálogo familiar no debe mutar COQ_VERBS.');
+assert(Object.isFrozen(w.COQ_VERB_FAMILY_CATALOG),'El catálogo familiar debe ser inmutable.');
+assert(Object.isFrozen(w.COQ_VERB_REGISTRY),'El registro unificado debe ser inmutable.');
 expect(engine.conjugate('parler',"présent de l'indicatif",'je'),'parle','parler presente');
 expect(engine.conjugate('manger',"présent de l'indicatif",'nous'),'mangeons','manger nous');
 expect(engine.conjugate('commencer',"présent de l'indicatif",'nous'),'commençons','commencer nous');
@@ -35,5 +27,4 @@ expect(engine.conjugate('se lever','passé composé','vous (féminin singulier)'
 expect(engine.conjugate('se lever','plus-que-parfait','tu (masculin singulier)','pronominale'),"t'étais levé",'se lever plus-que-parfait');
 expect(engine.conjugate('se parler','passé composé','ils','pronominale'),'se sont parlé','se parler sans accord');
 expect(engine.conjugate('venir','futur antérieur','elles'),'seront venues','venir futur antérieur');
-
-console.log(`Conjugaison regression OK — ${15} assertions.`);
+console.log('Conjugaison regression OK — 19 assertions.');
