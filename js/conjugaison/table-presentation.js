@@ -116,11 +116,18 @@
     window.setTimeout(apply,0);
   }
 
-  document.addEventListener('DOMContentLoaded',function(){
+  function init(){
     const result=document.querySelector('#conjResult');
-    if(result){
+    if(result && !result.dataset.coqTablePresentationObserver){
+      result.dataset.coqTablePresentationObserver='1';
       new MutationObserver(schedule).observe(result,{childList:true,subtree:true});
     }
     schedule();
-  });
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',init,{once:true});
+  }else{
+    init();
+  }
 })();
