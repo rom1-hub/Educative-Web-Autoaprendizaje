@@ -60,7 +60,7 @@
   function conjugate(verb,tense,subject,construction){
     const r=record(verb);if(!r)return null;
     const isPronominal=construction==='pronominale'||r.pronominal===true||(r.construction==='pronominale'&&construction!=='non-pronominale');
-    if(C&&C.isCompound(tense))return compoundForm(verb,tense,subject,isPronominal?'pronomiale':'non-pronomiale');
+    if(C&&C.isCompound(tense))return compoundForm(verb,tense,subject,isPronominal?'pronominale':'non-pronominale');
     let form=simpleForm(baseKey(verb),tense,subject);if(form==null)form=explicitForm(verb,tense,subject);if(form==null)return null;
     if(isPronominal){
       if(tense==='impératif présent'){const imperativePronoun={tu:'toi',nous:'nous',vous:'vous'}[P.baseSubject(subject)];if(!imperativePronoun)return form;return form+'-'+imperativePronoun;}
@@ -68,7 +68,7 @@
     }
     return form;
   }
-  function agreementSensitive(verb){const r=record(verb)||{};return r.pronominal===true||r.construction==='pronomiale'||r.auxiliaire==='être';}
+  function agreementSensitive(verb){const r=record(verb)||{};return r.pronominal===true||r.construction==='pronominale'||r.auxiliaire==='être';}
   function lookupCompoundSubjects(verb,tense){
     if(!agreementSensitive(verb)){
       if(tense==='subjonctif passé')return ['que je','que tu',"qu'il/elle/on",'que nous','que vous',"qu'ils/elles"];
@@ -81,9 +81,9 @@
     if(tense==='subjonctif passé')return ['que je','que tu',"qu'il","qu'elle","qu'on",'que nous','que vous',"qu'ils","qu'elles"];
     return ['je','tu','il','elle','on','nous','vous','ils','elles'];
   }
-  function rowsForLookup(verb,tense){const r=record(verb);if(!r)return [];if(!(C&&C.isCompound(tense)))return rowsFor(verb,tense);const construction=r.pronominal?'pronomiale':(r.construction||'non-pronomiale');return lookupCompoundSubjects(verb,tense).map(subject=>[subject,conjugate(verb,tense,subject,construction)]).filter(row=>row[1]!=null);}
-  function rowsFor(verb,tense){const r=record(verb);if(!r)return [];const source=(r.formes||{})[tense]||[];const isSimple=C?.isSimple?.(tense),isCompound=C?.isCompound?.(tense);if(!isSimple&&!isCompound)return source.map(x=>[x[0],x[1]]);const construction=r.pronominal?'pronomiale':(r.construction||'non-pronomiale');if(isCompound)return practiceCompoundSubjects(tense).map(subject=>[subject,conjugate(verb,tense,subject,construction)]).filter(row=>row[1]!=null);const fallback=tense==='impératif présent'?['tu','nous','vous']:tense==='subjonctif présent'?['que je','que tu',"qu'il/elle/on",'que nous','que vous',"qu'ils/elles"]:['je','tu','il/elle/on','nous','vous','ils/elles'];const rows=source.length?source:fallback.map(subject=>[subject,'']);return rows.map(row=>{const subject=String(row[0]).split('/').map(x=>x.trim()).filter(Boolean)[0];const generated=conjugate(verb,tense,subject,construction);return generated!=null?[row[0],generated]:null;}).filter(Boolean);}
+  function rowsForLookup(verb,tense){const r=record(verb);if(!r)return [];if(!(C&&C.isCompound(tense)))return rowsFor(verb,tense);const construction=r.pronominal?'pronominale':(r.construction||'non-pronominale');return lookupCompoundSubjects(verb,tense).map(subject=>[subject,conjugate(verb,tense,subject,construction)]).filter(row=>row[1]!=null);}
+  function rowsFor(verb,tense){const r=record(verb);if(!r)return [];const source=(r.formes||{})[tense]||[];const isSimple=C?.isSimple?.(tense),isCompound=C?.isCompound?.(tense);if(!isSimple&&!isCompound)return source.map(x=>[x[0],x[1]]);const construction=r.pronominal?'pronominale':(r.construction||'non-pronominale');if(isCompound)return practiceCompoundSubjects(tense).map(subject=>[subject,conjugate(verb,tense,subject,construction)]).filter(row=>row[1]!=null);const fallback=tense==='impératif présent'?['tu','nous','vous']:tense==='subjonctif présent'?['que je','que tu',"qu'il/elle/on",'que nous','que vous',"qu'ils/elles"]:['je','tu','il/elle/on','nous','vous','ils/elles'];const rows=source.length?source:fallback.map(subject=>[subject,'']);return rows.map(row=>{const subject=String(row[0]).split('/').map(x=>x.trim()).filter(Boolean)[0];const generated=conjugate(verb,tense,subject,construction);return generated!=null?[row[0],generated]:null;}).filter(Boolean);}
   function rowsForConstruction(verb,tense,construction){const r=record(verb);if(!r)return [];if(C?.isCompound?.(tense))return practiceCompoundSubjects(tense).map(subject=>[subject,conjugate(verb,tense,subject,construction)]).filter(row=>row[1]!=null);const source=(r.formes||{})[tense]||[];if(!C?.isSimple?.(tense))return source.map(x=>[x[0],x[1]]);const fallback=tense==='impératif présent'?['tu','nous','vous']:tense==='subjonctif présent'?['que je','que tu',"qu'il",'que nous','que vous',"qu'ils"]:['je','tu','il','elle','on','nous','vous','ils','elles'];const rows=source.length?source:fallback.map(subject=>[subject,'']);return rows.map(row=>{const subject=String(row[0]).split('/').map(x=>x.trim()).filter(Boolean)[0];const generated=conjugate(verb,tense,subject,construction);return generated!=null?[row[0],generated]:null;}).filter(Boolean);}
-  function canGenerate(verb,tense){const r=record(verb);if(!r)return false;if(C?.isCompound?.(tense))return !!(r.auxiliaire||r.pronominal||r.construction==='pronomiale');return !!C?.isSimple?.(tense)&&!!R&&typeof R.generate==='function';}
+  function canGenerate(verb,tense){const r=record(verb);if(!r)return false;if(C?.isCompound?.(tense))return !!(r.auxiliaire||r.pronominal||r.construction==='pronominale');return !!C?.isSimple?.(tense)&&!!R&&typeof R.generate==='function';}
   window.COQ_CONJ_ENGINE={conjugate,rowsFor,rowsForLookup,rowsForConstruction,canGenerate,subjectInfo};
 })();
