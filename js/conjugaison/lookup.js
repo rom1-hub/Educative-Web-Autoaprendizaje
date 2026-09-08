@@ -2,7 +2,7 @@
  * Responsabilidad: resolver la consulta, pedir las formas al motor y presentar la tabla.
  */
 (function(){
-  const U=window.COQ_CONJ_UTILS,conjugations=U.conjugations,resolver=window.COQ_PATTERN_RESOLVER,engine=window.COQ_CONJ_ENGINE,C=window.COQ_CONJ_COMPOUND;
+  const U=window.COQ_CONJ_UTILS,conjugations=U.conjugations,resolver=window.COQ_PATTERN_RESOLVER,engine=window.COQ_CONJ_ENGINE,C=window.COQ_CONJ_COMPOUND,A=window.COQ_CONJ_AGREEMENT;
   const SUBJECT_GROUPS={'il/elle/on':['il','elle','on'],'ils/elles':['ils','elles']},VOWELS=/^[aeiouàâäéèêëîïôöùûüÿœæ]/i;
   const record=v=>((resolver&&typeof resolver.resolveRecord==='function')?resolver.resolveRecord(v):null)||conjugations[v]||null;
   const meta=v=>record(v)||{},verbExists=verb=>!!record(verb),isCompound=tense=>!!C?.isCompound?.(tense);
@@ -19,29 +19,30 @@
   function agreementSensitive(verb){const m=meta(verb);return m.pronominal===true||m.construction==='pronominale'||m.auxiliaire==='être';}
   function compoundDisplayForm(form,subject,verb){
     if(!agreementSensitive(verb))return form;
-    const r=meta(verb),pp=String(r.participePasse||'').trim();
-    if(!pp||!String(form).endsWith(pp))return form;
-    const base=baseSubject(subject),suffix=String(form).slice(0,-pp.length);
+    const r=meta(verb),pp=String(r.participePasse||'').trim(),value=String(form||'');
+    if(!pp)return value;
+    const candidates=[];
+    const addCandidate=valueToAdd=>{const s=String(valueToAdd||'');if(s&&!candidates.includes(s))candidates.push(s);};
+    addCandidate(pp);
+    if(A&&typeof A.agree==='function'){
+      [['masculin','singulier'],['féminin','singulier'],['masculin','pluriel'],['féminin','pluriel']].forEach(([gender,number])=>addCandidate(A.agree(pp,{gender,number},{type:'non-pronominale',baseVerb:verb,auxiliaire:'être'})));
+    }else{addCandidate(pp+'e');addCandidate(pp+'s');addCandidate(pp+'es');}
+    const matched=candidates.sort((a,b)=>b.length-a.length).find(candidate=>value.endsWith(candidate));
+    if(!matched)return value;
+    const base=baseSubject(subject);
     let notation='(e)';
     if(base==='nous'||base==='ils'||base==='elles')notation='(e)s';
-    else if(base==='vous')notation='(e)(s)';
-    else if(base==='il/elle/on')notation='(e)(s)';
-    return suffix+pp+notation;
+    else if(base==='vous'||base==='il/elle/on')notation='(e)(s)';
+    return value.slice(0,-matched.length)+pp+notation;
   }
   function normalizedRows(rows,tense,verb){
     const output=[];
     (rows||[]).forEach(row=>{
       const form=String(row?.[1]??'').trim();if(!form)return;
       if(isCompound(tense)){
-        /* Les temps composés restent pédagogiquement à 6 lignes. Pour les
-           auxiliaires être/pronominaux, la concordance est indiquée dans le
-           participe: levé(e), levé(e)s, levé(e)(s), etc. */
         const subject=String(row?.[0]||'').trim();
-        const display=groupedSubject(subject,form,tense);
-        output.push([display,compoundDisplayForm(form,subject,verb)]);
-      }else{
-        displaySubject(row?.[0],form,tense).forEach(subject=>output.push([subject,form]));
-      }
+        output.push([groupedSubject(subject,form,tense),compoundDisplayForm(form,subject,verb)]);
+      }else displaySubject(row?.[0],form,tense).forEach(subject=>output.push([subject,form]));
     });
     const pattern=resolver&&typeof resolver.resolvePattern==='function'?resolver.resolvePattern(verb):null;
     if(C?.isSimple?.(tense)&&pattern==='yer'){
