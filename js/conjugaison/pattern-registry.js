@@ -125,6 +125,26 @@
     return null;
   }
 
+  function tenirType(inf,s,tense){
+    const stem=inf.replace(/ir$/,''),singular=stem.replace(/ten$/,'tien'),subjSingular=stem.replace(/ten$/,'tienn'),future=inf.replace(/enir$/,'iendr');
+    if(tense==="présent de l'indicatif"){
+      if(['je','tu','il','elle','on','ils','elles'].includes(s))return singular+{je:'s',tu:'s',il:'t',elle:'t',on:'t',nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];
+      return stem+{je:'s',tu:'s',il:'t',elle:'t',on:'t',nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];
+    }
+    if(tense==='imparfait')return stem+imparfait[s];
+    if(tense==='futur simple')return future+futur[s];
+    if(tense==='conditionnel présent')return future+conditionnel[s];
+    if(tense==='subjonctif présent'){
+      if(['je','tu','il','elle','on','ils','elles'].includes(s))return subjSingular+subjonctif[s];
+      return stem+subjonctif[s];
+    }
+    if(tense==='impératif présent'){
+      if(!imperativeSubjects.includes(s))return null;
+      return singular+{je:'s',tu:'s',il:'t',elle:'t',on:'t',nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];
+    }
+    return null;
+  }
+
   const definitions={
     'regular-er':{groupe:1,description:'Premier groupe régulier en -ER',generate:(inf,s,t)=>simpleGenerator(inf,s,t,'regular-er')},
     'regular-ir':{groupe:2,description:'Deuxième groupe régulier en -IR',generate:(inf,s,t)=>simpleGenerator(inf,s,t,'regular-ir')},
@@ -136,7 +156,8 @@
     'partir-type':{groupe:3,description:'Famille partir : alternance du radical au présent',generate:partirType},
     'suivre-type':{groupe:3,description:'Famille suivre : radical sui-/suiv-',generate:suivreType},
     'ouvrir-type':{groupe:3,description:'Famille ouvrir : présent en -e/-es/-e, pluriel en -ons/-ez/-ent',generate:ouvrirType},
-    'venir-type':{groupe:3,description:'Famille venir : alternance vien-/ven- au présent et viendr- au futur',generate:venirType}
+    'venir-type':{groupe:3,description:'Famille venir : alternance vien-/ven- au présent et viendr- au futur',generate:venirType},
+    'tenir-type':{groupe:3,description:'Famille tenir : alternance tien-/ten- au présent et tiendr- au futur',generate:tenirType}
   };
 
   function get(pattern){return definitions[pattern]||null;}
