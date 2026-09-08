@@ -23,6 +23,7 @@
     if(!engine)return [{name:'motor disponible',actual:'ausente',expected:'presente',ok:false}];
     if(!registry)return [{name:'registro disponible',actual:'ausente',expected:'presente',ok:false}];
     assertTruthy('registro expone generate()',typeof registry.generate==='function',results);
+    assertTruthy('registro expone get()',typeof registry.get==='function',results);
     assertTruthy('resolutor expone resolveRecord()',resolver&&typeof resolver.resolveRecord==='function',results);
     assertTruthy('motor expone conjugate()',typeof engine.conjugate==='function',results);
     assertTruthy('motor expone rowsForLookup()',typeof engine.rowsForLookup==='function',results);
@@ -43,6 +44,7 @@
     ];
     historicalCatalogVerbs.forEach(function(verb){
       assert('catálogo contiene · '+verb,Object.prototype.hasOwnProperty.call(catalog,verb),true,results);
+      if(catalog[verb])assert('patrón registrado · '+verb,typeof catalog[verb].pattern==='string'&&!!registry.get(catalog[verb].pattern),true,results);
     });
 
     const simple=[
@@ -60,6 +62,44 @@
     simple.forEach(function(item){
       const actual=engine.conjugate(item[0],item[1],item[2],'non-pronominale');
       assert(item[0]+' · '+item[1]+' · '+item[2],actual,item[3],results);
+    });
+
+    const registryFamilies=[
+      ['regular-er','parler',"présent de l'indicatif",'je','parle'],['regular-ir','finir',"présent de l'indicatif",'nous','finissons'],
+      ['regular-re','vendre',"présent de l'indicatif",'ils','vendent'],['er-ger','manger',"présent de l'indicatif",'nous','mangeons'],
+      ['er-cer','commencer',"présent de l'indicatif",'nous','commençons'],['er-eler','appeler',"présent de l'indicatif",'je','appelle'],
+      ['er-eter','jeter',"présent de l'indicatif",'je','jette'],['er-e-accent','lever',"présent de l'indicatif",'je','lève'],
+      ['yer','nettoyer',"présent de l'indicatif",'je','nettoie'],['avoir','avoir',"présent de l'indicatif",'je','ai'],
+      ['être','être',"présent de l'indicatif",'je','suis'],['prendre','prendre',"présent de l'indicatif",'je','prends'],
+      ['partir-type','partir',"présent de l'indicatif",'je','pars'],['suivre-type','suivre',"présent de l'indicatif",'nous','suivons'],
+      ['ouvrir-type','ouvrir',"présent de l'indicatif",'je','ouvre'],['venir-type','venir',"présent de l'indicatif",'je','viens'],
+      ['tenir-type','tenir',"présent de l'indicatif",'nous','tenons'],['aller-type','aller',"présent de l'indicatif",'je','vais'],
+      ['mettre-type','mettre',"présent de l'indicatif",'je','mets'],['lire-type','lire',"présent de l'indicatif",'je','lis'],
+      ['rire-type','rire',"présent de l'indicatif",'je','ris'],['vivre-type','vivre',"présent de l'indicatif",'je','vis'],
+      ['conduire-type','conduire',"présent de l'indicatif",'je','conduis'],['courir-type','courir',"présent de l'indicatif",'je','cours'],
+      ['mourir-type','mourir',"présent de l'indicatif",'je','meurs'],['croire-type','croire',"présent de l'indicatif",'je','crois'],
+      ['recevoir-type','recevoir',"présent de l'indicatif",'je','reçois'],['connaître-type','connaître',"présent de l'indicatif",'je','connais'],
+      ['paraître-type','paraître',"présent de l'indicatif",'je','parais'],['faire','faire',"présent de l'indicatif",'je','fais']
+    ];
+    registryFamilies.forEach(function(item){
+      const actual=registry.generate(item[0],item[1],item[3],item[2]);
+      assert('registro · '+item[0]+' · '+item[1]+' · '+item[2]+' · '+item[3],actual,item[4],results);
+    });
+
+    const representativeTenses=[
+      ['regular-er','parler','imparfait','je','parlais'],['regular-er','parler','futur simple','nous','parlerons'],
+      ['regular-er','parler','conditionnel présent','vous','parleriez'],['regular-er','parler','subjonctif présent','ils','parlent'],
+      ['regular-er','parler','impératif présent','tu','parle'],['regular-ir','finir','imparfait','nous','finissions'],
+      ['regular-ir','finir','subjonctif présent','ils','finissent'],['regular-re','vendre','imparfait','je','vendais'],
+      ['er-ger','manger','imparfait','je','mangeais'],['er-cer','commencer','imparfait','nous','commencions'],
+      ['er-e-accent','lever','futur simple','je','lèverai'],['er-eler','appeler','futur simple','je','appellerai'],
+      ['er-eter','jeter','futur simple','je','jetterai'],['yer','nettoyer','subjonctif présent','nous','nettoyions'],
+      ['avoir','avoir','subjonctif présent','nous','ayons'],['être','être','subjonctif présent','nous','soyons'],
+      ['prendre','prendre','subjonctif présent','ils','prennent'],['faire','faire','impératif présent','nous','faisons']
+    ];
+    representativeTenses.forEach(function(item){
+      const actual=registry.generate(item[0],item[1],item[3],item[2]);
+      assert('tiempo representativo · '+item[0]+' · '+item[2]+' · '+item[3],actual,item[4],results);
     });
 
     const inferred=[
@@ -93,26 +133,6 @@
     pronominal.forEach(function(item){
       const actual=engine.conjugate(item[0],item[1],item[2],'pronominale');
       assert(item[0]+' · '+item[1]+' · '+item[2],actual,item[3],results);
-    });
-
-    const registryFamilies=[
-      ['regular-er','parler',"présent de l'indicatif",'je','parle'],['regular-ir','finir',"présent de l'indicatif",'nous','finissons'],
-      ['regular-re','vendre',"présent de l'indicatif",'ils','vendent'],['er-ger','manger',"présent de l'indicatif",'nous','mangeons'],
-      ['er-cer','commencer',"présent de l'indicatif",'nous','commençons'],['er-eler','appeler',"présent de l'indicatif",'je','appelle'],
-      ['er-eter','jeter',"présent de l'indicatif",'je','jette'],['er-e-accent','lever',"présent de l'indicatif",'je','lève'],
-      ['partir-type','partir',"présent de l'indicatif",'je','pars'],['suivre-type','suivre',"présent de l'indicatif",'nous','suivons'],
-      ['ouvrir-type','ouvrir',"présent de l'indicatif",'je','ouvre'],['venir-type','venir',"présent de l'indicatif",'je','viens'],
-      ['tenir-type','tenir',"présent de l'indicatif",'nous','tenons'],['aller-type','aller',"présent de l'indicatif",'je','vais'],
-      ['mettre-type','mettre',"présent de l'indicatif",'je','mets'],['lire-type','lire',"présent de l'indicatif",'je','lis'],
-      ['rire-type','rire',"présent de l'indicatif",'je','ris'],['vivre-type','vivre',"présent de l'indicatif",'je','vis'],
-      ['conduire-type','conduire',"présent de l'indicatif",'je','conduis'],['courir-type','courir',"présent de l'indicatif",'je','cours'],
-      ['mourir-type','mourir',"présent de l'indicatif",'je','meurs'],['croire-type','croire',"présent de l'indicatif",'je','crois'],
-      ['recevoir-type','recevoir',"présent de l'indicatif",'je','reçois'],['connaître-type','connaître',"présent de l'indicatif",'je','connais'],
-      ['paraître-type','paraître',"présent de l'indicatif",'je','parais'],['faire','faire',"présent de l'indicatif",'je','fais']
-    ];
-    registryFamilies.forEach(function(item){
-      const actual=registry.generate(item[0],item[1],item[3],item[2]);
-      assert('registro · '+item[0]+' · '+item[1]+' · '+item[2]+' · '+item[3],actual,item[4],results);
     });
 
     if(presentation){
