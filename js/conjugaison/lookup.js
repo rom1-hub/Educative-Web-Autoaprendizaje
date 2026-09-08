@@ -14,37 +14,54 @@
   function baseSubject(value){return stripMetadata(value).replace(/^que\s+/i,'').replace(/^qu['’]/i,'').trim().toLowerCase();}
   function elideJe(label,form){const subject=normalizeSubject(label),value=String(form||'').trim();if(subject==='je'&&VOWELS.test(value))return "j'";if(subject==='que je'&&VOWELS.test(value))return "que j'";return label;}
   function addSubjonctifPrefix(label,form){const raw=String(label||'').trim(),base=baseSubject(raw),prefix={je:'que je',tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"}[base];if(!prefix)return raw;if(/^que\s|^qu['’]/i.test(raw))return elideJe(raw,form);return elideJe(prefix,form);}
-  function expandSubjects(label,form,tense){
+  function agreementSensitive(verb){const m=meta(verb);return m.pronominal===true||m.construction==='pronominale'||m.auxiliaire==='être';}
+  function expandSubjects(label,form,tense,verb){
     const raw=String(label||'').trim(),base=baseSubject(raw);
-    const subjects=base==='il/elle/on'?['il','elle','on']:base==='ils/elles'?['ils','elles']:[raw];
+    let subjects=base==='il/elle/on'?['il','elle','on']:base==='ils/elles'?['ils','elles']:[raw];
+    if(isCompound(tense)&&agreementSensitive(verb)&&base==='vous'){
+      subjects=['vous (masculin singulier)','vous (féminin singulier)','vous (masculin pluriel)','vous (féminin pluriel)'];
+    }
     return subjects.map(subject=>tense==='subjonctif présent'||tense==='subjonctif passé'?addSubjonctifPrefix(subject,form):elideJe(subject,form));
   }
-  function agreementSensitive(verb){const m=meta(verb);return m.pronominal===true||m.construction==='pronominale'||m.auxiliaire==='être';}
   function compoundDisplayForm(form,subject,verb){
-    if(!agreementSensitive(verb))return form;
-    const r=meta(verb),pp=String(r.participePasse||'').trim(),value=String(form||'');
+    const value=String(form||'');
+    if(!agreementSensitive(verb))return value;
+    const r=meta(verb),pp=String(r.participePasse||'').trim();
     if(!pp)return value;
-    const candidates=[];
-    const addCandidate=valueToAdd=>{const s=String(valueToAdd||'');if(s&&!candidates.includes(s))candidates.push(s);};
-    addCandidate(pp);
-    if(A&&typeof A.agree==='function'){
-      [['masculin','singulier'],['féminin','singulier'],['masculin','pluriel'],['féminin','pluriel']].forEach(([gender,number])=>addCandidate(A.agree(pp,{gender,number},{type:'non-pronominale',baseVerb:verb,auxiliaire:'être'})));
-    }else{addCandidate(pp+'e');addCandidate(pp+'s');addCandidate(pp+'es');}
-    const matched=candidates.sort((a,b)=>b.length-a.length).find(candidate=>value.endsWith(candidate));
-    if(!matched)return value;
     const base=baseSubject(subject);
-    let notation='(e)';
-    if(base==='nous'||base==='ils'||base==='elles'||base==='ils/elles')notation='(e)s';
-    else if(base==='vous')notation='(e)(s)';
-    else if(base==='on')notation='(e)(s)';
-    return value.slice(0,-matched.length)+pp+notation;
+    const contextBySubject={
+      je:{gender:'masculin',number:'singulier'},
+      tu:{gender:'masculin',number:'singulier'},
+      il:{gender:'masculin',number:'singulier'},
+      elle:{gender:'féminin',number:'singulier'},
+      on:null,
+      nous:{gender:'masculin',number:'pluriel'},
+      'vous (masculin singulier)':{gender:'masculin',number:'singulier'},
+      'vous (féminin singulier)':{gender:'féminin',number:'singulier'},
+      'vous (masculin pluriel)':{gender:'masculin',number:'pluriel'},
+      'vous (féminin pluriel)':{gender:'féminin',number:'pluriel'},
+      vous:null,
+      ils:{gender:'masculin',number:'pluriel'},
+      elles:{gender:'féminin',number:'pluriel'}
+    }[base];
+    if(base==='on'){
+      const generic=stripMetadata(value).replace(new RegExp(pp+'[es]*$'),'');
+      return generic+pp+'(e)(s)';
+    }
+    const context=contextBySubject;
+    if(!context)return value;
+    const agreed=A&&typeof A.agree==='function'?A.agree(pp,context,{type:'pronominale',baseVerb:r.verbeBase||verb,auxiliaire:r.auxiliaire}):pp;
+    const candidates=[pp,pp+'e',pp+'s',pp+'es'].sort((a,b)=>b.length-a.length);
+    const matched=candidates.find(candidate=>value.endsWith(candidate));
+    if(!matched)return value;
+    return value.slice(0,-matched.length)+agreed;
   }
   function normalizedRows(rows,tense,verb){
     const output=[];
     (rows||[]).forEach(row=>{
       const form=String(row?.[1]??'').trim();if(!form)return;
       const rawSubject=String(row?.[0]||'').trim();
-      expandSubjects(rawSubject,form,tense).forEach(subject=>output.push([subject,isCompound(tense)?compoundDisplayForm(form,subject,verb):form]));
+      expandSubjects(rawSubject,form,tense,verb).forEach(subject=>output.push([subject,isCompound(tense)?compoundDisplayForm(form,subject,verb):form]));
     });
     return output;
   }
