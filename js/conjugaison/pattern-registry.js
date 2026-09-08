@@ -94,6 +94,17 @@
     return null;
   }
 
+  function ouvrirType(inf,s,tense){
+    const stem=inf.replace(/ir$/,''),present={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ons',vous:'ez',ils:'ent',elles:'ent'};
+    if(tense==="présent de l'indicatif")return stem+present[s];
+    if(tense==='imparfait')return stem+imparfait[s];
+    if(tense==='futur simple')return inf+futur[s];
+    if(tense==='conditionnel présent')return inf+conditionnel[s];
+    if(tense==='subjonctif présent')return stem+subjonctif[s];
+    if(tense==='impératif présent'){if(!imperativeSubjects.includes(s))return null;return s==='tu'?stem+'e':stem+present[s];}
+    return null;
+  }
+
   const definitions={
     'regular-er':{groupe:1,description:'Premier groupe régulier en -ER',generate:(inf,s,t)=>simpleGenerator(inf,s,t,'regular-er')},
     'regular-ir':{groupe:2,description:'Deuxième groupe régulier en -IR',generate:(inf,s,t)=>simpleGenerator(inf,s,t,'regular-ir')},
@@ -103,7 +114,8 @@
     'er-e-accent':{groupe:1,description:'Premier groupe avec alternance E/È + consonne + ER',generate:erEAccent},
     'e-accent':{groupe:1,description:'Premier groupe avec alternance E/È',generate:erEAccent},
     'partir-type':{groupe:3,description:'Famille partir : alternance du radical au présent',generate:partirType},
-    'suivre-type':{groupe:3,description:'Famille suivre : radical sui-/suiv-',generate:suivreType}
+    'suivre-type':{groupe:3,description:'Famille suivre : radical sui-/suiv-',generate:suivreType},
+    'ouvrir-type':{groupe:3,description:'Famille ouvrir : présent en -e/-es/-e, pluriel en -ons/-ez/-ent',generate:ouvrirType}
   };
 
   function get(pattern){return definitions[pattern]||null;}
