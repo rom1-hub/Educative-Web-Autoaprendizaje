@@ -69,6 +69,110 @@
     return null;
   }
 
+  function elerType(inf){
+    const base=String(inf||'').toLowerCase();
+    if(!/eler$/.test(base))return null;
+    if(['appeler','rappeler'].includes(base))return'appeler';
+    if(['agneler','celer','déceler','receler','ciseler','démanteler','écarteler','encasteler','geler','dégeler','congeler','surgeler','marteler','modeler','peler'].includes(base))return'eler';
+    return'double';
+  }
+  function elerTypeFor(inf){return elerType(inf);}
+  function elerGenerator(inf,s,tense){
+    const type=elerTypeFor(inf);
+    if(!type)return null;
+    const stem=stemEr(inf),accented=stem.replace(/e([^e]*)$/,'è$1'),doubleStem=stem+'l';
+    const futureAccent=accented+'er',futureDouble=doubleStem+'er';
+    const make=(a,b)=>a===b?a:a+' / '+b;
+    if(tense==="présent de l'indicatif"){
+      if(['nous','vous'].includes(s))return stem+subjects[s];
+      const accent=accented+subjects[s],doubled=doubleStem+subjects[s];
+      if(type==='appeler')return doubled;
+      if(type==='eler')return accent;
+      return make(accent,doubled);
+    }
+    if(tense==='imparfait')return stem+imparfait[s];
+    if(tense==='futur simple'){
+      const end=futur[s];
+      if(type==='appeler')return futureDouble+end;
+      if(type==='eler')return futureAccent+end;
+      return make(futureAccent+end,futureDouble+end);
+    }
+    if(tense==='conditionnel présent'){
+      const end=conditionnel[s];
+      if(type==='appeler')return futureDouble+end;
+      if(type==='eler')return futureAccent+end;
+      return make(futureAccent+end,futureDouble+end);
+    }
+    if(tense==='subjonctif présent'){
+      if(['nous','vous'].includes(s))return stem+subjonctif[s];
+      const accent=accented+subjonctif[s],doubled=doubleStem+subjonctif[s];
+      if(type==='appeler')return doubled;
+      if(type==='eler')return accent;
+      return make(accent,doubled);
+    }
+    if(tense==='impératif présent'){
+      if(!imperativeSubjects.includes(s))return null;
+      if(s==='nous'||s==='vous')return stem+subjects[s];
+      const end=subjects[s].replace(/s$/,'');
+      const accent=accented+end,doubled=doubleStem+end;
+      if(type==='appeler')return doubled;
+      if(type==='eler')return accent;
+      return make(accent,doubled);
+    }
+    return null;
+  }
+
+  const eterAccentOnly=new Set(['acheter','racheter','bégueter','corseter','crocheter','fileter','fureter','haleter']);
+  function eterType(inf){
+    const base=String(inf||'').toLowerCase();
+    if(!/eter$/.test(base))return null;
+    if(/jeter$/.test(base))return'jeter';
+    if(eterAccentOnly.has(base))return'accent';
+    return'double';
+  }
+  function eterGenerator(inf,s,tense){
+    const type=eterType(inf);
+    if(!type)return null;
+    const stem=stemEr(inf),accented=stem.replace(/e([^e]*)$/,'è$1'),doubleStem=stem+'t';
+    const make=(a,b)=>a===b?a:a+' / '+b;
+    if(tense==="présent de l'indicatif"){
+      if(['nous','vous'].includes(s))return stem+subjects[s];
+      const accent=accented+subjects[s],doubled=doubleStem+subjects[s];
+      if(type==='accent')return accent;
+      if(type==='jeter')return doubled;
+      return make(accent,doubled);
+    }
+    if(tense==='imparfait')return stem+imparfait[s];
+    if(tense==='futur simple'){
+      const end=futur[s];
+      if(type==='accent')return accented+'er'+end;
+      if(type==='jeter')return stem+'ter'+end;
+      return make(accented+'er'+end,stem+'ter'+end);
+    }
+    if(tense==='conditionnel présent'){
+      const end=conditionnel[s];
+      if(type==='accent')return accented+'er'+end;
+      if(type==='jeter')return stem+'ter'+end;
+      return make(accented+'er'+end,stem+'ter'+end);
+    }
+    if(tense==='subjonctif présent'){
+      if(['nous','vous'].includes(s))return stem+subjonctif[s];
+      const accent=accented+subjonctif[s],doubled=doubleStem+subjonctif[s];
+      if(type==='accent')return accent;
+      if(type==='jeter')return doubled;
+      return make(accent,doubled);
+    }
+    if(tense==='impératif présent'){
+      if(!imperativeSubjects.includes(s))return null;
+      if(s==='nous'||s==='vous')return stem+subjects[s];
+      const accent=accented+'e',doubled=doubleStem+'e';
+      if(type==='accent')return accent;
+      if(type==='jeter')return doubled;
+      return make(accent,doubled);
+    }
+    return null;
+  }
+
   function partirType(inf,s,tense){
     const radical=inf.replace(/ir$/,''),singular=radical.slice(0,-1);
     if(tense==="présent de l'indicatif")return ['je','tu','il','elle','on'].includes(s)?singular+{je:'s',tu:'s',il:'t',elle:'t',on:'t'}[s]:radical+{nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];
@@ -79,7 +183,6 @@
     if(tense==='impératif présent'){if(!imperativeSubjects.includes(s))return null;return s==='tu'?singular+'s':radical+{nous:'ons',vous:'ez'}[s];}
     return null;
   }
-
   function suivreType(inf,s,tense){
     const singularStem='sui',pluralStem='suiv';
     if(tense==="présent de l'indicatif"){
@@ -93,7 +196,6 @@
     if(tense==='impératif présent'){if(!imperativeSubjects.includes(s))return null;return s==='tu'?'suis':pluralStem+{nous:'ons',vous:'ez'}[s];}
     return null;
   }
-
   function ouvrirType(inf,s,tense){
     const stem=inf.replace(/ir$/,''),present={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ons',vous:'ez',ils:'ent',elles:'ent'};
     if(tense==="présent de l'indicatif")return stem+present[s];
@@ -104,7 +206,6 @@
     if(tense==='impératif présent'){if(!imperativeSubjects.includes(s))return null;return s==='tu'?stem+'e':stem+present[s];}
     return null;
   }
-
   function venirType(inf,s,tense){
     const stem=inf.replace(/ir$/,''),singular=stem.replace(/ven$/,'vien'),subjSingular=stem.replace(/ven$/,'vienn'),future=inf.replace(/enir$/,'iendr');
     if(tense==="présent de l'indicatif"){
@@ -124,7 +225,6 @@
     }
     return null;
   }
-
   function tenirType(inf,s,tense){
     const stem=inf.replace(/ir$/,''),singular=stem.replace(/ten$/,'tien'),subjSingular=stem.replace(/ten$/,'tienn'),future=inf.replace(/enir$/,'iendr');
     if(tense==="présent de l'indicatif"){
@@ -144,7 +244,6 @@
     }
     return null;
   }
-
   function allerType(inf,s,tense){
     if(tense==="présent de l'indicatif"){
       const forms={je:'vais',tu:'vas',il:'va',elle:'va',on:'va',nous:'allons',vous:'allez',ils:'vont',elles:'vont'};
@@ -163,7 +262,6 @@
     }
     return null;
   }
-
   function mettreType(inf,s,tense){
     const singular=inf.replace(/mettre$/,'met'),plural=inf.replace(/mettre$/,'mett'),futureStem=inf.replace(/mettre$/,'mettr');
     if(tense==="présent de l'indicatif"){
@@ -177,7 +275,6 @@
     if(tense==='impératif présent')return imperativeSubjects.includes(s)?(s==='tu'?singular+'s':plural+({nous:'ons',vous:'ez'}[s])):null;
     return null;
   }
-
   function lireType(inf,s,tense){
     const stem=inf.replace(/re$/,''),subjStem=stem+'s';
     if(tense==="présent de l'indicatif"){
@@ -191,7 +288,6 @@
     if(tense==='impératif présent')return imperativeSubjects.includes(s)?(s==='tu'?stem+'s':stem+({nous:'sons',vous:'sez'}[s])):null;
     return null;
   }
-
   function rireType(inf,s,tense){
     const stem=inf.replace(/rire$/,'ri'),futureStem=inf.replace(/rire$/,'rir');
     if(tense==="présent de l'indicatif"){
@@ -205,7 +301,6 @@
     if(tense==='impératif présent')return imperativeSubjects.includes(s)?(s==='tu'?stem+'s':stem+({nous:'ons',vous:'ez'}[s])):null;
     return null;
   }
-
   function vivreType(inf,s,tense){
     const stem=inf.replace(/vivre$/,'viv'),futureStem=inf.replace(/vivre$/,'vivr');
     if(tense==="présent de l'indicatif"){
@@ -219,7 +314,6 @@
     if(tense==='impératif présent')return imperativeSubjects.includes(s)?(s==='tu'?stem+'s':stem+({nous:'ons',vous:'ez'}[s])):null;
     return null;
   }
-
   function conduireType(inf,s,tense){
     const stem=inf.replace(/re$/,''),presentStem=stem+'s',futureStem=stem+'r';
     if(tense==="présent de l'indicatif"){
@@ -236,7 +330,6 @@
     }
     return null;
   }
-
   function courirType(inf,s,tense){
     const present=inf.replace(/courir$/,'cour'),futureStem=inf.replace(/courir$/,'courr');
     if(tense==="présent de l'indicatif")return present+{je:'s',tu:'s',il:'t',elle:'t',on:'t',nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];
@@ -247,7 +340,6 @@
     if(tense==='impératif présent')return imperativeSubjects.includes(s)?(s==='tu'?present+'s':present+({nous:'ons',vous:'ez'}[s])):null;
     return null;
   }
-
   function mourirType(inf,s,tense){
     const present=inf.replace(/mourir$/,'mour'),futureStem=inf.replace(/mourir$/,'mourr');
     if(tense==="présent de l'indicatif"){
@@ -264,7 +356,6 @@
     if(tense==='impératif présent')return imperativeSubjects.includes(s)?(s==='tu'?'meurs':s==='nous'?'mourons':'mourez'):null;
     return null;
   }
-
   function croireType(inf,s,tense){
     const futureStem=inf.replace(/croire$/,'croir');
     if(tense==="présent de l'indicatif")return {je:'crois',tu:'crois',il:'croit',elle:'croit',on:'croit',nous:'croyons',vous:'croyez',ils:'croient',elles:'croient'}[s]||null;
@@ -275,7 +366,6 @@
     if(tense==='impératif présent')return imperativeSubjects.includes(s)?(s==='tu'?'crois':s==='nous'?'croyons':'croyez'):null;
     return null;
   }
-
   function recevoirType(inf,s,tense){
     const stem=inf.replace(/recevoir$/,'recev'),present=inf.replace(/recevoir$/,'reç'),futureStem=inf.replace(/recevoir$/,'recevr');
     if(tense==="présent de l'indicatif")return {je:present+'ois',tu:present+'ois',il:present+'oit',elle:present+'oit',on:present+'oit',nous:stem+'ons',vous:stem+'ez',ils:present+'oivent',elles:present+'oivent'}[s]||null;
@@ -286,7 +376,6 @@
     if(tense==='impératif présent')return imperativeSubjects.includes(s)?(s==='tu'?'reçois':s==='nous'?'recevons':'recevez'):null;
     return null;
   }
-
   function connaîtreType(inf,s,tense){
     const stem=inf.replace(/aître$/,'aiss'),futureStem=inf.replace(/aître$/,'aîtr');
     if(tense==="présent de l'indicatif")return {je:stem+'e',tu:stem+'s',il:stem+'t',elle:stem+'t',on:stem+'t',nous:stem+'ons',vous:stem+'ez',ils:stem+'ent',elles:stem+'ent'}[s]||null;
@@ -294,13 +383,9 @@
     if(tense==='futur simple')return futureStem+futur[s];
     if(tense==='conditionnel présent')return futureStem+conditionnel[s];
     if(tense==='subjonctif présent')return {je:stem+'e',tu:stem+'es',il:stem+'e',elle:stem+'e',on:stem+'e',nous:stem+'ions',vous:stem+'iez',ils:stem+'ent',elles:stem+'ent'}[s]||null;
-    if(tense==='impératif présent'){
-      if(!imperativeSubjects.includes(s))return null;
-      return s==='tu'?'connais':s==='nous'?stem+'ons':stem+'ez';
-    }
+    if(tense==='impératif présent'){if(!imperativeSubjects.includes(s))return null;return s==='tu'?'connais':s==='nous'?stem+'ons':stem+'ez';}
     return null;
   }
-
   function paraîtreType(inf,s,tense){
     const stem=inf.replace(/aître$/,'aiss'),futureStem=inf.replace(/aître$/,'aîtr');
     if(tense==="présent de l'indicatif")return {je:stem+'s',tu:stem+'s',il:stem+'t',elle:stem+'t',on:stem+'t',nous:stem+'ons',vous:stem+'ez',ils:stem+'ent',elles:stem+'ent'}[s]||null;
@@ -308,10 +393,7 @@
     if(tense==='futur simple')return futureStem+futur[s];
     if(tense==='conditionnel présent')return futureStem+conditionnel[s];
     if(tense==='subjonctif présent')return {je:stem+'e',tu:stem+'es',il:stem+'e',elle:stem+'e',on:stem+'e',nous:stem+'ions',vous:stem+'iez',ils:stem+'ent',elles:stem+'ent'}[s]||null;
-    if(tense==='impératif présent'){
-      if(!imperativeSubjects.includes(s))return null;
-      return s==='tu'?'parais':s==='nous'?stem+'ons':stem+'ez';
-    }
+    if(tense==='impératif présent'){if(!imperativeSubjects.includes(s))return null;return s==='tu'?'parais':s==='nous'?stem+'ons':stem+'ez';}
     return null;
   }
 
@@ -321,6 +403,8 @@
     'regular-re':{groupe:3,description:'Verbes réguliers en -RE',generate:(inf,s,t)=>simpleGenerator(inf,s,t,'regular-re')},
     'er-ger':{groupe:1,description:'Premier groupe avec terminaison -GER',generate:(inf,s,t)=>simpleGenerator(inf,s,t,'er-ger')},
     'er-cer':{groupe:1,description:'Premier groupe avec terminaison -CER',generate:(inf,s,t)=>simpleGenerator(inf,s,t,'er-cer')},
+    'er-eler':{groupe:1,description:'Premier groupe avec alternance en -ELER',generate:elerGenerator},
+    'er-eter':{groupe:1,description:'Premier groupe avec alternance en -ETER',generate:eterGenerator},
     'er-e-accent':{groupe:1,description:'Premier groupe avec alternance E/È + consonne + ER',generate:erEAccent},
     'e-accent':{groupe:1,description:'Premier groupe avec alternance E/È',generate:erEAccent},
     'partir-type':{groupe:3,description:'Famille partir : alternance du radical au présent',generate:partirType},
