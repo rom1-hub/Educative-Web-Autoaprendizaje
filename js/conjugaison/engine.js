@@ -1,7 +1,7 @@
 /* COQ — Motor de conjugación. El motor orquesta; el registro central genera. */
 (function(){
   const P=window.COQ_CONJ_PRONOUNS,C=window.COQ_CONJ_COMPOUND,A=window.COQ_CONJ_AGREEMENT,R=window.COQ_PATTERN_REGISTRY,resolver=window.COQ_PATTERN_RESOLVER,verbs=window.COQ_VERBS||{};
-  const simpleTenses=new Set(["présent de l'indicatif",'imparfait','futur simple','conditionnel présent','subjonctif présent','impératif présent']);
+  const simpleTenses=new Set(Object.keys(window.COQ_TENSE_RULES||{}).filter(t=>window.COQ_TENSE_RULES[t]?.type==='simple'));
   function baseKey(verb){const v=verbs[verb];if(v&&v.verbeBase&&verbs[v.verbeBase])return v.verbeBase;if(resolver&&typeof resolver.baseVerb==='function')return resolver.baseVerb(verb);return verb;}
   function record(verb){return verbs[verb]||(resolver&&typeof resolver.resolveRecord==='function'?resolver.resolveRecord(verb):null);}
   function generatedSimple(verb,tense,subject){const r=record(verb);if(!r||!R||typeof R.generate!=='function')return null;return R.generate(r.pattern,r.infinitif_base||r.infinitif,P.baseSubject(subject),tense);}
