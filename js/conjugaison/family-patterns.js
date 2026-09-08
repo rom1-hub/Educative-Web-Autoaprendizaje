@@ -1,25 +1,89 @@
-/* COQ — familias irregulares del 3.º grupo. */
+/* COQ — metadatos de familias irregulares del 3.º grupo.
+ *
+ * Responsabilidad exclusiva:
+ * - registrar metadatos mínimos de verbos pertenecientes a familias
+ * - asociar cada verbo a un patrón del registro central
+ *
+ * La generación de formas pertenece a COQ_PATTERN_REGISTRY + COQ_CONJ_ENGINE.
+ * Este módulo NO modifica métodos del motor y NO contiene lógica de presentación.
+ */
 (function(){
-const FAMILY_PATTERNS={'partir-type':{groupe:3,description:'Famille partir : alternance du radical au présent'},'suivre-type':{groupe:3,description:'Famille suivre : radical suiv- au présent et à l’imparfait/subjonctif'},'ouvrir-type':{groupe:3,description:'Famille ouvrir : présent en -e/-es/-e, pluriel en -ons/-ez/-ent'},'venir-type':{groupe:3,description:'Famille venir : alternance vien-/ven- au présent et viendr- au futur'},'tenir-type':{groupe:3,description:'Famille tenir : alternance tien-/ten- au présent et tiendr- au futur'},'aller-type':{groupe:3,description:'Verbe aller : vais-/all-/aill- au présent, imparfait et subjonctif'}};
-window.COQ_VERB_PATTERNS=window.COQ_VERB_PATTERNS||{};Object.keys(FAMILY_PATTERNS).forEach(function(key){window.COQ_VERB_PATTERNS[key]=FAMILY_PATTERNS[key];});
-const SIMPLE=new Set(["présent de l'indicatif",'imparfait','futur simple','conditionnel présent','subjonctif présent','impératif présent']);
-const END={present:{je:'s',tu:'s',il:'t',elle:'t',on:'t',nous:'ons',vous:'ez',ils:'ent',elles:'ent'},imparfait:{je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'},futur:{je:'ai',tu:'as',il:'a',elle:'a',on:'a',nous:'ons',vous:'ez',ils:'ont',elles:'ont'},conditionnel:{je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient'},subjonctif:{je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ions',vous:'iez',ils:'ent',elles:'ent'}};
-const STANDARD_SUBJECTS=['je','tu','il','elle','on','nous','vous','ils','elles'],IMPERATIVE_SUBJECTS=['tu','nous','vous'];
-function normalize(value){return String(value||'').trim().toLowerCase();}
-function baseSubject(subject){const raw=normalize(subject).replace(/\s*\([^)]*\)\s*$/,'').trim();if(/^j['’]$/.test(raw)||raw==='je'||/^que\s+j['’]$/.test(raw)||raw==='que je')return'je';if(/^qu['’]il$/.test(raw)||raw==='que il'||raw==='il')return'il';if(/^qu['’]elle$/.test(raw)||raw==='que elle'||raw==='elle')return'elle';if(/^qu['’]on$/.test(raw)||raw==='que on'||raw==='on')return'on';if(/^qu['’]ils$/.test(raw)||raw==='que ils'||raw==='ils')return'ils';if(/^qu['’]elles$/.test(raw)||raw==='que elles'||raw==='elles')return'elles';return raw;}
-function baseVerb(verb){const verbs=window.COQ_VERBS||{},key=normalize(verb),r=verbs[key];if(r&&r.verbeBase&&verbs[normalize(r.verbeBase)])return normalize(r.verbeBase);return key.startsWith('se ')?key.slice(3).trim():key;}
-function familyOf(verb){const verbs=window.COQ_VERBS||{},base=baseVerb(verb),r=verbs[base];return r&&r.pattern;}
-function partirType(inf,s,tense){const radical=inf.replace(/ir$/,''),singular=radical.slice(0,-1);if(tense==="présent de l'indicatif"){if(s==='je'||s==='tu')return singular+END.present[s];if(s==='il'||s==='elle'||s==='on')return singular+END.present[s];return radical+END.present[s];}if(tense==='imparfait')return radical+END.imparfait[s];if(tense==='futur simple')return inf+END.futur[s];if(tense==='conditionnel présent')return inf+END.conditionnel[s];if(tense==='subjonctif présent')return radical+END.subjonctif[s];if(tense==='impératif présent'){if(!IMPERATIVE_SUBJECTS.includes(s))return null;return s==='tu'?singular+'s':radical+END.present[s];}return null;}
-function suivreType(inf,s,tense){const singularStem='sui',pluralStem='suiv';if(tense==="présent de l'indicatif"){const end={je:'s',tu:'s',il:'t',elle:'t',on:'t',nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];return(['je','tu','il','elle','on'].includes(s)?singularStem:pluralStem)+end;}if(tense==='imparfait')return pluralStem+END.imparfait[s];if(tense==='futur simple')return inf+END.futur[s];if(tense==='conditionnel présent')return inf+END.conditionnel[s];if(tense==='subjonctif présent')return pluralStem+END.subjonctif[s];if(tense==='impératif présent'){if(!IMPERATIVE_SUBJECTS.includes(s))return null;return s==='tu'?'suis':pluralStem+{nous:'ons',vous:'ez'}[s];}return null;}
-function ouvrirType(inf,s,tense){const stem=inf.replace(/ir$/,''),present={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ons',vous:'ez',ils:'ent',elles:'ent'};if(tense==="présent de l'indicatif")return stem+present[s];if(tense==='imparfait')return stem+END.imparfait[s];if(tense==='futur simple')return inf+END.futur[s];if(tense==='conditionnel présent')return inf+END.conditionnel[s];if(tense==='subjonctif présent')return stem+END.subjonctif[s];if(tense==='impératif présent'){if(!IMPERATIVE_SUBJECTS.includes(s))return null;return s==='tu'?stem+'e':stem+present[s];}return null;}
-function venirType(inf,s,tense){const stem=inf.replace(/ir$/,''),singular=stem.replace(/ven$/,'vien'),subjSingular=stem.replace(/ven$/,'vienn'),future=inf.replace(/enir$/,'iendr');if(tense==="présent de l'indicatif"){if(['je','tu','il','elle','on','ils','elles'].includes(s))return singular+END.present[s];return stem+END.present[s];}if(tense==='imparfait')return stem+END.imparfait[s];if(tense==='futur simple')return future+END.futur[s];if(tense==='conditionnel présent')return future+END.conditionnel[s];if(tense==='subjonctif présent'){if(['je','tu','il','elle','on','ils','elles'].includes(s))return subjSingular+END.subjonctif[s];return stem+END.subjonctif[s];}if(tense==='impératif présent'){if(!IMPERATIVE_SUBJECTS.includes(s))return null;return singular+END.present[s];}return null;}
-function tenirType(inf,s,tense){const stem=inf.replace(/ir$/,''),singular=stem.replace(/ten$/,'tien'),subjSingular=stem.replace(/ten$/,'tienn'),future=inf.replace(/enir$/,'iendr');if(tense==="présent de l'indicatif"){if(['je','tu','il','elle','on','ils','elles'].includes(s))return singular+END.present[s];return stem+END.present[s];}if(tense==='imparfait')return stem+END.imparfait[s];if(tense==='futur simple')return future+END.futur[s];if(tense==='conditionnel présent')return future+END.conditionnel[s];if(tense==='subjonctif présent'){if(['je','tu','il','elle','on','ils','elles'].includes(s))return subjSingular+END.subjonctif[s];return stem+END.subjonctif[s];}if(tense==='impératif présent'){if(!IMPERATIVE_SUBJECTS.includes(s))return null;return singular+END.present[s];}return null;}
-function allerType(inf,s,tense){if(tense==="présent de l'indicatif"){const forms={je:'vais',tu:'vas',il:'va',elle:'va',on:'va',nous:'allons',vous:'allez',ils:'vont',elles:'vont'};return forms[s]||null;}if(tense==='imparfait')return 'all'+END.imparfait[s];if(tense==='futur simple')return 'ir'+END.futur[s];if(tense==='conditionnel présent')return 'ir'+END.conditionnel[s];if(tense==='subjonctif présent'){const stem=['je','tu','il','elle','on','ils','elles'].includes(s)?'aill':'all';return stem+END.subjonctif[s];}if(tense==='impératif présent'){if(!IMPERATIVE_SUBJECTS.includes(s))return null;return s==='tu'?'va':s==='nous'?'allons':'allez';}return null;}
-function familyForm(verb,tense,subject){const verbs=window.COQ_VERBS||{},base=baseVerb(verb),r=verbs[base];if(!r||!SIMPLE.has(tense))return null;const s=baseSubject(subject),inf=r.infinitif_base||r.infinitif||base;if(r.pattern==='partir-type'){const registry=window.COQ_PATTERN_REGISTRY;if(registry){const generated=registry.generate('partir-type',inf,s,tense);if(generated!==null&&generated!==undefined)return generated;}return partirType(inf,s,tense);}if(r.pattern==='suivre-type'){const registry=window.COQ_PATTERN_REGISTRY;if(registry){const generated=registry.generate('suivre-type',inf,s,tense);if(generated!==null&&generated!==undefined)return generated;}return suivreType(inf,s,tense);}if(r.pattern==='ouvrir-type'){const registry=window.COQ_PATTERN_REGISTRY;if(registry){const generated=registry.generate('ouvrir-type',inf,s,tense);if(generated!==null&&generated!==undefined)return generated;}return ouvrirType(inf,s,tense);}if(r.pattern==='venir-type'){const registry=window.COQ_PATTERN_REGISTRY;if(registry){const generated=registry.generate('venir-type',inf,s,tense);if(generated!==null&&generated!==undefined)return generated;}return venirType(inf,s,tense);}if(r.pattern==='tenir-type'){const registry=window.COQ_PATTERN_REGISTRY;if(registry){const generated=registry.generate('tenir-type',inf,s,tense);if(generated!==null&&generated!==undefined)return generated;}return tenirType(inf,s,tense);}if(r.pattern==='aller-type'){const registry=window.COQ_PATTERN_REGISTRY;if(registry){const generated=registry.generate('aller-type',inf,s,tense);if(generated!==null&&generated!==undefined)return generated;}return allerType(inf,s,tense);}return null;}
-function familyRows(verb,tense){const subjects=tense==='impératif présent'?IMPERATIVE_SUBJECTS:STANDARD_SUBJECTS;return subjects.map(function(subject){const form=familyForm(verb,tense,subject);if(form===null||form===undefined)return null;return[subject,form];}).filter(Boolean);}
-function ensureRecords(){const verbs=window.COQ_VERBS||(window.COQ_VERBS={}),family={servir:{pattern:'partir-type',auxiliaire:'avoir',pp:'servi'},suivre:{pattern:'suivre-type',auxiliaire:'avoir',pp:'suivi'},ouvrir:{pattern:'ouvrir-type',auxiliaire:'avoir',pp:'ouvert'},rouvrir:{pattern:'ouvrir-type',auxiliaire:'avoir',pp:'rouvert'},couvrir:{pattern:'ouvrir-type',auxiliaire:'avoir',pp:'couvert'},découvrir:{pattern:'ouvrir-type',auxiliaire:'avoir',pp:'découvert'},recouvrir:{pattern:'ouvrir-type',auxiliaire:'avoir',pp:'recouvert'},offrir:{pattern:'ouvrir-type',auxiliaire:'avoir',pp:'offert'},souffrir:{pattern:'ouvrir-type',auxiliaire:'avoir',pp:'souffert'},revenir:{pattern:'venir-type',auxiliaire:'être',pp:'revenu'},devenir:{pattern:'venir-type',auxiliaire:'être',pp:'devenu'},parvenir:{pattern:'venir-type',auxiliaire:'être',pp:'parvenu'},intervenir:{pattern:'venir-type',auxiliaire:'être',pp:'intervenu'},convenir:{pattern:'venir-type',auxiliaire:'être',pp:'convenu'},provenir:{pattern:'venir-type',auxiliaire:'être',pp:'provenu'},survenir:{pattern:'venir-type',auxiliaire:'être',pp:'survenu'},prévenir:{pattern:'venir-type',auxiliaire:'avoir',pp:'prévenu'},tenir:{pattern:'tenir-type',auxiliaire:'avoir',pp:'tenu'},retenir:{pattern:'tenir-type',auxiliaire:'avoir',pp:'retenu'},soutenir:{pattern:'tenir-type',auxiliaire:'avoir',pp:'soutenu'},obtenir:{pattern:'tenir-type',auxiliaire:'avoir',pp:'obtenu'},maintenir:{pattern:'tenir-type',auxiliaire:'avoir',pp:'maintenu'},contenir:{pattern:'tenir-type',auxiliaire:'avoir',pp:'contenu'},détenir:{pattern:'tenir-type',auxiliaire:'avoir',pp:'détenu'},appartenir:{pattern:'tenir-type',auxiliaire:'avoir',pp:'appartenu'}};if(verbs.aller){verbs.aller.pattern='aller-type';verbs.aller.auxiliaire='être';verbs.aller.participePasse='allé';}else verbs.aller={id:'aller',infinitif:'aller',infinitif_base:'aller',groupe:3,pattern:'aller-type',auxiliaire:'être',pronominal:false,participePasse:'allé',construction:'non-pronominale',verbeBase:'aller'};['partir','sortir','dormir'].forEach(function(key){if(verbs[key])verbs[key].pattern='partir-type';});if(verbs.venir){verbs.venir.pattern='venir-type';verbs.venir.auxiliaire='être';verbs.venir.participePasse='venu';}else verbs.venir={id:'venir',infinitif:'venir',infinitif_base:'venir',groupe:3,pattern:'venir-type',auxiliaire:'être',pronominal:false,participePasse:'venu',construction:'non-pronominale',verbeBase:'venir'};Object.keys(family).forEach(function(key){const x=family[key];if(verbs[key]){verbs[key].pattern=x.pattern;verbs[key].auxiliaire=x.auxiliaire;verbs[key].participePasse=x.pp;}else verbs[key]={id:key,infinitif:key,infinitif_base:key,groupe:3,pattern:x.pattern,auxiliaire:x.auxiliaire,pronominal:false,participePasse:x.pp,construction:'non-pronominale',verbeBase:key};});const utils=window.COQ_CONJ_UTILS;if(utils){Object.assign(utils.conjugations,verbs);Object.assign(utils.verbMeta,verbs);}}
-function applyJeElision(rows){return(rows||[]).map(function(row){const subject=String(row[0]||'').trim(),form=String(row[1]||'').trim();if(/^je$/i.test(subject)&&/^[aeiouàâäéèêëîïôöùûüœæ]/i.test(form))return["j'",form];return row;});}
-function applySubjonctifTablePrefix(rows,tense){if(tense!=='subjonctif présent')return rows;const prefixes={je:'que je',tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"};return(rows||[]).map(function(row){const subject=String(row[0]||'').trim(),base=subject.replace(/\s*\([^)]*\)\s*$/,'').trim().toLowerCase(),prefix=prefixes[base];if(!prefix)return row;const suffix=subject.match(/\s*(\([^)]*\))\s*$/)?.[1]||'';return[prefix+(suffix?' '+suffix:''),row[1]];});}
-function install(){ensureRecords();const engine=window.COQ_CONJ_ENGINE;if(!engine||engine.__familyPatternsInstalled)return false;const originalConjugate=engine.conjugate,originalRowsFor=engine.rowsFor,originalRowsForLookup=engine.rowsForLookup,originalRowsForConstruction=engine.rowsForConstruction;function isFamilyVerb(verb){return['partir-type','suivre-type','ouvrir-type','venir-type','tenir-type','aller-type'].includes(familyOf(verb));}engine.conjugate=function(verb,tense,subject,construction){const r=(window.COQ_VERBS||{})[baseVerb(verb)];if(r&&isFamilyVerb(verb)&&SIMPLE.has(tense)&&construction!=='pronominale'){const generated=familyForm(verb,tense,subject);if(generated!==null)return generated;}return originalConjugate(verb,tense,subject,construction);};engine.rowsFor=function(verb,tense){if(!isFamilyVerb(verb)||!SIMPLE.has(tense))return originalRowsFor(verb,tense);return familyRows(verb,tense);};engine.rowsForLookup=function(verb,tense){const rows=isFamilyVerb(verb)&&SIMPLE.has(tense)?familyRows(verb,tense):originalRowsForLookup(verb,tense);return applyJeElision(applySubjonctifTablePrefix(rows,tense));};engine.rowsForConstruction=function(verb,tense,construction){if(!isFamilyVerb(verb)||!SIMPLE.has(tense))return originalRowsForConstruction(verb,tense);if(construction==='pronominale')return originalRowsForConstruction(verb,tense,construction);return familyRows(verb,tense);};engine.__familyPatternsInstalled=true;window.COQ_FAMILY_PATTERN_REGRESSION={patterns:{partir:['partir','sortir','dormir','servir'],suivre:['suivre'],ouvrir:['ouvrir','rouvrir','couvrir','découvrir','recouvrir','offrir','souffrir'],venir:['venir','revenir','devenir','parvenir','intervenir','convenir','provenir','survenir','prévenir'],tenir:['tenir','retenir','soutenir','obtenir','maintenir','contenir','détenir','appartenir'],aller:['aller']},expected:{partir:{je:'pars',nous:'partons',ils:'partent'},sortir:{je:'sors',nous:'sortons',ils:'sortent'},dormir:{je:'dors',nous:'dormons',ils:'dorment'},servir:{je:'sers',nous:'servons',ils:'servent'},suivre:{je:'suis',nous:'suivons',ils:'suivent'},ouvrir:{je:"j'ouvre",nous:'ouvrons',ils:'ouvrent'},offrir:{je:"j'offre",nous:'offrons',ils:'offrent'},souffrir:{je:'je souffre',nous:'souffrons',ils:'souffrent'},venir:{je:'viens',nous:'venons',ils:'viennent'},devenir:{je:'deviens',nous:'devenons',ils:'deviennent'},tenir:{je:'tiens',nous:'tenons',ils:'tiennent'},obtenir:{je:'obtiens',nous:'obtenons',ils:'obtiennent'},aller:{je:'vais',nous:'allons',ils:'vont',imparfait:'allais',futur:'irai',conditionnel:'irais',subjonctif:'aille'}}};return true;}
-function waitForEngine(attempt){ensureRecords();if(install())return;if((attempt||0)<100)setTimeout(function(){waitForEngine((attempt||0)+1);},25);}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){waitForEngine(0);});else waitForEngine(0);
+  const FAMILY_VERBS={
+    'partir-type':{
+      partir:{auxiliaire:'être',pp:'parti'},sortir:{auxiliaire:'être',pp:'sorti'},dormir:{auxiliaire:'avoir',pp:'dormi'},servir:{auxiliaire:'avoir',pp:'servi'}
+    },
+    'suivre-type':{suivre:{auxiliaire:'avoir',pp:'suivi'}},
+    'ouvrir-type':{
+      ouvrir:{auxiliaire:'avoir',pp:'ouvert'},rouvrir:{auxiliaire:'avoir',pp:'rouvert'},couvrir:{auxiliaire:'avoir',pp:'couvert'},découvrir:{auxiliaire:'avoir',pp:'découvert'},recouvrir:{auxiliaire:'avoir',pp:'recouvert'},offrir:{auxiliaire:'avoir',pp:'offert'},souffrir:{auxiliaire:'avoir',pp:'souffert'}
+    },
+    'venir-type':{
+      venir:{auxiliaire:'être',pp:'venu'},revenir:{auxiliaire:'être',pp:'revenu'},devenir:{auxiliaire:'être',pp:'devenu'},parvenir:{auxiliaire:'être',pp:'parvenu'},intervenir:{auxiliaire:'être',pp:'intervenu'},convenir:{auxiliaire:'être',pp:'convenu'},provenir:{auxiliaire:'être',pp:'provenu'},survenir:{auxiliaire:'être',pp:'survenu'},prévenir:{auxiliaire:'avoir',pp:'prévenu'}
+    },
+    'tenir-type':{
+      tenir:{auxiliaire:'avoir',pp:'tenu'},retenir:{auxiliaire:'avoir',pp:'retenu'},soutenir:{auxiliaire:'avoir',pp:'soutenu'},obtenir:{auxiliaire:'avoir',pp:'obtenu'},maintenir:{auxiliaire:'avoir',pp:'maintenu'},contenir:{auxiliaire:'avoir',pp:'contenu'},détenir:{auxiliaire:'avoir',pp:'détenu'},appartenir:{auxiliaire:'avoir',pp:'appartenu'}
+    }
+  };
+
+  const PATTERN_META={
+    'partir-type':{groupe:3,description:'Famille partir'},
+    'suivre-type':{groupe:3,description:'Famille suivre'},
+    'ouvrir-type':{groupe:3,description:'Famille ouvrir'},
+    'venir-type':{groupe:3,description:'Famille venir'},
+    'tenir-type':{groupe:3,description:'Famille tenir'},
+    'aller-type':{groupe:3,description:'Verbe aller'}
+  };
+
+  window.COQ_VERB_PATTERNS=window.COQ_VERB_PATTERNS||{};
+  Object.keys(PATTERN_META).forEach(function(pattern){window.COQ_VERB_PATTERNS[pattern]=PATTERN_META[pattern];});
+
+  function ensureRecord(verb,pattern,meta){
+    const verbs=window.COQ_VERBS||(window.COQ_VERBS={});
+    const existing=verbs[verb];
+    if(existing){
+      existing.pattern=pattern;
+      if(meta.auxiliaire)existing.auxiliaire=meta.auxiliaire;
+      if(meta.pp)existing.participePasse=meta.pp;
+      return existing;
+    }
+    return verbs[verb]={
+      id:verb,
+      infinitif:verb,
+      infinitif_base:verb,
+      groupe:3,
+      pattern:pattern,
+      auxiliaire:meta.auxiliaire||'avoir',
+      pronominal:false,
+      participePasse:meta.pp||'',
+      construction:'non-pronominale',
+      verbeBase:verb
+    };
+  }
+
+  function register(){
+    Object.keys(FAMILY_VERBS).forEach(function(pattern){
+      const family=FAMILY_VERBS[pattern];
+      Object.keys(family).forEach(function(verb){ensureRecord(verb,pattern,family[verb]);});
+    });
+    ensureRecord('aller','aller-type',{auxiliaire:'être',pp:'allé'});
+
+    const verbs=window.COQ_VERBS||{};
+    const utils=window.COQ_CONJ_UTILS;
+    if(utils){
+      Object.assign(utils.conjugations,verbs);
+      Object.assign(utils.verbMeta,verbs);
+    }
+  }
+
+  function syncWhenReady(){
+    register();
+    if(!window.COQ_PATTERN_REGISTRY){
+      if((syncWhenReady.attempts||0)<100){
+        syncWhenReady.attempts=(syncWhenReady.attempts||0)+1;
+        setTimeout(syncWhenReady,25);
+      }
+    }
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',syncWhenReady);else syncWhenReady();
+  window.COQ_FAMILY_METADATA={register:register,patterns:PATTERN_META,families:FAMILY_VERBS};
 })();
