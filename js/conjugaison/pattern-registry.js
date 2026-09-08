@@ -80,6 +80,20 @@
     return null;
   }
 
+  function suivreType(inf,s,tense){
+    const singularStem='sui',pluralStem='suiv';
+    if(tense==="présent de l'indicatif"){
+      const end={je:'s',tu:'s',il:'t',elle:'t',on:'t',nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];
+      return (['je','tu','il','elle','on'].includes(s)?singularStem:pluralStem)+end;
+    }
+    if(tense==='imparfait')return pluralStem+imparfait[s];
+    if(tense==='futur simple')return inf+futur[s];
+    if(tense==='conditionnel présent')return inf+conditionnel[s];
+    if(tense==='subjonctif présent')return pluralStem+subjonctif[s];
+    if(tense==='impératif présent'){if(!imperativeSubjects.includes(s))return null;return s==='tu'?'suis':pluralStem+{nous:'ons',vous:'ez'}[s];}
+    return null;
+  }
+
   const definitions={
     'regular-er':{groupe:1,description:'Premier groupe régulier en -ER',generate:(inf,s,t)=>simpleGenerator(inf,s,t,'regular-er')},
     'regular-ir':{groupe:2,description:'Deuxième groupe régulier en -IR',generate:(inf,s,t)=>simpleGenerator(inf,s,t,'regular-ir')},
@@ -88,7 +102,8 @@
     'er-cer':{groupe:1,description:'Premier groupe avec terminaison -CER',generate:(inf,s,t)=>simpleGenerator(inf,s,t,'er-cer')},
     'er-e-accent':{groupe:1,description:'Premier groupe avec alternance E/È + consonne + ER',generate:erEAccent},
     'e-accent':{groupe:1,description:'Premier groupe avec alternance E/È',generate:erEAccent},
-    'partir-type':{groupe:3,description:'Famille partir : alternance du radical au présent',generate:partirType}
+    'partir-type':{groupe:3,description:'Famille partir : alternance du radical au présent',generate:partirType},
+    'suivre-type':{groupe:3,description:'Famille suivre : radical sui-/suiv-',generate:suivreType}
   };
 
   function get(pattern){return definitions[pattern]||null;}
