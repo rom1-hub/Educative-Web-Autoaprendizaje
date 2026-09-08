@@ -35,7 +35,7 @@ assert(practiceRows.length===9,'La pratique doit partir de 9 sujets de base avan
 assert(practiceRows.every(row=>!/[()]/.test(row[0])),'Les lignes de práctica ne doivent pas contenir variantes de género/número ya expandidas.');
 const lookupRows=engine.rowsForLookup('se lever','passé composé');
 assert(lookupRows.length===6,'La consulta pronominal debe conservar 6 filas pedagógicas agrupadas.');
-expect(lookupRows[0][0],"j'",'La tabla pronominal debe usar la forma agrupada de je.');
+expect(lookupRows[0][0],'je','La tabla pronominal debe usar el sujeto je.');
 expect(lookupRows[2][0],'il/elle/on','La tabla pronominal debe agrupar il/elle/on.');
 expect(lookupRows[5][0],'ils/elles','La tabla pronominal debe agrupar ils/elles.');
 const simpleLookup=lookup.normalizedRows(engine.rowsForLookup('parler',"présent de l'indicatif"),"présent de l'indicatif",'parler');
@@ -49,7 +49,7 @@ const avoirCompound=lookup.normalizedRows(engine.rowsForLookup('avoir','passé c
 assert(avoirCompound.length===6,'Los tiempos compuestos con avoir no deben expandirse artificialmente por género.');
 const etreCompound=lookup.normalizedRows(engine.rowsForLookup('venir','passé composé'),'passé composé','venir');
 assert(etreCompound.length===6,'Los tiempos compuestos con être deben conservar 6 filas pedagógicas agrupadas.');
-expect(etreCompound[0][0],"j'",'La tabla être debe agrupar je.');
+expect(etreCompound[0][0],'je','La tabla être debe usar el sujeto je.');
 expect(etreCompound[0][1],'suis venu(e)','La tabla être debe indicar el acuerdo femenino de je.');
 expect(etreCompound[2][1],'est venu(e)(s)','La tabla être debe indicar las posibilidades de il/elle/on.');
 expect(etreCompound[3][1],'sommes venu(e)s','La tabla être debe indicar el acuerdo plural de nous.');
