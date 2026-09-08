@@ -78,11 +78,11 @@ assert(etreCompound.length===12,'Los tiempos compuestos con être deben mostrar 
 expect(etreCompound[0][0],'je','La tabla être debe usar je.');
 expect(etreCompound[0][1],'suis venu(e)','je debe conservar la notación genérica.');
 expect(etreCompound[2][0],'il','La tabla être debe separar il.');
-expect(etreCompound[2][1],'suis venu','il debe usar masculino singular.');
+expect(etreCompound[2][1],'est venu','il debe usar masculino singular.');
 expect(etreCompound[3][0],'elle','La tabla être debe separar elle.');
-expect(etreCompound[3][1],'suis venue','elle debe usar femenino singular.');
+expect(etreCompound[3][1],'est venue','elle debe usar femenino singular.');
 expect(etreCompound[4][0],'on','La tabla être debe separar on.');
-expect(etreCompound[4][1],'suis venu(e)(s)','on debe conservar las posibilidades.');
+expect(etreCompound[4][1],'est venu(e)(s)','on debe conservar las posibilidades.');
 expect(etreCompound[6][0],'vous (masculin singulier)','La tabla être debe distinguir vous masculino singular.');
 expect(etreCompound[6][1],'êtes venu','vous masculino singular debe ser venu.');
 expect(etreCompound[7][1],'êtes venue','vous femenino singular debe ser venue.');
