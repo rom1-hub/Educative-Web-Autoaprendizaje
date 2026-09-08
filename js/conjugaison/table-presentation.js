@@ -5,7 +5,8 @@
  * - gestionar la elisión de je/j';
  * - presentar los sujetos del subjonctif con que/qu';
  * - separar grupos de sujetos cuando la fuente los entrega agrupados;
- * - aplicar decoraciones exclusivamente visuales del imperativo.
+ * - aplicar decoraciones exclusivamente visuales del imperativo;
+ * - añadir controles de audio a cada forma visible.
  *
  * Este módulo NO genera conjugaciones y NO modifica el motor.
  */
@@ -20,6 +21,29 @@
   function baseSubject(value){return stripMetadata(value).replace(/^que\s+/i,'').replace(/^qu['’]/i,'').trim().toLowerCase();}
   function elideJe(label,form){const subject=normalizeSubject(label),value=String(form||'').trim();if(subject==='je'&&VOWELS.test(value))return "j'";if(subject==='que je'&&VOWELS.test(value))return "que j'";return label;}
   function addSubjonctifPrefix(label,form){const raw=String(label||'').trim(),base=baseSubject(raw),prefix=SUBJ_PREFIXES[base];if(!prefix)return raw;if(/^que\s|^qu['’]/i.test(raw))return elideJe(raw,form);return elideJe(prefix,form);}
+  function speechForm(form){return stripMetadata(form).replace(/\s+/g,' ').trim();}
+  function addFormAudioButtons(table){
+    if(!table||table.dataset.coqFormAudioReady==='1')return;
+    const speak=window.Coqaudio&&typeof window.Coqaudio.speak==='function'?window.Coqaudio.speak:null;
+    if(!speak)return;
+    table.querySelectorAll('tbody tr').forEach(function(row){
+      const cells=row.querySelectorAll('td');
+      if(cells.length<2||cells[1].querySelector('[data-speak-form]'))return;
+      const form=cells[1].textContent.trim();
+      const spoken=speechForm(form);
+      if(!spoken)return;
+      const button=document.createElement('button');
+      button.type='button';
+      button.className='btn tiny secondary';
+      button.dataset.speakForm=spoken;
+      button.setAttribute('aria-label','Écouter la forme « '+spoken+' »');
+      button.textContent='🔊';
+      button.style.marginLeft='8px';
+      button.addEventListener('click',function(){speak(spoken);});
+      cells[1].appendChild(button);
+    });
+    table.dataset.coqFormAudioReady='1';
+  }
 
   function splitGroupedRows(rows,tense){
     const result=[];
@@ -84,6 +108,7 @@
       cells[0].textContent=tense==='subjonctif présent'?addSubjonctifPrefix(subject,form):elideJe(subject,form);
     });
     if(tense==='impératif présent')decorateImperativeTable(table);
+    addFormAudioButtons(table);
     table.dataset.coqSubjectsNormalized='1';
   }
 
