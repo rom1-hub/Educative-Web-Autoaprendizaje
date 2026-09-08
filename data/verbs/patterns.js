@@ -80,6 +80,19 @@ window.COQ_VERB_PATTERNS={
       if(pattern)record.pattern=pattern;
     });
   }
+  function installResolverViews(){
+    const U=window.COQ_CONJ_UTILS;
+    if(!U||U.__coqResolverViewsInstalled)return;
+    const resolve=function(target,key){
+      if(typeof key!=='string')return target[key];
+      if(Object.prototype.hasOwnProperty.call(target,key))return target[key];
+      return resolveRecord(key)||undefined;
+    };
+    U.conjugations=new Proxy(U.conjugations,{get:resolve});
+    U.verbMeta=new Proxy(U.verbMeta,{get:resolve});
+    U.__coqResolverViewsInstalled=true;
+  }
   window.COQ_PATTERN_RESOLVER={normalize,baseVerb,resolvePattern,resolveRecord,applyToDatabase};
   applyToDatabase();
+  installResolverViews();
 })();
