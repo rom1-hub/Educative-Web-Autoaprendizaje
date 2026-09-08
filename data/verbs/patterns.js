@@ -23,12 +23,6 @@ window.COQ_VERB_PATTERNS={
   const verbs=window.COQ_VERBS||{};
   const patterns=window.COQ_VERB_PATTERNS;
 
-  function normalize(value){return String(value||'').trim().toLowerCase();}
-  function isPronominal(verb){return normalize(verb).startsWith('se ');}
-
-  // Familles lexicales sûres: elles étaient auparavant enregistrées como
-  // metadatos en módulos de familias. Se conservan aquí como catálogo de
-  // resolución, sin reintroducir ningún parche de ejecución.
   const FAMILY_PATTERNS={
     'partir-type':['partir','sortir','dormir','servir'],
     'suivre-type':['suivre'],
@@ -51,6 +45,9 @@ window.COQ_VERB_PATTERNS={
   const FAMILY_BY_VERB={};
   Object.keys(FAMILY_PATTERNS).forEach(pattern=>FAMILY_PATTERNS[pattern].forEach(verb=>{FAMILY_BY_VERB[verb]=pattern;}));
 
+  function normalize(value){return String(value||'').trim().toLowerCase();}
+  function isPronominal(verb){return normalize(verb).startsWith('se ');}
+
   function baseVerb(verb){
     const key=normalize(verb),record=verbs[key];
     if(record&&record.verbeBase&&verbs[normalize(record.verbeBase)])return normalize(record.verbeBase);
@@ -62,7 +59,7 @@ window.COQ_VERB_PATTERNS={
     const key=normalize(verb);
     const base=baseVerb(key);
     const record=verbs[key]||verbs[base];
-    if(record&&record.pattern&&patterns[record.pattern])return record.pattern;
+    if(record&&record.pattern&&(patterns[record.pattern]||window.COQ_PATTERN_REGISTRY?.get?.(record.pattern)))return record.pattern;
     if(FAMILY_BY_VERB[base])return FAMILY_BY_VERB[base];
     if(/ger$/.test(base))return'er-ger';
     if(/cer$/.test(base))return'er-cer';
@@ -100,7 +97,6 @@ window.COQ_VERB_PATTERNS={
   function inferredRecord(key,base,pattern,baseRecord){
     const meta=patterns[pattern] || window.COQ_PATTERN_REGISTRY?.get?.(pattern);
     if(!meta)return null;
-    const isPro=isPronominal(key);
     const familyAux={
       'partir-type':{partir:'être',sortir:'être',dormir:'avoir',servir:'avoir'},
       'venir-type':{venir:'être',revenir:'être',devenir:'être',parvenir:'être',intervenir:'être',convenir:'être',provenir:'être',survenir:'être',prévenir:'avoir'},
@@ -113,14 +109,14 @@ window.COQ_VERB_PATTERNS={
       infinitif_base:base,
       groupe:baseRecord?.groupe??meta.groupe,
       pattern,
-      auxiliaire:isPro?'être':auxiliary,
-      pronominal:isPro,
-      construction:isPro?'pronominale':'non-pronominale',
+      auxiliaire:isPronominal(key)?'être':auxiliary,
+      pronominal:isPronominal(key),
+      construction:isPronominal(key)?'pronominale':'non-pronominale',
       verbeBase:base,
       participePasse:baseRecord?.participePasse||inferParticiple(base,pattern),
-      formePronominale:isPro?key:null,
+      formePronominale:isPronominal(key)?key:null,
       _inferred:true,
-      ...(isPro&&baseRecord?{_derivedFrom:base}:{})
+      ...(isPronominal(key)&&baseRecord?{_derivedFrom:base}:{})
     };
   }
 
@@ -146,8 +142,8 @@ window.COQ_VERB_PATTERNS={
     });
   }
 
-  function installResolverViews(){
-    const U=window.COQ_CONJ_UTILS;
+  function installResolverViews(U){
+    U=U||window.COQ_CONJ_UTILS;
     if(!U||U.__coqResolverViewsInstalled)return;
     const resolve=function(target,key){
       if(typeof key!=='string')return target[key];
@@ -159,7 +155,7 @@ window.COQ_VERB_PATTERNS={
     U.__coqResolverViewsInstalled=true;
   }
 
-  window.COQ_PATTERN_RESOLVER={normalize,baseVerb,resolvePattern,resolveRecord,applyToDatabase};
+  window.COQ_PATTERN_RESOLVER={normalize,baseVerb,resolvePattern,resolveRecord,applyToDatabase,installResolverViews};
   applyToDatabase();
   installResolverViews();
 })();
