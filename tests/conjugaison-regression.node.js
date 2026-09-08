@@ -29,6 +29,7 @@ expect(engine.conjugate('se lever','passé composé','vous (féminin singulier)'
 expect(engine.conjugate('se lever','plus-que-parfait','tu (masculin singulier)','pronominale'),"t'étais levé",'se lever plus-que-parfait');
 expect(engine.conjugate('se parler','passé composé','ils','pronominale'),'se sont parlé','se parler sans accord');
 expect(engine.conjugate('venir','futur antérieur','elles'),'seront venues','venir futur antérieur');
+expect(w.COQ_VERB_REGISTRY['venir'].auxiliaire,'être','venir doit conservar son auxiliaire être dans le registro normalisé');
 const practiceRows=engine.rowsFor('se lever','passé composé');
 assert(practiceRows.length===9,'La pratique doit partir de 9 sujets de base avant expansion des variantes.');
 assert(practiceRows.every(row=>!/[()]/.test(row[0])),'Les lignes de práctica ne doivent pas contenir variantes de género/número ya expandidas.');
@@ -43,6 +44,8 @@ assert(subjLookup.length===6,'La tabla de subjonctif présent debe conservar las
 expect(subjLookup[2][0],"qu'il/elle/on",'La tabla de subjonctif debe agrupar qu’il/elle/on.');
 const avoirCompound=lookup.normalizedRows(engine.rowsForLookup('avoir','passé composé'),'passé composé','avoir');
 assert(avoirCompound.length===6,'Los tiempos compuestos con avoir no deben expandirse artificialmente por género.');
-const etreCompound=lookup.normalizedRows(engine.rowsForLookup('venir','passé composé'),'passé composé','venir');
-assert(etreCompound.length===16,'Los tiempos compuestos con être deben conservar las variantes de género/número.');
-console.log('Conjugaison regression OK — 31 assertions.');
+const venirLookupRows=engine.rowsForLookup('venir','passé composé');
+assert(venirLookupRows.length===16,`La consulta interna de venir con être debe producir 16 variantes; obtuvo ${venirLookupRows.length}.`);
+const etreCompound=lookup.normalizedRows(venirLookupRows,'passé composé','venir');
+assert(etreCompound.length===16,`Los tiempos compuestos con être deben conservar las variantes de género/número; obtuvo ${etreCompound.length}.`);
+console.log('Conjugaison regression OK — 33 assertions.');
