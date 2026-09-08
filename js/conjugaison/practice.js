@@ -22,6 +22,19 @@
     return legacy===group || String(m.groupe)===String(group);
   }
 
+  function answerModel(answer){
+    const normalize=U.normalizeAnswerText||function(v){return String(v||'').trim().toLowerCase().replace(/\s+/g,' ');};
+    const accepted=String(answer??'').split(/\s+\/\s+/).map(normalize).filter(Boolean);
+    const unique=[...new Set(accepted)];
+    return {displayAnswer:unique[0]||'',acceptedAnswers:unique};
+  }
+
+  function pushQuestion(pool,verb,tense,subject,answer){
+    const model=answerModel(answer);
+    if(!model.displayAnswer)return;
+    pool.push({verb,tense,subject,answer:model.displayAnswer,displayAnswer:model.displayAnswer,acceptedAnswers:model.acceptedAnswers});
+  }
+
   function buildQuestions(verb,tense,group,construction,auxiliary){
     let pool=[];
     const add=v=>{
@@ -47,20 +60,18 @@
           const variants={
             je:['je (féminin singulier)','je (masculin singulier)'],
             tu:['tu (féminin singulier)','tu (masculin singulier)'],
-            il:['il'],
-            elle:['elle'],
+            il:['il'],elle:['elle'],
             on:['on (masculin singulier)','on (masculin pluriel)','on (féminin pluriel)'],
             nous:['nous (masculin pluriel)','nous (féminin pluriel)'],
             vous:['vous (masculin singulier)','vous (féminin singulier)','vous (masculin pluriel)','vous (féminin pluriel)'],
-            ils:['ils'],
-            elles:['elles']
+            ils:['ils'],elles:['elles']
           };
           if(isCompound && variants[baseSubject] && engine&&engine.conjugate){
             variants[baseSubject].forEach(subject=>{
               const answer=engine.conjugate(v,t,subject,construction||((verbMeta[v]||{}).pronominal?'pronominale':'non-pronominale'));
               if(answer!=null){
                 const displaySubject=formatPracticeSubject(subject,t,isCompound);
-                pool.push({verb:v,tense:t,subject:displaySubject,answer});
+                pushQuestion(pool,v,t,displaySubject,answer);
               }
             });
           }else{
@@ -68,7 +79,7 @@
             const finalAnswer=answer==null?r.answer:answer;
             if(finalAnswer!=null && String(finalAnswer).trim()!==''){
               const displaySubject=formatPracticeSubject(r.subject,t,false);
-              pool.push({verb:v,tense:t,subject:displaySubject,answer:finalAnswer});
+              pushQuestion(pool,v,t,displaySubject,finalAnswer);
             }
           }
         });
@@ -106,11 +117,11 @@
       variants={
         je:['je (féminin singulier)','je (masculin singulier)'],
         tu:['tu (féminin singulier)','tu (masculin singulier)'],
-        il:['il'], elle:['elle'],
+        il:['il'],elle:['elle'],
         on:['on (masculin singulier)','on (masculin pluriel)','on (féminin pluriel)'],
         nous:['nous (masculin pluriel)','nous (féminin pluriel)'],
         vous:['vous (masculin singulier)','vous (féminin singulier)','vous (masculin pluriel)','vous (féminin pluriel)'],
-        ils:['ils'], elles:['elles']
+        ils:['ils'],elles:['elles']
       };
     }
     const cleanBase=base||raw;
@@ -157,10 +168,11 @@
   }
 
   function samePracticeAnswer(value,q){
-    const normalize=s=>String(s??'').trim().replace(/\s+/g,' ').toLocaleLowerCase();
+    const normalize=U.normalizeAnswerText||function(s){return String(s??'').trim().toLocaleLowerCase().replace(/\s+/g,' ');};
     const input=normalize(value);
     if(!input)return false;
-    return String(q?.answer||'').split(/\s+\/\s+/).map(normalize).filter(Boolean).includes(input);
+    const accepted=Array.isArray(q?.acceptedAnswers)&&q.acceptedAnswers.length?q.acceptedAnswers:[q?.displayAnswer||q?.answer];
+    return accepted.map(normalize).filter(Boolean).includes(input);
   }
 
   function updatePracticeAuxiliaryOptions(){
@@ -223,7 +235,7 @@
   function renderSecondErrorFeedback(q){
     const fb=document.querySelector('#practiceFeedback');
     fb.className='feedback-box warn';
-    fb.innerHTML='Réponse incorrecte.<br>Réponse correcte : <strong>'+U.escapeHtml(q.answer)+'</strong><br>Escribe la respuesta correcta para continuar.';
+    fb.innerHTML='Réponse incorrecte.<br>Réponse correcte : <strong>'+U.escapeHtml(q.displayAnswer||q.answer)+'</strong><br>Escribe la respuesta correcta para continuar.';
   }
   function validateAnswer(){
     if(session.locked)return;
