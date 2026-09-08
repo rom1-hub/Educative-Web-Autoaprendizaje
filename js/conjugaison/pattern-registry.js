@@ -6,7 +6,7 @@
   const subjects={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ons',vous:'ez',ils:'ent',elles:'ent'};
   const imparfait={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'};
   const futur={je:'ai',tu:'as',il:'a',elle:'a',on:'a',nous:'ons',vous:'ez',ils:'ont',elles:'ont'};
-  const conditionnel={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient'};
+  const conditionnel={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'};
   const subjonctif={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ions',vous:'iez',ils:'ent',elles:'ent'};
   const presentIr={je:'is',tu:'is',il:'it',elle:'it',on:'it',nous:'issons',vous:'issez',ils:'issent',elles:'issent'};
   const presentRe={je:'s',tu:'s',il:'',elle:'',on:'',nous:'ons',vous:'ez',ils:'ent',elles:'ent'};
@@ -287,6 +287,34 @@
     return null;
   }
 
+  function connaîtreType(inf,s,tense){
+    const stem=inf.replace(/aître$/,'aiss'),futureStem=inf.replace(/aître$/,'aîtr');
+    if(tense==="présent de l'indicatif")return {je:stem+'e',tu:stem+'s',il:stem+'t',elle:stem+'t',on:stem+'t',nous:stem+'ons',vous:stem+'ez',ils:stem+'ent',elles:stem+'ent'}[s]||null;
+    if(tense==='imparfait')return stem+imparfait[s];
+    if(tense==='futur simple')return futureStem+futur[s];
+    if(tense==='conditionnel présent')return futureStem+conditionnel[s];
+    if(tense==='subjonctif présent')return {je:stem+'e',tu:stem+'es',il:stem+'e',elle:stem+'e',on:stem+'e',nous:stem+'ions',vous:stem+'iez',ils:stem+'ent',elles:stem+'ent'}[s]||null;
+    if(tense==='impératif présent'){
+      if(!imperativeSubjects.includes(s))return null;
+      return s==='tu'?'connais':s==='nous'?stem+'ons':stem+'ez';
+    }
+    return null;
+  }
+
+  function paraîtreType(inf,s,tense){
+    const stem=inf.replace(/aître$/,'aiss'),futureStem=inf.replace(/aître$/,'aîtr');
+    if(tense==="présent de l'indicatif")return {je:stem+'s',tu:stem+'s',il:stem+'t',elle:stem+'t',on:stem+'t',nous:stem+'ons',vous:stem+'ez',ils:stem+'ent',elles:stem+'ent'}[s]||null;
+    if(tense==='imparfait')return stem+imparfait[s];
+    if(tense==='futur simple')return futureStem+futur[s];
+    if(tense==='conditionnel présent')return futureStem+conditionnel[s];
+    if(tense==='subjonctif présent')return {je:stem+'e',tu:stem+'es',il:stem+'e',elle:stem+'e',on:stem+'e',nous:stem+'ions',vous:stem+'iez',ils:stem+'ent',elles:stem+'ent'}[s]||null;
+    if(tense==='impératif présent'){
+      if(!imperativeSubjects.includes(s))return null;
+      return s==='tu'?'parais':s==='nous'?stem+'ons':stem+'ez';
+    }
+    return null;
+  }
+
   const definitions={
     'regular-er':{groupe:1,description:'Premier groupe régulier en -ER',generate:(inf,s,t)=>simpleGenerator(inf,s,t,'regular-er')},
     'regular-ir':{groupe:2,description:'Deuxième groupe régulier en -IR',generate:(inf,s,t)=>simpleGenerator(inf,s,t,'regular-ir')},
@@ -309,7 +337,9 @@
     'courir-type':{groupe:3,description:'Famille courir : cour- au présent et courr- au futur',generate:courirType},
     'mourir-type':{groupe:3,description:'Verbe mourir : alternance meurs-/mour-/meurent',generate:mourirType},
     'croire-type':{groupe:3,description:'Famille croire : crois-/croy- au présent et croir- au futur',generate:croireType},
-    'recevoir-type':{groupe:3,description:'Famille recevoir : reçois-/recev- au présent et recevr- au futur',generate:recevoirType}
+    'recevoir-type':{groupe:3,description:'Famille recevoir : reçois-/recev- au présent et recevr- au futur',generate:recevoirType},
+    'connaître-type':{groupe:3,description:'Famille connaître : connaiss- au présent/imparfait, connaîtr- au futur',generate:connaîtreType},
+    'paraître-type':{groupe:3,description:'Famille paraître : paraiss- au présent/imparfait, paraîtr- au futur',generate:paraîtreType}
   };
 
   function get(pattern){return definitions[pattern]||null;}
