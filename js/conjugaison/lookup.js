@@ -28,13 +28,16 @@
     if(!agreementSensitive(verb))return value;
     const r=meta(verb),pp=String(r.participePasse||'').trim();
     if(!pp)return value;
-    const base=baseSubject(subject);
+    const raw=normalizeSubject(subject),base=baseSubject(subject);
+    if(base==='on'){
+      const generic=value.replace(new RegExp(pp+'[es]*$'),'');
+      return generic+pp+'(e)(s)';
+    }
     const contextBySubject={
       je:{gender:'masculin',number:'singulier'},
       tu:{gender:'masculin',number:'singulier'},
       il:{gender:'masculin',number:'singulier'},
       elle:{gender:'féminin',number:'singulier'},
-      on:null,
       nous:{gender:'masculin',number:'pluriel'},
       'vous (masculin singulier)':{gender:'masculin',number:'singulier'},
       'vous (féminin singulier)':{gender:'féminin',number:'singulier'},
@@ -43,14 +46,9 @@
       vous:null,
       ils:{gender:'masculin',number:'pluriel'},
       elles:{gender:'féminin',number:'pluriel'}
-    }[base];
-    if(base==='on'){
-      const generic=stripMetadata(value).replace(new RegExp(pp+'[es]*$'),'');
-      return generic+pp+'(e)(s)';
-    }
-    const context=contextBySubject;
-    if(!context)return value;
-    const agreed=A&&typeof A.agree==='function'?A.agree(pp,context,{type:'pronominale',baseVerb:r.verbeBase||verb,auxiliaire:r.auxiliaire}):pp;
+    }[raw];
+    if(!contextBySubject)return value;
+    const agreed=A&&typeof A.agree==='function'?A.agree(pp,contextBySubject,{type:r.pronominal?'pronominale':'non-pronominale',baseVerb:r.verbeBase||verb,auxiliaire:r.auxiliaire}):pp;
     const candidates=[pp,pp+'e',pp+'s',pp+'es'].sort((a,b)=>b.length-a.length);
     const matched=candidates.find(candidate=>value.endsWith(candidate));
     if(!matched)return value;
