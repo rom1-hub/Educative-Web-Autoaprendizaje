@@ -31,12 +31,14 @@
     const simple=[
       ['appeler',"présent de l'indicatif",'je','appelle'],['appeler',"présent de l'indicatif",'nous','appelons'],
       ['acheter',"présent de l'indicatif",'je','achète'],['jeter',"présent de l'indicatif",'je','jette'],
-      ['feuilleter',"présent de l'indicatif",'je','feuillette'],['partir',"présent de l'indicatif",'je','pars'],
+      ['feuilleter',"présent de l'indicatif",'je','feuillette'],['nettoyer',"présent de l'indicatif",'je','nettoie'],
+      ['essuyer',"présent de l'indicatif",'ils','essuient'],['partir',"présent de l'indicatif",'je','pars'],
       ['venir',"présent de l'indicatif",'nous','venons'],['tenir',"présent de l'indicatif",'vous','tenez'],
-      ['aller',"présent de l'indicatif",'je','vais'],['aller',"subjonctif présent",'je','aille'],
-      ['faire',"présent de l'indicatif",'je','fais'],['faire',"présent de l'indicatif",'vous','faites'],
-      ['faire','imparfait','nous','faisions'],['faire','futur simple','ils','feront'],
-      ['faire','conditionnel présent','je','ferais'],['faire','subjonctif présent','je','fasse'],['faire','impératif présent','vous','faites']
+      ['conduire',"présent de l'indicatif",'je','conduis'],['aller',"présent de l'indicatif",'je','vais'],
+      ['aller',"subjonctif présent",'je','aille'],['faire',"présent de l'indicatif",'je','fais'],
+      ['faire',"présent de l'indicatif",'vous','faites'],['faire','imparfait','nous','faisions'],
+      ['faire','futur simple','ils','feront'],['faire','conditionnel présent','je','ferais'],
+      ['faire','subjonctif présent','je','fasse'],['faire','impératif présent','vous','faites']
     ];
     simple.forEach(function(item){
       const actual=engine.conjugate(item[0],item[1],item[2],'non-pronominale');
@@ -52,8 +54,8 @@
       const actual=engine.conjugate(item[0],item[1],item[2],item[0].startsWith('se ')?'pronominale':'non-pronominale');
       assert('verbe inféré · '+item[0]+' · '+item[1]+' · '+item[2],actual,item[3],results);
     });
-    assert('IR inconnu no se infiere',resolver.resolveRecord('finir'),null,results);
-    assert('RE inconnu no se infiere',resolver.resolveRecord('vendre'),null,results);
+    assert('IR desconocido no se infiere',resolver.resolveRecord('zzzzir'),null,results);
+    assert('RE desconocido no se infiere',resolver.resolveRecord('zzzzre'),null,results);
 
     const compounds=[
       ['partir','passé composé','je (masculin singulier)','suis parti'],['partir','passé composé','je (féminin singulier)','suis partie'],
