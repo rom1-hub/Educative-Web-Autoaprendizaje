@@ -40,7 +40,37 @@ window.COQ_VERB_PATTERNS={
     if(/eter$/.test(base))return'er-eter';
     if(record&&record.pattern&&patterns[record.pattern])return record.pattern;
     if(/er$/.test(base))return'regular-er';
+    if(/ir$/.test(base))return'regular-ir';
+    if(/re$/.test(base))return'regular-re';
     return null;
+  }
+  function inferParticiple(verb,pattern){
+    const base=baseVerb(verb);
+    if(pattern==='regular-er'||pattern==='er-ger'||pattern==='er-cer'||pattern==='er-eler'||pattern==='er-eter'||pattern==='yer'||pattern==='er-e-accent')return base.replace(/er$/,'é');
+    if(pattern==='regular-ir')return base.replace(/ir$/,'i');
+    if(pattern==='regular-re')return base.replace(/re$/,'u');
+    return null;
+  }
+  function resolveRecord(verb){
+    const key=normalize(verb),base=baseVerb(key),known=verbs[key]||verbs[base];
+    if(known)return known;
+    const pattern=resolvePattern(key);
+    if(!pattern||!patterns[pattern])return null;
+    const meta=patterns[pattern];
+    return {
+      id:key,
+      infinitif:key,
+      infinitif_base:base,
+      groupe:meta.groupe,
+      pattern,
+      auxiliaire:'avoir',
+      pronominal:key.startsWith('se '),
+      construction:key.startsWith('se ')?'pronominale':'non-pronominale',
+      verbeBase:base,
+      participePasse:inferParticiple(key,pattern),
+      formePronominale:null,
+      _inferred:true
+    };
   }
   function applyToDatabase(){
     Object.keys(verbs).forEach(function(key){
@@ -50,6 +80,6 @@ window.COQ_VERB_PATTERNS={
       if(pattern)record.pattern=pattern;
     });
   }
-  window.COQ_PATTERN_RESOLVER={normalize,baseVerb,resolvePattern,applyToDatabase};
+  window.COQ_PATTERN_RESOLVER={normalize,baseVerb,resolvePattern,resolveRecord,applyToDatabase};
   applyToDatabase();
 })();
