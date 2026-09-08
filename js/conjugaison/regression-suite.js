@@ -1,13 +1,13 @@
-/* COQ — Suite de regresión manual para la arquitectura de Conjugaison.
+/* COQ — Suite de regresión para la arquitectura de Conjugaison.
  * No se carga en producción. Se puede importar desde DevTools para ejecutar
- * comprobaciones contra el motor central, el registro de patrones y la capa
- * de presentación.
+ * comprobaciones contra el motor central, el registro de patrones, el catálogo
+ * de tiempos y la construcción de filas de consulta/práctica.
  */
 (function(){
   function assert(name,actual,expected,results){const ok=actual===expected;results.push({name,actual,expected,ok});return ok;}
   function assertTruthy(name,value,results){const ok=!!value;results.push({name,actual:ok?'presente':'ausente',expected:'presente',ok});return ok;}
   function run(){
-    const engine=window.COQ_CONJ_ENGINE,registry=window.COQ_PATTERN_REGISTRY,resolver=window.COQ_PATTERN_RESOLVER,presentation=window.COQ_TABLE_PRESENTATION,results=[];
+    const engine=window.COQ_CONJ_ENGINE,registry=window.COQ_PATTERN_REGISTRY,resolver=window.COQ_PATTERN_RESOLVER,C=window.COQ_CONJ_COMPOUND,lookup=window.COQ_CONJ_LOOKUP,results=[];
     if(!engine)return [{name:'motor disponible',actual:'ausente',expected:'presente',ok:false}];
     if(!registry)return [{name:'registro disponible',actual:'ausente',expected:'presente',ok:false}];
     assertTruthy('registro expone generate()',typeof registry.generate==='function',results);
@@ -16,7 +16,11 @@
     assert('capa Proxy heredada eliminada',resolver&&typeof resolver.installResolverViews,'undefined',results);
     assertTruthy('motor expone conjugate()',typeof engine.conjugate==='function',results);
     assertTruthy('motor expone rowsForLookup()',typeof engine.rowsForLookup==='function',results);
-    assertTruthy('presentación central disponible',presentation&&typeof presentation.normalizeTable==='function',results);
+    assertTruthy('catálogo de tiempos disponible',C&&Array.isArray(C.allTenses),results);
+    assert('11 tiempos declarados',C?.allTenses?.length,11,results);
+    assert('5 tiempos compuestos',C?.compoundTenses?.length,5,results);
+    assert('6 tiempos simples',C?.simpleTenses?.length,6,results);
+    assertTruthy('consulta expone normalizedRows()',lookup&&typeof lookup.normalizedRows==='function',results);
 
     const catalog=window.COQ_VERBS||{},patterns=window.COQ_VERB_PATTERNS||{};
     Object.keys(patterns).forEach(pattern=>assert('patrón del catálogo tiene registro · '+pattern,!!registry.get(pattern),true,results));
@@ -49,7 +53,15 @@
     const pronominal=[['se lever','passé composé','je (féminin singulier)','me suis levée'],['se lever','plus-que-parfait','elle (féminin singulier)',"s'était levée"],['se lever','conditionnel passé','ils','se seraient levés'],['se lever','futur antérieur','vous (féminin singulier)','vous serez levée'],['se parler','subjonctif passé','que je (féminin singulier)','me sois parlé']];
     pronominal.forEach(item=>assert(item[0]+' · '+item[1]+' · '+item[2],engine.conjugate(item[0],item[1],item[2],'pronominale'),item[3],results));
 
-    if(presentation){const subjRows=presentation.normalizeRows([['je','parle'],['il/elle/on','parle'],['ils/elles','parlent']],"présent de l'indicatif");assert('presentación separa grupos de sujetos',subjRows.length,6,results);}
+    const normalized=lookup.normalizedRows([['je','parle'],['il/elle/on','parle'],['ils/elles','parlent']],"présent de l'indicatif");
+    assert('consulta separa grupos de sujetos',normalized.length,6,results);
+
+    const practice=window.COQ_CONJ_PRACTICE;
+    if(practice){
+      const mixed=practice.buildQuestions('', 'passé composé','Todos','', 'avec-avoir-et-etre');
+      assert('filtro AVOIR et ÊTRE devuelve preguntas',mixed.length>0,true,results);
+      assert('filtro AVOIR et ÊTRE excluye pronominales',mixed.some(q=>getRecord(q.verb)?.pronominal===true),false,results);
+    }
     return results;
   }
   window.COQ_CONJ_REGRESSION={run};
