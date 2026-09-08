@@ -14,6 +14,7 @@
     'subjonctif présent',
     'impératif présent'
   ];
+  const REPRESENTATIVE_SUBJECTS=['je','il','nous','vous','elles'];
 
   function run(){
     const registry=window.COQ_PATTERN_REGISTRY;
@@ -47,13 +48,13 @@
       const representative=Object.keys(verbs).find(v=>verbs[v]&&verbs[v].pattern===pattern);
       if(!representative)return;
       SIMPLE_TENSES.forEach(tense=>{
-        ['je','nous','vous'].forEach(subject=>{
+        REPRESENTATIVE_SUBJECTS.forEach(subject=>{
           const value=registry.generate(pattern,representative,subject,tense);
           push(
             'generación central · '+pattern+' · '+tense+' · '+subject,
             value!==null&&value!==undefined,
             value,
-            'forma generada o null explícito'
+            'forma generada'
           );
         });
       });
