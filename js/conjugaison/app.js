@@ -1,61 +1,40 @@
 /* COQ — Inicialización de la página de Conjugación */
 (function(){
   const C=window.COQ_CONJ_COMPOUND;
-  function initTabs(){const tabButtons=[...document.querySelectorAll('.tab')];tabButtons.forEach(btn=>btn.addEventListener('click',()=>{tabButtons.forEach(b=>b.classList.remove('active'));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');document.querySelector('#tab-'+btn.dataset.tab)?.classList.add('active')}))}
+  let lastModalTrigger=null;
+  function initTabs(){
+    const tabButtons=[...document.querySelectorAll('.tab')];
+    tabButtons.forEach((btn,index)=>{
+      const panel=document.querySelector('#tab-'+btn.dataset.tab);
+      btn.setAttribute('role','tab');btn.setAttribute('aria-selected',String(btn.classList.contains('active')));btn.setAttribute('tabindex',btn.classList.contains('active')?'0':'-1');
+      if(panel){btn.setAttribute('aria-controls',panel.id);panel.setAttribute('role','tabpanel');panel.setAttribute('aria-labelledby',btn.id||('tab-control-'+index));if(!btn.id)btn.id='tab-control-'+index;panel.hidden=!btn.classList.contains('active');}
+      btn.addEventListener('click',()=>activateTab(btn));
+      btn.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();let target=index;if(e.key==='ArrowRight')target=(index+1)%tabButtons.length;if(e.key==='ArrowLeft')target=(index-1+tabButtons.length)%tabButtons.length;if(e.key==='Home')target=0;if(e.key==='End')target=tabButtons.length-1;tabButtons[target].focus();activateTab(tabButtons[target]);});
+    });
+  }
+  function activateTab(btn){
+    const tabButtons=[...document.querySelectorAll('.tab')];tabButtons.forEach(b=>{const active=b===btn;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));b.setAttribute('tabindex',active?'0':'-1');const panel=document.querySelector('#tab-'+b.dataset.tab);if(panel){panel.classList.toggle('active',active);panel.hidden=!active;}});
+  }
   function initTenseSelects(){
     const tenses=C?.displayOrder||[];
-    ['lookupTense','practiceTense'].forEach(id=>{
-      const select=document.getElementById(id);if(!select||!tenses.length)return;
-      const current=select.value;
-      select.innerHTML='';
-      const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='-seleccionar-';placeholder.selected=true;select.appendChild(placeholder);
-      if(id==='practiceTense')placeholder.disabled=true;
-      const all=document.createElement('option');all.value='Todos los tiempos';all.textContent='Todos los tiempos';select.appendChild(all);
-      tenses.forEach(tense=>{const option=document.createElement('option');option.value=tense;option.textContent=tense.charAt(0).toUpperCase()+tense.slice(1);select.appendChild(option);});
-      if(current&&[...select.options].some(option=>option.value===current))select.value=current;
-    });
+    ['lookupTense','practiceTense'].forEach(id=>{const select=document.getElementById(id);if(!select||!tenses.length)return;const current=select.value;select.innerHTML='';const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='-seleccionar-';placeholder.selected=true;select.appendChild(placeholder);if(id==='practiceTense')placeholder.disabled=true;const all=document.createElement('option');all.value='Todos los tiempos';all.textContent='Todos los tiempos';select.appendChild(all);tenses.forEach(tense=>{const option=document.createElement('option');option.value=tense;option.textContent=tense.charAt(0).toUpperCase()+tense.slice(1);select.appendChild(option);});if(current&&[...select.options].some(option=>option.value===current))select.value=current;});
   }
-  function updateLookupStatus(){
-    const input=document.getElementById('lookupVerb'),status=document.getElementById('lookupStatus'),tense=document.getElementById('lookupTense');
-    if(!input||!status)return;
-    const value=input.value.trim(),result=document.getElementById('conjResult'),hasVisibleResult=!!result&&!result.classList.contains('hidden');
-    if(!value){status.className='lookup-status empty';status.textContent='Escribe el infinitivo de un verbo francés.';status.hidden=false;return}
-    if(hasVisibleResult){status.hidden=true;return}
-    status.className='lookup-status empty';
-    status.textContent=tense&&tense.value?'Escribe el verbo (en infinitivo) que quieras consultar. No estás limitado a una lista.':'Ahora selecciona un tiempo verbal.';
-    status.hidden=false;
-  }
+  function updateLookupStatus(){const input=document.getElementById('lookupVerb'),status=document.getElementById('lookupStatus'),tense=document.getElementById('lookupTense');if(!input||!status)return;const value=input.value.trim(),result=document.getElementById('conjResult'),hasVisibleResult=!!result&&!result.classList.contains('hidden');if(!value){status.className='lookup-status empty';status.textContent='Escribe el infinitivo de un verbo francés.';status.hidden=false;return;}if(hasVisibleResult){status.hidden=true;return;}status.className='lookup-status empty';status.textContent=tense&&tense.value?'Escribe el verbo (en infinitivo) que quieras consultar. No estás limitado a una lista.':'Ahora selecciona un tiempo verbal.';status.hidden=false;}
   function initLookupStatus(){document.addEventListener('input',e=>{if(e.target&&e.target.id==='lookupVerb')updateLookupStatus()});document.addEventListener('change',e=>{if(e.target&&(e.target.id==='lookupVerb'||e.target.id==='lookupTense'))setTimeout(updateLookupStatus,30)})}
-  function initPracticeShortcut(){document.addEventListener('click',function(e){const button=e.target.closest('#practiceThisVerb');if(!button)return;const verbInput=document.getElementById('lookupVerb'),practiceTab=document.querySelector('.tab[data-tab="practice"]'),practicePanel=document.getElementById('tab-practice'),practiceInput=document.getElementById('practiceVerb');if(practiceInput&&verbInput){practiceInput.value=verbInput.value.trim();practiceInput.dispatchEvent(new Event('input',{bubbles:true}));practiceInput.dispatchEvent(new Event('change',{bubbles:true}))}if(practiceTab)practiceTab.click();else if(practicePanel){document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));practicePanel.classList.add('active')}setTimeout(()=>{const panel=document.getElementById('tab-practice');if(panel)panel.scrollIntoView({behavior:'smooth',block:'start'})},50)})}
+  function initPracticeShortcut(){document.addEventListener('click',function(e){const button=e.target.closest('#practiceThisVerb');if(!button)return;const verbInput=document.getElementById('lookupVerb'),practiceTab=document.querySelector('.tab[data-tab="practice"]'),practicePanel=document.getElementById('tab-practice'),practiceInput=document.getElementById('practiceVerb');if(practiceInput&&verbInput){practiceInput.value=verbInput.value.trim();practiceInput.dispatchEvent(new Event('input',{bubbles:true}));practiceInput.dispatchEvent(new Event('change',{bubbles:true}))}if(practiceTab)activateTab(practiceTab);else if(practicePanel)practicePanel.hidden=false;setTimeout(()=>{const panel=document.getElementById('tab-practice');if(panel)panel.scrollIntoView({behavior:'smooth',block:'start'})},50)})}
   function initPracticeSummary(){
     document.addEventListener('coq:practice-finished',function(event){
-      const detail=event.detail||{},ordered=Array.isArray(detail.results)?detail.results:[];
-      if(ordered.length!==20)return;
-      const correct=Number(detail.correct)||0,errors=Number(detail.errors)||20-correct,score=Number(detail.score)||0;
-      const note=Number.isInteger(score)?String(score):score.toFixed(1);
-      const finalCorrect=document.getElementById('finalCorrect'),finalWrong=document.getElementById('finalWrong'),finalScore=document.getElementById('finalScore');
-      if(finalCorrect)finalCorrect.textContent=String(correct);
-      if(finalWrong)finalWrong.textContent=String(errors);
-      if(finalScore)finalScore.textContent=`${note} / 20`;
-      const tbody=document.getElementById('resultRows');
-      if(tbody){
-        tbody.innerHTML='';
-        ordered.forEach((r,i)=>{
-          const q=r.question||{},tr=document.createElement('tr'),isWrong=r.outcome==='incorrect-twice',isFirstError=r.outcome==='correct-after-first-error',result=isWrong?'Corrigé avec aide':isFirstError?'Corrigé sans aide':'Correct';
-          const attempts=[q.firstError,q.secondError].filter(Boolean);if(r.outcome!=='incorrect-twice'&&r.finalAnswer)attempts.push(r.finalAnswer);
-          const attemptText=attempts.length?attempts.join(' → '):'—';
-          const values=[i+1,q.verb||'—',q.subject||'—',q.tense||'—',attemptText,q.displayAnswer||q.answer||'—',result];
-          values.forEach((value,index)=>{const td=document.createElement('td');td.textContent=value;if(index===0)td.setAttribute('data-label','#');if(index===1)td.setAttribute('data-label','Verbe');if(index===2)td.setAttribute('data-label','Sujet');if(index===3)td.setAttribute('data-label','Temps');if(index===4)td.setAttribute('data-label','Ta réponse');if(index===5)td.setAttribute('data-label','Réponse correcte');if(index===6)td.setAttribute('data-label','Résultat');if(index===4){td.style.fontWeight='800';td.style.color=isWrong?'var(--red)':isFirstError?'var(--orange)':'var(--green)'}if(index===5){td.style.fontWeight='700';td.style.color='var(--green)'}if(index===6){td.style.fontWeight='800';td.style.color=isWrong?'var(--red)':isFirstError?'var(--orange)':'var(--green)'}tr.appendChild(td)});
-          tbody.appendChild(tr);
-        });
-      }
-      const modal=document.getElementById('resultModal');
-      if(modal){modal.classList.add('open');modal.setAttribute('aria-hidden','false');modal.style.display='flex';}
+      const detail=event.detail||{},ordered=Array.isArray(detail.results)?detail.results:[];if(ordered.length!==20)return;
+      const correct=Number(detail.correct)||0,errors=Number(detail.errors)||20-correct,score=Number(detail.score)||0,note=Number.isInteger(score)?String(score):score.toFixed(1);
+      const finalCorrect=document.getElementById('finalCorrect'),finalWrong=document.getElementById('finalWrong'),finalScore=document.getElementById('finalScore');if(finalCorrect)finalCorrect.textContent=String(correct);if(finalWrong)finalWrong.textContent=String(errors);if(finalScore)finalScore.textContent=`${note} / 20`;
+      const tbody=document.getElementById('resultRows');if(tbody){tbody.innerHTML='';ordered.forEach((r,i)=>{const q=r.question||{},tr=document.createElement('tr'),isWrong=r.outcome==='incorrect-twice',isFirstError=r.outcome==='correct-after-first-error',result=isWrong?'Corrigé avec aide':isFirstError?'Corrigé sans aide':'Correct',attempts=[q.firstError,q.secondError].filter(Boolean);if(r.outcome!=='incorrect-twice'&&r.finalAnswer)attempts.push(r.finalAnswer);const values=[i+1,q.verb||'—',q.subject||'—',q.tense||'—',attempts.length?attempts.join(' → '):'—',q.displayAnswer||q.answer||'—',result];values.forEach((value,index)=>{const td=document.createElement('td');td.textContent=value;['#','Verbe','Sujet','Temps','Ta réponse','Réponse correcte','Résultat'].forEach((label,j)=>{if(index===j)td.setAttribute('data-label',label)});if(index===4){td.style.fontWeight='800';td.style.color=isWrong?'var(--red)':isFirstError?'var(--orange)':'var(--green)'}if(index===5){td.style.fontWeight='700';td.style.color='var(--green)'}if(index===6){td.style.fontWeight='800';td.style.color=isWrong?'var(--red)':isFirstError?'var(--orange)':'var(--green)'}tr.appendChild(td)});tbody.appendChild(tr);});}
+      const modal=document.getElementById('resultModal');if(modal){lastModalTrigger=document.activeElement;modal.classList.add('open');modal.setAttribute('aria-hidden','false');modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-labelledby','resultModalTitle');document.querySelector('#resultModal h2')?.setAttribute('id','resultModalTitle');modal.style.display='flex';setTimeout(()=>document.getElementById('reviewDone')?.focus(),30);}
     });
-    function closeSummary(){const modal=document.getElementById('resultModal');if(!modal)return;modal.classList.remove('open');modal.setAttribute('aria-hidden','true');modal.style.display='none';if(window.COQ_CONJ_PRACTICE&&typeof window.COQ_CONJ_PRACTICE.resetPracticeForm==='function')window.COQ_CONJ_PRACTICE.resetPracticeForm();}
+    function closeSummary(){const modal=document.getElementById('resultModal');if(!modal)return;modal.classList.remove('open');modal.setAttribute('aria-hidden','true');modal.style.display='none';if(window.COQ_CONJ_PRACTICE&&typeof window.COQ_CONJ_PRACTICE.resetPracticeForm==='function')window.COQ_CONJ_PRACTICE.resetPracticeForm();setTimeout(()=>lastModalTrigger?.focus?.(),0);}
     document.getElementById('reviewDone')?.addEventListener('click',closeSummary);
     document.getElementById('resultModal')?.addEventListener('click',e=>{if(e.target===e.currentTarget)closeSummary()});
+    document.addEventListener('keydown',e=>{const modal=document.getElementById('resultModal');if(!modal||modal.getAttribute('aria-hidden')!=='false')return;if(e.key==='Escape'){e.preventDefault();closeSummary();return;}if(e.key!=='Tab')return;const focusables=[...modal.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')].filter(el=>!el.disabled);if(!focusables.length)return;const first=focusables[0],last=focusables[focusables.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
   }
   function init(){initTenseSelects();initTabs();window.COQ_CONJ_LOOKUP.init();initLookupStatus();initPracticeShortcut();initPracticeSummary()}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init()
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
