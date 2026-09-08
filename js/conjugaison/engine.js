@@ -9,6 +9,7 @@
   const C=window.COQ_CONJ_COMPOUND;
   const A=window.COQ_CONJ_AGREEMENT;
   const R=window.COQ_PATTERN_REGISTRY;
+  const resolver=window.COQ_PATTERN_RESOLVER;
   const verbs=window.COQ_VERBS||{};
   const patterns=window.COQ_VERB_PATTERNS||{};
   const simpleTenses=new Set([
@@ -18,9 +19,13 @@
 
   function baseKey(verb){
     const v=verbs[verb];
-    return v&&v.verbeBase&&verbs[v.verbeBase] ? v.verbeBase : verb;
+    if(v&&v.verbeBase&&verbs[v.verbeBase])return v.verbeBase;
+    if(resolver&&typeof resolver.baseVerb==='function')return resolver.baseVerb(verb);
+    return verb;
   }
-  function record(verb){return verbs[verb]||null;}
+  function record(verb){
+    return verbs[verb] || (resolver&&typeof resolver.resolveRecord==='function' ? resolver.resolveRecord(verb) : null);
+  }
   function stemEr(inf){return inf.replace(/er$/,'');}
   function presentRegularEr(inf,s){
     let stem=stemEr(inf);
@@ -45,7 +50,6 @@
     if(['je','tu','il','elle','on','ils','elles'].includes(s)) return accented+({je:'e',tu:'es',il:'e',elle:'e',on:'e',ils:'ent',elles:'ent'}[s]);
     return stem+({nous:'ons',vous:'ez'}[s]);
   }
-
   function presentEAccent(inf,s){
     const stem=stemEr(inf);
     const accented=stem.replace(/e([^e]*)$/,'è$1');
@@ -55,21 +59,18 @@
     }
     return stem+({nous:'ons',vous:'ez'}[s]);
   }
-
   function futureEAccent(inf,s){
     const base=inf.replace(/er$/,'');
     const stem=base.replace(/e([^e]*)$/,'è$1');
     const end={je:'ai',tu:'as',il:'a',elle:'a',on:'a',nous:'ons',vous:'ez',ils:'ont',elles:'ont'}[s];
     return stem+'er'+end;
   }
-
   function conditionalEAccent(inf,s){
     const base=inf.replace(/er$/,'');
     const stem=base.replace(/e([^e]*)$/,'è$1');
     const end={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'}[s];
     return stem+'er'+end;
   }
-
   function subjEAccent(inf,s){
     const stem=stemEr(inf);
     const accented=stem.replace(/e([^e]*)$/,'è$1');
@@ -81,7 +82,6 @@
     if(s==='vous') return stem+'iez';
     return accented+'ent';
   }
-
   function subjErEAccent(inf,s){
     const stem=stemEr(inf);
     const singular=stem.replace(/e([^e]*)$/,'è$1');
@@ -303,7 +303,7 @@ function rowsFor(verb,tense){
   const out=[];
   if(isSimple&&!source.length){
     if(tense==='impératif présent')source=[['tu',''],['nous',''],['vous','']];
-    else if(tense==='subjonctif présent')source=[['que je',''],['que tu','',[...[]]],["qu'il/elle/on",''],['que nous',''],['que vous',''],["qu'ils/elles",'']];
+    else if(tense==='subjonctif présent')source=[['que je',''],['que tu',''],["qu'il/elle/on",''],['que nous',''],['que vous',''],["qu'ils/elles",'']];
     else source=[['je',''],['tu',''],['il/elle/on',''],['nous',''],['vous',''],['ils/elles','']];
   }
   if(isCompound&&tense==='subjonctif passé'){
@@ -329,6 +329,11 @@ function rowsForConstruction(verb,tense,construction){
   const isSimple=simpleTenses.has(tense),isCompound=C&&C.isCompound(tense);
   if(!isSimple&&!isCompound)return source.map(x=>[x[0],x[1]]);
   const out=[];
+  if(!source.length && isSimple){
+    const fallback=tense==='impératif présent'?['tu','nous','vous']:tense==='subjonctif présent'?['que je','que tu',"qu'il",'que nous','que vous',"qu'ils"]:['je','tu','il','elle','on','nous','vous','ils','elles'];
+    fallback.forEach(subject=>{const generated=conjugate(verb,tense,subject,construction);if(generated!=null)out.push([subject,generated]);});
+    return out;
+  }
   source.forEach(row=>{
     const subject=row[0].split('/').map(x=>x.trim()).filter(Boolean)[0];
     const generated=conjugate(verb,tense,subject,construction);
