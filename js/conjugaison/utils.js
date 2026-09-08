@@ -1,21 +1,30 @@
 /* COQ — Utilidades de Conjugación
  *
  * Responsabilidad exclusiva:
+ * - construir la vista de datos consumida por la interfaz;
  * - normalización y escapado de datos;
  * - expansión de filas de práctica;
  * - utilidades puras de soporte.
  *
- * La validación de respuestas de práctica pertenece exclusivamente a
- * practice.js, que aplica el contrato canónico: solo la forma verbal.
- * La presentación pertenece a table-presentation.js.
+ * El motor conserva los registros de COQ_VERBS. La práctica recibe una vista
+ * estable de metadatos para evitar depender de mutaciones posteriores del
+ * catálogo global.
  */
 (function(){
   const data=window.COQ_VERB_DATA||{};
   const catalog=window.COQ_VERBS||{};
+  const source={...(data.verbMeta||{}),...catalog};
+  const normalizedMeta={};
+  Object.keys(source).forEach(function(key){
+    const record=source[key];
+    if(!record||typeof record!=='object')return;
+    normalizedMeta[key]={...record};
+    if(record.pronominal===true)normalizedMeta[key].auxiliaire=null;
+  });
   const api={
     conjugations:{...(data.conjugations||{}),...catalog},
     verbGroups:data.verbGroups||{},
-    verbMeta:{...(data.verbMeta||{}),...catalog}
+    verbMeta:normalizedMeta
   };
 
   api.normalizeVerb=function(v){return String(v||'').trim().toLowerCase();};
