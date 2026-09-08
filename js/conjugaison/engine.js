@@ -8,6 +8,7 @@
   const P=window.COQ_CONJ_PRONOUNS;
   const C=window.COQ_CONJ_COMPOUND;
   const A=window.COQ_CONJ_AGREEMENT;
+  const R=window.COQ_PATTERN_REGISTRY;
   const verbs=window.COQ_VERBS||{};
   const patterns=window.COQ_VERB_PATTERNS||{};
   const simpleTenses=new Set([
@@ -154,6 +155,8 @@
       const irregular=imperativeIrregular(inf,s);
       if(irregular)return irregular;
     }
+    const registryResult=R && R.generate(pattern,inf,s,tense);
+    if(registryResult!==null && registryResult!==undefined) return registryResult;
     if(pattern==='er-e-accent'){
       if(tense==="présent de l'indicatif") return presentErEAccent(inf,s);
       if(tense==='imparfait') return imparfaitFromPresent(inf,s,pattern);
@@ -336,7 +339,7 @@ function rowsForConstruction(verb,tense,construction){
 
   function canGenerate(verb,tense){
     const r=record(verb); if(!r)return false;
-    if(C&&C.isCompound(tense))return !!r.auxiliaire;
+    if(C&&C.isCompound(tense))return!!r.auxiliaire;
     return simpleTenses.has(tense);
   }
 
