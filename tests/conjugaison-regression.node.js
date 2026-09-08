@@ -66,7 +66,7 @@ expect(subjLookup[2][0],"qu'il",'La tabla de subjonctif debe separar qu’il.');
 expect(subjLookup[3][0],"qu'elle",'La tabla de subjonctif debe separar qu’elle.');
 expect(subjLookup[4][0],"qu'on",'La tabla de subjonctif debe separar qu’on.');
 const avoirCompound=lookup.normalizedRows(engine.rowsForLookup('avoir','passé composé'),'passé composé','avoir');
-assert(avoirCompound.length===6,'Los tiempos compuestos con avoir deben conservar 6 sujetos y ninguna concordancia.');
+assert(avoirCompound.length===9,'Los tiempos compuestos con avoir deben mostrar los 9 sujetos separados y ninguna concordancia.');
 const etreCompound=lookup.normalizedRows(engine.rowsForLookup('venir','passé composé'),'passé composé','venir');
 assert(etreCompound.length===9,'Los tiempos compuestos con être deben mostrar 9 sujetos separados, con vous en una sola fila genérica.');
 expect(etreCompound[0][0],'je','La tabla être debe usar je.');
