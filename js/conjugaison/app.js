@@ -19,7 +19,9 @@
         tbody.innerHTML='';
         ordered.forEach((r,i)=>{
           const q=r.question||{},tr=document.createElement('tr'),isWrong=r.outcome==='incorrect-twice',isFirstError=r.outcome==='correct-after-first-error',result=isWrong?'Corrigé avec aide':isFirstError?'Corrigé sans aide':'Correct';
-          const values=[i+1,q.verb||'—',q.subject||'—',q.tense||'—',(q.attempts&&q.attempts.length?q.attempts.join(' → '):r.finalAnswer||'—'),q.displayAnswer||q.answer||'—',result];
+          const attempts=[q.firstError,q.secondError].filter(Boolean);if(r.outcome!=='incorrect-twice'&&r.finalAnswer)attempts.push(r.finalAnswer);
+          const attemptText=attempts.length?attempts.join(' → '):'—';
+          const values=[i+1,q.verb||'—',q.subject||'—',q.tense||'—',attemptText,q.displayAnswer||q.answer||'—',result];
           values.forEach((value,index)=>{const td=document.createElement('td');td.textContent=value;if(index===0)td.setAttribute('data-label','#');if(index===1)td.setAttribute('data-label','Verbe');if(index===2)td.setAttribute('data-label','Sujet');if(index===3)td.setAttribute('data-label','Temps');if(index===4)td.setAttribute('data-label','Ta réponse');if(index===5)td.setAttribute('data-label','Réponse correcte');if(index===6)td.setAttribute('data-label','Résultat');if(index===4){td.style.fontWeight='800';td.style.color=isWrong?'var(--red)':isFirstError?'var(--orange)':'var(--green)'}if(index===5){td.style.fontWeight='700';td.style.color='var(--green)'}if(index===6){td.style.fontWeight='800';td.style.color=isWrong?'var(--red)':isFirstError?'var(--orange)':'var(--green)'}tr.appendChild(td)});
           tbody.appendChild(tr);
         });
