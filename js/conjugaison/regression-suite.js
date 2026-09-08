@@ -97,7 +97,7 @@
       ['paraître-type','paraître',"présent de l'indicatif",'je','parais']
     ];
     registryFamilies.forEach(function(item){
-      const actual=registry.generate(item[1],item[2],item[3],item[0]);
+      const actual=registry.generate(item[0],item[1],item[3],item[2]);
       assert('registro · '+item[0]+' · '+item[1]+' · '+item[2]+' · '+item[3],actual,item[4],results);
     });
 
