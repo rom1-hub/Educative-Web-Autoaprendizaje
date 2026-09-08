@@ -48,49 +48,37 @@ window.COQ_VERB_PATTERNS={
     if(pattern==='regular-er'||pattern==='er-ger'||pattern==='er-cer'||pattern==='er-eler'||pattern==='er-eter'||pattern==='yer'||pattern==='er-e-accent')return base.replace(/er$/,'é');
     return null;
   }
-  function derivedPronominalRecord(key,base,known){
-    const pattern=resolvePattern(base);
-    if(!known&&!pattern)return null;
+  function inferredRecord(key,base,pattern,baseRecord){
+    const meta=patterns[pattern];
+    if(!meta)return null;
+    const isPro=isPronominal(key);
     return {
       id:key,
       infinitif:key,
       infinitif_base:base,
-      groupe:known.groupe,
-      pattern:pattern,
-      auxiliaire:'être',
-      pronominal:true,
-      construction:'pronominale',
+      groupe:baseRecord?.groupe??meta.groupe,
+      pattern,
+      auxiliaire:isPro?'être':'avoir',
+      pronominal:isPro,
+      construction:isPro?'pronominale':'non-pronominale',
       verbeBase:base,
-      participePasse:known.participePasse||inferParticiple(base,pattern),
-      formePronominale:key,
+      participePasse:baseRecord?.participePasse||inferParticiple(base,pattern),
+      formePronominale:isPro?key:null,
       _inferred:true,
-      _derivedFrom:base
+      ...(isPro&&baseRecord?{_derivedFrom:base}:{} )
     };
   }
   function resolveRecord(verb){
-    const key=normalize(verb),base=baseVerb(key),pronominal=isPronominal(key),known=verbs[key];
+    const key=normalize(verb),base=baseVerb(key),known=verbs[key];
     if(known)return known;
-    if(pronominal){
-      const baseRecord=verbs[base];
-      if(baseRecord)return derivedPronominalRecord(key,base,baseRecord);
-    }
     const pattern=resolvePattern(key);
+    if(isPronominal(key)){
+      const baseRecord=verbs[base];
+      if(pattern)return inferredRecord(key,base,pattern,baseRecord||null);
+      return null;
+    }
     if(!pattern||!patterns[pattern])return null;
-    const meta=patterns[pattern];
-    return {
-      id:key,
-      infinitif:key,
-      infinitif_base:base,
-      groupe:meta.groupe,
-      pattern,
-      auxiliaire:'avoir',
-      pronominal:false,
-      construction:'non-pronominale',
-      verbeBase:base,
-      participePasse:inferParticiple(key,pattern),
-      formePronominale:null,
-      _inferred:true
-    };
+    return inferredRecord(key,base,pattern,null);
   }
   function applyToDatabase(){
     Object.keys(verbs).forEach(function(key){
