@@ -2,12 +2,12 @@
  *
  * Responsabilidad exclusiva:
  * - normalización y escapado de datos;
- * - variantes de respuesta compartidas;
- * - expansión y mezcla de filas de práctica;
+ * - expansión de filas de práctica;
  * - utilidades puras de soporte.
  *
- * Este módulo NO modifica el motor, NO observa el DOM y NO instala parches
- * de conjugación. La presentación pertenece a table-presentation.js.
+ * La validación de respuestas de práctica pertenece exclusivamente a
+ * practice.js, que aplica el contrato canónico: solo la forma verbal.
+ * La presentación pertenece a table-presentation.js.
  */
 (function(){
   const data=window.COQ_VERB_DATA||{};
@@ -21,54 +21,6 @@
   api.normalizeVerb=function(v){return String(v||'').trim().toLowerCase();};
   api.escapeHtml=function(v){return String(v).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#039;'}[c]));};
   api.normalizeAnswerText=function(v){return String(v||'').trim().toLocaleLowerCase().replace(/\s+/g,' ');};
-
-  api.answerVariants=function(q){
-    const expected=api.normalizeAnswerText(q.answer);
-    const expectedVariants=expected.split(/\s+\/\s+/).map(v=>v.trim()).filter(Boolean);
-    const variants=new Set(expectedVariants);
-    const rawSubject=String(q.subject||'').trim();
-    if(!rawSubject)return variants;
-
-    if(String(q.tense||'').trim()==='impératif présent')return variants;
-
-    const withoutGender=rawSubject.replace(/\s*\([^)]*\)\s*$/,'').trim();
-    const baseMap={"j'":'je',je:'je',tu:'tu',il:'il',elle:'elle',on:'on',nous:'nous',vous:'vous',ils:'ils',elles:'elles'};
-    let base=withoutGender.toLowerCase();
-    if(/^qu['’]il$/.test(base))base='il';
-    else if(/^qu['’]elle$/.test(base))base='elle';
-    else if(/^qu['’]on$/.test(base))base='on';
-    else if(/^qu['’]ils$/.test(base))base='ils';
-    else if(/^qu['’]elles$/.test(base))base='elles';
-    else if(/^que\s+j['’]$/.test(base))base='je';
-    else if(/^que\s+je$/.test(base))base='je';
-    else if(/^que\s+tu$/.test(base))base='tu';
-    else if(/^que\s+nous$/.test(base))base='nous';
-    else if(/^que\s+vous$/.test(base))base='vous';
-    else base=baseMap[base]||base;
-    if(!baseMap[base])return variants;
-
-    expectedVariants.forEach(function(form){
-      const startsWithVowel=/^[aeiouyàâäéèêëîïôöùûüÿœæ]/i.test(form);
-      if(base==='je'){
-        if(!startsWithVowel)variants.add(api.normalizeAnswerText('je '+form));
-        if(!/^j['’]/.test(form)&&startsWithVowel)variants.add(api.normalizeAnswerText("j'"+form));
-      }else{
-        variants.add(api.normalizeAnswerText(base+' '+form));
-      }
-
-      const isSubjonctif=/^subjonctif\s+(présent|passé)$/i.test(String(q.tense||''));
-      if(isSubjonctif){
-        const queSubject={je:"que je",tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"}[base];
-        if(queSubject){
-          if(!(base==='je'&&startsWithVowel))variants.add(api.normalizeAnswerText(queSubject+' '+form));
-          if(base==='je'&&!/^j['’]/.test(form)&&startsWithVowel)variants.add(api.normalizeAnswerText("que j'"+form));
-        }
-      }
-    });
-    return variants;
-  };
-
-  api.sameAnswer=function(a,q){return api.answerVariants(q).has(api.normalizeAnswerText(a));};
 
   api.expandPracticeRows=function(rows){
     const expanded=[];
