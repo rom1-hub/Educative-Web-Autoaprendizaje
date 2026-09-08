@@ -29,4 +29,9 @@ expect(engine.conjugate('se lever','passé composé','vous (féminin singulier)'
 expect(engine.conjugate('se lever','plus-que-parfait','tu (masculin singulier)','pronominale'),"t'étais levé",'se lever plus-que-parfait');
 expect(engine.conjugate('se parler','passé composé','ils','pronominale'),'se sont parlé','se parler sans accord');
 expect(engine.conjugate('venir','futur antérieur','elles'),'seront venues','venir futur antérieur');
-console.log('Conjugaison regression OK — 21 assertions.');
+const practiceRows=engine.rowsFor('se lever','passé composé');
+assert(practiceRows.length===9,'La pratique doit partir de 9 sujets de base avant expansion des variantes.');
+assert(practiceRows.every(row=>!/[()]/.test(row[0])),'Les lignes de práctica ne doivent pas contenir variantes de género/número ya expandidas.');
+const lookupRows=engine.rowsForLookup('se lever','passé composé');
+assert(lookupRows.some(row=>row[0]==='vous (féminin singulier)'),'La consulta debe conservar las variantes de vous para la tabla.');
+console.log('Conjugaison regression OK — 24 assertions.');
