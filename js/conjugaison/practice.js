@@ -156,6 +156,13 @@
     return true;
   }
 
+  function samePracticeAnswer(value,q){
+    const normalize=s=>String(s??'').trim().replace(/\s+/g,' ').toLocaleLowerCase();
+    const input=normalize(value);
+    if(!input)return false;
+    return String(q?.answer||'').split(/\s+\/\s+/).map(normalize).filter(Boolean).includes(input);
+  }
+
   function updatePracticeAuxiliaryOptions(){
     const tense=document.querySelector('#practiceTense')?.value;
     const verb=U.normalizeVerb(document.querySelector('#practiceVerb')?.value);
@@ -216,14 +223,14 @@
   function renderSecondErrorFeedback(q){
     const fb=document.querySelector('#practiceFeedback');
     fb.className='feedback-box warn';
-    fb.innerHTML='Réponse incorrecte.<br>Réponse correcte : <strong>'+U.escapeHtml(q.answer)+'</strong><br>Escribe la réponse correcte pour continuer.';
+    fb.innerHTML='Réponse incorrecte.<br>Réponse correcte : <strong>'+U.escapeHtml(q.answer)+'</strong><br>Escribe la respuesta correcta para continuar.';
   }
   function validateAnswer(){
     if(session.locked)return;
     const q=session.questions[session.index],input=document.querySelector('#answerInput'),value=input.value.trim();
     if(!value)return;
     if(q.mustTypeCorrect){
-      if(U.sameAnswer(value,q)){
+      if(samePracticeAnswer(value,q)){
         input.className='success';
         const fb=document.querySelector('#practiceFeedback');
         fb.className='feedback-box ok';
@@ -238,7 +245,7 @@
       return;
     }
     q.attempts++;
-    if(U.sameAnswer(value,q)){
+    if(samePracticeAnswer(value,q)){
       input.className='success';session.correct++;let outcome;if(q.attempts===1)outcome='correct-first';else if(q.attempts===2)outcome='correct-after-first-error';else outcome='correct-after-help';session.results.push({question:q,finalAnswer:value,outcome});session.locked=true;const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box ok';fb.textContent='✓ Correcto. Pasamos a la siguiente question.';document.querySelector('#practiceProgressBar').style.width=`${((session.index+1)/20)*100}%`;setTimeout(()=>{session.index++;session.index>=20?finishSession():showQuestion()},650);
     }else if(q.attempts===1){q.firstError=value;input.className='error-first';const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box warn';fb.textContent='Réponse incorrecte. Essaie encore.';
     }else{q.secondError=value;input.className='error-second';renderSecondErrorFeedback(q);q.mustTypeCorrect=true;session.results.push({question:q,finalAnswer:value,outcome:'incorrect-twice'});session.locked=false;input.value='';input.disabled=false;input.focus();const next=document.querySelector('#nextQuestion');if(next)next.classList.add('hidden');}
