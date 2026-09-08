@@ -15,12 +15,43 @@
   function elideJe(label,form){const subject=normalizeSubject(label),value=String(form||'').trim();if(subject==='je'&&VOWELS.test(value))return "j'";if(subject==='que je'&&VOWELS.test(value))return "que j'";return label;}
   function addSubjonctifPrefix(label,form){const raw=String(label||'').trim(),base=baseSubject(raw),prefix={je:'que je',tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"}[base];if(!prefix)return raw;if(/^que\s|^qu['’]/i.test(raw))return elideJe(raw,form);return elideJe(prefix,form);}
   function groupedSubject(label,form,tense){const raw=String(label||'').trim(),base=baseSubject(raw);if(base==='il/elle/on')return tense==='subjonctif présent'?"qu'il/elle/on":raw;if(base==='ils/elles')return tense==='subjonctif présent'?"qu'ils/elles":raw;return tense==='subjonctif présent'?addSubjonctifPrefix(raw,form):elideJe(raw,form);}
-  function displaySubject(label,form,tense,expandAgreement){const raw=String(label||'').trim(),base=baseSubject(raw),group=SUBJECT_GROUPS[base];if(group&&!expandAgreement)return [groupedSubject(raw,form,tense)];if(group)return group.map(member=>tense==='subjonctif présent'?addSubjonctifPrefix(member,form):elideJe(member,form));return [tense==='subjonctif présent'?addSubjonctifPrefix(raw,form):elideJe(raw,form)];}
-  function speechForm(form){return stripMetadata(form).replace(/\s+/g,' ').trim();}
+  function displaySubject(label,form,tense){const raw=String(label||'').trim(),base=baseSubject(raw),group=SUBJECT_GROUPS[base];if(group)return [groupedSubject(raw,form,tense)];return [tense==='subjonctif présent'?addSubjonctifPrefix(raw,form):elideJe(raw,form)];}
   function agreementSensitive(verb){const m=meta(verb);return m.pronominal===true||m.construction==='pronominale'||m.auxiliaire==='être';}
-  function hasAgreementVariants(rows){return (rows||[]).some(row=>/\((?:masculin|féminin)\s+(?:singulier|pluriel)\)/i.test(String(row?.[0]||'')));}
-  function normalizedRows(rows,tense,verb){const output=[],expandAgreement=isCompound(tense)&&(agreementSensitive(verb)||hasAgreementVariants(rows));(rows||[]).forEach(row=>{const form=String(row?.[1]??'').trim();if(!form)return;displaySubject(row?.[0],form,tense,expandAgreement).forEach(subject=>output.push([subject,form]));});const pattern=resolver&&typeof resolver.resolvePattern==='function'?resolver.resolvePattern(verb):null;if(C?.isSimple?.(tense)&&pattern==='yer'){const merge=(subjects,label)=>{const matches=output.filter(row=>subjects.includes(row[0]));if(matches.length!==subjects.length||new Set(matches.map(row=>row[1])).size!==1)return;const first=output.indexOf(matches[0]);output.splice(first,matches.length,[label,matches[0][1]]);};merge(['il','elle','on'],'il/elle/on');merge(['ils','elles'],'ils/elles');}return output;}
+  function compoundDisplayForm(form,subject,verb){
+    if(!agreementSensitive(verb))return form;
+    const r=meta(verb),pp=String(r.participePasse||'').trim();
+    if(!pp||!String(form).endsWith(pp))return form;
+    const base=baseSubject(subject),suffix=String(form).slice(0,-pp.length);
+    let notation='(e)';
+    if(base==='nous'||base==='ils'||base==='elles')notation='(e)s';
+    else if(base==='vous')notation='(e)(s)';
+    else if(base==='il/elle/on')notation='(e)(s)';
+    return suffix+pp+notation;
+  }
+  function normalizedRows(rows,tense,verb){
+    const output=[];
+    (rows||[]).forEach(row=>{
+      const form=String(row?.[1]??'').trim();if(!form)return;
+      if(isCompound(tense)){
+        /* Les temps composés restent pédagogiquement à 6 lignes. Pour les
+           auxiliaires être/pronominaux, la concordance est indiquée dans le
+           participe: levé(e), levé(e)s, levé(e)(s), etc. */
+        const subject=String(row?.[0]||'').trim();
+        const display=groupedSubject(subject,form,tense);
+        output.push([display,compoundDisplayForm(form,subject,verb)]);
+      }else{
+        displaySubject(row?.[0],form,tense).forEach(subject=>output.push([subject,form]));
+      }
+    });
+    const pattern=resolver&&typeof resolver.resolvePattern==='function'?resolver.resolvePattern(verb):null;
+    if(C?.isSimple?.(tense)&&pattern==='yer'){
+      const merge=(subjects,label)=>{const matches=output.filter(row=>subjects.includes(row[0]));if(matches.length!==subjects.length||new Set(matches.map(row=>row[1])).size!==1)return;const first=output.indexOf(matches[0]);output.splice(first,matches.length,[label,matches[0][1]]);};
+      merge(['il','elle','on'],'il/elle/on');merge(['ils','elles'],'ils/elles');
+    }
+    return output;
+  }
   function addFormAudioButtons(table){const speak=window.Coqaudio&&typeof window.Coqaudio.speak==='function'?window.Coqaudio.speak:null;if(!speak)return;table.querySelectorAll('tbody tr').forEach(row=>{const cells=row.querySelectorAll('td');if(cells.length<2||cells[1].querySelector('[data-speak-form]'))return;const form=cells[1].textContent.trim(),spoken=speechForm(form);if(!spoken)return;const button=document.createElement('button');button.type='button';button.className='btn tiny secondary';button.dataset.speakForm=spoken;button.setAttribute('aria-label','Écouter la forme « '+spoken+' »');button.textContent='🔊';button.style.marginLeft='8px';button.addEventListener('click',()=>speak(spoken));cells[1].appendChild(button);});}
+  function speechForm(form){return stripMetadata(form).replace(/\s+/g,' ').trim();}
   function imperativeDecoration(rows){return rows.map(([subject,form])=>[subject==='tu'||subject==='nous'||subject==='vous'?subject+'*':subject,form]);}
   function renderRowsTable(tense,rows){let displayRows=normalizedRows(rows,tense,window.COQ_CONJ_LOOKUP?.currentVerb||'');if(tense==='impératif présent')displayRows=imperativeDecoration(displayRows);let html='<div class="tense-block"><div class="tense-head"><h3>'+U.escapeHtml(tense)+'</h3><button class="btn tiny secondary" type="button" data-speak-tense="'+U.escapeHtml(tense)+'">🔊</button></div><table class="tense-table"><tbody>';displayRows.forEach(row=>{html+='<tr><td>'+U.escapeHtml(row[0])+'</td><td>'+U.escapeHtml(row[1])+'</td></tr>';});if(tense==='impératif présent')html+='<tr><td colspan="2">* En el imperativo los sujetos desaparecen. No se pronuncian, ni se escriben.</td></tr>';return html+'</tbody></table></div>';}
   function renderConjugation(verb){const result=document.querySelector('#conjResult');if(!result)return;result.classList.remove('hidden');window.COQ_CONJ_LOOKUP.currentVerb=verb;const data=meta(verb).formes||conjugations[verb]||{},selectedTense=document.querySelector('#lookupTense')?.value||'',other=counterpart(verb);let html='<div class="card verb-summary" style="background:var(--soft-blue);border-color:#CBEAF4"><span class="tag">Conjugaison</span><div class="conj-result-head"><div><h2 style="margin-top:10px">'+U.escapeHtml(verb)+'</h2><p class="muted">'+(meta(verb).pronominal?'Forme pronominale':'Forme non pronominale')+'</p></div><div class="conj-actions">';if(other)html+='<button class="btn secondary" type="button" id="togglePronominal" data-target-verb="'+U.escapeHtml(other)+'">'+toggleLabel(verb)+'</button>';html+='<button class="btn secondary" type="button" id="speakVerb" aria-label="Escuchar el verbo">🔊 Escuchar el verbo</button><button class="btn tiny secondary" type="button" id="practiceThisVerb">Practicar este verbo</button></div></div></div>';if(selectedTense){const orderIndex=t=>{const i=(C?.displayOrder||[]).indexOf(t);return i===-1?9999:i;};let timesToShow=[];if(selectedTense==='Todos los tiempos'){timesToShow=(C?.displayOrder||[]).map(t=>[t,data[t]||[]]);Object.keys(data).filter(t=>!(C?.displayOrder||[]).includes(t)).forEach(t=>timesToShow.push([t,data[t]]));}else if(Object.prototype.hasOwnProperty.call(data,selectedTense)||engine?.canGenerate?.(verb,selectedTense))timesToShow=[[selectedTense,data[selectedTense]||[]]];timesToShow.sort((a,b)=>orderIndex(a[0])-orderIndex(b[0]));const generated=timesToShow.map(([tense])=>[tense,rowsForTense(verb,tense)]).filter(([,rows])=>rows?.length);html+='<div class="conj-toolbar"><span class="muted">'+(selectedTense==='Todos los tiempos'?'Todos los tiempos':'Tiempo seleccionado')+'</span></div>';if(!generated.length)html+='<div class="callout">Todavía no hay una conjugación disponible para <strong>'+U.escapeHtml(verb)+'</strong> en el tiempo «'+U.escapeHtml(selectedTense)+'».</div>';else{html+='<div class="conj-times" id="conjTimes">';generated.forEach(([tense,rows])=>{html+=renderRowsTable(tense,rows);});html+='</div>';}}else html+='<div class="callout">Selecciona un tiempo verbal para mostrar la conjugación.</div>';result.innerHTML=html;bindResultControls(verb);}
