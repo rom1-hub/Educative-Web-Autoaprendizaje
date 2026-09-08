@@ -13,6 +13,7 @@
     assertTruthy('registro expone generate()',typeof registry.generate==='function',results);
     assertTruthy('registro expone get()',typeof registry.get==='function',results);
     assertTruthy('resolutor expone resolveRecord()',resolver&&typeof resolver.resolveRecord==='function',results);
+    assert('capa Proxy heredada eliminada',resolver&&typeof resolver.installResolverViews,'undefined',results);
     assertTruthy('motor expone conjugate()',typeof engine.conjugate==='function',results);
     assertTruthy('motor expone rowsForLookup()',typeof engine.rowsForLookup==='function',results);
     assertTruthy('presentación central disponible',presentation&&typeof presentation.normalizeTable==='function',results);
@@ -39,7 +40,7 @@
 
     const inferred=[['parler',"présent de l'indicatif",'je','parle'],['parler','futur simple','nous','parlerons'],['se parler','passé composé','je (masculin singulier)','me suis parlé']];
     inferred.forEach(item=>assert('verbo inféré · '+item[0]+' · '+item[1]+' · '+item[2],engine.conjugate(item[0],item[1],item[2],item[0].startsWith('se ')?'pronominale':'non-pronominale'),item[3],results));
-    assert('IR desconocido no se infiere',resolver.resolveRecord('zzzzir'),null,results);assert('RE desconocido no se infiere',resolver.resolveRecord('zzzzre'),null,results);
+    assert('IR desconocido no se infiere',resolver.resolveRecord('zzzzir'),null,results);assert('RE desconocido no se infiere',resolver.resolveRecord('zzzzre'),null,results);assertTruthy('ER desconocido sí se resuelve',resolver.resolveRecord('zzzzparler'),results);assert('ER desconocido genera presente',engine.conjugate('zzzzparler',"présent de l'indicatif",'je','non-pronominale'),'zzzzparle',results);
 
     const compounds=[['partir','passé composé','je (masculin singulier)','suis parti'],['partir','passé composé','je (féminin singulier)','suis partie'],['partir','passé composé','vous (masculin pluriel)','êtes partis'],['partir','plus-que-parfait','elle (féminin singulier)','était partie'],['partir','conditionnel passé','elle (féminin singulier)','serait partie'],['partir','futur antérieur','elles','seront parties'],['partir','subjonctif passé','que je (féminin singulier)','sois partie'],['faire','passé composé','je (masculin singulier)','ai fait']];
     compounds.forEach(item=>assert(item[0]+' · '+item[1]+' · '+item[2],engine.conjugate(item[0],item[1],item[2],'non-pronominale'),item[3],results));
