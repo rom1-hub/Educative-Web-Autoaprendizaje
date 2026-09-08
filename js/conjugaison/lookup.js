@@ -31,7 +31,7 @@
     if(!matched)return value;
     const base=baseSubject(subject);
     let notation='(e)';
-    if(base==='nous'||base==='ils'||base==='elles')notation='(e)s';
+    if(base==='nous'||base==='ils'||base==='elles'||base==='ils/elles')notation='(e)s';
     else if(base==='vous'||base==='il/elle/on')notation='(e)(s)';
     return value.slice(0,-matched.length)+pp+notation;
   }
@@ -39,10 +39,8 @@
     const output=[];
     (rows||[]).forEach(row=>{
       const form=String(row?.[1]??'').trim();if(!form)return;
-      if(isCompound(tense)){
-        const subject=String(row?.[0]||'').trim();
-        output.push([groupedSubject(subject,form,tense),compoundDisplayForm(form,subject,verb)]);
-      }else displaySubject(row?.[0],form,tense).forEach(subject=>output.push([subject,form]));
+      if(isCompound(tense)){const subject=String(row?.[0]||'').trim();output.push([groupedSubject(subject,form,tense),compoundDisplayForm(form,subject,verb)]);}
+      else displaySubject(row?.[0],form,tense).forEach(subject=>output.push([subject,form]));
     });
     const pattern=resolver&&typeof resolver.resolvePattern==='function'?resolver.resolvePattern(verb):null;
     if(C?.isSimple?.(tense)&&pattern==='yer'){
