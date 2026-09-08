@@ -28,6 +28,23 @@
     assertTruthy('motor expone rowsForLookup()',typeof engine.rowsForLookup==='function',results);
     assertTruthy('presentación central disponible',presentation&&typeof presentation.normalizeTable==='function',results);
 
+    const catalog=window.COQ_VERBS||{};
+    const historicalCatalogVerbs=[
+      'nettoyer','essuyer','partir','sortir','dormir','servir','suivre',
+      'ouvrir','rouvrir','couvrir','découvrir','recouvrir','offrir','souffrir',
+      'venir','revenir','devenir','parvenir','intervenir','convenir','provenir','survenir','prévenir',
+      'tenir','retenir','soutenir','obtenir','maintenir','contenir','détenir','appartenir',
+      'mettre','remettre','permettre','promettre','admettre','transmettre','soumettre',
+      'lire','relire','rire','sourire','vivre','revivre','survivre',
+      'conduire','traduire','produire','construire','détruire','réduire','cuire',
+      'courir','accourir','recourir','mourir','croire','recevoir',
+      'connaître','reconnaître','méconnaître',
+      'paraître','apparaître','disparaître','reparaître','transparaître','comparaître'
+    ];
+    historicalCatalogVerbs.forEach(function(verb){
+      assert('catálogo contiene · '+verb,Object.prototype.hasOwnProperty.call(catalog,verb),true,results);
+    });
+
     const simple=[
       ['appeler',"présent de l'indicatif",'je','appelle'],['appeler',"présent de l'indicatif",'nous','appelons'],
       ['acheter',"présent de l'indicatif",'je','achète'],['jeter',"présent de l'indicatif",'je','jette'],
@@ -35,7 +52,7 @@
       ['essuyer',"présent de l'indicatif",'ils','essuient'],['partir',"présent de l'indicatif",'je','pars'],
       ['venir',"présent de l'indicatif",'nous','venons'],['tenir',"présent de l'indicatif",'vous','tenez'],
       ['conduire',"présent de l'indicatif",'je','conduis'],['aller',"présent de l'indicatif",'je','vais'],
-      ['aller',"subjonctif présent",'je','aille'],['faire',"présent de l'indicatif",'je','fais'],
+      ['aller','subjonctif présent','je','aille'],['faire',"présent de l'indicatif",'je','fais'],
       ['faire',"présent de l'indicatif",'vous','faites'],['faire','imparfait','nous','faisions'],
       ['faire','futur simple','ils','feront'],['faire','conditionnel présent','je','ferais'],
       ['faire','subjonctif présent','je','fasse'],['faire','impératif présent','vous','faites']
