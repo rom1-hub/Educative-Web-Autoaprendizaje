@@ -44,7 +44,12 @@
   Object.keys(families).forEach(pattern=>{
     Object.keys(families[pattern]).forEach(infinitif=>{
       if(verbs[infinitif]){
-        verbs[infinitif].pattern=verbs[infinitif].pattern||pattern;
+        // Las familias son la autoridad para la asignación de patrones.
+        // Esto corrige los nombres de patrón heredados (p. ej. "venir")
+        // para que el motor utilice siempre el registro central ("venir-type").
+        verbs[infinitif].pattern=pattern;
+        verbs[infinitif].auxiliaire=verbs[infinitif].auxiliaire||families[pattern][infinitif][1];
+        verbs[infinitif].participePasse=verbs[infinitif].participePasse||families[pattern][infinitif][0];
         return;
       }
       const [participePasse,auxiliaire]=families[pattern][infinitif];
@@ -63,11 +68,8 @@
     });
   });
 
-  // Ces formas -ER no forman parte de las familias regulares: se registran
-  // explícitamente porque ya pertenecían al catálogo anterior.
-  const explicitEr={
-    nettoyer:'nettoyé', essuyer:'essuyé'
-  };
+  // Estas formas -ER se registran explícitamente porque ya pertenecían al catálogo anterior.
+  const explicitEr={nettoyer:'nettoyé',essuyer:'essuyé'};
   Object.keys(explicitEr).forEach(infinitif=>{
     if(verbs[infinitif])return;
     verbs[infinitif]={
