@@ -20,14 +20,12 @@
     'recevoir-type':{recevoir:['reçu','avoir']},
     'connaître-type':{connaître:['connu','avoir'],reconnaître:['reconnu','avoir'],méconnaître:['méconnu','avoir']},
     'paraître-type':{paraître:['paru','avoir'],apparaître:['apparu','avoir'],disparaître:['disparu','avoir'],reparaître:['reparu','avoir'],transparaître:['transparu','avoir'],comparaître:['comparu','avoir']},
-    'explicit-er':{nettoyer:['nettoyé','avoir'],essuyer:['essuyé','avoir']}
+    'yer-explicit':{nettoyer:['nettoyé','avoir'],essuyer:['essuyé','avoir']}
   };
-
   const catalog={};
   Object.entries(families).forEach(([pattern,verbs])=>Object.entries(verbs).forEach(([infinitif,[participePasse,auxiliaire]])=>{
-    catalog[infinitif]={infinitif,infinitif_base:infinitif,groupe:pattern==='explicit-er'?1:3,pattern,auxiliaire,pronominal:false,participePasse,construction:'non-pronominale',verbeBase:infinitif};
+    catalog[infinitif]={infinitif,infinitif_base:infinitif,groupe:pattern==='yer-explicit'?1:3,pattern:pattern==='yer-explicit'?'yer':pattern,auxiliaire,pronominal:false,participePasse,construction:'non-pronominale',verbeBase:infinitif};
   }));
-
   window.COQ_VERB_FAMILY_CATALOG=Object.freeze(catalog);
   window.COQ_VERB_FAMILIES=Object.freeze(families);
 })();
