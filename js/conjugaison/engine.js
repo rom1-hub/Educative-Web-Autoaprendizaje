@@ -14,7 +14,7 @@
   const A=window.COQ_CONJ_AGREEMENT;
   const R=window.COQ_PATTERN_REGISTRY;
   const resolver=window.COQ_PATTERN_RESOLVER;
-  const verbs=window.COQ_VERBS||{};
+  const verbs=window.COQ_VERB_REGISTRY||window.COQ_VERBS||{};
 
   function baseKey(verb){
     const v=verbs[verb];
