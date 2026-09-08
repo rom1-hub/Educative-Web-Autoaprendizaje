@@ -39,7 +39,14 @@
       ['venir',"présent de l'indicatif",'nous','venons'],
       ['tenir',"présent de l'indicatif",'vous','tenez'],
       ['aller',"présent de l'indicatif",'je','vais'],
-      ['aller',"subjonctif présent",'je','aille']
+      ['aller',"subjonctif présent",'je','aille'],
+      ['faire',"présent de l'indicatif",'je','fais'],
+      ['faire',"présent de l'indicatif",'vous','faites'],
+      ['faire','imparfait','nous','faisions'],
+      ['faire','futur simple','ils','feront'],
+      ['faire','conditionnel présent','je','ferais'],
+      ['faire','subjonctif présent','que je','fasse'],
+      ['faire','impératif présent','vous','faites']
     ];
     simple.forEach(function(item){
       const actual=engine.conjugate(item[0],item[1],item[2],'non-pronominale');
@@ -52,7 +59,8 @@
       ['partir','passé composé','vous (masculin pluriel)','vous êtes partis'],
       ['partir','plus-que-parfait','elle (féminin singulier)','elle était partie'],
       ['partir','conditionnel passé','elle (féminin singulier)','elle serait partie'],
-      ['partir','futur antérieur','elles','elles seront parties']
+      ['partir','futur antérieur','elles','elles seront parties'],
+      ['faire','passé composé','je (masculin singulier)','je ai fait']
     ];
     compounds.forEach(function(item){
       const actual=engine.conjugate(item[0],item[1],item[2],'non-pronominale');
@@ -94,7 +102,8 @@
       ['croire-type','croire',"présent de l'indicatif",'je','crois'],
       ['recevoir-type','recevoir',"présent de l'indicatif",'je','reçois'],
       ['connaître-type','connaître',"présent de l'indicatif",'je','connais'],
-      ['paraître-type','paraître',"présent de l'indicatif",'je','parais']
+      ['paraître-type','paraître',"présent de l'indicatif",'je','parais'],
+      ['faire','faire',"présent de l'indicatif",'je','fais']
     ];
     registryFamilies.forEach(function(item){
       const actual=registry.generate(item[0],item[1],item[3],item[2]);
