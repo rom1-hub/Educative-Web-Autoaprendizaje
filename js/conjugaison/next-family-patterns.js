@@ -1,19 +1,60 @@
-/* Coq — familias generativas: connaître / paraître. */
+/* COQ — metadatos de familias connaître / paraître.
+ * La generación pertenece exclusivamente a COQ_PATTERN_REGISTRY + COQ_CONJ_ENGINE.
+ */
 (function(){
-  const SIMPLE=new Set(["présent de l'indicatif",'imparfait','futur simple','conditionnel présent','subjonctif présent','impératif présent']);
-  const SUBJECTS=['je','tu','il','elle','on','nous','vous','ils','elles'];
-  const IMP=['tu','nous','vous'];
-  const END={imparfait:{je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'},futur:{je:'ai',tu:'as',il:'a',elle:'a',on:'a',nous:'ons',vous:'ez',ils:'ont',elles:'ont'},cond:{je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'}};
-  const families={connaître:{pattern:'connaître-type',aux:'avoir',pp:'connu'},reconnaître:{pattern:'connaître-type',aux:'avoir',pp:'reconnu'},méconnaître:{pattern:'connaître-type',aux:'avoir',pp:'méconnu'},paraître:{pattern:'paraître-type',aux:'avoir',pp:'paru'},apparaître:{pattern:'paraître-type',aux:'avoir',pp:'apparu'},disparaître:{pattern:'paraître-type',aux:'avoir',pp:'disparu'},reparaître:{pattern:'paraître-type',aux:'avoir',pp:'reparu'},transparaître:{pattern:'paraître-type',aux:'avoir',pp:'transparu'},comparaître:{pattern:'paraître-type',aux:'avoir',pp:'comparu'}};
-  const patterns={'connaître-type':{groupe:3,description:'Famille connaître : connaiss- au présent/imparfait, connaîtr- au futur',fn:connaître},'paraître-type':{groupe:3,description:'Famille paraître : paraiss- au présent/imparfait, paraîtr- au futur',fn:paraître}};
-  function norm(v){return String(v||'').trim().toLowerCase();}
-  function subject(s){return norm(s).replace(/\s*\([^)]*\)\s*$/,'').replace(/^que\s+/,'').replace(/^qu['’]/,'');}
-  function base(v){const verbs=window.COQ_VERBS||{},k=norm(v),r=verbs[k];return r&&r.verbeBase&&verbs[norm(r.verbeBase)]?norm(r.verbeBase):k.startsWith('se ')?k.slice(3).trim():k;}
-  function connaître(v,s,t){const present=v.replace(/aître$/,'aiss'),future=v.replace(/aître$/,'aîtr');if(t==="présent de l'indicatif"){const f={je:present+'e',tu:present+'s',il:present+'t',elle:present+'t',on:present+'t',nous:present+'ons',vous:present+'ez',ils:present+'ent',elles:present+'ent'};return f[s]||null;}if(t==='imparfait')return present+END.imparfait[s];if(t==='futur simple')return future+END.futur[s];if(t==='conditionnel présent')return future+END.cond[s];if(t==='subjonctif présent'){const f={je:present+'e',tu:present+'es',il:present+'e',elle:present+'e',on:present+'e',nous:present+'ions',vous:present+'iez',ils:present+'ent',elles:present+'ent'};return f[s]||null;}if(t==='impératif présent'){if(!IMP.includes(s))return null;return s==='tu'? 'connais':s==='nous'?present+'ons':present+'ez';}return null;}
-  function paraître(v,s,t){const present=v.replace(/aître$/,'aiss'),future=v.replace(/aître$/,'aîtr');if(t==="présent de l'indicatif"){const f={je:present+'s',tu:present+'s',il:present+'t',elle:present+'t',on:present+'t',nous:present+'ons',vous:present+'ez',ils:present+'ent',elles:present+'ent'};return f[s]||null;}if(t==='imparfait')return present+END.imparfait[s];if(t==='futur simple')return future+END.futur[s];if(t==='conditionnel présent')return future+END.cond[s];if(t==='subjonctif présent'){const f={je:present+'e',tu:present+'es',il:present+'e',elle:present+'e',on:present+'e',nous:present+'ions',vous:present+'iez',ils:present+'ent',elles:present+'ent'};return f[s]||null;}if(t==='impératif présent'){if(!IMP.includes(s))return null;return s==='tu'?'parais':s==='nous'?present+'ons':present+'ez';}return null;}
-  function ensure(){const verbs=window.COQ_VERBS||(window.COQ_VERBS={});Object.keys(families).forEach(function(k){const x=families[k];if(!verbs[k])verbs[k]={id:k,infinitif:k,infinitif_base:k,groupe:3,pattern:x.pattern,auxiliaire:x.aux,pronominal:false,participePasse:x.pp,construction:'non-pronominale',verbeBase:k};else{verbs[k].pattern=x.pattern;verbs[k].auxiliaire=x.aux;verbs[k].participePasse=x.pp;}});window.COQ_VERB_PATTERNS=window.COQ_VERB_PATTERNS||{};Object.keys(patterns).forEach(k=>{window.COQ_VERB_PATTERNS[k]={groupe:patterns[k].groupe,description:patterns[k].description};});const u=window.COQ_CONJ_UTILS;if(u){Object.assign(u.conjugations,verbs);Object.assign(u.verbMeta,verbs);}}
-  function form(v,t,s){const b=base(v),r=(window.COQ_VERBS||{})[b],registry=window.COQ_PATTERN_REGISTRY;if(!r||!SIMPLE.has(t))return null;if(registry){const generated=registry.generate(r.pattern,b,subject(s),t);if(generated!==null&&generated!==undefined)return generated;}const p=r&&patterns[r.pattern];return p?p.fn(b,subject(s),t):null;}
-  function install(){ensure();const e=window.COQ_CONJ_ENGINE;if(!e||e.__nextFamiliesInstalled)return false;const oc=e.conjugate,or=e.rowsFor,ol=e.rowsForLookup,orc=e.rowsForConstruction;e.conjugate=function(v,t,s,c){const f=c!=='pronominale'?form(v,t,s):null;return f!==null?f:oc(v,t,s,c);};e.rowsFor=function(v,t){if(!form(v,t,'je')&&!form(v,t,'nous'))return or(v,t);const ss=t==='impératif présent'?IMP:SUBJECTS;return ss.map(s=>[s,e.conjugate(v,t,s,'non-pronominale')]).filter(r=>r[1]!==null);};e.rowsForLookup=function(v,t){if(!form(v,t,'je')&&!form(v,t,'nous'))return ol(v,t);return e.rowsFor(v,t);};e.rowsForConstruction=function(v,t,c){if(c==='pronominale'||(!form(v,t,'je')&&!form(v,t,'nous')))return orc(v,t,c);return e.rowsFor(v,t);};e.__nextFamiliesInstalled=true;return true;}
-  function boot(){if(install())return;setTimeout(install,0);setTimeout(install,100);setTimeout(install,500);}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+  const FAMILY_VERBS={
+    'connaître-type':{
+      connaître:{auxiliaire:'avoir',pp:'connu'},
+      reconnaître:{auxiliaire:'avoir',pp:'reconnu'},
+      méconnaître:{auxiliaire:'avoir',pp:'méconnu'}
+    },
+    'paraître-type':{
+      paraître:{auxiliaire:'avoir',pp:'paru'},
+      apparaître:{auxiliaire:'avoir',pp:'apparu'},
+      disparaître:{auxiliaire:'avoir',pp:'disparu'},
+      reparaître:{auxiliaire:'avoir',pp:'reparu'},
+      transparaître:{auxiliaire:'avoir',pp:'transparu'},
+      comparaître:{auxiliaire:'avoir',pp:'comparu'}
+    }
+  };
+
+  const PATTERN_META={
+    'connaître-type':{groupe:3,description:'Famille connaître'},
+    'paraître-type':{groupe:3,description:'Famille paraître'}
+  };
+
+  window.COQ_VERB_PATTERNS=window.COQ_VERB_PATTERNS||{};
+  Object.keys(PATTERN_META).forEach(function(pattern){window.COQ_VERB_PATTERNS[pattern]=PATTERN_META[pattern];});
+
+  function ensureRecord(verb,pattern,meta){
+    const verbs=window.COQ_VERBS||(window.COQ_VERBS={});
+    const existing=verbs[verb];
+    if(existing){
+      existing.pattern=pattern;
+      existing.auxiliaire=meta.auxiliaire||existing.auxiliaire||'avoir';
+      existing.participePasse=meta.pp||existing.participePasse||'';
+      return existing;
+    }
+    return verbs[verb]={id:verb,infinitif:verb,infinitif_base:verb,groupe:3,pattern,auxiliaire:meta.auxiliaire||'avoir',pronominal:false,participePasse:meta.pp||'',construction:'non-pronominale',verbeBase:verb};
+  }
+
+  function register(){
+    Object.keys(FAMILY_VERBS).forEach(function(pattern){
+      Object.keys(FAMILY_VERBS[pattern]).forEach(function(verb){ensureRecord(verb,pattern,FAMILY_VERBS[pattern][verb]);});
+    });
+    const verbs=window.COQ_VERBS||{};
+    const utils=window.COQ_CONJ_UTILS;
+    if(utils){Object.assign(utils.conjugations,verbs);Object.assign(utils.verbMeta,verbs);}
+  }
+
+  function wait(){
+    register();
+    if(!window.COQ_PATTERN_REGISTRY&&!wait.done){
+      wait.attempts=(wait.attempts||0)+1;
+      if(wait.attempts<100)setTimeout(wait,25);else wait.done=true;
+    }
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wait);else wait();
+  window.COQ_NEXT_FAMILY_METADATA={register:register,patterns:PATTERN_META,families:FAMILY_VERBS};
 })();
