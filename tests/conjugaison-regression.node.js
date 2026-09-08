@@ -8,8 +8,10 @@ files.forEach(file=>vm.runInContext(fs.readFileSync(path.join(root,file),'utf8')
 const w=context.window,engine=w.COQ_CONJ_ENGINE;
 const assert=(condition,message)=>{if(!condition)throw new Error(message);};
 const expect=(actual,expected,label)=>assert(actual===expected,`${label}: esperado «${expected}», obtenido «${actual}»`);
-assert(w.COQ_VERBS['partir'],'Los datos base deben seguir intactos tras cargar el catálogo.');
+assert(w.COQ_VERBS['parler'],'Los datos base deben seguir intactos tras cargar el catálogo.');
 assert(!Object.prototype.hasOwnProperty.call(w.COQ_VERBS,'sortir'),'El catálogo familiar no debe mutar COQ_VERBS.');
+assert(w.COQ_VERB_REGISTRY['partir'],'El registro unificado debe conservar verbos provenientes de catálogos familiares.');
+assert(w.COQ_VERB_REGISTRY['partir'].pattern==='partir-type','El registro familiar de partir debe conservar su patrón.');
 assert(Object.isFrozen(w.COQ_VERB_FAMILY_CATALOG),'El catálogo familiar debe ser inmutable.');
 assert(Object.isFrozen(w.COQ_VERB_REGISTRY),'El registro unificado debe ser inmutable.');
 expect(engine.conjugate('parler',"présent de l'indicatif",'je'),'parle','parler presente');
@@ -27,4 +29,4 @@ expect(engine.conjugate('se lever','passé composé','vous (féminin singulier)'
 expect(engine.conjugate('se lever','plus-que-parfait','tu (masculin singulier)','pronominale'),"t'étais levé",'se lever plus-que-parfait');
 expect(engine.conjugate('se parler','passé composé','ils','pronominale'),'se sont parlé','se parler sans accord');
 expect(engine.conjugate('venir','futur antérieur','elles'),'seront venues','venir futur antérieur');
-console.log('Conjugaison regression OK — 19 assertions.');
+console.log('Conjugaison regression OK — 21 assertions.');
