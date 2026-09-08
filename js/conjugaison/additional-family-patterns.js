@@ -1,26 +1,125 @@
-/* COQ — familias adicionales del 3.º grupo. */
+/* COQ — metadatos de familias adicionales del 3.º grupo.
+ *
+ * Responsabilidad exclusiva:
+ * - registrar metadatos mínimos de verbos pertenecientes a familias
+ * - asociar cada verbo a un patrón del registro central
+ *
+ * La generación pertenece exclusivamente a COQ_PATTERN_REGISTRY + COQ_CONJ_ENGINE.
+ * Este módulo NO modifica métodos del motor y NO contiene lógica de presentación.
+ */
 (function(){
-  const SIMPLE=new Set(["présent de l'indicatif",'imparfait','futur simple','conditionnel présent','subjonctif présent','impératif présent']);
-  const SUBJECTS=['je','tu','il','elle','on','nous','vous','ils','elles'];
-  const IMP=['tu','nous','vous'];
-  const END={imparfait:{je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'},futur:{je:'ai',tu:'as',il:'a',elle:'a',on:'a',nous:'ons',vous:'ez',ils:'ont',elles:'ont'},cond:{je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'},subj:{je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ions',vous:'iez',ils:'ent',elles:'ent'}};
-  const PREFIX={je:'que je',tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"};
-  function norm(v){return String(v||'').trim().toLowerCase();}
-  function base(v){const verbs=window.COQ_VERBS||{},k=norm(v),r=verbs[k];return r&&r.verbeBase&&verbs[norm(r.verbeBase)]?norm(r.verbeBase):k.startsWith('se ')?k.slice(3).trim():k;}
-  function subj(s){const x=norm(s).replace(/\s*\([^)]*\)\s*$/,'');return x.replace(/^que\s+/,'').replace(/^qu['’]/,'');}
-  function mettre(v,s,t){const singular=v.replace(/mettre$/,'met'),plural=v.replace(/mettre$/,'mett'),future=v.replace(/mettre$/,'mettr');if(t==="présent de l'indicatif"){const f={je:singular+'s',tu:singular+'s',il:singular,elle:singular,on:singular,nous:plural+'ons',vous:plural+'ez',ils:plural+'ent',elles:plural+'ent'};return f[s]||null;}if(t==='imparfait')return plural+END.imparfait[s];if(t==='futur simple')return future+END.futur[s];if(t==='conditionnel présent')return future+END.cond[s];if(t==='subjonctif présent')return plural+END.subj[s];if(t==='impératif présent'){if(!IMP.includes(s))return null;return s==='tu'?singular+'s':plural+({nous:'ons',vous:'ez'}[s]);}return null;}
-  function lire(v,s,t){const stem=v.replace(/re$/,''),subjStem=stem+'s';if(t==="présent de l'indicatif"){const f={je:stem+'s',tu:stem+'s',il:stem+'t',elle:stem+'t',on:stem+'t',nous:stem+'sons',vous:stem+'sez',ils:stem+'sent',elles:stem+'sent'};return f[s]||null;}if(t==='imparfait')return stem+END.imparfait[s];if(t==='futur simple')return v+END.futur[s];if(t==='conditionnel présent')return v+END.cond[s];if(t==='subjonctif présent')return subjStem+END.subj[s];if(t==='impératif présent'){if(!IMP.includes(s))return null;return s==='tu'?stem+'s':stem+({nous:'sons',vous:'sez'}[s]);}return null;}
-  function rire(v,s,t){const stem=v.replace(/rire$/,'ri'),future=v.replace(/rire$/,'rir');if(t==="présent de l'indicatif"){const f={je:stem+'s',tu:stem+'s',il:stem+'t',elle:stem+'t',on:stem+'t',nous:stem+'ons',vous:stem+'ez',ils:stem+'ent',elles:stem+'ent'};return f[s]||null;}if(t==='imparfait')return stem+END.imparfait[s];if(t==='futur simple')return future+END.futur[s];if(t==='conditionnel présent')return future+END.cond[s];if(t==='subjonctif présent')return stem+END.subj[s];if(t==='impératif présent'){if(!IMP.includes(s))return null;return s==='tu'?stem+'s':stem+({nous:'ons',vous:'ez'}[s]);}return null;}
-  function vivre(v,s,t){const stem=v.replace(/vivre$/,'viv'),future=v.replace(/vivre$/,'vivr');if(t==="présent de l'indicatif"){const f={je:stem+'s',tu:stem+'s',il:stem+'t',elle:stem+'t',on:stem+'t',nous:stem+'ons',vous:stem+'ez',ils:stem+'ent',elles:stem+'ent'};return f[s]||null;}if(t==='imparfait')return stem+END.imparfait[s];if(t==='futur simple')return future+END.futur[s];if(t==='conditionnel présent')return future+END.cond[s];if(t==='subjonctif présent')return stem+END.subj[s];if(t==='impératif présent'){if(!IMP.includes(s))return null;return s==='tu'?stem+'s':stem+({nous:'ons',vous:'ez'}[s]);}return null;}
-  function conduire(v,s,t){const stem=v.replace(/re$/,''),presentStem=stem+'s',future=stem+'r';if(t==="présent de l'indicatif"){const f={je:presentStem,tu:presentStem,il:stem+'t',elle:stem+'t',on:stem+'t',nous:presentStem+'ons',vous:presentStem+'ez',ils:presentStem+'ent',elles:presentStem+'ent'};return f[s]||null;}if(t==='imparfait')return presentStem+END.imparfait[s];if(t==='futur simple')return future+END.futur[s];if(t==='conditionnel présent')return future+END.cond[s];if(t==='subjonctif présent')return presentStem+END.subj[s];if(t==='impératif présent'){if(!IMP.includes(s))return null;return s==='tu'?presentStem:presentStem+({nous:'ons',vous:'ez'}[s]);}return null;}
-  function courir(v,s,t){const present=v.replace(/courir$/,'cour'),future=v.replace(/courir$/,'courr');if(t==="présent de l'indicatif"){const f={je:present+'s',tu:present+'s',il:present+'t',elle:present+'t',on:present+'t',nous:present+'ons',vous:present+'ez',ils:present+'ent',elles:present+'ent'};return f[s]||null;}if(t==='imparfait')return present+END.imparfait[s];if(t==='futur simple')return future+END.futur[s];if(t==='conditionnel présent')return future+END.cond[s];if(t==='subjonctif présent')return present+END.subj[s];if(t==='impératif présent'){if(!IMP.includes(s))return null;return s==='tu'?present+'s':present+({nous:'ons',vous:'ez'}[s]);}return null;}
-  function mourir(v,s,t){const present=v.replace(/mourir$/,'mour'),future=v.replace(/mourir$/,'mourr');if(t==="présent de l'indicatif"){const f={je:'meurs',tu:'meurs',il:'meurt',elle:'meurt',on:'meurt',nous:'mourons',vous:'mourez',ils:'meurent',elles:'meurent'};return f[s]||null;}if(t==='imparfait')return present+END.imparfait[s];if(t==='futur simple')return future+END.futur[s];if(t==='conditionnel présent')return future+END.cond[s];if(t==='subjonctif présent'){const f={je:'meure',tu:'meures',il:'meure',elle:'meure',on:'meure',nous:'mourions',vous:'mouriez',ils:'meurent',elles:'meurent'};return f[s]||null;}if(t==='impératif présent'){if(!IMP.includes(s))return null;return s==='tu'?'meurs':s==='nous'?'mourons':'mourez';}return null;}
-  function croire(v,s,t){const stem=v.replace(/croire$/,'croi'),future=v.replace(/croire$/,'croir');if(t==="présent de l'indicatif"){const f={je:'crois',tu:'crois',il:'croit',elle:'croit',on:'croit',nous:'croyons',vous:'croyez',ils:'croient',elles:'croient'};return f[s]||null;}if(t==='imparfait'){const f={je:'croyais',tu:'croyais',il:'croyait',elle:'croyait',on:'croyait',nous:'croyions',vous:'croyiez',ils:'croyaient',elles:'croyaient'};return f[s]||null;}if(t==='futur simple')return future+END.futur[s];if(t==='conditionnel présent')return future+END.cond[s];if(t==='subjonctif présent'){const f={je:'croie',tu:'croies',il:'croie',elle:'croie',on:'croie',nous:'croyions',vous:'croyiez',ils:'croient',elles:'croient'};return f[s]||null;}if(t==='impératif présent'){if(!IMP.includes(s))return null;return s==='tu'?'crois':s==='nous'?'croyons':'croyez';}return null;}
-  function recevoir(v,s,t){const stem=v.replace(/recevoir$/,'recev'),present=v.replace(/recevoir$/,'reç'),future=v.replace(/recevoir$/,'recevr');if(t==="présent de l'indicatif"){const f={je:present+'ois',tu:present+'ois',il:present+'oit',elle:present+'oit',on:present+'oit',nous:stem+'ons',vous:stem+'ez',ils:present+'oivent',elles:present+'oivent'};return f[s]||null;}if(t==='imparfait')return stem+END.imparfait[s];if(t==='futur simple')return future+END.futur[s];if(t==='conditionnel présent')return future+END.cond[s];if(t==='subjonctif présent'){const f={je:'reçoive',tu:'reçoives',il:'reçoive',elle:'reçoive',on:'reçoive',nous:'recevions',vous:'receviez',ils:'reçoivent',elles:'reçoivent'};return f[s]||null;}if(t==='impératif présent'){if(!IMP.includes(s))return null;return s==='tu'?'reçois':s==='nous'?'recevons':'recevez';}return null;}
-  const families={mettre:{pattern:'mettre-type',aux:'avoir',pp:'mis'},remettre:{pattern:'mettre-type',aux:'avoir',pp:'remis'},permettre:{pattern:'mettre-type',aux:'avoir',pp:'permis'},promettre:{pattern:'mettre-type',aux:'avoir',pp:'promis'},admettre:{pattern:'mettre-type',aux:'avoir',pp:'admis'},transmettre:{pattern:'mettre-type',aux:'avoir',pp:'transmis'},soumettre:{pattern:'mettre-type',aux:'avoir',pp:'soumis'},lire:{pattern:'lire-type',aux:'avoir',pp:'lu'},relire:{pattern:'lire-type',aux:'avoir',pp:'relu'},rire:{pattern:'rire-type',aux:'avoir',pp:'ri'},sourire:{pattern:'rire-type',aux:'avoir',pp:'souri'},vivre:{pattern:'vivre-type',aux:'avoir',pp:'vécu'},revivre:{pattern:'vivre-type',aux:'avoir',pp:'revécu'},survivre:{pattern:'vivre-type',aux:'avoir',pp:'survécu'},conduire:{pattern:'conduire-type',aux:'avoir',pp:'conduit'},traduire:{pattern:'conduire-type',aux:'avoir',pp:'traduit'},produire:{pattern:'conduire-type',aux:'avoir',pp:'produit'},construire:{pattern:'conduire-type',aux:'avoir',pp:'construit'},détruire:{pattern:'conduire-type',aux:'avoir',pp:'détruit'},réduire:{pattern:'conduire-type',aux:'avoir',pp:'réduit'},cuire:{pattern:'conduire-type',aux:'avoir',pp:'cuit'},courir:{pattern:'courir-type',aux:'avoir',pp:'couru'},accourir:{pattern:'courir-type',aux:'avoir',pp:'accouru'},recourir:{pattern:'courir-type',aux:'avoir',pp:'recouru'},mourir:{pattern:'mourir-type',aux:'être',pp:'mort'},croire:{pattern:'croire-type',aux:'avoir',pp:'cru'},recevoir:{pattern:'recevoir-type',aux:'avoir',pp:'reçu'}};
-  const patterns={'mettre-type':{groupe:3,description:'Famille mettre : alternance mett- au présent/imparfait y mettr- al futur',fn:mettre},'lire-type':{groupe:3,description:'Famille lire : lis- au présent y lis- aux tiempos derivados',fn:lire},'rire-type':{groupe:3,description:'Famille rire : ri- au présent y rir- al futur',fn:rire},'vivre-type':{groupe:3,description:'Famille vivre : viv- au présent/imparfait y vivr- al futur',fn:vivre},'conduire-type':{groupe:3,description:'Famille en -UIRE : conduis-/conduir- y mismo modelo para derivados',fn:conduire},'courir-type':{groupe:3,description:'Famille courir : cour- au présent y courr- al futur',fn:courir},'mourir-type':{groupe:3,description:'Verbe mourir : alternancia meurs-/mour-/meurent',fn:mourir},'croire-type':{groupe:3,description:'Famille croire : crois-/croy- au présent et croir- au futur',fn:croire},'recevoir-type':{groupe:3,description:'Famille recevoir : reçois-/recev- au présent et recevr- au futur',fn:recevoir}};
-  function ensure(){const verbs=window.COQ_VERBS||(window.COQ_VERBS={});Object.keys(families).forEach(function(k){const x=families[k];if(!verbs[k])verbs[k]={id:k,infinitif:k,infinitif_base:k,groupe:3,pattern:x.pattern,auxiliaire:x.aux,pronominal:false,participePasse:x.pp,construction:'non-pronominale',verbeBase:k};else{verbs[k].pattern=x.pattern;verbs[k].auxiliaire=x.aux;verbs[k].participePasse=x.pp;}});window.COQ_VERB_PATTERNS=window.COQ_VERB_PATTERNS||{};Object.keys(patterns).forEach(k=>{window.COQ_VERB_PATTERNS[k]={groupe:patterns[k].groupe,description:patterns[k].description};});const utils=window.COQ_CONJ_UTILS;if(utils){Object.assign(utils.conjugations,verbs);Object.assign(utils.verbMeta,verbs);}}
-  function form(v,t,s){const b=base(v),r=(window.COQ_VERBS||{})[b];if(!r||!SIMPLE.has(t))return null;const x=subj(s),registry=window.COQ_PATTERN_REGISTRY;if(registry){const generated=registry.generate(r.pattern,b,x,t);if(generated!==null&&generated!==undefined)return generated;}const p=patterns[r.pattern];return p?p.fn(b,x,t):null;}
-  function install(){ensure();const e=window.COQ_CONJ_ENGINE;if(!e||e.__additionalFamiliesInstalled)return false;const oc=e.conjugate,or=e.rowsFor,ol=e.rowsForLookup,orc=e.rowsForConstruction;function is(v){const r=(window.COQ_VERBS||{})[base(v)];return r&&patterns[r.pattern];}e.conjugate=function(v,t,s,c){const f=is(v)&&c!=='pronominale'?form(v,t,s):null;return f!==null?f:oc(v,t,s,c);};e.rowsFor=function(v,t){if(!is(v)||!SIMPLE.has(t))return or(v,t);const ss=t==='impératif présent'?IMP:SUBJECTS;return ss.map(s=>[s,form(v,t,s)]);};e.rowsForLookup=function(v,t){const rows=is(v)&&SIMPLE.has(t)?e.rowsFor(v,t):ol(v,t);if(t!=='subjonctif présent')return rows;return rows.map(r=>[PREFIX[subj(r[0])]||r[0],r[1]]);};e.rowsForConstruction=function(v,t,c){if(is(v)&&SIMPLE.has(t)&&c!=='pronominale')return e.rowsFor(v,t);return orc(v,t,c);};e.__additionalFamiliesInstalled=true;window.COQ_ADDITIONAL_FAMILY_REGRESSION={mettre:{je:'mets',nous:'mettons',ils:'mettent',futur:'mettrai',subjonctif:'mette'},lire:{je:'lis',nous:'lisons',ils:'lisent',futur:'lirai',subjonctif:'lise'},rire:{je:'ris',nous:'rions',ils:'rient',futur:'rirai',subjonctif:'rie'},vivre:{je:'vis',nous:'vivons',ils:'vivent',futur:'vivrai',subjonctif:'vive'},conduire:{je:'conduis',nous:'conduisons',ils:'conduisent',futur:'conduirai',subjonctif:'conduise'},courir:{je:'cours',nous:'courons',ils:'courent',futur:'courrai',subjonctif:'coure'},mourir:{je:'meurs',nous:'mourons',ils:'meurent',futur:'mourrai',subjonctif:'meure'},croire:{je:'crois',nous:'croyons',ils:'croient',futur:'croirai',subjonctif:'croie'},recevoir:{je:'reçois',nous:'recevons',ils:'reçoivent',futur:'recevrai',subjonctif:'reçoive'}};return true;}
-  function wait(n){ensure();if(!install()&&(n||0)<100)setTimeout(()=>wait((n||0)+1),25);}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>wait(0));else wait(0);
+  const FAMILY_VERBS={
+    'mettre-type':{
+      mettre:{auxiliaire:'avoir',pp:'mis'},
+      remettre:{auxiliaire:'avoir',pp:'remis'},
+      permettre:{auxiliaire:'avoir',pp:'permis'},
+      promettre:{auxiliaire:'avoir',pp:'promis'},
+      admettre:{auxiliaire:'avoir',pp:'admis'},
+      transmettre:{auxiliaire:'avoir',pp:'transmis'},
+      soumettre:{auxiliaire:'avoir',pp:'soumis'}
+    },
+    'lire-type':{
+      lire:{auxiliaire:'avoir',pp:'lu'},
+      relire:{auxiliaire:'avoir',pp:'relu'}
+    },
+    'rire-type':{
+      rire:{auxiliaire:'avoir',pp:'ri'},
+      sourire:{auxiliaire:'avoir',pp:'souri'}
+    },
+    'vivre-type':{
+      vivre:{auxiliaire:'avoir',pp:'vécu'},
+      revivre:{auxiliaire:'avoir',pp:'revécu'},
+      survivre:{auxiliaire:'avoir',pp:'survécu'}
+    },
+    'conduire-type':{
+      conduire:{auxiliaire:'avoir',pp:'conduit'},
+      traduire:{auxiliaire:'avoir',pp:'traduit'},
+      produire:{auxiliaire:'avoir',pp:'produit'},
+      construire:{auxiliaire:'avoir',pp:'construit'},
+      détruire:{auxiliaire:'avoir',pp:'détruit'},
+      réduire:{auxiliaire:'avoir',pp:'réduit'},
+      cuire:{auxiliaire:'avoir',pp:'cuit'}
+    },
+    'courir-type':{
+      courir:{auxiliaire:'avoir',pp:'couru'},
+      accourir:{auxiliaire:'avoir',pp:'accouru'},
+      recourir:{auxiliaire:'avoir',pp:'recouru'}
+    },
+    'mourir-type':{
+      mourir:{auxiliaire:'être',pp:'mort'}
+    },
+    'croire-type':{
+      croire:{auxiliaire:'avoir',pp:'cru'}
+    },
+    'recevoir-type':{
+      recevoir:{auxiliaire:'avoir',pp:'reçu'}
+    }
+  };
+
+  const PATTERN_META={
+    'mettre-type':{groupe:3,description:'Famille mettre'},
+    'lire-type':{groupe:3,description:'Famille lire'},
+    'rire-type':{groupe:3,description:'Famille rire'},
+    'vivre-type':{groupe:3,description:'Famille vivre'},
+    'conduire-type':{groupe:3,description:'Famille en -UIRE'},
+    'courir-type':{groupe:3,description:'Famille courir'},
+    'mourir-type':{groupe:3,description:'Verbe mourir'},
+    'croire-type':{groupe:3,description:'Famille croire'},
+    'recevoir-type':{groupe:3,description:'Famille recevoir'}
+  };
+
+  window.COQ_VERB_PATTERNS=window.COQ_VERB_PATTERNS||{};
+  Object.keys(PATTERN_META).forEach(function(pattern){
+    window.COQ_VERB_PATTERNS[pattern]=PATTERN_META[pattern];
+  });
+
+  function ensureRecord(verb,pattern,meta){
+    const verbs=window.COQ_VERBS||(window.COQ_VERBS={});
+    const existing=verbs[verb];
+    if(existing){
+      existing.pattern=pattern;
+      if(meta.auxiliaire)existing.auxiliaire=meta.auxiliaire;
+      if(meta.pp)existing.participePasse=meta.pp;
+      return existing;
+    }
+    return verbs[verb]={
+      id:verb,
+      infinitif:verb,
+      infinitif_base:verb,
+      groupe:3,
+      pattern:pattern,
+      auxiliaire:meta.auxiliaire||'avoir',
+      pronominal:false,
+      participePasse:meta.pp||'',
+      construction:'non-pronominale',
+      verbeBase:verb
+    };
+  }
+
+  function register(){
+    Object.keys(FAMILY_VERBS).forEach(function(pattern){
+      const family=FAMILY_VERBS[pattern];
+      Object.keys(family).forEach(function(verb){ensureRecord(verb,pattern,family[verb]);});
+    });
+    const verbs=window.COQ_VERBS||{};
+    const utils=window.COQ_CONJ_UTILS;
+    if(utils){
+      Object.assign(utils.conjugations,verbs);
+      Object.assign(utils.verbMeta,verbs);
+    }
+  }
+
+  function waitForRegistry(){
+    register();
+    if(!window.COQ_PATTERN_REGISTRY&&(waitForRegistry.attempts||0)<100){
+      waitForRegistry.attempts=(waitForRegistry.attempts||0)+1;
+      setTimeout(waitForRegistry,25);
+    }
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',waitForRegistry);else waitForRegistry();
+  window.COQ_FAMILY_METADATA=window.COQ_FAMILY_METADATA||{};
+  window.COQ_FAMILY_METADATA.register=register;
+  window.COQ_FAMILY_METADATA.patterns=PATTERN_META;
+  window.COQ_FAMILY_METADATA.families=FAMILY_VERBS;
 })();
