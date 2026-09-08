@@ -39,4 +39,11 @@
   };
 
   window.COQ_CONJ_UTILS=api;
+
+  // patterns.js se carga antes que este módulo. En ese momento todavía no
+  // existe COQ_CONJ_UTILS y el resolver no puede instalar sus vistas Proxy.
+  // Reintentamos aquí, una vez creado el catálogo consumido por la UI.
+  if(window.COQ_PATTERN_RESOLVER&&typeof window.COQ_PATTERN_RESOLVER.installResolverViews==='function'){
+    window.COQ_PATTERN_RESOLVER.installResolverViews(api);
+  }
 })();
