@@ -3,6 +3,7 @@
 (function(){
   const verbs=window.COQ_VERBS||(window.COQ_VERBS={});
   const families={
+    'être':{être:['été','avoir']},
     'partir-type':{
       partir:['parti','être'], sortir:['sorti','être'], dormir:['dormi','avoir'], servir:['servi','avoir']
     },
@@ -44,12 +45,10 @@
   Object.keys(families).forEach(pattern=>{
     Object.keys(families[pattern]).forEach(infinitif=>{
       if(verbs[infinitif]){
-        // Las familias son la autoridad para la asignación de patrones.
-        // Esto corrige los nombres de patrón heredados (p. ej. "venir")
-        // para que el motor utilice siempre el registro central ("venir-type").
+        // Las familias son la autoridad para la asignación de patrones y metadatos comunes.
         verbs[infinitif].pattern=pattern;
-        verbs[infinitif].auxiliaire=verbs[infinitif].auxiliaire||families[pattern][infinitif][1];
-        verbs[infinitif].participePasse=verbs[infinitif].participePasse||families[pattern][infinitif][0];
+        verbs[infinitif].auxiliaire=families[pattern][infinitif][1];
+        verbs[infinitif].participePasse=families[pattern][infinitif][0];
         return;
       }
       const [participePasse,auxiliaire]=families[pattern][infinitif];
