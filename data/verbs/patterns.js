@@ -23,37 +23,57 @@ window.COQ_VERB_PATTERNS={
   const verbs=window.COQ_VERBS||{};
   const patterns=window.COQ_VERB_PATTERNS;
   function normalize(value){return String(value||'').trim().toLowerCase();}
+  function isPronominal(verb){return normalize(verb).startsWith('se ');}
   function baseVerb(verb){
     const key=normalize(verb),record=verbs[key];
     if(record&&record.verbeBase&&verbs[normalize(record.verbeBase)])return normalize(record.verbeBase);
-    if(key.startsWith('se '))return key.slice(3).trim();
+    if(isPronominal(key))return key.slice(3).trim();
     return key;
   }
   function resolvePattern(verb){
     const key=normalize(verb);
     const base=baseVerb(key);
     const record=verbs[key]||verbs[base];
+    if(record&&record.pattern&&patterns[record.pattern])return record.pattern;
     if(/ger$/.test(base))return'er-ger';
     if(/cer$/.test(base))return'er-cer';
     if(/yer$/.test(base))return'yer';
     if(/eler$/.test(base))return'er-eler';
     if(/eter$/.test(base))return'er-eter';
-    if(record&&record.pattern&&patterns[record.pattern])return record.pattern;
     if(/er$/.test(base))return'regular-er';
-    if(/ir$/.test(base))return'regular-ir';
-    if(/re$/.test(base))return'regular-re';
     return null;
   }
   function inferParticiple(verb,pattern){
     const base=baseVerb(verb);
     if(pattern==='regular-er'||pattern==='er-ger'||pattern==='er-cer'||pattern==='er-eler'||pattern==='er-eter'||pattern==='yer'||pattern==='er-e-accent')return base.replace(/er$/,'é');
-    if(pattern==='regular-ir')return base.replace(/ir$/,'i');
-    if(pattern==='regular-re')return base.replace(/re$/,'u');
     return null;
   }
+  function derivedPronominalRecord(key,base,known){
+    const pattern=resolvePattern(base);
+    if(!known&&!pattern)return null;
+    return {
+      id:key,
+      infinitif:key,
+      infinitif_base:base,
+      groupe:known.groupe,
+      pattern:pattern,
+      auxiliaire:'être',
+      pronominal:true,
+      construction:'pronominale',
+      verbeBase:base,
+      participePasse:known.participePasse||inferParticiple(base,pattern),
+      formePronominale:key,
+      _inferred:true,
+      _derivedFrom:base
+    };
+  }
   function resolveRecord(verb){
-    const key=normalize(verb),base=baseVerb(key),known=verbs[key]||verbs[base];
+    const key=normalize(verb),base=baseVerb(key),pronominal=isPronominal(key),known=verbs[key];
     if(known)return known;
+    if(pronominal){
+      const baseRecord=verbs[base];
+      if(baseRecord)return derivedPronominalRecord(key,base,baseRecord);
+    }
     const pattern=resolvePattern(key);
     if(!pattern||!patterns[pattern])return null;
     const meta=patterns[pattern];
@@ -64,8 +84,8 @@ window.COQ_VERB_PATTERNS={
       groupe:meta.groupe,
       pattern,
       auxiliaire:'avoir',
-      pronominal:key.startsWith('se '),
-      construction:key.startsWith('se ')?'pronominale':'non-pronominale',
+      pronominal:false,
+      construction:'non-pronominale',
       verbeBase:base,
       participePasse:inferParticiple(key,pattern),
       formePronominale:null,
