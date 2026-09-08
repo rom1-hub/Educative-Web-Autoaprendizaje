@@ -29,10 +29,11 @@
     const r=meta(verb),pp=String(r.participePasse||'').trim();
     if(!pp)return value;
     const raw=normalizeSubject(subject),base=baseSubject(subject);
-    if(base==='on'){
-      const generic=value.replace(new RegExp(pp+'[es]*$'),'');
-      return generic+pp+'(e)(s)';
-    }
+    const withoutMarkers=value.replace(/\(e\)\(s\)|\(e\)s|\(e\)/g,'');
+    const ppIndex=withoutMarkers.lastIndexOf(pp);
+    if(ppIndex===-1)return value;
+    const prefix=withoutMarkers.slice(0,ppIndex);
+    if(base==='on')return prefix+pp+'(e)(s)';
     const contextBySubject={
       je:{gender:'masculin',number:'singulier'},
       tu:{gender:'masculin',number:'singulier'},
@@ -49,10 +50,7 @@
     }[raw];
     if(!contextBySubject)return value;
     const agreed=A&&typeof A.agree==='function'?A.agree(pp,contextBySubject,{type:r.pronominal?'pronominale':'non-pronominale',baseVerb:r.verbeBase||verb,auxiliaire:r.auxiliaire}):pp;
-    const candidates=[pp,pp+'e',pp+'s',pp+'es'].sort((a,b)=>b.length-a.length);
-    const matched=candidates.find(candidate=>value.endsWith(candidate));
-    if(!matched)return value;
-    return value.slice(0,-matched.length)+agreed;
+    return prefix+agreed;
   }
   function normalizedRows(rows,tense,verb){
     const output=[];
