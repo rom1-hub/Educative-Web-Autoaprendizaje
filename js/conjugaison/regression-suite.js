@@ -17,11 +17,13 @@
   function run(){
     const engine=window.COQ_CONJ_ENGINE;
     const registry=window.COQ_PATTERN_REGISTRY;
+    const resolver=window.COQ_PATTERN_RESOLVER;
     const presentation=window.COQ_TABLE_PRESENTATION;
     const results=[];
     if(!engine)return [{name:'motor disponible',actual:'ausente',expected:'presente',ok:false}];
     if(!registry)return [{name:'registro disponible',actual:'ausente',expected:'presente',ok:false}];
     assertTruthy('registro expone generate()',typeof registry.generate==='function',results);
+    assertTruthy('resolutor expone resolveRecord()',resolver&&typeof resolver.resolveRecord==='function',results);
     assertTruthy('motor expone conjugate()',typeof engine.conjugate==='function',results);
     assertTruthy('motor expone rowsForLookup()',typeof engine.rowsForLookup==='function',results);
     assertTruthy('presentación central disponible',presentation&&typeof presentation.normalizeTable==='function',results);
@@ -39,6 +41,23 @@
     simple.forEach(function(item){
       const actual=engine.conjugate(item[0],item[1],item[2],'non-pronominale');
       assert(item[0]+' · '+item[1]+' · '+item[2],actual,item[3],results);
+    });
+
+    const inferred=[
+      ['parler',"présent de l'indicatif",'je','parle'],
+      ['parler','futur simple','nous','parlerons'],
+      ['finir',"présent de l'indicatif",'nous','finissons'],
+      ['finir','subjonctif présent','ils','finissent'],
+      ['vendre',"présent de l'indicatif",'ils','vendent'],
+      ['vendre','imparfait','je','vendais'],
+      ['parler','passé composé','je (masculin singulier)','ai parlé'],
+      ['finir','plus-que-parfait','elle (féminin singulier)','avait fini'],
+      ['vendre','futur antérieur','elles','auront vendu'],
+      ['se parler','passé composé','je (masculin singulier)','me suis parlé']
+    ];
+    inferred.forEach(function(item){
+      const actual=engine.conjugate(item[0],item[1],item[2],item[0].startsWith('se ')?'pronominale':'non-pronominale');
+      assert('verbe inféré · '+item[0]+' · '+item[1]+' · '+item[2],actual,item[3],results);
     });
 
     const compounds=[
