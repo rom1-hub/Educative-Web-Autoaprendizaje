@@ -14,15 +14,12 @@
   function baseSubject(value){return stripMetadata(value).replace(/^que\s+/i,'').replace(/^qu['’]/i,'').trim().toLowerCase();}
   function elideJe(label,form){const subject=normalizeSubject(label),value=String(form||'').trim();if(subject==='je'&&VOWELS.test(value))return "j'";if(subject==='que je'&&VOWELS.test(value))return "que j'";return label;}
   function addSubjonctifPrefix(label,form){const raw=String(label||'').trim(),base=baseSubject(raw),prefix={je:'que je',tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"}[base];if(!prefix)return raw;if(/^que\s|^qu['’]/i.test(raw))return elideJe(raw,form);return elideJe(prefix,form);}
-  function agreementSensitive(verb){const m=meta(verb);return m.pronominal===true||m.construction==='pronominale'||m.auxiliaire==='être';}
-  function expandSubjects(label,form,tense,verb){
+  function expandSubjects(label,form,tense){
     const raw=String(label||'').trim(),base=baseSubject(raw);
-    let subjects=base==='il/elle/on'?['il','elle','on']:base==='ils/elles'?['ils','elles']:[raw];
-    if(isCompound(tense)&&agreementSensitive(verb)&&base==='vous'){
-      subjects=['vous (masculin singulier)','vous (féminin singulier)','vous (masculin pluriel)','vous (féminin pluriel)'];
-    }
+    const subjects=base==='il/elle/on'?['il','elle','on']:base==='ils/elles'?['ils','elles']:[raw];
     return subjects.map(subject=>tense==='subjonctif présent'||tense==='subjonctif passé'?addSubjonctifPrefix(subject,form):elideJe(subject,form));
   }
+  function agreementSensitive(verb){const m=meta(verb);return m.pronominal===true||m.construction==='pronominale'||m.auxiliaire==='être';}
   function compoundDisplayForm(form,subject,verb){
     const value=String(form||'');
     if(!agreementSensitive(verb))return value;
@@ -33,21 +30,14 @@
     const ppIndex=withoutMarkers.lastIndexOf(pp);
     if(ppIndex===-1)return value;
     const prefix=withoutMarkers.slice(0,ppIndex);
-    if(base==='on')return prefix+pp+'(e)(s)';
+    const genericNotation={je:'(e)',tu:'(e)',on:'(e)(s)',nous:'(e)s',vous:'(e)(s)'}[base];
+    if(genericNotation)return prefix+pp+genericNotation;
     const contextBySubject={
-      je:{gender:'masculin',number:'singulier'},
-      tu:{gender:'masculin',number:'singulier'},
       il:{gender:'masculin',number:'singulier'},
       elle:{gender:'féminin',number:'singulier'},
-      nous:{gender:'masculin',number:'pluriel'},
-      'vous (masculin singulier)':{gender:'masculin',number:'singulier'},
-      'vous (féminin singulier)':{gender:'féminin',number:'singulier'},
-      'vous (masculin pluriel)':{gender:'masculin',number:'pluriel'},
-      'vous (féminin pluriel)':{gender:'féminin',number:'pluriel'},
-      vous:null,
       ils:{gender:'masculin',number:'pluriel'},
       elles:{gender:'féminin',number:'pluriel'}
-    }[raw];
+    }[base];
     if(!contextBySubject)return value;
     const agreed=A&&typeof A.agree==='function'?A.agree(pp,contextBySubject,{type:r.pronominal?'pronominale':'non-pronominale',baseVerb:r.verbeBase||verb,auxiliaire:r.auxiliaire}):pp;
     return prefix+agreed;
@@ -57,7 +47,7 @@
     (rows||[]).forEach(row=>{
       const form=String(row?.[1]??'').trim();if(!form)return;
       const rawSubject=String(row?.[0]||'').trim();
-      expandSubjects(rawSubject,form,tense,verb).forEach(subject=>output.push([subject,isCompound(tense)?compoundDisplayForm(form,subject,verb):form]));
+      expandSubjects(rawSubject,form,tense).forEach(subject=>output.push([subject,isCompound(tense)?compoundDisplayForm(form,subject,verb):form]));
     });
     return output;
   }
