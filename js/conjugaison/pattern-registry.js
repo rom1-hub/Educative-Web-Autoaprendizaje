@@ -145,6 +145,25 @@
     return null;
   }
 
+  function allerType(inf,s,tense){
+    if(tense==="présent de l'indicatif"){
+      const forms={je:'vais',tu:'vas',il:'va',elle:'va',on:'va',nous:'allons',vous:'allez',ils:'vont',elles:'vont'};
+      return forms[s]||null;
+    }
+    if(tense==='imparfait')return 'all'+imparfait[s];
+    if(tense==='futur simple')return 'ir'+futur[s];
+    if(tense==='conditionnel présent')return 'ir'+conditionnel[s];
+    if(tense==='subjonctif présent'){
+      const stem=['je','tu','il','elle','on','ils','elles'].includes(s)?'aill':'all';
+      return stem+subjonctif[s];
+    }
+    if(tense==='impératif présent'){
+      if(!imperativeSubjects.includes(s))return null;
+      return s==='tu'?'va':s==='nous'?'allons':'allez';
+    }
+    return null;
+  }
+
   const definitions={
     'regular-er':{groupe:1,description:'Premier groupe régulier en -ER',generate:(inf,s,t)=>simpleGenerator(inf,s,t,'regular-er')},
     'regular-ir':{groupe:2,description:'Deuxième groupe régulier en -IR',generate:(inf,s,t)=>simpleGenerator(inf,s,t,'regular-ir')},
@@ -157,7 +176,8 @@
     'suivre-type':{groupe:3,description:'Famille suivre : radical sui-/suiv-',generate:suivreType},
     'ouvrir-type':{groupe:3,description:'Famille ouvrir : présent en -e/-es/-e, pluriel en -ons/-ez/-ent',generate:ouvrirType},
     'venir-type':{groupe:3,description:'Famille venir : alternance vien-/ven- au présent et viendr- au futur',generate:venirType},
-    'tenir-type':{groupe:3,description:'Famille tenir : alternance tien-/ten- au présent et tiendr- au futur',generate:tenirType}
+    'tenir-type':{groupe:3,description:'Famille tenir : alternance tien-/ten- au présent et tiendr- au futur',generate:tenirType},
+    'aller-type':{groupe:3,description:'Verbe aller : vais-/all-/aill- au présent, imparfait et subjonctif',generate:allerType}
   };
 
   function get(pattern){return definitions[pattern]||null;}
