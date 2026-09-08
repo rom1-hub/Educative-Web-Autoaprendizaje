@@ -1,4 +1,6 @@
-/* COQ — Resumen de práctica responsive en móvil. */
+/* COQ — Responsive de Conjugaison en móvil. */
+@import url("./conjugaison-mobile.css");
+
 @media (max-width:700px){
   .result-modal{padding:10px;align-items:center}
   .result-window{width:100%;max-width:100%;max-height:calc(100vh - 20px);padding:16px;border-radius:20px;overflow-y:auto;overflow-x:hidden}
