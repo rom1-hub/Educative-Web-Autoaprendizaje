@@ -4,7 +4,17 @@
   const conjugations=U.conjugations, verbGroups=U.verbGroups, verbMeta=U.verbMeta;
   const resolver=window.COQ_PATTERN_RESOLVER;
   const engine=window.COQ_CONJ_ENGINE;
+  const C=window.COQ_CONJ_COMPOUND;
+  const constructions=window.COQ_COMPOUND_CONSTRUCTION_FILTERS||{};
   const getRecord=v=>verbMeta[v]||((resolver&&typeof resolver.resolveRecord==='function')?resolver.resolveRecord(v):null);
+  const compoundTenses=C?.compoundTenses||[];
+  const simpleTenses=C?.simpleTenses||[];
+  const allTenses=C?.allTenses||[];
+  const SUBJECT_VARIANTS={
+    je:['je (féminin singulier)','je (masculin singulier)'],tu:['tu (féminin singulier)','tu (masculin singulier)'],il:['il'],elle:['elle'],
+    on:['on (masculin singulier)','on (masculin pluriel)','on (féminin pluriel)'],nous:['nous (masculin pluriel)','nous (féminin pluriel)'],
+    vous:['vous (masculin singulier)','vous (féminin singulier)','vous (masculin pluriel)','vous (féminin pluriel)'],ils:['ils'],elles:['elles']
+  };
   let session={questions:[],index:0,correct:0,results:[],locked:false};
 
   function matchesGroup(v,group){
@@ -46,7 +56,7 @@
       if(matchesGroup(v,group)===false)return;
       if(!matchesConstruction(v,construction))return;
       const data=conjugations[v]||{};
-      const ts=tense==='Todos los tiempos'?Array.from(new Set([...Object.keys(data),...simpleTenses,...compoundTenses])):[tense];
+      const ts=tense==='Todos los tiempos'?Array.from(new Set([...Object.keys(data),...allTenses])):[tense];
       ts.forEach(t=>{
         const hasExplicit=!!data[t];
         const isSimple=simpleTenses.includes(t);
@@ -59,14 +69,9 @@
           rows=constructionRows.length?constructionRows:rows;
         }
         U.expandPracticeRows(rows).forEach(r=>{
-          const variants={
-            je:['je (féminin singulier)','je (masculin singulier)'],tu:['tu (féminin singulier)','tu (masculin singulier)'],il:['il'],elle:['elle'],
-            on:['on (masculin singulier)','on (masculin pluriel)','on (féminin pluriel)'],nous:['nous (masculin pluriel)','nous (féminin pluriel)'],
-            vous:['vous (masculin singulier)','vous (féminin singulier)','vous (masculin pluriel)','vous (féminin pluriel)'],ils:['ils'],elles:['elles']
-          };
-          if(isCompound && variants[PSubject(String(r.subject||'').split(' (')[0].trim())] && engine&&engine.conjugate){
+          if(isCompound && SUBJECT_VARIANTS[PSubject(String(r.subject||'').split(' (')[0].trim())] && engine&&engine.conjugate){
             const baseSubject=PSubject(String(r.subject||'').split(' (')[0].trim());
-            variants[baseSubject].forEach(subject=>{
+            SUBJECT_VARIANTS[baseSubject].forEach(subject=>{
               const answer=engine.conjugate(v,t,subject,construction||((meta.pronominal)?'pronominale':'non-pronominale'));
               if(answer!=null)pushQuestion(pool,v,t,formatPracticeSubject(subject,t,true),answer);
             });
@@ -97,21 +102,28 @@
     while(selected.length<20&&reusable.length&&guard<200){const last=selected[selected.length-1]?.subject;const idx=reusable.findIndex(q=>q.subject!==last);const pick=idx>=0?reusable.splice(idx,1)[0]:reusable.shift();selected.push({...pick});guard++;if(!reusable.length)reusable.push(...U.shuffleArray(pool));}
     return selected.slice(0,20);
   }
-  const compoundTenses=['passé composé','plus-que-parfait','conditionnel passé','futur antérieur','subjonctif passé'];
-  const simpleTenses=["présent de l'indicatif",'impératif présent','imparfait','futur simple','conditionnel présent','subjonctif présent'];
 
   function formatPracticeSubject(subject,tense,isCompound){
     const raw=String(subject||'').trim(),base=PSubject(raw),compound=!!isCompound,isSubjonctif=tense==='subjonctif présent'||tense==='subjonctif passé';
-    let variants={};
-    if(compound)variants={je:['je (féminin singulier)','je (masculin singulier)'],tu:['tu (féminin singulier)','tu (masculin singulier)'],il:['il'],elle:['elle'],on:['on (masculin singulier)','on (masculin pluriel)','on (féminin pluriel)'],nous:['nous (masculin pluriel)','nous (féminin pluriel)'],vous:['vous (masculin singulier)','vous (féminin singulier)','vous (masculin pluriel)','vous (féminin pluriel)'],ils:['ils'],elles:['elles']};
+    const variants=compound?SUBJECT_VARIANTS:{};
     const cleanBase=base||raw,suffix=raw.match(/\s*(\([^)]*\))\s*$/)?.[1]||'';
     if(isSubjonctif){const prefix={je:'que je',tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"}[cleanBase];return prefix?prefix+(suffix?' '+suffix:''):raw;}
     return variants[cleanBase]?.includes(raw)?raw:(variants[cleanBase]?.[0]&&compound?variants[cleanBase][0]:raw);
   }
+
   function PSubject(subject){let raw=String(subject||'').trim().replace(/\s*\([^)]*\)\s*$/,'').trim().toLowerCase();raw=raw.replace(/^qu['’]/,'').replace(/^que\s+/,'');if(raw==="j'")return 'je';return raw;}
   function formatSubjonctifSubject(subject){const raw=String(subject||'').trim(),match=raw.match(/^([^\s(]+)(.*)$/);if(!match)return raw;const base=match[1].toLowerCase(),suffix=match[2]||'',prefix={"j'":"que j'",je:'que je',tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"}[base];return prefix?prefix+suffix:raw;}
   function matchesConstruction(v,construction){if(!construction)return true;const m=getRecord(v)||{};if(construction==='pronominale')return m.pronominal===true;if(construction==='non-pronominale')return m.pronominal!==true;return true;}
-  function matchesAuxiliary(v,tense,auxiliary){if(!auxiliary)return true;if(tense==='Todos los tiempos')return true;const m=getRecord(v)||{};if(!compoundTenses.includes(tense))return true;if(auxiliary==='avec-avoir')return m.auxiliaire==='avoir'&&!m.pronominal;if(auxiliary==='avec-etre')return m.auxiliaire==='être'&&!m.pronominal;if(auxiliary==='avec-avoir-et-etre')return m.auxiliaire==='avoir'||m.auxiliaire==='être';return true;}
+  function matchesAuxiliary(v,tense,auxiliary){
+    if(!auxiliary||tense==='Todos los tiempos')return true;
+    const m=getRecord(v)||{};
+    if(!compoundTenses.includes(tense))return true;
+    const filter=constructions[auxiliary];
+    if(!filter)return true;
+    if(filter.pronominal===true)return m.pronominal===true;
+    if(filter.pronominal===false&&m.pronominal===true)return false;
+    return Array.isArray(filter.auxiliaires)?filter.auxiliaires.includes(m.auxiliaire):true;
+  }
   function samePracticeAnswer(value,q){const normalize=U.normalizeAnswerText||function(s){return String(s??'').trim().toLocaleLowerCase().replace(/\s+/g,' ');};const input=normalize(value);if(!input)return false;const accepted=Array.isArray(q?.acceptedAnswers)&&q.acceptedAnswers.length?q.acceptedAnswers:[q?.displayAnswer||q?.answer];return accepted.map(normalize).filter(Boolean).includes(input);}
   function updatePracticeAuxiliaryOptions(){const tense=document.querySelector('#practiceTense')?.value,verb=U.normalizeVerb(document.querySelector('#practiceVerb')?.value),construction=document.querySelector('#practiceConstruction')?.value,aux=document.querySelector('#practiceAuxiliary'),help=document.querySelector('#practiceAuxiliaryHelp');if(!aux)return;aux.innerHTML='';let disabledReason='';if(verb)disabledReason='Déterminé par le verbe sélectionné';else if(construction==='pronominale')disabledReason='Non disponible pour les verbes pronominaux';else if(!tense||!compoundTenses.includes(tense))disabledReason=tense==='Todos los tiempos'?'Disponible uniquement lorsqu’un temps composé est sélectionné.':'Non disponible pour un temps simple';if(disabledReason){aux.disabled=true;const o=document.createElement('option');o.value='';o.selected=true;o.textContent=disabledReason;aux.appendChild(o);if(help){if(verb)help.textContent='Le verbe sélectionné détermine déjà le verbe auxiliaire dans Conjugaison.';else if(construction==='pronominale')help.textContent='La construction pronominale détermine l’auxiliaire dans Conjugaison.';else help.textContent=tense==='Todos los tiempos'?'Disponible uniquement lorsqu’un temps composé est sélectionné.':'Disponible uniquement avec un temps composé.';}return;}aux.disabled=false;[['','- sélectionner -'],['avec-avoir','Avec auxiliaire AVOIR'],['avec-etre','Avec auxiliaire ÊTRE'],['avec-avoir-et-etre','Avec auxiliaire AVOIR et ÊTRE']].forEach(([value,label])=>{const o=document.createElement('option');o.value=value;o.textContent=label;aux.appendChild(o);});if(help)help.textContent='Este filtro se aplica a todos los tiempos compuestos.';}
   function updatePracticeConstructionOptions(){const construction=document.querySelector('#practiceConstruction'),help=document.querySelector('#practiceConstructionHelp'),verb=U.normalizeVerb(document.querySelector('#practiceVerb')?.value);if(!construction)return;if(verb){const meta=getRecord(verb)||{},isPronominal=meta.pronominal===true||meta.construction==='pronominale'||/^se\s/.test(verb);construction.disabled=true;construction.innerHTML='<option value="'+(isPronominal?'pronominale':'non-pronominale')+'" selected>'+ (isPronominal?'Verbes pronominaux':'Verbes non pronominaux') +'</option>';if(help)help.textContent='Déterminée par le verbe sélectionné.';return;}construction.disabled=false;construction.innerHTML='<option value="" selected>-seleccionar-</option><option value="non-pronominale">Verbes non pronominaux</option><option value="pronominale">Verbes pronominaux</option>';if(help)help.textContent='Puedes elegir una construcción para afinar el ejercicio.';}
