@@ -109,7 +109,7 @@
     const stem=inf.replace(/ir$/,''),singular=stem.replace(/ven$/,'vien'),subjSingular=stem.replace(/ven$/,'vienn'),future=inf.replace(/enir$/,'iendr');
     if(tense==="présent de l'indicatif"){
       if(['je','tu','il','elle','on','ils','elles'].includes(s))return singular+{je:'s',tu:'s',il:'t',elle:'t',on:'t',nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];
-      return stem+{je:'s',tu:'s',il:'t',elle:'t',on:'t',nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];
+      return stem+{nous:'ons',vous:'ez'}[s];
     }
     if(tense==='imparfait')return stem+imparfait[s];
     if(tense==='futur simple')return future+futur[s];
@@ -120,7 +120,7 @@
     }
     if(tense==='impératif présent'){
       if(!imperativeSubjects.includes(s))return null;
-      return singular+{je:'s',tu:'s',il:'t',elle:'t',on:'t',nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];
+      return s==='tu'?singular+'s':stem+{nous:'ons',vous:'ez'}[s];
     }
     return null;
   }
@@ -128,8 +128,8 @@
   function tenirType(inf,s,tense){
     const stem=inf.replace(/ir$/,''),singular=stem.replace(/ten$/,'tien'),subjSingular=stem.replace(/ten$/,'tienn'),future=inf.replace(/enir$/,'iendr');
     if(tense==="présent de l'indicatif"){
-      if(['je','tu','il','elle','on','ils','elles'].includes(s))return singular+{je:'s',tu:'s',il:'t',elle:'t',on:'t',nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];
-      return stem+{je:'s',tu:'s',il:'t',elle:'t',on:'t',nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];
+      if(['je','tu','il','elle','on','ils','elles'].includes(s))return singular+{je:'s',tu:'s',il:'t',elle:'t',on:'t',ils:'ent',elles:'ent'}[s];
+      return stem+{nous:'ons',vous:'ez'}[s];
     }
     if(tense==='imparfait')return stem+imparfait[s];
     if(tense==='futur simple')return future+futur[s];
@@ -140,7 +140,7 @@
     }
     if(tense==='impératif présent'){
       if(!imperativeSubjects.includes(s))return null;
-      return singular+{je:'s',tu:'s',il:'t',elle:'t',on:'t',nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];
+      return s==='tu'?singular+'s':stem+{nous:'ons',vous:'ez'}[s];
     }
     return null;
   }
@@ -164,6 +164,129 @@
     return null;
   }
 
+  function mettreType(inf,s,tense){
+    const singular=inf.replace(/mettre$/,'met'),plural=inf.replace(/mettre$/,'mett'),futureStem=inf.replace(/mettre$/,'mettr');
+    if(tense==="présent de l'indicatif"){
+      const end={je:'s',tu:'s',il:'',elle:'',on:'',nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];
+      return (['je','tu','il','elle','on'].includes(s)?singular:plural)+end;
+    }
+    if(tense==='imparfait')return plural+imparfait[s];
+    if(tense==='futur simple')return futureStem+futur[s];
+    if(tense==='conditionnel présent')return futureStem+conditionnel[s];
+    if(tense==='subjonctif présent')return plural+subjonctif[s];
+    if(tense==='impératif présent')return imperativeSubjects.includes(s)?(s==='tu'?singular+'s':plural+({nous:'ons',vous:'ez'}[s])):null;
+    return null;
+  }
+
+  function lireType(inf,s,tense){
+    const stem=inf.replace(/re$/,''),subjStem=stem+'s';
+    if(tense==="présent de l'indicatif"){
+      const end={je:'s',tu:'s',il:'t',elle:'t',on:'t',nous:'sons',vous:'sez',ils:'sent',elles:'sent'}[s];
+      return stem+end;
+    }
+    if(tense==='imparfait')return stem+imparfait[s];
+    if(tense==='futur simple')return inf+futur[s];
+    if(tense==='conditionnel présent')return inf+conditionnel[s];
+    if(tense==='subjonctif présent')return subjStem+subjonctif[s];
+    if(tense==='impératif présent')return imperativeSubjects.includes(s)?(s==='tu'?stem+'s':stem+({nous:'sons',vous:'sez'}[s])):null;
+    return null;
+  }
+
+  function rireType(inf,s,tense){
+    const stem=inf.replace(/rire$/,'ri'),futureStem=inf.replace(/rire$/,'rir');
+    if(tense==="présent de l'indicatif"){
+      const end={je:'s',tu:'s',il:'t',elle:'t',on:'t',nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];
+      return stem+end;
+    }
+    if(tense==='imparfait')return stem+imparfait[s];
+    if(tense==='futur simple')return futureStem+futur[s];
+    if(tense==='conditionnel présent')return futureStem+conditionnel[s];
+    if(tense==='subjonctif présent')return stem+subjonctif[s];
+    if(tense==='impératif présent')return imperativeSubjects.includes(s)?(s==='tu'?stem+'s':stem+({nous:'ons',vous:'ez'}[s])):null;
+    return null;
+  }
+
+  function vivreType(inf,s,tense){
+    const stem=inf.replace(/vivre$/,'viv'),futureStem=inf.replace(/vivre$/,'vivr');
+    if(tense==="présent de l'indicatif"){
+      const end={je:'s',tu:'s',il:'t',elle:'t',on:'t',nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];
+      return stem+end;
+    }
+    if(tense==='imparfait')return stem+imparfait[s];
+    if(tense==='futur simple')return futureStem+futur[s];
+    if(tense==='conditionnel présent')return futureStem+conditionnel[s];
+    if(tense==='subjonctif présent')return stem+subjonctif[s];
+    if(tense==='impératif présent')return imperativeSubjects.includes(s)?(s==='tu'?stem+'s':stem+({nous:'ons',vous:'ez'}[s])):null;
+    return null;
+  }
+
+  function conduireType(inf,s,tense){
+    const stem=inf.replace(/re$/,''),presentStem=stem+'s',futureStem=stem+'r';
+    if(tense==="présent de l'indicatif"){
+      const end={je:'',tu:'',il:'t',elle:'t',on:'t',nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];
+      return (['je','tu'].includes(s)?presentStem:stem)+end;
+    }
+    if(tense==='imparfait')return presentStem+imparfait[s];
+    if(tense==='futur simple')return futureStem+futur[s];
+    if(tense==='conditionnel présent')return futureStem+conditionnel[s];
+    if(tense==='subjonctif présent')return presentStem+subjonctif[s];
+    if(tense==='impératif présent'){
+      if(!imperativeSubjects.includes(s))return null;
+      return s==='tu'?presentStem:presentStem+({nous:'ons',vous:'ez'}[s]);
+    }
+    return null;
+  }
+
+  function courirType(inf,s,tense){
+    const present=inf.replace(/courir$/,'cour'),futureStem=inf.replace(/courir$/,'courr');
+    if(tense==="présent de l'indicatif")return present+{je:'s',tu:'s',il:'t',elle:'t',on:'t',nous:'ons',vous:'ez',ils:'ent',elles:'ent'}[s];
+    if(tense==='imparfait')return present+imparfait[s];
+    if(tense==='futur simple')return futureStem+futur[s];
+    if(tense==='conditionnel présent')return futureStem+conditionnel[s];
+    if(tense==='subjonctif présent')return present+subjonctif[s];
+    if(tense==='impératif présent')return imperativeSubjects.includes(s)?(s==='tu'?present+'s':present+({nous:'ons',vous:'ez'}[s])):null;
+    return null;
+  }
+
+  function mourirType(inf,s,tense){
+    const present=inf.replace(/mourir$/,'mour'),futureStem=inf.replace(/mourir$/,'mourr');
+    if(tense==="présent de l'indicatif"){
+      const forms={je:'meurs',tu:'meurs',il:'meurt',elle:'meurt',on:'meurt',nous:'mourons',vous:'mourez',ils:'meurent',elles:'meurent'};
+      return forms[s]||null;
+    }
+    if(tense==='imparfait')return present+imparfait[s];
+    if(tense==='futur simple')return futureStem+futur[s];
+    if(tense==='conditionnel présent')return futureStem+conditionnel[s];
+    if(tense==='subjonctif présent'){
+      const forms={je:'meure',tu:'meures',il:'meure',elle:'meure',on:'meure',nous:'mourions',vous:'mouriez',ils:'meurent',elles:'meurent'};
+      return forms[s]||null;
+    }
+    if(tense==='impératif présent')return imperativeSubjects.includes(s)?(s==='tu'?'meurs':s==='nous'?'mourons':'mourez'):null;
+    return null;
+  }
+
+  function croireType(inf,s,tense){
+    const futureStem=inf.replace(/croire$/,'croir');
+    if(tense==="présent de l'indicatif")return {je:'crois',tu:'crois',il:'croit',elle:'croit',on:'croit',nous:'croyons',vous:'croyez',ils:'croient',elles:'croient'}[s]||null;
+    if(tense==='imparfait')return {je:'croyais',tu:'croyais',il:'croyait',elle:'croyait',on:'croyait',nous:'croyions',vous:'croyiez',ils:'croyaient',elles:'croyaient'}[s]||null;
+    if(tense==='futur simple')return futureStem+futur[s];
+    if(tense==='conditionnel présent')return futureStem+conditionnel[s];
+    if(tense==='subjonctif présent')return {je:'croie',tu:'croies',il:'croie',elle:'croie',on:'croie',nous:'croyions',vous:'croyiez',ils:'croient',elles:'croient'}[s]||null;
+    if(tense==='impératif présent')return imperativeSubjects.includes(s)?(s==='tu'?'crois':s==='nous'?'croyons':'croyez'):null;
+    return null;
+  }
+
+  function recevoirType(inf,s,tense){
+    const stem=inf.replace(/recevoir$/,'recev'),present=inf.replace(/recevoir$/,'reç'),futureStem=inf.replace(/recevoir$/,'recevr');
+    if(tense==="présent de l'indicatif")return {je:present+'ois',tu:present+'ois',il:present+'oit',elle:present+'oit',on:present+'oit',nous:stem+'ons',vous:stem+'ez',ils:present+'oivent',elles:present+'oivent'}[s]||null;
+    if(tense==='imparfait')return stem+imparfait[s];
+    if(tense==='futur simple')return futureStem+futur[s];
+    if(tense==='conditionnel présent')return futureStem+conditionnel[s];
+    if(tense==='subjonctif présent')return {je:'reçoive',tu:'reçoives',il:'reçoive',elle:'reçoive',on:'reçoive',nous:'recevions',vous:'receviez',ils:'reçoivent',elles:'reçoivent'}[s]||null;
+    if(tense==='impératif présent')return imperativeSubjects.includes(s)?(s==='tu'?'reçois':s==='nous'?'recevons':'recevez'):null;
+    return null;
+  }
+
   const definitions={
     'regular-er':{groupe:1,description:'Premier groupe régulier en -ER',generate:(inf,s,t)=>simpleGenerator(inf,s,t,'regular-er')},
     'regular-ir':{groupe:2,description:'Deuxième groupe régulier en -IR',generate:(inf,s,t)=>simpleGenerator(inf,s,t,'regular-ir')},
@@ -177,7 +300,16 @@
     'ouvrir-type':{groupe:3,description:'Famille ouvrir : présent en -e/-es/-e, pluriel en -ons/-ez/-ent',generate:ouvrirType},
     'venir-type':{groupe:3,description:'Famille venir : alternance vien-/ven- au présent et viendr- au futur',generate:venirType},
     'tenir-type':{groupe:3,description:'Famille tenir : alternance tien-/ten- au présent et tiendr- au futur',generate:tenirType},
-    'aller-type':{groupe:3,description:'Verbe aller : vais-/all-/aill- au présent, imparfait et subjonctif',generate:allerType}
+    'aller-type':{groupe:3,description:'Verbe aller : vais-/all-/aill- au présent, imparfait et subjonctif',generate:allerType},
+    'mettre-type':{groupe:3,description:'Famille mettre : mett- au présent/imparfait et mettr- au futur',generate:mettreType},
+    'lire-type':{groupe:3,description:'Famille lire : lis- au présent et aux temps dérivés',generate:lireType},
+    'rire-type':{groupe:3,description:'Famille rire : ri- au présent et rir- au futur',generate:rireType},
+    'vivre-type':{groupe:3,description:'Famille vivre : viv- au présent/imparfait et vivr- au futur',generate:vivreType},
+    'conduire-type':{groupe:3,description:'Famille en -UIRE : conduis-/conduir- et même modèle pour les dérivés',generate:conduireType},
+    'courir-type':{groupe:3,description:'Famille courir : cour- au présent et courr- au futur',generate:courirType},
+    'mourir-type':{groupe:3,description:'Verbe mourir : alternance meurs-/mour-/meurent',generate:mourirType},
+    'croire-type':{groupe:3,description:'Famille croire : crois-/croy- au présent et croir- au futur',generate:croireType},
+    'recevoir-type':{groupe:3,description:'Famille recevoir : reçois-/recev- au présent et recevr- au futur',generate:recevoirType}
   };
 
   function get(pattern){return definitions[pattern]||null;}
