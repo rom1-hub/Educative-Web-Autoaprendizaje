@@ -86,22 +86,5 @@
     return a;
   };
 
-  /* Donnée héritée conservée pendant la migration du catalogue.
-   * Les formes de faire doivent à terme rejoindre la source de données,
-   * mais ce changement est volontairement séparé de la suppression des
-   * patches runtime.
-   */
-  const faire=window.COQ_VERBS&&window.COQ_VERBS['faire'];
-  if(faire){
-    faire.formes=faire.formes||{};
-    Object.assign(faire.formes,{
-      "imparfait":[["je","faisais"],["tu","faisais"],["il/elle/on","faisait"],["nous","faisions"],["vous","faisiez"],["ils/elles","faisaient"]],
-      "futur simple":[["je","ferai"],["tu","feras"],["il/elle/on","fera"],["nous","ferons"],["vous","ferez"],["ils/elles","feront"]],
-      "conditionnel présent":[["je","ferais"],["tu","ferais"],["il/elle/on","ferait"],["nous","ferions"],["vous","feriez"],["ils/elles","feraient"]],
-      "subjonctif présent":[["que je","fasse"],["que tu","fasses"],["qu'il/elle/on","fasse"],["que nous","fassions"],["que vous","fassiez"],["qu'ils/elles","fassent"]],
-      "impératif présent":[["tu","fais"],["nous","faisons"],["vous","faites"]]
-    });
-  }
-
   window.COQ_CONJ_UTILS=api;
 })();
