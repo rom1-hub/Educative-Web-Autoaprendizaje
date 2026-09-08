@@ -1,133 +1,27 @@
 /* COQ — Regla única de presentación de tablas de conjugación. */
 (function(){
-  const SIMPLE_TENSES=new Set([
-    "présent de l'indicatif",
-    'imparfait',
-    'futur simple',
-    'conditionnel présent',
-    'subjonctif présent'
-  ]);
+  const SIMPLE_TENSES=new Set(["présent de l'indicatif",'imparfait','futur simple','conditionnel présent','subjonctif présent']);
+  const SUBJECT_GROUPS={'il/elle/on':['il','elle','on'],'ils/elles':['ils','elles']};
+  const SUBJ_PREFIXES={je:'que je',tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"};
+  function normalizeSubject(value){return String(value||'').trim().toLowerCase().replace(/\s+/g,' ');}
+  function splitSubjectRow(row,tense){const cells=row.querySelectorAll('td');if(cells.length<2)return false;const rawSubject=cells[0].textContent.trim(),normalized=normalizeSubject(rawSubject.replace(/\s*\([^)]*\)\s*$/,'')),group=SUBJECT_GROUPS[normalized];if(!group)return false;const suffix=(rawSubject.match(/\s*(\([^)]*\))\s*$/)||[])[1]||'',form=cells[1].textContent.trim(),fragment=document.createDocumentFragment();group.forEach(function(subject){const tr=document.createElement('tr'),subjectCell=document.createElement('td'),formCell=document.createElement('td');let label=subject;if(tense==='subjonctif présent')label=SUBJ_PREFIXES[subject]||subject;subjectCell.textContent=label+(suffix?' '+suffix:'');formCell.textContent=form;tr.append(subjectCell,formCell);fragment.appendChild(tr);});row.replaceWith(fragment);return true;}
+  function addSubjonctifPrefix(row){const cells=row.querySelectorAll('td');if(cells.length<2)return;const rawSubject=cells[0].textContent.trim(),suffix=(rawSubject.match(/\s*(\([^)]*\))\s*$/)||[])[1]||'',base=normalizeSubject(rawSubject.replace(/\s*\([^)]*\)\s*$/,''));if(!SUBJ_PREFIXES[base])return;if(/^que\s|^qu['’]/i.test(base))return;cells[0].textContent=SUBJ_PREFIXES[base]+(suffix?' '+suffix:'');}
+  function normalizeTable(table){if(table.dataset.coqSubjectsNormalized==='1')return;const block=table.closest('.tense-block'),tense=block?.querySelector('.tense-head h3')?.textContent?.trim()||'';if(tense==='impératif présent'){table.dataset.coqSubjectsNormalized='1';return;}Array.from(table.querySelectorAll('tbody tr')).forEach(function(row){splitSubjectRow(row,tense);});if(SIMPLE_TENSES.has(tense)&&tense==='subjonctif présent')table.querySelectorAll('tbody tr').forEach(addSubjonctifPrefix);table.dataset.coqSubjectsNormalized='1';}
+  function apply(){const result=document.querySelector('#conjResult');if(!result)return;result.querySelectorAll('.tense-table').forEach(normalizeTable);}
+  function schedule(){window.setTimeout(apply,0);}
+  function init(){const result=document.querySelector('#conjResult');if(result&&!result.dataset.coqTablePresentationObserver){result.dataset.coqTablePresentationObserver='1';new MutationObserver(schedule).observe(result,{childList:true,subtree:true});}schedule();}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
 
-  const SUBJECT_GROUPS={
-    'il/elle/on':['il','elle','on'],
-    'ils/elles':['ils','elles']
-  };
-
-  const SUBJ_PREFIXES={
-    je:'que je',
-    tu:'que tu',
-    il:"qu'il",
-    elle:"qu'elle",
-    on:"qu'on",
-    nous:'que nous',
-    vous:'que vous',
-    ils:"qu'ils",
-    elles:"qu'elles"
-  };
-
-  function normalizeSubject(value){
-    return String(value||'')
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g,' ');
-  }
-
-  function splitSubjectRow(row,tense){
-    const cells=row.querySelectorAll('td');
-    if(cells.length<2)return false;
-
-    const rawSubject=cells[0].textContent.trim();
-    const normalized=normalizeSubject(
-      rawSubject.replace(/\s*\([^)]*\)\s*$/,'')
-    );
-    const group=SUBJECT_GROUPS[normalized];
-
-    if(!group)return false;
-
-    const suffix=(rawSubject.match(/\s*(\([^)]*\))\s*$/)||[])[1]||'';
-    const form=cells[1].textContent.trim();
-    const fragment=document.createDocumentFragment();
-
-    group.forEach(function(subject){
-      const tr=document.createElement('tr');
-      const subjectCell=document.createElement('td');
-      const formCell=document.createElement('td');
-
-      let label=subject;
-      if(tense==='subjonctif présent'){
-        label=SUBJ_PREFIXES[subject]||subject;
-      }
-
-      subjectCell.textContent=label+(suffix?' '+suffix:'');
-      formCell.textContent=form;
-      tr.append(subjectCell,formCell);
-      fragment.appendChild(tr);
-    });
-
-    row.replaceWith(fragment);
-    return true;
-  }
-
-  function addSubjonctifPrefix(row){
-    const cells=row.querySelectorAll('td');
-    if(cells.length<2)return;
-
-    const rawSubject=cells[0].textContent.trim();
-    const suffix=(rawSubject.match(/\s*(\([^)]*\))\s*$/)||[])[1]||'';
-    const base=normalizeSubject(
-      rawSubject.replace(/\s*\([^)]*\)\s*$/,'')
-    );
-
-    if(!SUBJ_PREFIXES[base])return;
-    if(/^que\s|^qu['’]/i.test(base))return;
-
-    cells[0].textContent=SUBJ_PREFIXES[base]+(suffix?' '+suffix:'');
-  }
-
-  function normalizeTable(table){
-    if(table.dataset.coqSubjectsNormalized==='1')return;
-
-    const block=table.closest('.tense-block');
-    const tense=block?.querySelector('.tense-head h3')?.textContent?.trim()||'';
-
-    if(tense==='impératif présent'){
-      table.dataset.coqSubjectsNormalized='1';
-      return;
-    }
-
-    Array.from(table.querySelectorAll('tbody tr')).forEach(function(row){
-      splitSubjectRow(row,tense);
-    });
-
-    if(SIMPLE_TENSES.has(tense) && tense==='subjonctif présent'){
-      table.querySelectorAll('tbody tr').forEach(addSubjonctifPrefix);
-    }
-
-    table.dataset.coqSubjectsNormalized='1';
-  }
-
-  function apply(){
-    const result=document.querySelector('#conjResult');
-    if(!result)return;
-    result.querySelectorAll('.tense-table').forEach(normalizeTable);
-  }
-
-  function schedule(){
-    window.setTimeout(apply,0);
-  }
-
-  function init(){
-    const result=document.querySelector('#conjResult');
-    if(result && !result.dataset.coqTablePresentationObserver){
-      result.dataset.coqTablePresentationObserver='1';
-      new MutationObserver(schedule).observe(result,{childList:true,subtree:true});
-    }
-    schedule();
-  }
-
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',init,{once:true});
-  }else{
-    init();
-  }
+/* COQ — regla generativa de la familia prendre: conditionnel présent y subjonctif présent. */
+(function(){
+  const SUBJECTS=['je','tu','il','elle','on','nous','vous','ils','elles'];
+  const CONDITIONAL={je:'ais',tu:'ais',il:'ait',elle:'ait',on:'ait',nous:'ions',vous:'iez',ils:'aient',elles:'aient'};
+  const SUBJ={je:'e',tu:'es',il:'e',elle:'e',on:'e',nous:'ions',vous:'iez',ils:'ent',elles:'ent'};
+  const PREFIX={je:'que je',tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"};
+  function base(v){const key=String(v||'').trim().toLowerCase(),verbs=window.COQ_VERBS||{},r=verbs[key];if(r&&r.verbeBase&&verbs[String(r.verbeBase).trim().toLowerCase()])return String(r.verbeBase).trim().toLowerCase();return key.startsWith('se ')?key.slice(3).trim():key;}
+  function subject(v){const x=String(v||'').trim().toLowerCase().replace(/\s*\([^)]*\)\s*$/,'');return x.replace(/^que\s+/,'').replace(/^qu['’]/,'')==='j\''?'je':x.replace(/^que\s+/,'').replace(/^qu['’]/,'');}
+  function form(v,t,s){if(base(v)!=='prendre')return null;const x=subject(s);if(!SUBJECTS.includes(x))return null;if(t==='conditionnel présent')return 'prendr'+CONDITIONAL[x];if(t==='subjonctif présent')return (['je','tu','il','elle','on','ils','elles'].includes(x)?'prenn':'pren')+SUBJ[x];return null;}
+  function install(){const engine=window.COQ_CONJ_ENGINE;if(!engine||engine.__prendrePatternInstalled)return false;const oc=engine.conjugate,or=engine.rowsFor,orl=engine.rowsForLookup,orc=engine.rowsForConstruction,SIMPLE=new Set(['conditionnel présent','subjonctif présent']);engine.conjugate=function(v,t,s,c){const f=form(v,t,s);if(base(v)==='prendre'&&SIMPLE.has(t)&&c!=='pronominale'&&f!==null)return f;return oc(v,t,s,c);};engine.rowsFor=function(v,t){if(base(v)!=='prendre'||!SIMPLE.has(t))return or(v,t);return SUBJECTS.map(s=>[s,form(v,t,s)]);};engine.rowsForLookup=function(v,t){if(base(v)!=='prendre'||!SIMPLE.has(t))return orl(v,t);return SUBJECTS.map(s=>[t==='subjonctif présent'?PREFIX[s]:s,form(v,t,s)]);};engine.rowsForConstruction=function(v,t,c){if(base(v)==='prendre'&&SIMPLE.has(t)&&c!=='pronominale')return engine.rowsFor(v,t);return orc(v,t,c);};engine.__prendrePatternInstalled=true;window.COQ_PRENDRE_PATTERN_REGRESSION={conditionnel:{je:'prendrais',nous:'prendrions',ils:'prendraient'},subjonctif:{je:'prenne',nous:'prenions',ils:'prennent'}};return true;}
+  function wait(){if(!install())window.setTimeout(wait,25);}wait();
 })();
