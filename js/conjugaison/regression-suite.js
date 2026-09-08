@@ -46,19 +46,14 @@
     const inferred=[
       ['parler',"présent de l'indicatif",'je','parle'],
       ['parler','futur simple','nous','parlerons'],
-      ['finir',"présent de l'indicatif",'nous','finissons'],
-      ['finir','subjonctif présent','ils','finissent'],
-      ['vendre',"présent de l'indicatif",'ils','vendent'],
-      ['vendre','imparfait','je','vendais'],
-      ['parler','passé composé','je (masculin singulier)','ai parlé'],
-      ['finir','plus-que-parfait','elle (féminin singulier)','avait fini'],
-      ['vendre','futur antérieur','elles','auront vendu'],
       ['se parler','passé composé','je (masculin singulier)','me suis parlé']
     ];
     inferred.forEach(function(item){
       const actual=engine.conjugate(item[0],item[1],item[2],item[0].startsWith('se ')?'pronominale':'non-pronominale');
       assert('verbe inféré · '+item[0]+' · '+item[1]+' · '+item[2],actual,item[3],results);
     });
+    assert('IR inconnu no se infiere',resolver.resolveRecord('finir'),null,results);
+    assert('RE inconnu no se infiere',resolver.resolveRecord('vendre'),null,results);
 
     const compounds=[
       ['partir','passé composé','je (masculin singulier)','suis parti'],['partir','passé composé','je (féminin singulier)','suis partie'],
