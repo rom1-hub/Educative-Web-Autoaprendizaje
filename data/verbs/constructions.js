@@ -14,6 +14,10 @@ window.COQ_COMPOUND_CONSTRUCTION_FILTERS={
 (function(){
   const catalog={};
   const add=(key,pattern,participePasse,variante)=>{catalog[key]={id:key,infinitif:key,infinitif_base:key,groupe:1,pattern,auxiliaire:'avoir',pronominal:false,participePasse,construction:'non-pronominale',verbeBase:key,variante};};
+  const addPronominal=(key,base,accord,fonctionDeSe)=>{catalog[key]={id:key,infinitif:key,infinitif_base:base,groupe:1,pattern:null,auxiliaire:'être',pronominal:true,participePasse:null,construction:'pronomiale',verbeBase:base,formePronominale:{infinitif:key},accord,fonctionDeSe};};
+  addPronominal('se lever','lever','sujet','COD');
+  addPronominal('se promener','promener','sujet','COD');
+  addPronominal('se parler','parler','aucun','COI');
   const eler={
     appeler:['appelé','appeler'],rappeler:['rappelé','appeler'],
     agneler:['agnelé','eler'],celer:['celé','eler'],déceler:['décelé','eler'],receler:['recelé','eler'],ciseler:['ciselé','eler'],démanteler:['démantelé','eler'],écarteler:['écartelé','eler'],encasteler:['encastelé','eler'],geler:['gelé','eler'],dégeler:['dégelé','eler'],congeler:['congelé','eler'],surgeler:['surgelé','eler'],marteler:['martelé','eler'],modeler:['modelé','eler'],peler:['pelé','eler'],ficeler:['ficelé','double']
