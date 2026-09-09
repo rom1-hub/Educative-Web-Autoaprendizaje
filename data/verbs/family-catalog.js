@@ -23,9 +23,7 @@
     'yer-explicit':{nettoyer:['nettoyé','avoir'],essuyer:['essuyé','avoir']}
   };
   const catalog={};
-  const baseVerbs=window.COQ_VERBS||{};
   Object.entries(families).forEach(([pattern,verbs])=>Object.entries(verbs).forEach(([infinitif,[participePasse,auxiliaire]])=>{
-    if(Object.prototype.hasOwnProperty.call(baseVerbs,infinitif))return;
     catalog[infinitif]={infinitif,infinitif_base:infinitif,groupe:pattern==='yer-explicit'?1:3,pattern:pattern==='yer-explicit'?'yer':pattern,auxiliaire,pronominal:false,participePasse,construction:'non-pronominale',verbeBase:infinitif};
   }));
   window.COQ_VERB_FAMILY_CATALOG=Object.freeze(catalog);
