@@ -2,15 +2,15 @@
  * Capa de datos/reglas, sin interfaz.
  */
 (function(){
-  const subjectPronouns={
+  const subjectPronouns=Object.freeze({
     je:'me', tu:'te', il:'se', elle:'se', on:'se', nous:'nous', vous:'vous', ils:'se', elles:'se'
-  };
-  const subjectBase={
+  });
+  const subjectBase=Object.freeze({
     "j'":'je', je:'je', tu:'tu', il:'il', elle:'elle', on:'on', nous:'nous', vous:'vous', ils:'ils', elles:'elles',
     "que je":'je', "que j'":'je', "que tu":'tu', "qu'il":'il', "qu'elle":'elle', "qu'on":'on',
     "qu'il/elle/on":'il', "que nous":'nous', "que vous":'vous', "qu'ils":'ils', "qu'elles":'elles', "qu'ils/elles":'ils'
-  };
-  const imperativePronouns={tu:'toi',nous:'nous',vous:'vous'};
+  });
+  const imperativePronouns=Object.freeze({tu:'toi',nous:'nous',vous:'vous'});
   function baseSubject(label){
     const s=String(label||'').trim();
     const withoutGender=s.replace(/\s*\([^)]*\)\s*$/,'').trim();
