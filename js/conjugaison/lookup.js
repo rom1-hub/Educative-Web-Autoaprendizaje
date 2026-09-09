@@ -19,35 +19,12 @@
     const subjects=base==='il/elle/on'?['il','elle','on']:base==='ils/elles'?['ils','elles']:[raw];
     return subjects.map(subject=>tense==='subjonctif présent'||tense==='subjonctif passé'?addSubjonctifPrefix(subject,form):elideJe(subject,form));
   }
-  function agreementSensitive(verb){const m=meta(verb);return m.pronominal===true||m.construction==='pronominale'||m.auxiliaire==='être';}
-  function compoundDisplayForm(form,subject,verb){
-    const value=String(form||'');
-    if(!agreementSensitive(verb))return value;
-    const r=meta(verb),pp=String(r.participePasse||'').trim();
-    if(!pp)return value;
-    const raw=normalizeSubject(subject),base=baseSubject(subject);
-    const withoutMarkers=value.replace(/\(e\)\(s\)|\(e\)s|\(e\)/g,'');
-    const ppIndex=withoutMarkers.lastIndexOf(pp);
-    if(ppIndex===-1)return value;
-    const prefix=withoutMarkers.slice(0,ppIndex);
-    const genericNotation={je:'(e)',tu:'(e)',on:'(e)(s)',nous:'(e)s',vous:'(e)(s)'}[base];
-    if(genericNotation)return prefix+pp+genericNotation;
-    const contextBySubject={
-      il:{gender:'masculin',number:'singulier'},
-      elle:{gender:'féminin',number:'singulier'},
-      ils:{gender:'masculin',number:'pluriel'},
-      elles:{gender:'féminin',number:'pluriel'}
-    }[base];
-    if(!contextBySubject)return value;
-    const agreed=A&&typeof A.agree==='function'?A.agree(pp,contextBySubject,{type:r.pronominal?'pronominale':'non-pronominale',baseVerb:r.verbeBase||verb,auxiliaire:r.auxiliaire}):pp;
-    return prefix+agreed;
-  }
   function normalizedRows(rows,tense,verb){
     const output=[];
     (rows||[]).forEach(row=>{
       const form=String(row?.[1]??'').trim();if(!form)return;
       const rawSubject=String(row?.[0]||'').trim();
-      expandSubjects(rawSubject,form,tense).forEach(subject=>output.push([subject,isCompound(tense)?compoundDisplayForm(form,subject,verb):form]));
+      expandSubjects(rawSubject,form,tense).forEach(subject=>output.push([subject,isCompound(tense)?A.formatLookupCompoundForm(form,subject,meta(verb),verb):form]));
     });
     return output;
   }
