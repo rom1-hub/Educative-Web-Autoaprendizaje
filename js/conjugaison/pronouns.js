@@ -5,6 +5,7 @@
   const subjectPronouns={
     je:'me', tu:'te', il:'se', elle:'se', on:'se', nous:'nous', vous:'vous', ils:'se', elles:'se'
   };
+  const imperativePronouns={tu:'toi',nous:'nous',vous:'vous'};
   const subjectBase={
     "j'":'je', je:'je', tu:'tu', il:'il', elle:'elle', on:'on', nous:'nous', vous:'vous', ils:'ils', elles:'elles',
     "que je":'je', "que j'":'je', "que tu":'tu', "qu'il":'il', "qu'elle":'elle', "qu'on":'on',
@@ -22,6 +23,7 @@
     return subjectBase[first]||subjectBase[normalizedFirst]||normalizedFirst;
   }
   function pronounFor(label){return subjectPronouns[baseSubject(label)]||null;}
+  function imperativePronounFor(label){return imperativePronouns[baseSubject(label)]||null;}
   function contractPronoun(pronoun, nextWord){
     if(!pronoun || !nextWord) return pronoun;
     if(!['me','te','se'].includes(pronoun)) return pronoun;
@@ -36,5 +38,5 @@
     const cp=contractPronoun(p, first);
     return cp + (cp.endsWith("'")?'':' ') + clean;
   }
-  window.COQ_CONJ_PRONOUNS={subjectPronouns,baseSubject,pronounFor,contractPronoun,apply};
+  window.COQ_CONJ_PRONOUNS={subjectPronouns,imperativePronouns,baseSubject,pronounFor,imperativePronounFor,contractPronoun,apply};
 })();
