@@ -2,7 +2,7 @@
  * Responsabilidad exclusiva: resolver y generar formas; la UI decide cómo presentarlas.
  */
 (function(){
-  const P=window.COQ_CONJ_PRONOUNS,C=window.COQ_CONJ_COMPOUND,A=window.COQ_CONJ_AGREEMENT,R=window.COQ_PATTERN_REGISTRY,resolver=window.COQ_PATTERN_RESOLVER,verbs=window.COQ_VERB_REGISTRY||window.COQ_VERBS||{};
+  const P=window.COQ_CONJ_PRONOUNS,C=window.COQ_CONJ_COMPOUND,A=window.COQ_CONJ_AGREEMENT,R=window.COQ_PATTERN_REGISTRY,resolver=window.COQ_PATTERN_RESOLVER,verbs=window.COQ_VERB_REGISTRY||{};
   function baseKey(verb){const v=verbs[verb];if(v&&v.verbeBase&&verbs[v.verbeBase])return v.verbeBase;if(resolver&&typeof resolver.baseVerb==='function')return resolver.baseVerb(verb);return verb;}
   function record(verb){return verbs[verb]||(resolver&&typeof resolver.resolveRecord==='function'?resolver.resolveRecord(verb):null);}
   function subjectInfo(subject){const label=String(subject||'').trim(),base=P.baseSubject(label),match=label.match(/\(([^)]+)\)/);let gender='masculin',number='singulier';if(match){const details=match[1].toLowerCase();if(details.includes('féminin'))gender='féminin';if(details.includes('pluriel'))number='pluriel';}else if(base==='elle'){gender='féminin';}else if(base==='ils'){gender='masculin';number='pluriel';}else if(base==='elles'){gender='féminin';number='pluriel';}else if(base==='nous'||base==='vous'){number='pluriel';}return {label,base,gender,number};}
