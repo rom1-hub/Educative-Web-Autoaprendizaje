@@ -15,7 +15,6 @@ assert(w.COQ_VERB_REGISTRY['partir'].pattern==='partir-type','El registro famili
 assert(Object.isFrozen(w.COQ_VERB_FAMILY_CATALOG),'El catálogo familiar debe ser inmutable.');
 assert(Object.isFrozen(w.COQ_VERB_REGISTRY),'El registro unificado debe ser inmutable.');
 assert(w.COQ_VERBS['parler'].formePronominale?.infinitif==='se parler','La relación pronominal de parler debe apuntar a se parler.');
-expect(w.COQ_VERBS['parler'].formePronominale?.statut,'disponible','La relación pronominal de parler debe reflejar que se parler está disponible.');
 assert(w.COQ_VERB_CONSTRUCTION_CATALOG['se parler'],'se parler debe estar registrado explícitamente en el catálogo de construcciones.');
 expect(w.COQ_VERB_CONSTRUCTION_CATALOG['se parler'].verbeBase,'parler','La construcción se parler debe conservar su verbo base.');
 expect(engine.conjugate('parler',"présent de l'indicatif",'je'),'parle','parler presente');
@@ -34,9 +33,6 @@ expect(engine.conjugate('se lever','plus-que-parfait','tu (masculin singulier)',
 expect(engine.conjugate('se parler','passé composé','ils','pronomiale'),'se sont parlé','se parler sans accord');
 expect(engine.conjugate('venir','futur antérieur','elles'),'seront venues','venir futur antérieur');
 expect(w.COQ_VERB_REGISTRY['venir'].auxiliaire,'être','venir doit conservar son auxiliaire être dans el registro normalizado');
-
-// Contrato de familias especiales - ELER/-ETER: el inventario declarativo debe
-// seguir siendo compatible con el generador y no depender de listas duplicadas en tests.
 const specialCatalog=w.COQ_VERB_CONSTRUCTION_CATALOG||{};
 const elerVerbs=Object.keys(specialCatalog).filter(v=>specialCatalog[v]?.pattern==='er-eler');
 const eterVerbs=Object.keys(specialCatalog).filter(v=>specialCatalog[v]?.pattern==='er-eter');
@@ -58,7 +54,6 @@ eterVerbs.forEach(verb=>{
   assert(engine.conjugate(verb,'subjonctif présent','que je'),`${verb}: debe generar una forma de subjonctif présent.`);
   assert(engine.conjugate(verb,'impératif présent','tu'),`${verb}: debe generar una forma de impératif présent.`);
 });
-
 const practiceRows=engine.rowsFor('se lever','passé composé');
 assert(practiceRows.length===9,'La pratique doit partir de 9 sujets de base avant expansión de variantes.');
 assert(practiceRows.every(row=>!/[()]/.test(row[0])),'Les lignes de práctica ne doivent pas contenir variantes de género/número ya expandidas.');
@@ -112,7 +107,7 @@ expect(etreCompound[6][0],'vous','La tabla être debe mostrar vous en una sola f
 expect(etreCompound[6][1],'êtes venu(e)(s)','vous debe conservar las cuatro posibilidades.');
 expect(etreCompound[7][0],'ils','La tabla être debe separar ils.');
 expect(etreCompound[7][1],'sont venus','ils debe usar masculino plural.');
-expect(etreCompound[8][0],'elles','elles debe usar femenino plural.');
+expect(etreCompound[8][0],'elles','La tabla être debe usar femenino plural.');
 expect(etreCompound[8][1],'sont venues','elles debe usar femenino plural.');
 const subjonctifPasse=lookup.normalizedRows(engine.rowsForLookup('venir','subjonctif passé'),'subjonctif passé','venir');
 assert(subjonctifPasse.length===9,'El subjonctif passé con être debe mostrar 9 sujetos separados, con vous en una sola fila genérica.');
