@@ -9,9 +9,6 @@
   const constructionCatalog=window.COQ_VERB_CONSTRUCTION_CATALOG||{};
   const source={};
 
-  // verbMeta es una capa de metadata, no un reemplazo del registro completo.
-  // Conservamos formes/pattern/participePasse y cualquier otro dato completo de
-  // COQ_VERBS, y encima aplicamos las correcciones de metadata normalizada.
   const keys=new Set([...Object.keys(rawVerbs),...Object.keys(verbMeta),...Object.keys(familyCatalog),...Object.keys(constructionCatalog)]);
   keys.forEach(key=>{
     source[key]={...(rawVerbs[key]||{}),...(verbMeta[key]||{}),...(familyCatalog[key]||{}),...(constructionCatalog[key]||{})};
@@ -38,18 +35,10 @@
   });
   deepFreeze(registry);
 
-  const normalizedMeta={};
-  Object.entries(registry).forEach(([key,record])=>{
-    const meta={...record};
-    if(record.pronominal===true)meta.auxiliaire=null;
-    normalizedMeta[key]=deepFreeze(meta);
-  });
-  deepFreeze(normalizedMeta);
-
   const api={
     conjugations:registry,
     verbGroups:Object.freeze({...((window.COQ_VERB_DATA||{}).verbGroups||{})}),
-    verbMeta:normalizedMeta
+    verbMeta:registry
   };
   api.normalizeVerb=v=>String(v??'').trim().toLowerCase();
   api.escapeHtml=v=>String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#039;'}[c]));
