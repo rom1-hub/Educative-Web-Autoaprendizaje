@@ -13,8 +13,8 @@ window.COQ_COMPOUND_CONSTRUCTION_FILTERS={
 };
 (function(){
   const catalog={};
-  const add=(key,pattern,participePasse,variante)=>{catalog[key]={id:key,infinitif:key,infinitif_base:key,groupe:1,pattern,auxiliaire:'avoir',pronominal:false,participePasse,construction:'non-pronomiale',verbeBase:key,variante};};
-  const addPronominal=(key,base,pattern,participePasse,accord,fonctionDeSe)=>{catalog[key]={id:key,infinitif:key,infinitif_base:base,groupe:1,pattern,auxiliaire:'être',pronominal:true,participePasse,construction:'pronomiale',verbeBase:base,formePronominale:{infinitif:key},accord,fonctionDeSe};};
+  const add=(key,pattern,participePasse,variante)=>{catalog[key]={id:key,infinitif:key,infinitif_base:key,groupe:1,pattern,auxiliaire:'avoir',pronominal:false,participePasse,construction:'non-pronominale',verbeBase:key,variante};};
+  const addPronominal=(key,base,pattern,participePasse,accord,fonctionDeSe)=>{catalog[key]={id:key,infinitif:key,infinitif_base:base,groupe:1,pattern,auxiliaire:'être',pronominal:true,participePasse,construction:'pronominale',verbeBase:base,formePronominale:{infinitif:key},accord,fonctionDeSe};};
   addPronominal('se lever','lever','regular-er','levé','sujet','COD');
   addPronominal('se promener','promener','regular-er','promené','sujet','COD');
   addPronominal('se parler','parler','regular-er','parlé','aucun','COI');
