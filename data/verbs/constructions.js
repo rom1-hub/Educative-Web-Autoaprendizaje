@@ -1,9 +1,5 @@
 // COQ — catálogo declarativo de construcciones y familias especiales.
 // Este módulo NO modifica COQ_VERBS.
-window.COQ_CONSTRUCTIONS={
-  'non-pronominale':{id:'non-pronominale',label:'Forme non pronominale',pronom:false},
-  'pronominale':{id:'pronominale',label:'Forme pronominale',pronom:true}
-};
 window.COQ_PRONOMINAL_RULES={
   'lever':{fonctionDeSe:'COD',accord:'sujet'},
   'promener':{fonctionDeSe:'COD',accord:'sujet'},
