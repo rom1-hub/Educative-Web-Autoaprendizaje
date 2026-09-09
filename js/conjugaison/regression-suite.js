@@ -60,7 +60,7 @@
     if(practice){
       const mixed=practice.buildQuestions('', 'passé composé','Todos','', 'avec-avoir-et-etre');
       assert('filtro AVOIR et ÊTRE devuelve preguntas',mixed.length>0,true,results);
-      assert('filtro AVOIR et ÊTRE excluye pronominales',mixed.some(q=>getRecord(q.verb)?.pronominal===true),false,results);
+      assert('filtro AVOIR et ÊTRE excluye pronominales',mixed.some(q=>resolver.resolveRecord(q.verb)?.pronominal===true),false,results);
     }
     return results;
   }
