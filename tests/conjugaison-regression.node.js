@@ -14,6 +14,10 @@ assert(w.COQ_VERB_REGISTRY['partir'],'El registro unificado debe conservar verbo
 assert(w.COQ_VERB_REGISTRY['partir'].pattern==='partir-type','El registro familiar de partir debe conservar su patrón.');
 assert(Object.isFrozen(w.COQ_VERB_FAMILY_CATALOG),'El catálogo familiar debe ser inmutable.');
 assert(Object.isFrozen(w.COQ_VERB_REGISTRY),'El registro unificado debe ser inmutable.');
+assert(w.COQ_VERBS['parler'].formePronominale?.infinitif==='se parler','La relación pronominal de parler debe apuntar a se parler.');
+expect(w.COQ_VERBS['parler'].formePronominale?.statut,'disponible','La relación pronominal de parler debe reflejar que se parler está disponible.');
+assert(w.COQ_VERB_CONSTRUCTION_CATALOG['se parler'],'se parler debe estar registrado explícitamente en el catálogo de construcciones.');
+expect(w.COQ_VERB_CONSTRUCTION_CATALOG['se parler'].verbeBase,'parler','La construcción se parler debe conservar su verbo base.');
 expect(engine.conjugate('parler',"présent de l'indicatif",'je'),'parle','parler presente');
 expect(engine.conjugate('manger',"présent de l'indicatif",'nous'),'mangeons','manger nous');
 expect(engine.conjugate('commencer',"présent de l'indicatif",'nous'),'commençons','commencer nous');
@@ -25,9 +29,9 @@ expect(engine.conjugate('partir','passé composé','je (masculin singulier)'),'s
 expect(engine.conjugate('partir','plus-que-parfait','je (féminin singulier)'),'étais partie','partir plus-que-parfait');
 expect(engine.conjugate('être','passé composé','je (masculin singulier)'),'ai été','être passé composé');
 expect(engine.conjugate('faire','conditionnel passé','nous (féminin pluriel)'),'aurions fait','faire conditionnel passé');
-expect(engine.conjugate('se lever','passé composé','vous (féminin singulier)','pronominale'),'vous êtes levée','se lever passé composé');
-expect(engine.conjugate('se lever','plus-que-parfait','tu (masculin singulier)','pronominale'),"t'étais levé",'se lever plus-que-parfait');
-expect(engine.conjugate('se parler','passé composé','ils','pronominale'),'se sont parlé','se parler sans accord');
+expect(engine.conjugate('se lever','passé composé','vous (féminin singulier)','pronomiale'),'vous êtes levée','se lever passé composé');
+expect(engine.conjugate('se lever','plus-que-parfait','tu (masculin singulier)','pronomiale'),"t'étais levé",'se lever plus-que-parfait');
+expect(engine.conjugate('se parler','passé composé','ils','pronomiale'),'se sont parlé','se parler sans accord');
 expect(engine.conjugate('venir','futur antérieur','elles'),'seront venues','venir futur antérieur');
 expect(w.COQ_VERB_REGISTRY['venir'].auxiliaire,'être','venir doit conservar son auxiliaire être dans el registro normalizado');
 
