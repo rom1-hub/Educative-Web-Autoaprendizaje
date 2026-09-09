@@ -14,6 +14,13 @@ assert(w.COQ_VERB_REGISTRY['partir'],'El registro unificado debe conservar verbo
 assert(w.COQ_VERB_REGISTRY['partir'].pattern==='partir-type','El registro familiar de partir debe conservar su patrón.');
 assert(Object.isFrozen(w.COQ_VERB_FAMILY_CATALOG),'El catálogo familiar debe ser inmutable.');
 assert(Object.isFrozen(w.COQ_VERB_REGISTRY),'El registro unificado debe ser inmutable.');
+assert(Array.isArray(w.COQ_VERB_GROUP_CATALOG),'El catálogo de grupos debe existir como fuente única de verdad.');
+assert(Object.isFrozen(w.COQ_VERB_GROUP_CATALOG),'El catálogo de grupos debe ser inmutable.');
+expect(w.COQ_VERB_GROUP_CATALOG.find(g=>g.id==='er-eler')?.label,'Premier groupe verbes en -ELER','El catálogo debe conservar la etiqueta de er-eler.');
+assert(w.COQ_PATTERN_RESOLVER.matchesGroup('appeler','er-eler'),'El resolver debe reconocer la familia er-eler mediante el catálogo central.');
+assert(!w.COQ_PATTERN_RESOLVER.matchesGroup('parler','er-eler'),'El resolver no debe mezclar familias distintas.');
+expect(w.COQ_PATTERN_RESOLVER.resolveRecord('se lever')?.construction,'pronominale','La construcción pronominal debe usar el identificador canónico.');
+expect(w.COQ_PATTERN_RESOLVER.resolveRecord('parler')?.construction,'non-pronominale','La construcción no pronominal debe usar el identificador canónico.');
 assert(w.COQ_VERBS['parler'].formePronominale?.infinitif==='se parler','La relación pronominal de parler debe apuntar a se parler.');
 assert(w.COQ_VERB_CONSTRUCTION_CATALOG['se parler'],'se parler debe estar registrado explícitamente en el catálogo de construcciones.');
 expect(w.COQ_VERB_CONSTRUCTION_CATALOG['se parler'].verbeBase,'parler','La construcción se parler debe conservar su verbo base.');
@@ -28,9 +35,9 @@ expect(engine.conjugate('partir','passé composé','je (masculin singulier)'),'s
 expect(engine.conjugate('partir','plus-que-parfait','je (féminin singulier)'),'étais partie','partir plus-que-parfait');
 expect(engine.conjugate('être','passé composé','je (masculin singulier)'),'ai été','être passé composé');
 expect(engine.conjugate('faire','conditionnel passé','nous (féminin pluriel)'),'aurions fait','faire conditionnel passé');
-expect(engine.conjugate('se lever','passé composé','vous (féminin singulier)','pronomiale'),'vous êtes levée','se lever passé composé');
-expect(engine.conjugate('se lever','plus-que-parfait','tu (masculin singulier)','pronomiale'),"t'étais levé",'se lever plus-que-parfait');
-expect(engine.conjugate('se parler','passé composé','ils','pronomiale'),'se sont parlé','se parler sans accord');
+expect(engine.conjugate('se lever','passé composé','vous (féminin singulier)','pronominale'),'vous êtes levée','se lever passé composé');
+expect(engine.conjugate('se lever','plus-que-parfait','tu (masculin singulier)','pronominale'),"t'étais levé",'se lever plus-que-parfait');
+expect(engine.conjugate('se parler','passé composé','ils','pronominale'),'se sont parlé','se parler sans accord');
 expect(engine.conjugate('venir','futur antérieur','elles'),'seront venues','venir futur antérieur');
 expect(w.COQ_VERB_REGISTRY['venir'].auxiliaire,'être','venir doit conservar son auxiliaire être dans el registro normalizado');
 const specialCatalog=w.COQ_VERB_CONSTRUCTION_CATALOG||{};
