@@ -30,6 +30,31 @@ expect(engine.conjugate('se lever','plus-que-parfait','tu (masculin singulier)',
 expect(engine.conjugate('se parler','passé composé','ils','pronominale'),'se sont parlé','se parler sans accord');
 expect(engine.conjugate('venir','futur antérieur','elles'),'seront venues','venir futur antérieur');
 expect(w.COQ_VERB_REGISTRY['venir'].auxiliaire,'être','venir doit conservar son auxiliaire être dans el registro normalizado');
+
+// Contrato de familias especiales - ELER/-ETER: el inventario declarativo debe
+// seguir siendo compatible con el generador y no depender de listas duplicadas en tests.
+const specialCatalog=w.COQ_VERB_CONSTRUCTION_CATALOG||{};
+const elerVerbs=Object.keys(specialCatalog).filter(v=>specialCatalog[v]?.pattern==='er-eler');
+const eterVerbs=Object.keys(specialCatalog).filter(v=>specialCatalog[v]?.pattern==='er-eter');
+assert(elerVerbs.length>0,'El catálogo debe contener verbos de la familia er-eler.');
+assert(eterVerbs.length>0,'El catálogo debe contener verbos de la familia er-eter.');
+elerVerbs.forEach(verb=>{
+  assert(engine.canGenerate(verb,"présent de l'indicatif"),`${verb}: la familia er-eler debe ser generable en presente.`);
+  assert(engine.conjugate(verb,"présent de l'indicatif",'je'),`${verb}: debe generar una forma de presente.`);
+  assert(engine.conjugate(verb,'futur simple','je'),`${verb}: debe generar una forma de futur simple.`);
+  assert(engine.conjugate(verb,'conditionnel présent','je'),`${verb}: debe generar una forma de conditionnel présent.`);
+  assert(engine.conjugate(verb,'subjonctif présent','que je'),`${verb}: debe generar una forma de subjonctif présent.`);
+  assert(engine.conjugate(verb,'impératif présent','tu'),`${verb}: debe generar una forma de impératif présent.`);
+});
+eterVerbs.forEach(verb=>{
+  assert(engine.canGenerate(verb,"présent de l'indicatif"),`${verb}: la familia er-eter debe ser generable en presente.`);
+  assert(engine.conjugate(verb,"présent de l'indicatif",'je'),`${verb}: debe generar una forma de presente.`);
+  assert(engine.conjugate(verb,'futur simple','je'),`${verb}: debe generar una forma de futur simple.`);
+  assert(engine.conjugate(verb,'conditionnel présent','je'),`${verb}: debe generar una forma de conditionnel présent.`);
+  assert(engine.conjugate(verb,'subjonctif présent','que je'),`${verb}: debe generar una forma de subjonctif présent.`);
+  assert(engine.conjugate(verb,'impératif présent','tu'),`${verb}: debe generar una forma de impératif présent.`);
+});
+
 const practiceRows=engine.rowsFor('se lever','passé composé');
 assert(practiceRows.length===9,'La pratique doit partir de 9 sujets de base avant expansión de variantes.');
 assert(practiceRows.every(row=>!/[()]/.test(row[0])),'Les lignes de práctica ne doivent pas contenir variantes de género/número ya expandidas.');
@@ -83,11 +108,11 @@ expect(etreCompound[6][0],'vous','La tabla être debe mostrar vous en una sola f
 expect(etreCompound[6][1],'êtes venu(e)(s)','vous debe conservar las cuatro posibilidades.');
 expect(etreCompound[7][0],'ils','La tabla être debe separar ils.');
 expect(etreCompound[7][1],'sont venus','ils debe usar masculino plural.');
-expect(etreCompound[8][0],'elles','La tabla être debe separar elles.');
+expect(etreCompound[8][0],'elles','elles debe usar femenino plural.');
 expect(etreCompound[8][1],'sont venues','elles debe usar femenino plural.');
 const subjonctifPasse=lookup.normalizedRows(engine.rowsForLookup('venir','subjonctif passé'),'subjonctif passé','venir');
 assert(subjonctifPasse.length===9,'El subjonctif passé con être debe mostrar 9 sujetos separados, con vous en una sola fila genérica.');
 expect(subjonctifPasse[2][0],"qu'il",'El subjonctif passé debe separar qu’il.');
 expect(subjonctifPasse[3][0],"qu'elle",'El subjonctif passé debe separar qu’elle.');
 expect(subjonctifPasse[4][0],"qu'on",'El subjonctif passé debe separar qu’on.');
-console.log('Conjugaison regression OK — sujetos separados y concordancia de être verificada.');
+console.log('Conjugaison regression OK — sujetos separados, concordancia de être y familias -ELER/-ETER verificadas.');
