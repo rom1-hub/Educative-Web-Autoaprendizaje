@@ -8,7 +8,7 @@
   function subjectInfo(subject){const label=String(subject||'').trim(),base=P.baseSubject(label),match=label.match(/\(([^)]+)\)/);let gender='masculin',number='singulier';if(match){const details=match[1].toLowerCase();if(details.includes('féminin'))gender='féminin';if(details.includes('pluriel'))number='pluriel';}else if(base==='elle'){gender='féminin';}else if(base==='ils'){gender='masculin';number='pluriel';}else if(base==='elles'){gender='féminin';number='pluriel';}else if(base==='nous'||base==='vous'){number='pluriel';}return {label,base,gender,number};}
   function generatedSimple(verb,tense,subject){const r=record(verb);if(!r||!R||typeof R.generate!=='function')return null;return R.generate(r.pattern,r.infinitif_base||r.infinitif,P.baseSubject(subject),tense);}
   function explicitForm(verb,tense,subject){const rows=(record(verb)?.formes||{})[tense]||[];const exact=rows.find(r=>r[0]===subject);if(exact)return exact[1];const base=P.baseSubject(subject);const grouped=rows.find(r=>String(r[0]).split('/').map(x=>x.trim()).some(label=>P.baseSubject(label)===base));return grouped?grouped[1]:null;}
-  function simpleForm(verb,tense,subject){const explicit=explicitForm(verb,tense,subject);if(explicit!==null&&explicit!==undefined&&String(explicit)!=='')return explicit;return generatedSimple(verb,tense,subject);}
+  function simpleForm(verb,tense,subject){const generated=generatedSimple(verb,tense,subject);if(generated!==null&&generated!==undefined&&String(generated)!=='')return generated;return explicitForm(verb,tense,subject);}
   function participle(verb){const r=record(baseKey(verb));return r&&r.participePasse?r.participePasse:null;}
   function applyAgreement(pp,info,base,isPronominal,auxiliary){
     if(!A)return pp;
