@@ -11,6 +11,15 @@ window.COQ_COMPOUND_CONSTRUCTION_FILTERS={
   'avec-avoir-et-etre':{id:'avec-avoir-et-etre',label:'Avec auxiliaire AVOIR et ÊTRE',auxiliaires:['avoir','être'],pronominal:null},
   'verbes-pronominaux':{id:'verbes-pronominaux',label:'Verbes pronominaux',auxiliaires:['être'],pronominal:true}
 };
+window.COQ_CONSTRUCTION_OPTIONS=Object.freeze([
+  {id:'non-pronominale',label:'Verbes non pronominaux'},
+  {id:'pronominale',label:'Verbes pronominaux'}
+]);
+window.COQ_AUXILIARY_OPTIONS=Object.freeze([
+  {id:'avec-avoir',label:'Avec auxiliaire AVOIR'},
+  {id:'avec-etre',label:'Avec auxiliaire ÊTRE'},
+  {id:'avec-avoir-et-etre',label:'Avec auxiliaire AVOIR et ÊTRE'}
+]);
 (function(){
   const catalog={};
   const add=(key,pattern,participePasse,variante)=>{catalog[key]={id:key,infinitif:key,infinitif_base:key,groupe:1,pattern,auxiliaire:'avoir',pronominal:false,participePasse,construction:'non-pronominale',verbeBase:key,variante};};
