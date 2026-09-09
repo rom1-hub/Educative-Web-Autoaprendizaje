@@ -13,10 +13,16 @@ window.COQ_COMPOUND_CONSTRUCTION_FILTERS={
 };
 (function(){
   const catalog={};
-  const add=(key,pattern,participePasse)=>{catalog[key]={id:key,infinitif:key,infinitif_base:key,groupe:1,pattern,auxiliaire:'avoir',pronominal:false,participePasse,construction:'non-pronominale',verbeBase:key};};
-  const eler={appeler:'appelé',rappeler:'rappelé',agneler:'agnelé',celer:'celé',déceler:'décelé',receler:'recelé',ciseler:'ciselé',démanteler:'démantelé',écarteler:'écartelé',encasteler:'encastelé',geler:'gelé',dégeler:'dégelé',congeler:'congelé',surgeler:'surgelé',marteler:'martelé',modeler:'modelé',peler:'pelé',ficeler:'ficelé'};
-  Object.entries(eler).forEach(([key,pp])=>add(key,'er-eler',pp));
-  const eter={jeter:'jeté',projeter:'projeté',rejeter:'rejeté',déjeter:'déjeté',surjeter:'surjeté',acheter:'acheté',racheter:'racheté',bégueter:'bégueté',corseter:'corseté',crocheter:'crocheté',fileter:'fileté',fureter:'fureté',haleter:'haleté',feuilleter:'feuilleté'};
-  Object.entries(eter).forEach(([key,pp])=>add(key,'er-eter',pp));
+  const add=(key,pattern,participePasse,variante)=>{catalog[key]={id:key,infinitif:key,infinitif_base:key,groupe:1,pattern,auxiliaire:'avoir',pronominal:false,participePasse,construction:'non-pronominale',verbeBase:key,variante};};
+  const eler={
+    appeler:['appelé','appeler'],rappeler:['rappelé','appeler'],
+    agneler:['agnelé','eler'],celer:['celé','eler'],déceler:['décelé','eler'],receler:['recelé','eler'],ciseler:['ciselé','eler'],démanteler:['démantelé','eler'],écarteler:['écartelé','eler'],encasteler:['encastelé','eler'],geler:['gelé','eler'],dégeler:['dégelé','eler'],congeler:['congelé','eler'],surgeler:['surgelé','eler'],marteler:['martelé','eler'],modeler:['modelé','eler'],peler:['pelé','eler'],ficeler:['ficelé','double']
+  };
+  Object.entries(eler).forEach(([key,[pp,variante]])=>add(key,'er-eler',pp,variante));
+  const eter={
+    jeter:['jeté','jeter'],projeter:['projeté','double'],rejeter:['rejeté','double'],déjeter:['déjeté','double'],surjeter:['surjeté','double'],
+    acheter:['acheté','accent'],racheter:['racheté','accent'],bégueter:['bégueté','accent'],corseter:['corseté','accent'],crocheter:['crocheté','accent'],fileter:['fileté','accent'],fureter:['fureté','accent'],haleter:['haleté','accent'],feuilleter:['feuilleté','double']
+  };
+  Object.entries(eter).forEach(([key,[pp,variante]])=>add(key,'er-eter',pp,variante));
   window.COQ_VERB_CONSTRUCTION_CATALOG=Object.freeze(catalog);
 })();
