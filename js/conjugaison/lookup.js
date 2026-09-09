@@ -6,7 +6,7 @@
   const VOWELS=/^[aeiouàâäéèêëîïôöùûüÿœæ]/i;
   const record=v=>((resolver&&typeof resolver.resolveRecord==='function')?resolver.resolveRecord(v):null)||conjugations[v]||null;
   const meta=v=>record(v)||{},verbExists=verb=>!!record(verb),isCompound=tense=>!!C?.isCompound?.(tense);
-  function counterpart(verb){const m=meta(verb);if(m.pronominal&&m.verbeBase&&record(m.verbeBase))return m.verbeBase;if(!m.pronominal&&m.formePronominale?.infinitif&&record(m.formePronominale.infinitif))return m.formePronominale.infinitif;if(!m.pronominal&&m.verbeBase&&record('se '+m.verbeBase))return 'se '+m.verbeBase;return null;}
+  function counterpart(verb){const m=meta(verb);if(m.pronominal&&m.verbeBase&&record(m.verbeBase))return m.verbeBase;if(!m.pronominal&&m.formePronominale?.infinitif&&record(m.formePronominale.infinitif))return m.formePronominale.infinitif;return null;}
   function toggleLabel(verb){return meta(verb).pronominal?'Voir sa forme non pronominale':'Voir sa forme pronominale';}
   function rowsForTense(verb,tense){return engine?.rowsForLookup?engine.rowsForLookup(verb,tense):((conjugations[verb]||{})[tense]||[]);}
   function normalizeSubject(value){return String(value||'').trim().toLowerCase().replace(/\s+/g,' ');}
