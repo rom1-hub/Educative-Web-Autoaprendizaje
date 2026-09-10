@@ -4,6 +4,7 @@
   const P=window.COQ_CONJ_PRONOUNS;
   const conjugations=U.conjugations, verbGroups=U.verbGroups, verbMeta=U.verbMeta;
   const resolver=window.COQ_PATTERN_RESOLVER;
+  const categoryResolver=window.COQ_CATEGORY_RESOLVER;
   const engine=window.COQ_CONJ_ENGINE;
   const C=window.COQ_CONJ_COMPOUND;
   const constructions=window.COQ_COMPOUND_CONSTRUCTION_FILTERS||{};
@@ -15,9 +16,9 @@
   const allTenses=C?.allTenses||[];
   const subjectVariants=P?.subjectVariants||{};
   let session={questions:[],index:0,correct:0,results:[],locked:false};
-  function matchesGroup(v,group){
-    if(!group || group==='all')return true;
-    return !!(resolver&&typeof resolver.matchesGroup==='function'&&resolver.matchesGroup(v,group));
+  function matchesCategory(v,category){
+    if(!category || category==='all')return true;
+    return !!(categoryResolver&&typeof categoryResolver.matchesCategory==='function'&&categoryResolver.matchesCategory(v,category));
   }
   function answerModel(answer){
     const normalize=U.normalizeAnswerText||function(v){return String(v||'').trim().toLowerCase().replace(/\s+/g,' ');};
@@ -65,12 +66,12 @@
     }
     return selected;
   }
-  function buildQuestions(verb,tense,group,construction,auxiliary){
+  function buildQuestions(verb,tense,category,construction,auxiliary){
     let pool=[];
     const add=v=>{
       const meta=getRecord(v);
       if(!meta)return;
-      if(!verb&&!matchesGroup(v,group))return;
+      if(!verb&&!matchesCategory(v,category))return;
       if(!matchesConstruction(v,construction))return;
       const data=conjugations[v]||{};
       const ts=tense==='Todos los tiempos'?Array.from(new Set([...Object.keys(data),...allTenses])):[tense];
@@ -131,9 +132,9 @@
     if(!group)return;
     if(verb){group.disabled=true;group.innerHTML='<option value="" selected>No necesario: verbo concreto</option>';if(help)help.textContent='';return;}
     group.disabled=false;
-    const options=resolver&&typeof resolver.categoryOptions==='function'?resolver.categoryOptions():[];
+    const options=categoryResolver&&typeof categoryResolver.categoryOptions==='function'?categoryResolver.categoryOptions():[];
     group.innerHTML='<option value="" selected>-seleccionar-</option>'+options.map(item=>'<option value="'+U.escapeHtml(item.id)+'">'+U.escapeHtml(item.label)+'</option>').join('');
-    if(help)help.textContent='Selecciona un grupo o una categoría verbal para afinar el ejercicio.';
+    if(help)help.textContent='Selecciona una categoría verbal para afinar el ejercicio.';
   }
   function startSession(){const verb=U.normalizeVerb(document.querySelector('#practiceVerb')?.value),tense=document.querySelector('#practiceTense')?.value,group=document.querySelector('#practiceGroup')?.value,construction=document.querySelector('#practiceConstruction')?.value,auxiliary=document.querySelector('#practiceAuxiliary')?.value,msg=document.querySelector('#practiceMessage');if(!msg)return;if(!tense){msg.className='form-message error';msg.textContent='Debes seleccionar un tiempo verbal para comenzar la práctica.';return;}if(verb&&!getRecord(verb)){msg.className='form-message error';msg.textContent='Ese verbo no puede resolverse todavía con los patrones disponibles.';return;}const questions=buildQuestions(verb,tense,group,construction,auxiliary);if(questions.length<20){msg.className='form-message error';msg.textContent='No hay suficientes preguntas disponibles para crear una sesión de 20 preguntas con esta configuración.';return;}session={questions,index:0,correct:0,results:[],locked:false};document.querySelector('#practiceSession')?.classList.remove('hidden');document.querySelector('#practiceCriteria').textContent=[verb||'grupo',tense,group||'',construction||'',auxiliary||''].filter(Boolean).join(' · ');showQuestion();document.querySelector('#practiceSession')?.scrollIntoView({behavior:'smooth',block:'start'});}
   function showQuestion(){const q=session.questions[session.index];session.locked=false;q.attempts=0;q.firstError='';q.secondError='';q.mustTypeCorrect=false;document.querySelector('#questionVerb').textContent=`${q.verb} · ${q.tense}`;document.querySelector('#questionSubject').textContent=q.subject;const input=document.querySelector('#answerInput');input.value='';input.className='';input.disabled=false;const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box';fb.textContent='';document.querySelector('#practiceProgressText').textContent=`Question ${session.index+1} / 20`;document.querySelector('#practiceProgressBar').style.width=`${(session.index/20)*100}%`;setTimeout(()=>input.focus(),80);}
