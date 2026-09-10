@@ -47,7 +47,8 @@
     if(genericNotation)return prefix+pp+genericNotation;
     const context=lookupAgreementContext(subject);
     if(!context)return value;
-    const agreed=agree(pp,context,{type:meta.pronominal?'pronominale':'non-pronominale',baseVerb:meta.verbeBase||verb,auxiliaire:meta.auxiliaire});
+    const ruleBase=meta.baseVerbId||meta.verbeBase||verb;
+    const agreed=agree(pp,context,{type:meta.pronominal?'pronominale':'non-pronominale',baseVerb:ruleBase,auxiliaire:meta.auxiliaire});
     return prefix+agreed;
   }
   window.COQ_CONJ_AGREEMENT={agree,applySubjectAgreement,stripAgreementMarkers,lookupAgreementContext,formatLookupCompoundForm};
