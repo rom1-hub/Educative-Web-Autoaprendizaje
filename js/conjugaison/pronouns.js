@@ -22,6 +22,14 @@
     elles:Object.freeze(['elles'])
   });
   const imperativePronouns=Object.freeze({tu:'toi',nous:'nous',vous:'vous'});
+  const subjonctifSubjects=Object.freeze({je:'que je',tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"});
+  const subjectGroups=Object.freeze({
+    'il/elle/on':Object.freeze(['il','elle','on']),
+    "qu'il/elle/on":Object.freeze(["qu'il","qu'elle","qu'on"]),
+    'ils/elles':Object.freeze(['ils','elles']),
+    "qu'ils/elles":Object.freeze(["qu'ils","qu'elles"])
+  });
+  const VOWELS=/^[aeiouàâäéèêëîïôöùûüÿœæ]/i;
   function baseSubject(label){
     const s=String(label||'').trim();
     const withoutGender=s.replace(/\s*\([^)]*\)\s*$/,'').trim();
@@ -32,6 +40,10 @@
     const first=withoutGender.split(/\s+/)[0].split('/')[0];
     const normalizedFirst=first.replace(/^qu['’]/,'').replace(/^que\s*/,'').replace(/^q['’]/,'');
     return subjectBase[first]||subjectBase[normalizedFirst]||normalizedFirst;
+  }
+  function subjectGroupFor(label){
+    const raw=String(label||'').trim().replace(/\s*\([^)]*\)\s*$/,'').trim().toLowerCase();
+    return subjectGroups[raw]||null;
   }
   function subjectInfo(subject){
     const label=String(subject||'').trim();
@@ -50,19 +62,28 @@
   }
   function pronounFor(label){return subjectPronouns[baseSubject(label)]||null;}
   function imperativePronounFor(label){return imperativePronouns[baseSubject(label)]||null;}
-  function contractPronoun(pronoun, nextWord){
+  function contractPronoun(pronoun,nextWord){
     if(!pronoun || !nextWord) return pronoun;
     if(!['me','te','se'].includes(pronoun)) return pronoun;
     return /^[aeiouyàâäéèêëîïôöùûüÿh]/i.test(nextWord) ? pronoun.charAt(0)+"'" : pronoun;
   }
-  function apply(subjectLabel, verbForm){
+  function apply(subjectLabel,verbForm){
     const p=pronounFor(subjectLabel);
     if(!p) return verbForm;
     const clean=String(verbForm||'').trim();
     if(!clean) return clean;
     const first=clean.match(/^([^\s']+)/)?.[1]||clean;
-    const cp=contractPronoun(p, first);
+    const cp=contractPronoun(p,first);
     return cp + (cp.endsWith("'")?'':' ') + clean;
   }
-  window.COQ_CONJ_PRONOUNS={subjectPronouns,baseSubject,subjectInfo,subjectVariants,pronounFor,imperativePronounFor,contractPronoun,apply};
+  function subjectForMode(label,mode,form){
+    const raw=String(label||'').trim();
+    const context=raw.match(/\s*(\([^)]*\))\s*$/)?.[1]||'';
+    const base=baseSubject(raw);
+    let result=raw;
+    if(mode==='subjonctif')result=subjonctifSubjects[base]||raw;
+    if((result==='je'||result==='que je')&&VOWELS.test(String(form||'').trim()))result=result==='que je'?"que j'":"j'";
+    return result+(context?' '+context:'');
+  }
+  window.COQ_CONJ_PRONOUNS={subjectPronouns,baseSubject,subjectInfo,subjectVariants,imperativePronouns,subjonctifSubjects,subjectGroupFor,pronounFor,imperativePronounFor,contractPronoun,apply,subjectForMode};
 })();
