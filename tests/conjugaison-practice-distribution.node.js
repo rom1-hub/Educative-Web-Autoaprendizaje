@@ -21,6 +21,7 @@ const files=[
   'data/verbs/family-catalog.js',
   'data/verbs/patterns.js',
   'data/verbs/constructions.js',
+  'data/verbs/auxiliaries.js',
   'data/verbs/tense-rules.js',
   'js/conjugaison/utils.js',
   'js/conjugaison/pronouns.js',
@@ -34,7 +35,7 @@ const files=[
 
 files.forEach(file=>vm.runInContext(fs.readFileSync(file,'utf8'),context,{filename:file}));
 
-assert.ok(context.window.COQ_CONJ_PRACTICE_TESTING,'API de pruebas de práctica no disponible.');
+assert(context.window.COQ_CONJ_PRACTICE_TESTING,'API de pruebas de práctica no disponible.');
 const {selectPracticeQuestions}=context.window.COQ_CONJ_PRACTICE_TESTING;
 
 const makeQuestion=(subject,tense,verb='parler')=>({verb,tense,subject,answer:`${verb}-${subject}-${tense}`});
