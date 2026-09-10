@@ -12,18 +12,14 @@
  * - auxiliaire y participePasse siguen siendo propiedades del verbo.
  * - las formas históricas (formes) se conservan por compatibilidad, pero no
  *   forman parte de la autoridad conceptual del nuevo modelo.
- * - no se infieren familias nuevas ni se inventan excepciones.
+ * - no se infieren familias nuevas a partir de sufijos, prefijos o patterns.
+ * - los familyId todavía no declarados explícitamente permanecen en null;
+ *   la migración del catálogo de familias será el siguiente bloque.
  */
 (function(){
   const rawVerbs=window.COQ_VERBS||{};
   const familyCatalog=window.COQ_VERB_FAMILY_CATALOG||{};
   const constructionCatalog=window.COQ_VERB_CONSTRUCTION_CATALOG||{};
-
-  const familyByVerb=Object.create(null);
-  Object.entries(familyCatalog).forEach(([familyId,entry])=>{
-    if(!entry||typeof entry!=='object')return;
-    familyByVerb[familyId]=familyId;
-  });
 
   const sourceKeys=new Set([
     ...Object.keys(rawVerbs),
@@ -47,11 +43,6 @@
     return value;
   }
 
-  function findFamilyId(verb){
-    if(Object.prototype.hasOwnProperty.call(familyCatalog,verb))return verb;
-    return null;
-  }
-
   function normalizeBaseVerbId(record,key){
     const candidate=String(record?.verbeBase||'').trim();
     if(!candidate||candidate===key)return null;
@@ -63,8 +54,10 @@
     const family=familyCatalog[key]||{};
     const construction=constructionCatalog[key]||{};
     const merged={...raw,...family,...construction};
-    const familyId=findFamilyId(key);
-    const patternId=typeof merged.pattern==='string'&&merged.pattern.trim()?merged.pattern.trim():null;
+    const familyId=typeof merged.familyId==='string'&&merged.familyId.trim()?merged.familyId.trim():null;
+    const patternId=typeof merged.patternId==='string'&&merged.patternId.trim()
+      ?merged.patternId.trim()
+      :(typeof merged.pattern==='string'&&merged.pattern.trim()?merged.pattern.trim():null);
     const baseVerbId=normalizeBaseVerbId(merged,key);
 
     records[key]=deepFreeze({
