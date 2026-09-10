@@ -71,7 +71,17 @@
     });
   });
 
+  const familyResolver=Object.freeze({
+    normalize(value){return String(value||'').trim().toLowerCase();},
+    options(){return Object.values(frozenFamilies);},
+    resolve(verb){
+      const entry=familyIndex&&Object.entries(familyIndex).find(([,verbs])=>verbs.includes(this.normalize(verb)));
+      return entry?frozenFamilies[entry[0]]||null:null;
+    }
+  });
+
   window.COQ_VERB_FAMILIES=Object.freeze(frozenFamilies);
   window.COQ_VERB_FAMILY_CATALOG=Object.freeze(catalog);
   window.COQ_VERB_FAMILY_INDEX=Object.freeze(familyIndex);
+  window.COQ_FAMILY_RESOLVER=familyResolver;
 })();
