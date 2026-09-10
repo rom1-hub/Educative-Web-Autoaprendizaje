@@ -17,18 +17,17 @@
   function explicitForm(verb,tense,subject){const r=record(verb);const rows=(r?.legacyFormes||r?.formes||{})[tense]||[];const exact=rows.find(r=>r[0]===subject);if(exact)return exact[1];const base=P.baseSubject(subject);const grouped=rows.find(r=>String(r[0]).split('/').map(x=>x.trim()).some(label=>P.baseSubject(label)===base));return grouped?grouped[1]:null;}
   function simpleForm(verb,tense,subject){const generated=generatedSimple(verb,tense,subject);if(generated!==null&&generated!==undefined&&String(generated)!=='')return generated;return explicitForm(verb,tense,subject);}
   function participle(verb){const r=record(baseKey(verb));return r&&r.participePasse?r.participePasse:null;}
-  function applyAgreement(pp,info,base,isPronominal,auxiliary,recordData){
+  function applyAgreement(pp,info,base,isPronominal,auxiliary){
     if(!A)return pp;
     if(isPronominal){
-      const ruleBase=base||recordData?.baseVerbId||recordData?.legacyVerbeBase||recordData?.infinitifBase;
-      const rule=window.COQ_PRONOMINAL_RULES?.[ruleBase];
+      const rule=window.COQ_PRONOMINAL_RULES?.[base];
       if(rule?.accord==='sujet'&&typeof A.applySubjectAgreement==='function')return A.applySubjectAgreement(pp,{gender:info.gender,number:info.number});
       return typeof A.stripAgreementMarkers==='function'?A.stripAgreementMarkers(pp):pp;
     }
     if(auxiliary==='être'&&typeof A.applySubjectAgreement==='function')return A.applySubjectAgreement(pp,{gender:info.gender,number:info.number});
     return typeof A.stripAgreementMarkers==='function'?A.stripAgreementMarkers(pp):pp;
   }
-  function compoundForm(verb,tense,subject,construction){if(!C||!C.isCompound(tense))return null;const r=record(verb);if(!r)return null;const base=baseKey(verb),info=P.subjectInfo(subject),isPronominal=construction==='pronominale'||r.pronominal===true||r.construction==='pronominale',auxiliary=isPronominal?'être':r.auxiliaire;if(!auxiliary)return null;const auxTense=C.auxiliaryTense(tense),auxForm=simpleForm(auxiliary,auxTense,info.base);if(!auxForm)return null;const pp=participle(base);if(!pp)return null;const agreed=applyAgreement(pp,info,base,isPronominal,auxiliary,r);if(isPronominal){const pron=P.pronounFor(info.base);if(!pron)return null;const contracted=P.contractPronoun(pron,auxForm);return contracted+(contracted.endsWith("'")?'':' ')+auxForm+' '+agreed;}return auxForm+' '+agreed;}
+  function compoundForm(verb,tense,subject,construction){if(!C||!C.isCompound(tense))return null;const r=record(verb);if(!r)return null;const base=baseKey(verb),info=P.subjectInfo(subject),isPronominal=construction==='pronominale'||r.pronominal===true||r.construction==='pronominale',auxiliary=isPronominal?'être':r.auxiliaire;if(!auxiliary)return null;const auxTense=C.auxiliaryTense(tense),auxForm=simpleForm(auxiliary,auxTense,info.base);if(!auxForm)return null;const pp=participle(base);if(!pp)return null;const agreed=applyAgreement(pp,info,base,isPronominal,auxiliary);if(isPronominal){const pron=P.pronounFor(info.base);if(!pron)return null;const contracted=P.contractPronoun(pron,auxForm);return contracted+(contracted.endsWith("'")?'':' ')+auxForm+' '+agreed;}return auxForm+' '+agreed;}
   function conjugate(verb,tense,subject,construction){const r=record(verb);if(!r)return null;const isPronominal=construction==='pronominale'||r.pronominal===true||(r.construction==='pronominale'&&construction!=='non-pronominale');if(C&&C.isCompound(tense))return compoundForm(verb,tense,subject,isPronominal?'pronominale':'non-pronominale');let form=simpleForm(baseKey(verb),tense,subject);if(form==null)return null;if(isPronominal){if(tense==='impératif présent'){const imperativePronoun=P.imperativePronounFor?.(subject);if(!imperativePronoun)return form;return form+'-'+imperativePronoun;}form=P.apply(subject,form);}return form;}
   function practiceCompoundSubjects(tense){return tense==='subjonctif passé'?SUBJONCTIF_PRACTICE_SUBJECTS:PRACTICE_SUBJECTS;}
   function rowsForLookup(verb,tense){const r=record(verb);if(!r)return [];if(!(C&&C.isCompound(tense)))return rowsFor(verb,tense);const construction=r.pronominal?'pronominale':(r.construction||'non-pronominale');return LOOKUP_COMPOUND_SUBJECTS.map(subject=>[subject,conjugate(verb,tense,P.baseSubject(subject),construction)]).filter(row=>row[1]!=null);}
