@@ -82,7 +82,7 @@ expect(lookupRows[6][0],'vous','La tabla pronominal debe mostrar vous en una sol
 expect(lookupRows[6][1],'vous êtes levé(e)(s)','vous debe conservar las cuatro posibilidades de concordancia.');
 expect(lookupRows[7][0],'ils','La tabla pronominal debe separar ils.');
 expect(lookupRows[7][1],'se sont levés','ils debe usar el masculino plural.');
-expect(lookupRows[8][0],'elles','La tabla pronominal debe usar femenino plural.');
+expect(lookupRows[8][0],'elles','elles debe usar femenino plural.');
 expect(lookupRows[8][1],'se sont levées','elles debe usar femenino plural.');
 const simpleLookup=lookup.normalizedRows(engine.rowsForLookup('parler',"présent de l'indicatif"),"présent de l'indicatif",'parler');
 assert(simpleLookup.length===9,'La tabla simple debe mostrar los 9 sujetos separados.');
