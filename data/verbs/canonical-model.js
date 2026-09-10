@@ -15,6 +15,13 @@
  * - no se infieren familias nuevas a partir de sufijos, prefijos o patterns.
  * - los familyId todavía no declarados explícitamente permanecen en null;
  *   la migración del catálogo de familias será el siguiente bloque.
+ *
+ * Normalización de migración:
+ * - Se corrigen aquí únicamente inconsistencias heredadas ya identificadas
+ *   mientras la fuente léxica histórica sigue siendo compatible con el motor.
+ * - Esta capa no añade reglas lingüísticas al motor ni crea una segunda fuente
+ *   permanente de datos: produce la vista canónica que reemplazará al registro
+ *   histórico durante la migración.
  */
 (function(){
   const rawVerbs=window.COQ_VERBS||{};
@@ -43,11 +50,18 @@
     return candidate;
   }
 
+  function normalizeLegacyLexicalData(key,merged){
+    if(key==='être'&&merged.pattern==='être'&&merged.participePasse==='été'&&!merged.pronominal){
+      return {...merged,auxiliaire:'avoir'};
+    }
+    return merged;
+  }
+
   sourceKeys.forEach(key=>{
     const raw=rawVerbs[key]||{};
     const family=familyCatalog[key]||{};
     const construction=constructionCatalog[key]||{};
-    const merged={...raw,...family,...construction};
+    const merged=normalizeLegacyLexicalData(key,{...raw,...family,...construction});
     const familyId=typeof merged.familyId==='string'&&merged.familyId.trim()?merged.familyId.trim():null;
     const patternId=typeof merged.patternId==='string'&&merged.patternId.trim()
       ?merged.patternId.trim()
@@ -89,11 +103,10 @@
   // autoridad de datos. La migración del motor al modelo canónico lo eliminará.
   const legacyRegistry={};
   sourceKeys.forEach(key=>{
-    legacyRegistry[key]={
-      ...(rawVerbs[key]||{}),
-      ...(familyCatalog[key]||{}),
-      ...(constructionCatalog[key]||{})
-    };
+    const raw=rawVerbs[key]||{};
+    const family=familyCatalog[key]||{};
+    const construction=constructionCatalog[key]||{};
+    legacyRegistry[key]=normalizeLegacyLexicalData(key,{...raw,...family,...construction});
   });
 
   const api={
