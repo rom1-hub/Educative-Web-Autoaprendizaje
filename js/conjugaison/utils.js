@@ -1,54 +1,50 @@
 /* COQ — Utilidades de Conjugación.
- * Construye una única vista normalizada de datos y expone utilidades puras.
+ * Construye vistas derivadas del modelo canónico y expone utilidades puras.
  * Después de esta fase, motor y UI no deben leer ni modificar COQ_VERBS.
  */
 (function(){
-  const rawVerbs=window.COQ_VERBS||{};
-  const verbMeta=window.COQ_VERB_DATA?.verbMeta||{};
-  const familyCatalog=window.COQ_VERB_FAMILY_CATALOG||{};
-  const constructionCatalog=window.COQ_VERB_CONSTRUCTION_CATALOG||{};
-  const source={};
-
-  // verbMeta es una capa de metadata, no un reemplazo del registro completo.
-  // Conservamos formes/pattern/participePasse y cualquier otro dato completo de
-  // COQ_VERBS, y encima aplicamos las correcciones de metadata normalizada.
-  const keys=new Set([...Object.keys(rawVerbs),...Object.keys(verbMeta),...Object.keys(familyCatalog),...Object.keys(constructionCatalog)]);
-  keys.forEach(key=>{
-    source[key]={...(rawVerbs[key]||{}),...(verbMeta[key]||{}),...(familyCatalog[key]||{}),...(constructionCatalog[key]||{})};
-  });
-
-  function clone(value){
-    if(Array.isArray(value))return value.map(clone);
-    if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).map(([k,v])=>[k,clone(v)]));
-    return value;
-  }
-  function deepFreeze(value){
-    if(value&&typeof value==='object'&&!Object.isFrozen(value)){
-      Object.values(value).forEach(deepFreeze);
-      Object.freeze(value);
-    }
-    return value;
-  }
-
+  const dataModel=window.COQ_CONJ_DATA_MODEL;
+  const records=dataModel?.records||{};
+  const verbData=window.COQ_VERB_DATA||{};
   const registry={};
-  Object.keys(source).forEach(key=>{
-    const record=source[key];
-    if(!record||typeof record!=='object')return;
-    registry[key]=deepFreeze(clone(record));
+
+  // Adaptador de compatibilidad: mantiene la forma histórica que todavía
+  // consumen algunas capas mientras la migración termina. Los datos provienen
+  // exclusivamente del modelo canónico; no constituye una segunda autoridad.
+  Object.entries(records).forEach(([key,record])=>{
+    registry[key]=Object.freeze({
+      id:record.id,
+      infinitif:record.infinitif,
+      infinitif_base:record.infinitifBase,
+      groupe:record.groupe,
+      familyId:record.familyId,
+      patternId:record.patternId,
+      pattern:record.legacyPattern,
+      auxiliaire:record.auxiliaire,
+      participePasse:record.participePasse,
+      construction:record.construction,
+      verbeBase:record.legacyVerbeBase,
+      pronominal:record.pronominal,
+      formePronominale:record.formePronominale,
+      formeNonPronominale:record.formeNonPronominale,
+      variantes:record.variantes,
+      exceptions:record.exceptions,
+      formes:record.legacyFormes
+    });
   });
-  deepFreeze(registry);
+  Object.freeze(registry);
 
   const normalizedMeta={};
-  Object.entries(registry).forEach(([key,record])=>{
+  Object.entries(records).forEach(([key,record])=>{
     const meta={...record};
     if(record.pronominal===true)meta.auxiliaire=null;
-    normalizedMeta[key]=deepFreeze(meta);
+    normalizedMeta[key]=Object.freeze(meta);
   });
-  deepFreeze(normalizedMeta);
+  Object.freeze(normalizedMeta);
 
   const api={
-    conjugations:registry,
-    verbGroups:Object.freeze({...((window.COQ_VERB_DATA||{}).verbGroups||{})}),
+    conjugations:Object.freeze(Object.fromEntries(Object.entries(registry).map(([key,record])=>[key,record.formes||{}]))),
+    verbGroups:Object.freeze({...((verbData.verbGroups)||{})}),
     verbMeta:normalizedMeta
   };
   api.normalizeVerb=v=>String(v??'').trim().toLowerCase();
