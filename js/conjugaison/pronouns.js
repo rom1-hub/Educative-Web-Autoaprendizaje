@@ -29,6 +29,16 @@
     'ils/elles':Object.freeze(['ils','elles']),
     "qu'ils/elles":Object.freeze(["qu'ils","qu'elles"])
   });
+  const subjectSets=Object.freeze({
+    lookupCompound:Object.freeze(['je','tu','il','elle','on','nous','vous','ils','elles']),
+    practice:Object.freeze(['je','tu','il','elle','on','nous','vous','ils','elles']),
+    subjonctifPractice:Object.freeze(['que je','que tu',"qu'il","qu'elle","qu'on",'que nous','que vous',"qu'ils","qu'elles"]),
+    simpleFallback:Object.freeze(['je','tu','il/elle/on','nous','vous','ils/elles']),
+    subjonctifSimpleFallback:Object.freeze(['que je','que tu',"qu'il/elle/on",'que nous','que vous',"qu'ils/elles"]),
+    subjonctifConstructionFallback:Object.freeze(['que je','que tu',"qu'il",'que nous','que vous',"qu'ils"]),
+    simpleConstructionFallback:Object.freeze(['je','tu','il','elle','on','nous','vous','ils','elles']),
+    imperative:Object.freeze(['tu','nous','vous'])
+  });
   const VOWELS=/^[aeiouàâäéèêëîïôöùûüÿœæ]/i;
   function baseSubject(label){
     const s=String(label||'').trim();
@@ -85,5 +95,5 @@
     if((result==='je'||result==='que je')&&VOWELS.test(String(form||'').trim()))result=result==='que je'?"que j'":"j'";
     return result+(context?' '+context:'');
   }
-  window.COQ_CONJ_PRONOUNS={subjectPronouns,baseSubject,subjectInfo,subjectVariants,imperativePronouns,subjonctifSubjects,subjectGroupFor,pronounFor,imperativePronounFor,contractPronoun,apply,subjectForMode};
+  window.COQ_CONJ_PRONOUNS={subjectPronouns,baseSubject,subjectInfo,subjectVariants,imperativePronouns,subjonctifSubjects,subjectGroupFor,subjectSets,pronounFor,imperativePronounFor,contractPronoun,apply,subjectForMode};
 })();
