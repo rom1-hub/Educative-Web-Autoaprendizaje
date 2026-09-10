@@ -51,8 +51,8 @@
         if(!matchesAuxiliary(v,t,auxiliary))return;
         let rows=(engine&&engine.rowsFor)?engine.rowsFor(v,t):data[t];
         if(engine&&engine.rowsForConstruction&&construction){
-          const constructionRows=engine.rowsForConstruction(v,t,construction);
-          rows=constructionRows.length?constructionRows:rows;
+          rows=engine.rowsForConstruction(v,t,construction);
+          if(!rows.length)return;
         }
         U.expandPracticeRows(rows).forEach(r=>{
           if(isCompound && SUBJECT_VARIANTS[PSubject(String(r.subject||'').split(' (')[0].trim())] && engine&&engine.conjugate){
