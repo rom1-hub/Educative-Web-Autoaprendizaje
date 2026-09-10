@@ -31,10 +31,10 @@
     familyIds:category.familyIds?Object.freeze([...category.familyIds]):null
   }));
 
-  const dataModel=window.COQ_CONJ_DATA_MODEL;
-  const records=dataModel?.records||{};
-  const normalize=value=>String(value||'').trim().toLowerCase();
-  const canonicalRecord=verb=>records[normalize(verb)]||null;
+  const canonicalRecord=verb=>{
+    const records=window.COQ_CONJ_DATA_MODEL?.records||{};
+    return records[String(verb||'').trim().toLowerCase()]||null;
+  };
   function categoryOptions(){
     return frozen.map(category=>Object.freeze({
       ...category,
