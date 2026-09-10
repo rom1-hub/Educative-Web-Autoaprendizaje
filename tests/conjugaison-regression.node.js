@@ -8,7 +8,7 @@ files.forEach(file=>vm.runInContext(fs.readFileSync(path.join(root,file),'utf8')
 const w=context.window,engine=w.COQ_CONJ_ENGINE,lookup=w.COQ_CONJ_LOOKUP;
 const assert=(condition,message)=>{if(!condition)throw new Error(message);};
 const expect=(actual,expected,label)=>assert(actual===expected,`${label}: esperado «${expected}», obtenido «${actual}»`);
-assert(w.COQ_VERBS['parler'],'Los datos base deben seguir intactos tras cargar el catálogo.');
+assert(w.COQ_VERBS['parler'],'Los datos base deben seguir intactos tras cargar el registro extendido.');
 assert(w.COQ_VERBS['sortir'],'Los datos léxicos extendidos deben cargarse antes del modelo canónico.');
 assert(w.COQ_VERBS['prévenir'],'prévenir debe pertenecer al registro léxico de verbos.');
 assert(w.COQ_VERB_REGISTRY['partir'],'El registro unificado debe conservar verbos provenientes de los datos extendidos.');
@@ -58,7 +58,6 @@ expect(engine.conjugate('acheter',"présent de l'indicatif",'je'),'achète','ach
 expect(engine.conjugate('nettoyer',"présent de l'indicatif",'je'),'nettoie','nettoyer je');
 expect(engine.conjugate('prendre',"présent de l'indicatif",'ils'),'prennent','prendre ils');
 expect(engine.conjugate('partir','passé composé','je (masculin singulier)'),'suis parti','partir passé composé');
-expect(engine.conjugate('plus-que-parfait','plus-que-parfait','je (féminin singulier)'),'étais plus-que-parfait','dummy');
 expect(engine.conjugate('partir','plus-que-parfait','je (féminin singulier)'),'étais partie','partir plus-que-parfait');
 expect(engine.conjugate('être','passé composé','je (masculin singulier)'),'ai été','être passé composé');
 expect(engine.conjugate('faire','conditionnel passé','nous (féminin pluriel)'),'aurions fait','faire conditionnel passé');
@@ -66,7 +65,7 @@ expect(engine.conjugate('se lever','passé composé','vous (féminin singulier)'
 expect(engine.conjugate('se lever','plus-que-parfait','tu (masculin singulier)','pronominale'),"t'étais levé",'se lever plus-que-parfait');
 expect(engine.conjugate('se parler','passé composé','ils','pronominale'),'se sont parlé','se parler sans accord');
 expect(engine.conjugate('venir','futur antérieur','elles'),'seront venues','venir futur antérieur');
-expect(w.COQ_VERB_REGISTRY['venir'].auxiliaire,'être','venir doit conservar son auxiliaire être dans el registro normalizado');
+expect(w.COQ_VERB_REGISTRY['venir'].auxiliaire,'être','venir doit conserver son auxiliaire être dans el registro normalizado');
 const specialCatalog=w.COQ_VERB_CONSTRUCTION_CATALOG||{};
 const elerVerbs=Object.keys(specialCatalog).filter(v=>specialCatalog[v]?.pattern==='er-eler');
 const eterVerbs=Object.keys(specialCatalog).filter(v=>specialCatalog[v]?.pattern==='er-eter');
