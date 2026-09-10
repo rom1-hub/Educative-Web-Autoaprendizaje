@@ -17,7 +17,7 @@
     {id:'er-e-accent',label:'Premier groupe verbe en -E (È) + consonne + ER',groupes:[1],familyIds:['er-e-accent']},
     {id:'groupe-2',label:'Deuxième groupe',groupes:[2],familyIds:['ir-regular-2']},
     {id:'groupe-3',label:'Verbes du troisième groupe',groupes:[3],familyIds:[
-      'être','avoir','prendre-type','faire-type','partir-type','suivre-type','ouvrir-type',
+      'être','avoir','aller-type','prendre-type','faire-type','partir-type','suivre-type','ouvrir-type',
       'venir-type','tenir-type','mettre-type','lire-type','rire-type','vivre-type',
       'conduire-type','courir-type','mourir-type','croire-type','recevoir-type',
       'connaître-type','paraître-type'
