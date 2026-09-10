@@ -29,12 +29,6 @@
 
   const records={};
 
-  function clone(value){
-    if(Array.isArray(value))return value.map(clone);
-    if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).map(([k,v])=>[k,clone(v)]));
-    return value;
-  }
-
   function deepFreeze(value){
     if(value&&typeof value==='object'&&!Object.isFrozen(value)){
       Object.values(value).forEach(deepFreeze);
