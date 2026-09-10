@@ -1,0 +1,15 @@
+const fs=require('fs');
+const path=require('path');
+const vm=require('vm');
+const root=path.resolve(__dirname,'..');
+const context=vm.createContext({window:{},document:{querySelector:()=>null,getElementById:()=>null,querySelectorAll:()=>[]},console,Object,Array,Set,Map,String,Number,Boolean,RegExp,JSON});
+['data/verbs/verbs.js','data/verbs/verbs-extended.js','data/verbs/family-catalog.js','data/verbs/category-catalog.js','data/verbs/canonical-model.js','data/verbs/patterns.js'].forEach(file=>vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),context,{filename:file}));
+const w=context.window;
+const assert=(condition,message)=>{if(!condition)throw new Error(message);};
+assert(Array.isArray(w.COQ_VERB_CATEGORY_CATALOG),'El catálogo de categorías debe existir.');
+assert(typeof w.COQ_PATTERN_RESOLVER.categoryOptions==='function','El resolver debe exponer categoryOptions como API canónica.');
+assert(typeof w.COQ_PATTERN_RESOLVER.groupOptions==='undefined','La API obsoleta groupOptions no debe seguir expuesta.');
+const options=w.COQ_PATTERN_RESOLVER.categoryOptions();
+assert(options.length===w.COQ_VERB_CATEGORY_CATALOG.length,'categoryOptions debe reflejar exactamente el catálogo canónico.');
+assert(options.some(category=>category.id==='er-eler'),'categoryOptions debe conservar las categorías pedagógicas existentes.');
+console.log('✓ Category API regression passed');
