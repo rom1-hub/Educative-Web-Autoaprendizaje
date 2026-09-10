@@ -7,9 +7,14 @@ const context=vm.createContext({window:{},document:{querySelector:()=>null,getEl
 const w=context.window;
 const assert=(condition,message)=>{if(!condition)throw new Error(message);};
 assert(Array.isArray(w.COQ_VERB_CATEGORY_CATALOG),'El catálogo de categorías debe existir.');
-assert(typeof w.COQ_PATTERN_RESOLVER.categoryOptions==='function','El resolver debe exponer categoryOptions como API canónica.');
-assert(typeof w.COQ_PATTERN_RESOLVER.groupOptions==='undefined','La API obsoleta groupOptions no debe seguir expuesta.');
-const options=w.COQ_PATTERN_RESOLVER.categoryOptions();
+assert(w.COQ_CATEGORY_RESOLVER&&typeof w.COQ_CATEGORY_RESOLVER.categoryOptions==='function','El resolver de categorías debe exponer categoryOptions.');
+assert(typeof w.COQ_CATEGORY_RESOLVER.matchesCategory==='function','El resolver de categorías debe exponer matchesCategory.');
+assert(typeof w.COQ_PATTERN_RESOLVER.categoryOptions==='undefined','El resolver de patterns no debe exponer la API de categorías.');
+assert(typeof w.COQ_PATTERN_RESOLVER.matchesGroup==='undefined','El resolver de patterns no debe exponer reglas de categorías con nomenclatura histórica.');
+const options=w.COQ_CATEGORY_RESOLVER.categoryOptions();
 assert(options.length===w.COQ_VERB_CATEGORY_CATALOG.length,'categoryOptions debe reflejar exactamente el catálogo canónico.');
 assert(options.some(category=>category.id==='er-eler'),'categoryOptions debe conservar las categorías pedagógicas existentes.');
-console.log('✓ Category API regression passed');
+assert(w.COQ_CATEGORY_RESOLVER.matchesCategory('appeler','er-eler'),'appeler debe resolverse dentro de la categoría er-eler.');
+assert(!w.COQ_CATEGORY_RESOLVER.matchesCategory('appeler','er-eter'),'appeler no debe pertenecer a la categoría er-eter.');
+assert(w.COQ_CATEGORY_RESOLVER.matchesCategory('prendre','groupe-3'),'prendre debe pertenecer al tercer grupo.');
+console.log('✓ Category resolver ownership regression passed');
