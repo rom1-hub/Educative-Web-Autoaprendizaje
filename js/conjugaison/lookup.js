@@ -2,22 +2,18 @@
  * Responsabilidad: resolver la consulta, pedir las formas al motor y presentar la tabla.
  */
 (function(){
-  const U=window.COQ_CONJ_UTILS,resolver=window.COQ_PATTERN_RESOLVER,engine=window.COQ_CONJ_ENGINE,C=window.COQ_CONJ_COMPOUND,A=window.COQ_CONJ_AGREEMENT;
-  const VOWELS=/^[aeiouàâäéèêëîïôöùûüÿœæ]/i;
+  const U=window.COQ_CONJ_UTILS,P=window.COQ_CONJ_PRONOUNS,resolver=window.COQ_PATTERN_RESOLVER,engine=window.COQ_CONJ_ENGINE,C=window.COQ_CONJ_COMPOUND,A=window.COQ_CONJ_AGREEMENT;
   const record=v=>resolver&&typeof resolver.resolveRecord==='function'?resolver.resolveRecord(v):null;
   const meta=v=>record(v)||{},verbExists=verb=>!!record(verb),isCompound=tense=>!!C?.isCompound?.(tense);
   function counterpart(verb){const m=meta(verb);if(m.pronominal&&m.verbeBase&&record(m.verbeBase))return m.verbeBase;if(!m.pronominal&&m.formePronominale?.infinitif&&record(m.formePronominale.infinitif))return m.formePronominale.infinitif;return null;}
   function toggleLabel(verb){return meta(verb).pronominal?'Voir sa forme non pronominale':'Voir sa forme pronominale';}
   function rowsForTense(verb,tense){return engine?.rowsForLookup?engine.rowsForLookup(verb,tense):[];}
-  function normalizeSubject(value){return String(value||'').trim().toLowerCase().replace(/\s+/g,' ');}
   function stripMetadata(value){return String(value||'').replace(/\s*\([^)]*\)\s*/g,'').trim();}
-  function baseSubject(value){return stripMetadata(value).replace(/^que\s+/i,'').replace(/^qu['’]/i,'').trim().toLowerCase();}
-  function elideJe(label,form){const subject=normalizeSubject(label),value=String(form||'').trim();if(subject==='je'&&VOWELS.test(value))return "j'";if(subject==='que je'&&VOWELS.test(value))return "que j'";return label;}
-  function addSubjonctifPrefix(label,form){const raw=String(label||'').trim(),base=baseSubject(raw),prefix={je:'que je',tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"}[base];if(!prefix)return raw;if(/^que\s|^qu['’]/i.test(raw))return elideJe(raw,form);return elideJe(prefix,form);}
   function expandSubjects(label,form,tense){
-    const raw=String(label||'').trim(),base=baseSubject(raw);
+    const raw=String(label||'').trim(),base=P.baseSubject(raw);
     const subjects=base==='il/elle/on'?['il','elle','on']:base==='ils/elles'?['ils','elles']:[raw];
-    return subjects.map(subject=>tense==='subjonctif présent'||tense==='subjonctif passé'?addSubjonctifPrefix(subject,form):elideJe(subject,form));
+    const mode=tense==='subjonctif présent'||tense==='subjonctif passé'?'subjonctif':'normal';
+    return subjects.map(subject=>P.subjectForMode(subject,mode,form));
   }
   function normalizedRows(rows,tense,verb){
     const output=[];
