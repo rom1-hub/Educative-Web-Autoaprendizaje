@@ -24,12 +24,12 @@
     ]}
   ];
 
-  const frozen=categories.map(category=>Object.freeze({
+  const frozen=Object.freeze(categories.map(category=>Object.freeze({
     id:category.id,
     label:category.label,
     groupes:category.groupes?Object.freeze([...category.groupes]):null,
     familyIds:category.familyIds?Object.freeze([...category.familyIds]):null
-  }));
+  })));
 
   const canonicalRecord=verb=>{
     const records=window.COQ_CONJ_DATA_MODEL?.records||{};
