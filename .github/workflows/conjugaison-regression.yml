@@ -2,9 +2,7 @@ name: Conjugaison regression
 
 on:
   push:
-    branches: [audit-arquitectura]
   pull_request:
-    branches: [audit-arquitectura]
 
 jobs:
   regression:

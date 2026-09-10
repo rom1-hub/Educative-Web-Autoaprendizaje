@@ -1,30 +1,61 @@
-// COQ — catálogo declarativo de familias léxicas.
-// Este módulo NO modifica COQ_VERBS. Solo publica metadatos que el registro
-// normalizado fusionará una vez terminada la carga de datos.
+// COQ — catálogo declarativo de familias morfológicas.
+//
+// Responsabilidad única:
+//   Famille → Pattern
+//
+// Este módulo NO almacena participios, auxiliares ni formas conjugadas.
+// Esos datos pertenecen al verbo. Tampoco contiene categorías pedagógicas.
+// La pertenencia a una familia se declara explícitamente: no se infiere por
+// sufijo, prefijo ni por el nombre del pattern.
 (function(){
   const families={
-    'être':{être:['été','avoir']},
-    'partir-type':{partir:['parti','être'],sortir:['sorti','être'],dormir:['dormi','avoir'],servir:['servi','avoir']},
-    'suivre-type':{suivre:['suivi','avoir']},
-    'ouvrir-type':{ouvrir:['ouvert','avoir'],rouvrir:['rouvert','avoir'],couvrir:['couvert','avoir'],découvrir:['découvert','avoir'],recouvrir:['recouvert','avoir'],offrir:['offert','avoir'],souffrir:['souffert','avoir']},
-    'venir-type':{venir:['venu','être'],revenir:['revenu','être'],devenir:['devenu','être'],parvenir:['parvenu','être'],intervenir:['intervenu','être'],convenir:['convenu','être'],provenir:['provenu','être'],survenir:['survenu','être'],prévenir:['prévenu','avoir']},
-    'tenir-type':{tenir:['tenu','avoir'],retenir:['retenu','avoir'],soutenir:['soutenu','avoir'],obtenir:['obtenu','avoir'],maintenir:['maintenu','avoir'],contenir:['contenu','avoir'],détenir:['détenu','avoir'],appartenir:['appartenu','avoir']},
-    'mettre-type':{mettre:['mis','avoir'],remettre:['remis','avoir'],permettre:['permis','avoir'],promettre:['promis','avoir'],admettre:['admis','avoir'],transmettre:['transmis','avoir'],soumettre:['soumis','avoir']},
-    'lire-type':{lire:['lu','avoir'],relire:['relu','avoir']},
-    'rire-type':{rire:['ri','avoir'],sourire:['souri','avoir']},
-    'vivre-type':{vivre:['vécu','avoir'],revivre:['revécu','avoir'],survivre:['survécu','avoir']},
-    'conduire-type':{conduire:['conduit','avoir'],traduire:['traduit','avoir'],produire:['produit','avoir'],construire:['construit','avoir'],détruire:['détruit','avoir'],réduire:['réduit','avoir'],cuire:['cuit','avoir']},
-    'courir-type':{courir:['couru','avoir'],accourir:['accouru','avoir'],recourir:['recouru','avoir']},
-    'mourir-type':{mourir:['mort','être']},
-    'croire-type':{croire:['cru','avoir']},
-    'recevoir-type':{recevoir:['reçu','avoir']},
-    'connaître-type':{connaître:['connu','avoir'],reconnaître:['reconnu','avoir'],méconnaître:['méconnu','avoir']},
-    'paraître-type':{paraître:['paru','avoir'],apparaître:['apparu','avoir'],disparaître:['disparu','avoir'],reparaître:['reparu','avoir'],transparaître:['transparu','avoir'],comparaître:['comparu','avoir']},
-    'yer-explicit':{nettoyer:['nettoyé','avoir'],essuyer:['essuyé','avoir']}
+    'être':{id:'être',patternId:'être',groupe:3,verbs:['être']},
+    'avoir':{id:'avoir',patternId:'avoir',groupe:3,verbs:['avoir']},
+    'prendre-type':{id:'prendre-type',patternId:'prendre',groupe:3,verbs:['prendre']},
+    'faire-type':{id:'faire-type',patternId:'faire',groupe:3,verbs:['faire']},
+    'partir-type':{id:'partir-type',patternId:'partir-type',groupe:3,verbs:['partir','sortir','dormir','servir']},
+    'suivre-type':{id:'suivre-type',patternId:'suivre-type',groupe:3,verbs:['suivre']},
+    'ouvrir-type':{id:'ouvrir-type',patternId:'ouvrir-type',groupe:3,verbs:['ouvrir','rouvrir','couvrir','découvrir','recouvrir','offrir','souffrir']},
+    'venir-type':{id:'venir-type',patternId:'venir-type',groupe:3,verbs:['venir','revenir','devenir','parvenir','intervenir','convenir','provenir','survenir','prévenir']},
+    'tenir-type':{id:'tenir-type',patternId:'tenir-type',groupe:3,verbs:['tenir','retenir','soutenir','obtenir','maintenir','contenir','détenir','appartenir']},
+    'mettre-type':{id:'mettre-type',patternId:'mettre-type',groupe:3,verbs:['mettre','remettre','permettre','promettre','admettre','transmettre','soumettre']},
+    'lire-type':{id:'lire-type',patternId:'lire-type',groupe:3,verbs:['lire','relire']},
+    'rire-type':{id:'rire-type',patternId:'rire-type',groupe:3,verbs:['rire','sourire']},
+    'vivre-type':{id:'vivre-type',patternId:'vivre-type',groupe:3,verbs:['vivre','revivre','survivre']},
+    'conduire-type':{id:'conduire-type',patternId:'conduire-type',groupe:3,verbs:['conduire','traduire','produire','construire','détruire','réduire','cuire']},
+    'courir-type':{id:'courir-type',patternId:'courir-type',groupe:3,verbs:['courir','accourir','recourir']},
+    'mourir-type':{id:'mourir-type',patternId:'mourir-type',groupe:3,verbs:['mourir']},
+    'croire-type':{id:'croire-type',patternId:'croire-type',groupe:3,verbs:['croire']},
+    'recevoir-type':{id:'recevoir-type',patternId:'recevoir-type',groupe:3,verbs:['recevoir']},
+    'connaître-type':{id:'connaître-type',patternId:'connaître-type',groupe:3,verbs:['connaître','reconnaître','méconnaître']},
+    'paraître-type':{id:'paraître-type',patternId:'paraître-type',groupe:3,verbs:['paraître','apparaître','disparaître','reparaître','transparaître','comparaître']},
+    'yer-oyer-uyer':{id:'yer-oyer-uyer',patternId:'yer',groupe:1,verbs:['nettoyer','essuyer']}
   };
+
   const catalog={};
-  Object.entries(families).forEach(([pattern,verbs])=>Object.entries(verbs).forEach(([infinitif,[participePasse,auxiliaire]])=>{
-    catalog[infinitif]={infinitif,infinitif_base:infinitif,groupe:pattern==='yer-explicit'?1:3,pattern:pattern==='yer-explicit'?'yer':pattern,auxiliaire,pronominal:false,participePasse,construction:'non-pronominale',verbeBase:infinitif};
-  }));
+  const familyIndex={};
+
+  Object.values(families).forEach(family=>{
+    familyIndex[family.id]=Object.freeze([...family.verbs]);
+    family.verbs.forEach(infinitif=>{
+      catalog[infinitif]=Object.freeze({
+        familyId:family.id,
+        patternId:family.patternId
+      });
+    });
+  });
+
+  const frozenFamilies={};
+  Object.entries(families).forEach(([id,family])=>{
+    frozenFamilies[id]=Object.freeze({
+      id:family.id,
+      patternId:family.patternId,
+      groupe:family.groupe,
+      verbs:familyIndex[id]
+    });
+  });
+
+  window.COQ_VERB_FAMILIES=Object.freeze(frozenFamilies);
   window.COQ_VERB_FAMILY_CATALOG=Object.freeze(catalog);
+  window.COQ_VERB_FAMILY_INDEX=Object.freeze(familyIndex);
 })();

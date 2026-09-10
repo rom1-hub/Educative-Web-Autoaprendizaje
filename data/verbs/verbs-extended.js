@@ -1,0 +1,80 @@
+// COQ — extensión declarativa del registro léxico de verbos.
+//
+// Responsabilidad única:
+//   aportar registros léxicos que todavía no están en verbs.js.
+//
+// Las familias no almacenan estos datos: family-catalog.js conserva únicamente
+// la relación Famille → Pattern y la pertenencia explícita de cada verbo.
+(function(){
+  const verbs={
+    'partir':{id:'partir',infinitif:'partir',infinitif_base:'partir',groupe:3,pattern:'partir-type',auxiliaire:'être',pronominal:false,participePasse:'parti',construction:'non-pronominale',verbeBase:'partir'},
+    'sortir':{id:'sortir',infinitif:'sortir',infinitif_base:'sortir',groupe:3,pattern:'partir-type',auxiliaire:'être',pronominal:false,participePasse:'sorti',construction:'non-pronominale',verbeBase:'sortir'},
+    'dormir':{id:'dormir',infinitif:'dormir',infinitif_base:'dormir',groupe:3,pattern:'partir-type',auxiliaire:'avoir',pronominal:false,participePasse:'dormi',construction:'non-pronominale',verbeBase:'dormir'},
+    'servir':{id:'servir',infinitif:'servir',infinitif_base:'servir',groupe:3,pattern:'partir-type',auxiliaire:'avoir',pronominal:false,participePasse:'servi',construction:'non-pronominale',verbeBase:'servir'},
+    'suivre':{id:'suivre',infinitif:'suivre',infinitif_base:'suivre',groupe:3,pattern:'suivre-type',auxiliaire:'avoir',pronominal:false,participePasse:'suivi',construction:'non-pronominale',verbeBase:'suivre'},
+    'ouvrir':{id:'ouvrir',infinitif:'ouvrir',infinitif_base:'ouvrir',groupe:3,pattern:'ouvrir-type',auxiliaire:'avoir',pronominal:false,participePasse:'ouvert',construction:'non-pronominale',verbeBase:'ouvrir'},
+    'rouvrir':{id:'rouvrir',infinitif:'rouvrir',infinitif_base:'rouvrir',groupe:3,pattern:'ouvrir-type',auxiliaire:'avoir',pronominal:false,participePasse:'rouvert',construction:'non-pronominale',verbeBase:'rouvrir'},
+    'couvrir':{id:'couvrir',infinitif:'couvrir',infinitif_base:'couvrir',groupe:3,pattern:'ouvrir-type',auxiliaire:'avoir',pronominal:false,participePasse:'couvert',construction:'non-pronominale',verbeBase:'couvrir'},
+    'découvrir':{id:'découvrir',infinitif:'découvrir',infinitif_base:'découvrir',groupe:3,pattern:'ouvrir-type',auxiliaire:'avoir',pronominal:false,participePasse:'découvert',construction:'non-pronominale',verbeBase:'découvrir'},
+    'recouvrir':{id:'recouvrir',infinitif:'recouvrir',infinitif_base:'recouvrir',groupe:3,pattern:'ouvrir-type',auxiliaire:'avoir',pronominal:false,participePasse:'recouvert',construction:'non-pronominale',verbeBase:'recouvrir'},
+    'offrir':{id:'offrir',infinitif:'offrir',infinitif_base:'offrir',groupe:3,pattern:'ouvrir-type',auxiliaire:'avoir',pronominal:false,participePasse:'offert',construction:'non-pronominale',verbeBase:'offrir'},
+    'souffrir':{id:'souffrir',infinitif:'souffrir',infinitif_base:'souffrir',groupe:3,pattern:'ouvrir-type',auxiliaire:'avoir',pronominal:false,participePasse:'souffert',construction:'non-pronominale',verbeBase:'souffrir'},
+    'revenir':{id:'revenir',infinitif:'revenir',infinitif_base:'revenir',groupe:3,pattern:'venir-type',auxiliaire:'être',pronominal:false,participePasse:'revenu',construction:'non-pronominale',verbeBase:'revenir'},
+    'devenir':{id:'devenir',infinitif:'devenir',infinitif_base:'devenir',groupe:3,pattern:'venir-type',auxiliaire:'être',pronominal:false,participePasse:'devenu',construction:'non-pronominale',verbeBase:'devenir'},
+    'parvenir':{id:'parvenir',infinitif:'parvenir',infinitif_base:'parvenir',groupe:3,pattern:'venir-type',auxiliaire:'être',pronominal:false,participePasse:'parvenu',construction:'non-pronominale',verbeBase:'parvenir'},
+    'intervenir':{id:'intervenir',infinitif:'intervenir',infinitif_base:'intervenir',groupe:3,pattern:'venir-type',auxiliaire:'être',pronominal:false,participePasse:'intervenu',construction:'non-pronominale',verbeBase:'intervenir'},
+    'convenir':{id:'convenir',infinitif:'convenir',infinitif_base:'convenir',groupe:3,pattern:'venir-type',auxiliaire:'être',pronominal:false,participePasse:'convenu',construction:'non-pronominale',verbeBase:'convenir'},
+    'provenir':{id:'provenir',infinitif:'provenir',infinitif_base:'provenir',groupe:3,pattern:'venir-type',auxiliaire:'être',pronominal:false,participePasse:'provenu',construction:'non-pronominale',verbeBase:'provenir'},
+    'survenir':{id:'survenir',infinitif:'survenir',infinitif_base:'survenir',groupe:3,pattern:'venir-type',auxiliaire:'être',pronominal:false,participePasse:'survenu',construction:'non-pronominale',verbeBase:'survenir'},
+    'prévenir':{id:'prévenir',infinitif:'prévenir',infinitif_base:'prévenir',groupe:3,pattern:'venir-type',auxiliaire:'avoir',pronominal:false,participePasse:'prévenu',construction:'non-pronominale',verbeBase:'prévenir'},
+    'tenir':{id:'tenir',infinitif:'tenir',infinitif_base:'tenir',groupe:3,pattern:'tenir-type',auxiliaire:'avoir',pronominal:false,participePasse:'tenu',construction:'non-pronominale',verbeBase:'tenir'},
+    'retenir':{id:'retenir',infinitif:'retenir',infinitif_base:'retenir',groupe:3,pattern:'tenir-type',auxiliaire:'avoir',pronominal:false,participePasse:'retenu',construction:'non-pronominale',verbeBase:'retenir'},
+    'soutenir':{id:'soutenir',infinitif:'soutenir',infinitif_base:'soutenir',groupe:3,pattern:'tenir-type',auxiliaire:'avoir',pronominal:false,participePasse:'soutenu',construction:'non-pronominale',verbeBase:'soutenir'},
+    'obtenir':{id:'obtenir',infinitif:'obtenir',infinitif_base:'obtenir',groupe:3,pattern:'tenir-type',auxiliaire:'avoir',pronominal:false,participePasse:'obtenu',construction:'non-pronominale',verbeBase:'obtenir'},
+    'maintenir':{id:'maintenir',infinitif:'maintenir',infinitif_base:'maintenir',groupe:3,pattern:'tenir-type',auxiliaire:'avoir',pronominal:false,participePasse:'maintenu',construction:'non-pronominale',verbeBase:'maintenir'},
+    'contenir':{id:'contenir',infinitif:'contenir',infinitif_base:'contenir',groupe:3,pattern:'tenir-type',auxiliaire:'avoir',pronominal:false,participePasse:'contenu',construction:'non-pronominale',verbeBase:'contenir'},
+    'détenir':{id:'détenir',infinitif:'détenir',infinitif_base:'détenir',groupe:3,pattern:'tenir-type',auxiliaire:'avoir',pronominal:false,participePasse:'détenu',construction:'non-pronominale',verbeBase:'détenir'},
+    'appartenir':{id:'appartenir',infinitif:'appartenir',infinitif_base:'appartenir',groupe:3,pattern:'tenir-type',auxiliaire:'avoir',pronominal:false,participePasse:'appartenu',construction:'non-pronominale',verbeBase:'appartenir'},
+    'mettre':{id:'mettre',infinitif:'mettre',infinitif_base:'mettre',groupe:3,pattern:'mettre-type',auxiliaire:'avoir',pronominal:false,participePasse:'mis',construction:'non-pronominale',verbeBase:'mettre'},
+    'remettre':{id:'remettre',infinitif:'remettre',infinitif_base:'remettre',groupe:3,pattern:'mettre-type',auxiliaire:'avoir',pronominal:false,participePasse:'remis',construction:'non-pronominale',verbeBase:'remettre'},
+    'permettre':{id:'permettre',infinitif:'permettre',infinitif_base:'permettre',groupe:3,pattern:'mettre-type',auxiliaire:'avoir',pronominal:false,participePasse:'permis',construction:'non-pronominale',verbeBase:'permettre'},
+    'promettre':{id:'promettre',infinitif:'promettre',infinitif_base:'promettre',groupe:3,pattern:'mettre-type',auxiliaire:'avoir',pronominal:false,participePasse:'promis',construction:'non-pronominale',verbeBase:'promettre'},
+    'admettre':{id:'admettre',infinitif:'admettre',infinitif_base:'admettre',groupe:3,pattern:'mettre-type',auxiliaire:'avoir',pronominal:false,participePasse:'admis',construction:'non-pronominale',verbeBase:'admettre'},
+    'transmettre':{id:'transmettre',infinitif:'transmettre',infinitif_base:'transmettre',groupe:3,pattern:'mettre-type',auxiliaire:'avoir',pronominal:false,participePasse:'transmis',construction:'non-pronominale',verbeBase:'transmettre'},
+    'soumettre':{id:'soumettre',infinitif:'soumettre',infinitif_base:'soumettre',groupe:3,pattern:'mettre-type',auxiliaire:'avoir',pronominal:false,participePasse:'soumis',construction:'non-pronominale',verbeBase:'soumettre'},
+    'lire':{id:'lire',infinitif:'lire',infinitif_base:'lire',groupe:3,pattern:'lire-type',auxiliaire:'avoir',pronominal:false,participePasse:'lu',construction:'non-pronominale',verbeBase:'lire'},
+    'relire':{id:'relire',infinitif:'relire',infinitif_base:'relire',groupe:3,pattern:'lire-type',auxiliaire:'avoir',pronominal:false,participePasse:'relu',construction:'non-pronominale',verbeBase:'relire'},
+    'rire':{id:'rire',infinitif:'rire',infinitif_base:'rire',groupe:3,pattern:'rire-type',auxiliaire:'avoir',pronominal:false,participePasse:'ri',construction:'non-pronominale',verbeBase:'rire'},
+    'sourire':{id:'sourire',infinitif:'sourire',infinitif_base:'sourire',groupe:3,pattern:'rire-type',auxiliaire:'avoir',pronominal:false,participePasse:'souri',construction:'non-pronominale',verbeBase:'sourire'},
+    'vivre':{id:'vivre',infinitif:'vivre',infinitif_base:'vivre',groupe:3,pattern:'vivre-type',auxiliaire:'avoir',pronominal:false,participePasse:'vécu',construction:'non-pronominale',verbeBase:'vivre'},
+    'revivre':{id:'revivre',infinitif:'revivre',infinitif_base:'revivre',groupe:3,pattern:'vivre-type',auxiliaire:'avoir',pronominal:false,participePasse:'revécu',construction:'non-pronominale',verbeBase:'revivre'},
+    'survivre':{id:'survivre',infinitif:'survivre',infinitif_base:'survivre',groupe:3,pattern:'vivre-type',auxiliaire:'avoir',pronominal:false,participePasse:'survécu',construction:'non-pronominale',verbeBase:'survivre'},
+    'conduire':{id:'conduire',infinitif:'conduire',infinitif_base:'conduire',groupe:3,pattern:'conduire-type',auxiliaire:'avoir',pronominal:false,participePasse:'conduit',construction:'non-pronominale',verbeBase:'conduire'},
+    'traduire':{id:'traduire',infinitif:'traduire',infinitif_base:'traduire',groupe:3,pattern:'conduire-type',auxiliaire:'avoir',pronominal:false,participePasse:'traduit',construction:'non-pronominale',verbeBase:'traduire'},
+    'produire':{id:'produire',infinitif:'produire',infinitif_base:'produire',groupe:3,pattern:'conduire-type',auxiliaire:'avoir',pronominal:false,participePasse:'produit',construction:'non-pronominale',verbeBase:'produire'},
+    'construire':{id:'construire',infinitif:'construire',infinitif_base:'construire',groupe:3,pattern:'conduire-type',auxiliaire:'avoir',pronominal:false,participePasse:'construit',construction:'non-pronominale',verbeBase:'construire'},
+    'détruire':{id:'détruire',infinitif:'détruire',infinitif_base:'détruire',groupe:3,pattern:'conduire-type',auxiliaire:'avoir',pronominal:false,participePasse:'détruit',construction:'non-pronominale',verbeBase:'détruire'},
+    'réduire':{id:'réduire',infinitif:'réduire',infinitif_base:'réduire',groupe:3,pattern:'conduire-type',auxiliaire:'avoir',pronominal:false,participePasse:'réduit',construction:'non-pronominale',verbeBase:'réduire'},
+    'cuire':{id:'cuire',infinitif:'cuire',infinitif_base:'cuire',groupe:3,pattern:'conduire-type',auxiliaire:'avoir',pronominal:false,participePasse:'cuit',construction:'non-pronominale',verbeBase:'cuire'},
+    'courir':{id:'courir',infinitif:'courir',infinitif_base:'courir',groupe:3,pattern:'courir-type',auxiliaire:'avoir',pronominal:false,participePasse:'couru',construction:'non-pronominale',verbeBase:'courir'},
+    'accourir':{id:'accourir',infinitif:'accourir',infinitif_base:'accourir',groupe:3,pattern:'courir-type',auxiliaire:'avoir',pronominal:false,participePasse:'accouru',construction:'non-pronominale',verbeBase:'accourir'},
+    'recourir':{id:'recourir',infinitif:'recourir',infinitif_base:'recourir',groupe:3,pattern:'courir-type',auxiliaire:'avoir',pronominal:false,participePasse:'recouru',construction:'non-pronominale',verbeBase:'recourir'},
+    'mourir':{id:'mourir',infinitif:'mourir',infinitif_base:'mourir',groupe:3,pattern:'mourir-type',auxiliaire:'être',pronominal:false,participePasse:'mort',construction:'non-pronominale',verbeBase:'mourir'},
+    'croire':{id:'croire',infinitif:'croire',infinitif_base:'croire',groupe:3,pattern:'croire-type',auxiliaire:'avoir',pronominal:false,participePasse:'cru',construction:'non-pronominale',verbeBase:'croire'},
+    'recevoir':{id:'recevoir',infinitif:'recevoir',infinitif_base:'recevoir',groupe:3,pattern:'recevoir-type',auxiliaire:'avoir',pronominal:false,participePasse:'reçu',construction:'non-pronominale',verbeBase:'recevoir'},
+    'connaître':{id:'connaître',infinitif:'connaître',infinitif_base:'connaître',groupe:3,pattern:'connaître-type',auxiliaire:'avoir',pronominal:false,participePasse:'connu',construction:'non-pronominale',verbeBase:'connaître'},
+    'reconnaître':{id:'reconnaître',infinitif:'reconnaître',infinitif_base:'reconnaître',groupe:3,pattern:'connaître-type',auxiliaire:'avoir',pronominal:false,participePasse:'reconnu',construction:'non-pronominale',verbeBase:'reconnaître'},
+    'méconnaître':{id:'méconnaître',infinitif:'méconnaître',infinitif_base:'méconnaître',groupe:3,pattern:'connaître-type',auxiliaire:'avoir',pronominal:false,participePasse:'méconnu',construction:'non-pronominale',verbeBase:'méconnaître'},
+    'paraître':{id:'paraître',infinitif:'paraître',infinitif_base:'paraître',groupe:3,pattern:'paraître-type',auxiliaire:'avoir',pronominal:false,participePasse:'paru',construction:'non-pronominale',verbeBase:'paraître'},
+    'apparaître':{id:'apparaître',infinitif:'apparaître',infinitif_base:'apparaître',groupe:3,pattern:'paraître-type',auxiliaire:'avoir',pronominal:false,participePasse:'apparu',construction:'non-pronominale',verbeBase:'apparaître'},
+    'disparaître':{id:'disparaître',infinitif:'disparaître',infinitif_base:'disparaître',groupe:3,pattern:'paraître-type',auxiliaire:'avoir',pronominal:false,participePasse:'disparu',construction:'non-pronominale',verbeBase:'disparaître'},
+    'reparaître':{id:'reparaître',infinitif:'reparaître',infinitif_base:'reparaître',groupe:3,pattern:'paraître-type',auxiliaire:'avoir',pronominal:false,participePasse:'reparu',construction:'non-pronominale',verbeBase:'reparaître'},
+    'transparaître':{id:'transparaître',infinitif:'transparaître',infinitif_base:'transparaître',groupe:3,pattern:'paraître-type',auxiliaire:'avoir',pronominal:false,participePasse:'transparu',construction:'non-pronominale',verbeBase:'transparaître'},
+    'comparaître':{id:'comparaître',infinitif:'comparaître',infinitif_base:'comparaître',groupe:3,pattern:'paraître-type',auxiliaire:'avoir',pronominal:false,participePasse:'comparu',construction:'non-pronominale',verbeBase:'comparaître'},
+    'nettoyer':{id:'nettoyer',infinitif:'nettoyer',infinitif_base:'nettoyer',groupe:1,pattern:'yer',auxiliaire:'avoir',pronominal:false,participePasse:'nettoyé',construction:'non-pronominale',verbeBase:'nettoyer'},
+    'essuyer':{id:'essuyer',infinitif:'essuyer',infinitif_base:'essuyer',groupe:1,pattern:'yer',auxiliaire:'avoir',pronominal:false,participePasse:'essuyé',construction:'non-pronominale',verbeBase:'essuyer'}
+  };
+  const target=window.COQ_VERBS||{};
+  Object.entries(verbs).forEach(([key,record])=>{if(!target[key])target[key]=record;});
+  window.COQ_VERBS=target;
+})();
