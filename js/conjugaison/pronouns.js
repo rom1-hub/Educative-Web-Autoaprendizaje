@@ -22,6 +22,21 @@
     const normalizedFirst=first.replace(/^qu['’]/,'').replace(/^que\s*/,'').replace(/^q['’]/,'');
     return subjectBase[first]||subjectBase[normalizedFirst]||normalizedFirst;
   }
+  function subjectInfo(subject){
+    const label=String(subject||'').trim();
+    const base=baseSubject(label);
+    const match=label.match(/\(([^)]+)\)/);
+    let gender='masculin',number='singulier';
+    if(match){
+      const details=match[1].toLowerCase();
+      if(details.includes('féminin'))gender='féminin';
+      if(details.includes('pluriel'))number='pluriel';
+    }else if(base==='elle'){gender='féminin';}
+    else if(base==='ils'){gender='masculin';number='pluriel';}
+    else if(base==='elles'){gender='féminin';number='pluriel';}
+    else if(base==='nous'||base==='vous'){number='pluriel';}
+    return Object.freeze({label,base,gender,number});
+  }
   function pronounFor(label){return subjectPronouns[baseSubject(label)]||null;}
   function imperativePronounFor(label){return imperativePronouns[baseSubject(label)]||null;}
   function contractPronoun(pronoun, nextWord){
@@ -38,5 +53,5 @@
     const cp=contractPronoun(p, first);
     return cp + (cp.endsWith("'")?'':' ') + clean;
   }
-  window.COQ_CONJ_PRONOUNS={subjectPronouns,baseSubject,pronounFor,imperativePronounFor,contractPronoun,apply};
+  window.COQ_CONJ_PRONOUNS={subjectPronouns,baseSubject,subjectInfo,pronounFor,imperativePronounFor,contractPronoun,apply};
 })();
