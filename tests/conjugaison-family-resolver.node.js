@@ -10,6 +10,8 @@ assert(w.COQ_FAMILY_RESOLVER&&typeof w.COQ_FAMILY_RESOLVER.resolve==='function',
 assert(typeof w.COQ_FAMILY_RESOLVER.options==='function','El resolver de familias debe exponer options.');
 assert(typeof w.COQ_PATTERN_RESOLVER.familyOptions==='undefined','El resolver de patterns no debe exponer familyOptions.');
 assert(typeof w.COQ_PATTERN_RESOLVER.resolveFamily==='undefined','El resolver de patterns no debe exponer resolveFamily.');
+assert(typeof w.COQ_CONJ_DATA_MODEL.familyIndex==='undefined','El modelo canónico no debe duplicar el índice de familias.');
+assert(typeof w.COQ_CONJ_DATA_MODEL.getFamilyVerbs==='undefined','El modelo canónico no debe exponer resolución de familias.');
 const families=w.COQ_VERB_FAMILIES||{};
 const options=w.COQ_FAMILY_RESOLVER.options();
 assert(options.length===Object.keys(families).length,'options debe reflejar exactamente el catálogo de familias.');
