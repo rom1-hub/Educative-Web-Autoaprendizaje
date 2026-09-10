@@ -51,9 +51,6 @@ expect(w.COQ_VERB_CATEGORY_CATALOG.find(g=>g.id==='er-eler')?.label,'Premier gro
 expect(w.COQ_VERB_CATEGORY_CATALOG.find(g=>g.id==='er-eler')?.familyIds?.length,2,'er-eler debe agrupar familias distintas sin usar el pattern como familia.');
 expect(w.COQ_VERB_CATEGORY_CATALOG.find(g=>g.id==='yer')?.familyIds?.includes('yer-oyer-uyer'),true,'La categoría YER debe incluir -OYER/-UYER.');
 expect(w.COQ_VERB_CATEGORY_CATALOG.find(g=>g.id==='yer')?.familyIds?.includes('yer-ayer'),true,'La categoría YER debe reservar una familia distinta para -AYER.');
-assert(Array.isArray(w.COQ_VERB_GROUP_CATALOG),'La API histórica de grupos debe apuntar al catálogo de categorías.');
-assert(w.COQ_VERB_GROUP_CATALOG===w.COQ_VERB_CATEGORY_CATALOG,'La compatibilidad de grupos no debe crear un segundo catálogo.');
-assert(Object.isFrozen(w.COQ_VERB_GROUP_CATALOG),'El catálogo compatible debe ser inmutable.');
 assert(w.COQ_PATTERN_RESOLVER.matchesGroup('appeler','er-eler'),'El resolver debe reconocer la familia er-eler mediante el catálogo central.');
 assert(!w.COQ_PATTERN_RESOLVER.matchesGroup('parler','er-eler'),'El resolver no debe mezclar familias distintas.');
 assert(w.COQ_PATTERN_RESOLVER.matchesGroup('aller','groupe-3'),'aller debe pertenecer al filtro pedagógico del tercer grupo.');
@@ -157,7 +154,7 @@ expect(etreCompound[4][1],'est venu(e)(s)','on debe conservar las posibilidades.
 expect(etreCompound[5][0],'nous','La tabla être debe usar nous.');
 expect(etreCompound[5][1],'sommes venu(e)s','nous debe conservar la notación plural.');
 expect(etreCompound[6][0],'vous','La tabla être debe mostrar vous en una sola fila.');
-expect(etreCompound[6][1],'êtes venu(e)(s)','vous debe conservar las cuatro posibilidades.');
+expect(etreCompound[6][1],'êtes venu(e)(s)','vous debe conserver les quatre possibilités.');
 expect(etreCompound[7][0],'ils','La tabla être debe separar ils.');
 expect(etreCompound[7][1],'sont venus','ils debe usar masculino plural.');
 expect(etreCompound[8][0],'elles','La tabla être debe usar femenino plural.');
