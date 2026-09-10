@@ -31,5 +31,28 @@
     familyIds:category.familyIds?Object.freeze([...category.familyIds]):null
   }));
 
-  window.COQ_VERB_CATEGORY_CATALOG=Object.freeze(frozen);
+  const dataModel=window.COQ_CONJ_DATA_MODEL;
+  const records=dataModel?.records||{};
+  const normalize=value=>String(value||'').trim().toLowerCase();
+  const canonicalRecord=verb=>records[normalize(verb)]||null;
+  function categoryOptions(){
+    return frozen.map(category=>Object.freeze({
+      ...category,
+      groupes:category.groupes?Object.freeze([...category.groupes]):null,
+      familyIds:category.familyIds?Object.freeze([...category.familyIds]):null
+    }));
+  }
+  function matchesCategory(verb,categoryId){
+    if(!categoryId||categoryId==='all')return true;
+    const category=frozen.find(item=>item.id===categoryId);
+    if(!category)return false;
+    const record=canonicalRecord(verb);
+    if(!record)return false;
+    if(category.familyIds)return category.familyIds.includes(record.familyId);
+    if(category.groupes&&category.groupes.length)return category.groupes.includes(Number(record.groupe));
+    return false;
+  }
+
+  window.COQ_VERB_CATEGORY_CATALOG=frozen;
+  window.COQ_CATEGORY_RESOLVER=Object.freeze({categoryOptions,matchesCategory});
 })();
