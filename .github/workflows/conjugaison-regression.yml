@@ -16,6 +16,8 @@ jobs:
           node-version: 24
       - name: Run category API regression
         run: node tests/conjugaison-category-api.node.js
+      - name: Run family inventory regression
+        run: node tests/conjugaison-family-inventory.node.js
       - name: Run subject model regression
         run: node tests/conjugaison-subject-model.node.js
       - name: Run conjugaison regression
