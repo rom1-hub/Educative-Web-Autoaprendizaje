@@ -5,6 +5,7 @@
   const conjugations=U.conjugations, verbGroups=U.verbGroups, verbMeta=U.verbMeta;
   const resolver=window.COQ_PATTERN_RESOLVER;
   const categoryResolver=window.COQ_CATEGORY_RESOLVER;
+  const constructionResolver=window.COQ_CONSTRUCTION_RESOLVER;
   const engine=window.COQ_CONJ_ENGINE;
   const C=window.COQ_CONJ_COMPOUND;
   const constructions=window.COQ_COMPOUND_CONSTRUCTION_FILTERS||{};
@@ -109,23 +110,19 @@
     const raw=String(subject||'').trim(),base=P.baseSubject(raw),compound=!!isCompound,isSubjonctif=tense==='subjonctif présent'||tense==='subjonctif passé';
     const variants=compound?subjectVariants:{};
     const normalized=P.subjectForMode(raw,isSubjonctif?'subjonctif':'normal','');
-    const suffix=raw.match(/\s*(\([^)]*\))\s*$/)?.[1]||'';
     if(isSubjonctif)return normalized;
     return variants[base]?.includes(raw)?raw:(variants[base]?.[0]&&compound?variants[base][0]:raw);
   }
-  function matchesConstruction(v,construction){if(!construction)return true;const m=getRecord(v)||{};if(construction==='pronominale')return m.pronominal===true;if(construction==='non-pronominale')return m.pronominal!==true;return true;}
+  function matchesConstruction(v,construction){
+    if(!construction)return true;
+    const meta=getRecord(v)||{};
+    return !!(constructionResolver&&typeof constructionResolver.matchesConstruction==='function'&&constructionResolver.matchesConstruction(meta,construction));
+  }
   function matchesAuxiliary(v,tense,auxiliary){
-    if(!auxiliary||tense==='Todos los tiempos')return true;
-    const m=getRecord(v)||{};
-    if(!compoundTenses.includes(tense))return true;
-    const filter=constructions[auxiliary];
-    if(!filter)return true;
-    if(filter.pronominal===true)return m.pronominal===true;
-    if(filter.pronominal===false&&m.pronominal===true)return false;
-    return Array.isArray(filter.auxiliaires)?filter.auxiliaires.includes(m.auxiliaire):true;
+    return !!(constructionResolver&&typeof constructionResolver.matchesAuxiliary==='function'&&constructionResolver.matchesAuxiliary(getRecord(v)||{},tense,auxiliary,compoundTenses));
   }
   function samePracticeAnswer(value,q){const normalize=U.normalizeAnswerText||function(s){return String(s??'').trim().toLocaleLowerCase().replace(/\s+/g,' ');};const input=normalize(value);if(!input)return false;const accepted=Array.isArray(q?.acceptedAnswers)&&q.acceptedAnswers.length?q.acceptedAnswers:[q?.displayAnswer||q?.answer];return accepted.map(normalize).filter(Boolean).includes(input);}
-  function updatePracticeAuxiliaryOptions(){const tense=document.querySelector('#practiceTense')?.value,verb=U.normalizeVerb(document.querySelector('#practiceVerb')?.value),construction=document.querySelector('#practiceConstruction')?.value,aux=document.querySelector('#practiceAuxiliary'),help=document.querySelector('#practiceAuxiliaryHelp');if(!aux)return;aux.innerHTML='';let disabledReason='';if(verb)disabledReason='Déterminé par le verbe sélectionné';else if(construction==='pronominale')disabledReason='Non disponible pour les verbes pronominaux';else if(!tense||!compoundTenses.includes(tense))disabledReason=tense==='Todos los tiempos'?'Disponible uniquement lorsqu’un temps composé est sélectionné.':'Non disponible pour un temps simple';if(disabledReason){aux.disabled=true;const o=document.createElement('option');o.value='';o.selected=true;o.textContent=disabledReason;aux.appendChild(o);if(help){if(verb)help.textContent='Le verbe sélectionné détermine déjà le verbe auxiliaire dans Conjugaison.';else if(construction==='pronominale')help.textContent='La construction pronominale détermine l’auxiliaire dans Conjugaison.';else help.textContent=tense==='Todos los tiempos'?'Disponible uniquement lorsqu’un temps composé est sélectionné.':'Disponible uniquement avec un temps composé.';}return;}aux.disabled=false;const placeholder=document.createElement('option');placeholder.value='';placeholder.selected=true;placeholder.textContent='- seleccionar -';aux.appendChild(placeholder);auxiliaryOptions.forEach(item=>{const o=document.createElement('option');o.value=U.escapeHtml(item.id);o.textContent=U.escapeHtml(item.label);aux.appendChild(o);});if(help)help.textContent='Este filtro se aplica a todos los tiempos compuestos.';}
+  function updatePracticeAuxiliaryOptions(){const tense=document.querySelector('#practiceTense')?.value,verb=U.normalizeVerb(document.querySelector('#practiceVerb')?.value),construction=document.querySelector('#practiceConstruction')?.value,aux=document.querySelector('#practiceAuxiliary'),help=document.querySelector('#practiceAuxiliaryHelp');if(!aux)return;aux.innerHTML='';let disabledReason='';if(verb)disabledReason='Déterminé par le verbe sélectionné';else if(construction==='pronominale')disabledReason='Non disponible pour les verbes pronominaux';else if(!tense||!compoundTenses.includes(tense))disabledReason=tense==='Todos los tiempos'?'Disponible uniquement lorsqu’un temps composé est sélectionné.':'Non disponible pour un temps simple';if(disabledReason){aux.disabled=true;const o=document.createElement('option');o.value='';o.selected=true;o.textContent=disabledReason;aux.appendChild(o);if(help){if(verb)help.textContent='Le verbe sélectionné détermine déjà le verbe auxiliaire dans Conjugaison.';else if(construction==='pronominale')help.textContent='La construction pronominale détermine l’auxiliaire dans Conjugaison.';else help.textContent=tense==='Todos los temps'? 'Disponible uniquement lorsqu’un temps composé est sélectionné.':'Disponible uniquement avec un temps composé.';}return;}aux.disabled=false;const placeholder=document.createElement('option');placeholder.value='';placeholder.selected=true;placeholder.textContent='- seleccionar -';aux.appendChild(placeholder);auxiliaryOptions.forEach(item=>{const o=document.createElement('option');o.value=U.escapeHtml(item.id);o.textContent=U.escapeHtml(item.label);aux.appendChild(o);});if(help)help.textContent='Este filtro se aplica a todos los tiempos compuestos.';}
   function updatePracticeConstructionOptions(){const construction=document.querySelector('#practiceConstruction'),help=document.querySelector('#practiceConstructionHelp'),verb=U.normalizeVerb(document.querySelector('#practiceVerb')?.value);if(!construction)return;if(verb){const meta=getRecord(verb)||{},isPronominal=meta.pronominal===true||meta.construction==='pronominale',selectedId=isPronominal?'pronominale':'non-pronominale',selected=constructionOptions.find(item=>item.id===selectedId);construction.disabled=true;construction.innerHTML='';const o=document.createElement('option');o.value=U.escapeHtml(selectedId);o.selected=true;o.textContent=U.escapeHtml(selected?.label||selectedId);construction.appendChild(o);if(help)help.textContent='Déterminée par le verbe sélectionné.';return;}construction.disabled=false;construction.innerHTML='<option value="" selected>-seleccionar-</option>'+constructionOptions.map(item=>'<option value="'+U.escapeHtml(item.id)+'">'+U.escapeHtml(item.label)+'</option>').join('');if(help)help.textContent='Puedes elegir una construcción para afinar el ejercicio.';}
   function updatePracticeGroupState(){
     const verb=U.normalizeVerb(document.querySelector('#practiceVerb')?.value),group=document.querySelector('#practiceGroup'),help=document.querySelector('#practiceGroupHelp');
@@ -151,7 +148,5 @@
     document.querySelector('#practiceConstruction')?.addEventListener('change',updatePracticeAuxiliaryOptions);
     updatePracticeGroupState();updatePracticeConstructionOptions();updatePracticeAuxiliaryOptions();
   }
-  window.COQ_CONJ_PRACTICE={start:startSession,buildQuestions,validate:validateAnswer};
-  window.COQ_CONJ_PRACTICE_TESTING=Object.freeze({selectPracticeQuestions});
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
+  document.addEventListener('DOMContentLoaded',bind);
 })();
