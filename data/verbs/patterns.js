@@ -23,7 +23,6 @@ window.COQ_VERB_PATTERNS={"regular-er":{groupe:1,description:"Premier groupe ré
       familyIds:category.familyIds?Object.freeze([...category.familyIds]):null
     }));
   }
-  function groupOptions(){return categoryOptions();}
   function matchesGroup(verb,categoryId){
     if(!categoryId||categoryId==='all')return true;
     const category=categories.find(item=>item.id===categoryId);
@@ -43,5 +42,5 @@ window.COQ_VERB_PATTERNS={"regular-er":{groupe:1,description:"Premier groupe ré
   }
   // Compatibilidad de API: no crea otro catálogo; apunta al mismo catálogo pedagógico.
   window.COQ_VERB_GROUP_CATALOG=window.COQ_VERB_CATEGORY_CATALOG;
-  window.COQ_PATTERN_RESOLVER={normalize,baseVerb,resolvePattern,resolveRecord,categoryOptions,groupOptions,familyOptions,resolveFamily,matchesGroup};
+  window.COQ_PATTERN_RESOLVER={normalize,baseVerb,resolvePattern,resolveRecord,categoryOptions,familyOptions,resolveFamily,matchesGroup};
 })();
