@@ -84,6 +84,18 @@
   });
   Object.keys(familyIndex).forEach(id=>Object.freeze(familyIndex[id]));
 
+  // Compatibilidad temporal: el motor actual todavía consume el registro
+  // histórico. Se deriva del mismo conjunto de fuentes y no constituye otra
+  // autoridad de datos. La migración del motor al modelo canónico lo eliminará.
+  const legacyRegistry={};
+  sourceKeys.forEach(key=>{
+    legacyRegistry[key]={
+      ...(rawVerbs[key]||{}),
+      ...(familyCatalog[key]||{}),
+      ...(constructionCatalog[key]||{})
+    };
+  });
+
   const api={
     version:'1.0.0',
     records:deepFreeze(records),
@@ -93,4 +105,5 @@
   };
 
   window.COQ_CONJ_DATA_MODEL=Object.freeze(api);
+  window.COQ_VERB_REGISTRY=deepFreeze(legacyRegistry);
 })();
