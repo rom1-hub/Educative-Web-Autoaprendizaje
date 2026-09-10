@@ -10,29 +10,11 @@ window.COQ_VERB_PATTERNS={"regular-er":{groupe:1,description:"Premier groupe ré
   const dataModel=window.COQ_CONJ_DATA_MODEL;
   const records=dataModel?.records||{};
   const families=window.COQ_VERB_FAMILIES||{};
-  const categories=window.COQ_VERB_CATEGORY_CATALOG||[];
   const normalize=value=>String(value||'').trim().toLowerCase();
   function canonicalRecord(verb){return records[normalize(verb)]||null;}
   function baseVerb(verb){const record=canonicalRecord(verb);return record?.baseVerbId||normalize(verb);}
   function resolvePattern(verb){return canonicalRecord(verb)?.patternId||null;}
   function resolveRecord(verb){return canonicalRecord(verb);}
-  function categoryOptions(){
-    return categories.map(category=>Object.freeze({
-      ...category,
-      groupes:category.groupes?Object.freeze([...category.groupes]):null,
-      familyIds:category.familyIds?Object.freeze([...category.familyIds]):null
-    }));
-  }
-  function matchesGroup(verb,categoryId){
-    if(!categoryId||categoryId==='all')return true;
-    const category=categories.find(item=>item.id===categoryId);
-    if(!category)return false;
-    const record=canonicalRecord(verb);
-    if(!record)return false;
-    if(category.familyIds)return category.familyIds.includes(record.familyId);
-    if(category.groupes&&category.groupes.length)return category.groupes.includes(Number(record.groupe));
-    return false;
-  }
   function familyOptions(){
     return Object.values(families).map(family=>Object.freeze({...family,verbs:Object.freeze([...family.verbs])}));
   }
@@ -40,5 +22,5 @@ window.COQ_VERB_PATTERNS={"regular-er":{groupe:1,description:"Premier groupe ré
     const record=canonicalRecord(verb);
     return record?.familyId?families[record.familyId]||null:null;
   }
-  window.COQ_PATTERN_RESOLVER={normalize,baseVerb,resolvePattern,resolveRecord,categoryOptions,familyOptions,resolveFamily,matchesGroup};
+  window.COQ_PATTERN_RESOLVER={normalize,baseVerb,resolvePattern,resolveRecord,familyOptions,resolveFamily};
 })();
