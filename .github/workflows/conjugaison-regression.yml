@@ -18,3 +18,5 @@ jobs:
         run: node tests/conjugaison-regression.node.js
       - name: Run practice distribution regression
         run: node tests/conjugaison-practice-distribution.node.js
+      - name: Run subject model regression
+        run: node tests/conjugaison-subject-model.node.js
