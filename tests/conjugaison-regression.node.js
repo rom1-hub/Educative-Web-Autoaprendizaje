@@ -82,8 +82,8 @@ expect(lookupRows[6][0],'vous','La tabla pronominal debe mostrar vous en una sol
 expect(lookupRows[6][1],'vous êtes levé(e)(s)','vous debe conservar las cuatro posibilidades de concordancia.');
 expect(lookupRows[7][0],'ils','La tabla pronominal debe separar ils.');
 expect(lookupRows[7][1],'se sont levés','ils debe usar el masculino plural.');
-expect(lookupRows[8][0],'elles','La tabla pronominal debe separar elles.');
-expect(lookupRows[8][1],'se sont levées','elles debe usar el femenino plural.');
+expect(lookupRows[8][0],'elles','elles debe usar femenino plural.');
+expect(lookupRows[8][1],'se sont levées','elles debe usar femenino plural.');
 const simpleLookup=lookup.normalizedRows(engine.rowsForLookup('parler',"présent de l'indicatif"),"présent de l'indicatif",'parler');
 assert(simpleLookup.length===9,'La tabla simple debe mostrar los 9 sujetos separados.');
 expect(simpleLookup[2][0],'il','La tabla simple debe separar il.');
@@ -111,7 +111,7 @@ expect(etreCompound[4][1],'est venu(e)(s)','on debe conservar las posibilidades.
 expect(etreCompound[5][0],'nous','La tabla être debe usar nous.');
 expect(etreCompound[5][1],'sommes venu(e)s','nous debe conservar la notación plural.');
 expect(etreCompound[6][0],'vous','La tabla être debe mostrar vous en una sola fila.');
-expect(etreCompound[6][1],'êtes venu(e)(s)','vous debe conservar las cuatro posibilidades.');
+expect(etreCompound[6][1],'êtes venu(e)(s)','vous debe conservar las cuatro possibilités.');
 expect(etreCompound[7][0],'ils','La tabla être debe separar ils.');
 expect(etreCompound[7][1],'sont venus','ils debe usar masculino plural.');
 expect(etreCompound[8][0],'elles','La tabla être debe usar femenino plural.');
