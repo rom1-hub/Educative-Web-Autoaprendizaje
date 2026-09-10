@@ -10,8 +10,7 @@
   function rowsForTense(verb,tense){return engine?.rowsForLookup?engine.rowsForLookup(verb,tense):[];}
   function stripMetadata(value){return String(value||'').replace(/\s*\([^)]*\)\s*/g,'').trim();}
   function expandSubjects(label,form,tense){
-    const raw=String(label||'').trim(),base=P.baseSubject(raw);
-    const subjects=base==='il/elle/on'?['il','elle','on']:base==='ils/elles'?['ils','elles']:[raw];
+    const raw=String(label||'').trim(),group=P.subjectGroupFor?.(raw),subjects=group||[raw];
     const mode=tense==='subjonctif présent'||tense==='subjonctif passé'?'subjonctif':'normal';
     return subjects.map(subject=>P.subjectForMode(subject,mode,form));
   }
