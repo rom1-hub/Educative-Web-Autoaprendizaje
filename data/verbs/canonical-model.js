@@ -1,39 +1,14 @@
 /* COQ — Modelo canónico de datos de Conjugaison.
  *
- * Fase 1 del refactor: define una vista estructural única sobre los datos
- * existentes sin cambiar todavía el comportamiento del motor.
+ * Vista estructural única sobre los datos léxicos de Conjugaison.
  *
  * Jerarquía conceptual:
  * Groupe → Catégorie → Famille → Pattern → Verbe → Variante/Exception
- *
- * En esta fase:
- * - familyId y patternId se introducen como conceptos explícitos.
- * - baseVerbId reemplaza semánticamente a la relación ambigua verbeBase.
- * - auxiliaire y participePasse siguen siendo propiedades del verbo.
- * - las formas históricas (formes) se conservan por compatibilidad, pero no
- *   forman parte de la autoridad conceptual del nuevo modelo.
- * - no se infieren familias nuevas a partir de sufijos, prefijos o patterns.
- * - los familyId todavía no declarados explícitamente permanecen en null;
- *   la migración del catálogo de familias será el siguiente bloque.
- *
- * Normalización de migración:
- * - Se corrigen aquí únicamente inconsistencias heredadas ya identificadas
- *   mientras la fuente léxica histórica sigue siendo compatible con el motor.
- * - Esta capa no añade reglas lingüísticas al motor ni crea una segunda fuente
- *   permanente de datos: produce la vista canónica que reemplazará al registro
- *   histórico durante la migración.
  */
 (function(){
   const rawVerbs=window.COQ_VERBS||{};
   const familyCatalog=window.COQ_VERB_FAMILY_CATALOG||{};
-  const constructionCatalog=window.COQ_VERB_CONSTRUCTION_CATALOG||{};
-
-  const sourceKeys=new Set([
-    ...Object.keys(rawVerbs),
-    ...Object.keys(familyCatalog),
-    ...Object.keys(constructionCatalog)
-  ]);
-
+  const sourceKeys=new Set([...Object.keys(rawVerbs),...Object.keys(familyCatalog)]);
   const records={};
 
   function deepFreeze(value){
@@ -46,8 +21,7 @@
 
   function normalizeBaseVerbId(record,key){
     const candidate=String(record?.verbeBase||'').trim();
-    if(!candidate||candidate===key)return null;
-    return candidate;
+    return !candidate||candidate===key?null:candidate;
   }
 
   function normalizeLegacyLexicalData(key,merged){
@@ -60,13 +34,13 @@
   sourceKeys.forEach(key=>{
     const raw=rawVerbs[key]||{};
     const family=familyCatalog[key]||{};
-    const construction=constructionCatalog[key]||{};
-    const merged=normalizeLegacyLexicalData(key,{...raw,...family,...construction});
+    const merged=normalizeLegacyLexicalData(key,{...raw,...family});
     const familyId=typeof merged.familyId==='string'&&merged.familyId.trim()?merged.familyId.trim():null;
     const patternId=typeof merged.patternId==='string'&&merged.patternId.trim()
       ?merged.patternId.trim()
       :(typeof merged.pattern==='string'&&merged.pattern.trim()?merged.pattern.trim():null);
     const baseVerbId=normalizeBaseVerbId(merged,key);
+    const variantes=merged.variantes??merged.variante??null;
 
     records[key]=deepFreeze({
       id:merged.id||key,
@@ -82,9 +56,8 @@
       formePronominale:merged.formePronominale||null,
       formeNonPronominale:merged.formeNonPronominale||null,
       pronominal:merged.pronominal===true,
-      variantes:merged.variantes||null,
+      variantes,
       exceptions:merged.exceptions||null,
-      // Compatibilidad únicamente: no es fuente de verdad del nuevo modelo.
       legacyPattern:merged.pattern||null,
       legacyVerbeBase:merged.verbeBase||null,
       legacyFormes:merged.formes||null
