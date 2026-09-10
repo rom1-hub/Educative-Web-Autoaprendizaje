@@ -10,6 +10,17 @@
     "que je":'je', "que j'":'je', "que tu":'tu', "qu'il":'il', "qu'elle":'elle', "qu'on":'on',
     "qu'il/elle/on":'il', "que nous":'nous', "que vous":'vous', "qu'ils":'ils', "qu'elles":'elles', "qu'ils/elles":'ils'
   });
+  const subjectVariants=Object.freeze({
+    je:Object.freeze(['je (féminin singulier)','je (masculin singulier)']),
+    tu:Object.freeze(['tu (féminin singulier)','tu (masculin singulier)']),
+    il:Object.freeze(['il']),
+    elle:Object.freeze(['elle']),
+    on:Object.freeze(['on (masculin singulier)','on (masculin pluriel)','on (féminin pluriel)']),
+    nous:Object.freeze(['nous (masculin pluriel)','nous (féminin pluriel)']),
+    vous:Object.freeze(['vous (masculin singulier)','vous (féminin singulier)','vous (masculin pluriel)','vous (féminin pluriel)']),
+    ils:Object.freeze(['ils']),
+    elles:Object.freeze(['elles'])
+  });
   const imperativePronouns=Object.freeze({tu:'toi',nous:'nous',vous:'vous'});
   function baseSubject(label){
     const s=String(label||'').trim();
@@ -53,5 +64,5 @@
     const cp=contractPronoun(p, first);
     return cp + (cp.endsWith("'")?'':' ') + clean;
   }
-  window.COQ_CONJ_PRONOUNS={subjectPronouns,baseSubject,subjectInfo,pronounFor,imperativePronounFor,contractPronoun,apply};
+  window.COQ_CONJ_PRONOUNS={subjectPronouns,baseSubject,subjectInfo,subjectVariants,pronounFor,imperativePronounFor,contractPronoun,apply};
 })();
