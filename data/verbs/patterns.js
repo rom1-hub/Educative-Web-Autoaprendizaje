@@ -11,7 +11,6 @@ window.COQ_VERB_PATTERNS={"regular-er":{groupe:1,description:"Premier groupe ré
   const records=dataModel?.records||{};
   const families=window.COQ_VERB_FAMILIES||{};
   const categories=window.COQ_VERB_CATEGORY_CATALOG||[];
-  const patterns=window.COQ_VERB_PATTERNS;
   const normalize=value=>String(value||'').trim().toLowerCase();
   function canonicalRecord(verb){return records[normalize(verb)]||null;}
   function baseVerb(verb){const record=canonicalRecord(verb);return record?.baseVerbId||normalize(verb);}
@@ -31,13 +30,8 @@ window.COQ_VERB_PATTERNS={"regular-er":{groupe:1,description:"Premier groupe ré
     if(!category)return false;
     const record=canonicalRecord(verb);
     if(!record)return false;
-    if(category.familyIds){
-      if(!category.familyIds.includes(record.familyId))return false;
-      return true;
-    }
-    if(category.groupes&&category.groupes.length){
-      return category.groupes.includes(Number(record.groupe));
-    }
+    if(category.familyIds)return category.familyIds.includes(record.familyId);
+    if(category.groupes&&category.groupes.length)return category.groupes.includes(Number(record.groupe));
     return false;
   }
   function familyOptions(){
@@ -47,5 +41,7 @@ window.COQ_VERB_PATTERNS={"regular-er":{groupe:1,description:"Premier groupe ré
     const record=canonicalRecord(verb);
     return record?.familyId?families[record.familyId]||null:null;
   }
+  // Compatibilidad de API: no crea otro catálogo; apunta al mismo catálogo pedagógico.
+  window.COQ_VERB_GROUP_CATALOG=window.COQ_VERB_CATEGORY_CATALOG;
   window.COQ_PATTERN_RESOLVER={normalize,baseVerb,resolvePattern,resolveRecord,categoryOptions,groupOptions,familyOptions,resolveFamily,matchesGroup};
 })();
