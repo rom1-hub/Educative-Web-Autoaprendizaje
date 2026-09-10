@@ -52,7 +52,7 @@ expect(w.COQ_CONJ_DATA_MODEL.get('jeter')?.patternId,'er-eter','El pattern espec
 expect(w.COQ_CONJ_DATA_MODEL.get('se lever')?.pronominal,true,'La construcción pronominal debe ser una propiedad del registro verbal canónico.');
 expect(w.COQ_CONJ_DATA_MODEL.get('se lever')?.auxiliaire,'être','El auxiliar de la forma pronominal debe ser un dato léxico canónico.');
 assert(w.COQ_VERBS['parler'].formePronominale?.infinitif==='se parler','La relación pronominal de parler debe apuntar a se parler.');
-expect(w.COQ_VERB_CONSTRUCTION_CATALOG,'undefined','Las construcciones ya no deben almacenar un registro léxico paralelo de verbos.');
+assert(typeof w.COQ_VERB_CONSTRUCTION_CATALOG==='undefined','Las construcciones ya no deben almacenar un registro léxico paralelo de verbos.');
 expect(w.COQ_PRONOMINAL_RULES['parler']?.fonctionDeSe,'COI','La regla sintáctica pronominal debe permanecer en constructions.js.');
 expect(w.COQ_PRONOMINAL_RULES['lever']?.accord,'sujet','La regla de concordancia pronominal debe permanecer en constructions.js.');
 expect(engine.conjugate('parler',"présent de l'indicatif",'je'),'parle','parler presente');
