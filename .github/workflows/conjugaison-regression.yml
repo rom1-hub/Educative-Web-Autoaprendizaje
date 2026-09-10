@@ -20,6 +20,8 @@ jobs:
         run: node tests/conjugaison-family-inventory.node.js
       - name: Run category-family coverage regression
         run: node tests/conjugaison-category-family-coverage.node.js
+      - name: Run family resolver ownership regression
+        run: node tests/conjugaison-family-resolver.node.js
       - name: Run construction resolver regression
         run: node tests/conjugaison-construction-resolver.node.js
       - name: Run auxiliary resolver regression

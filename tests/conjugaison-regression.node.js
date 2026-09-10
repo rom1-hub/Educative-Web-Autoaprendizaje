@@ -54,9 +54,9 @@ expect(w.COQ_VERB_CATEGORY_CATALOG.find(g=>g.id==='yer')?.familyIds?.includes('y
 assert(w.COQ_CATEGORY_RESOLVER.matchesCategory('appeler','er-eler'),'El resolver de categorías debe reconocer appeler en er-eler.');
 assert(!w.COQ_CATEGORY_RESOLVER.matchesCategory('parler','er-eler'),'El resolver de categorías no debe mezclar familias distintas.');
 assert(w.COQ_CATEGORY_RESOLVER.matchesCategory('aller','groupe-3'),'aller debe pertenecer al filtro pedagógico del tercer grupo.');
-expect(w.COQ_PATTERN_RESOLVER.resolveFamily('appeler')?.id,'er-eler-double','El resolver debe recuperar la familia explícita de appeler.');
-expect(w.COQ_PATTERN_RESOLVER.resolveFamily('prendre')?.id,'prendre-type','El resolver debe conservar prendre como familia independiente.');
-expect(w.COQ_PATTERN_RESOLVER.resolveFamily('faire')?.id,'faire-type','El resolver debe conservar faire como familia independiente.');
+expect(w.COQ_FAMILY_RESOLVER.resolve('appeler')?.id,'er-eler-double','El resolver de familias debe recuperar la familia explícita de appeler.');
+expect(w.COQ_FAMILY_RESOLVER.resolve('prendre')?.id,'prendre-type','El resolver de familias debe conservar prendre como familia independiente.');
+expect(w.COQ_FAMILY_RESOLVER.resolve('faire')?.id,'faire-type','El resolver de familias debe conservar faire como familia independiente.');
 expect(w.COQ_PATTERN_RESOLVER.resolveRecord('se lever')?.construction,'pronominale','La construcción pronominal debe usar el identificador canónico.');
 expect(w.COQ_PATTERN_RESOLVER.resolveRecord('parler')?.construction,'non-pronominale','La construcción no pronominal debe usar el identificador canónico.');
 expect(w.COQ_CONJ_DATA_MODEL.get('appeler')?.patternId,'er-eler','El pattern especial de appeler debe vivir en el modelo léxico canónico.');
