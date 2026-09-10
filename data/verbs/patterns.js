@@ -9,18 +9,10 @@ window.COQ_VERB_PATTERNS={"regular-er":{groupe:1,description:"Premier groupe ré
 (function(){
   const dataModel=window.COQ_CONJ_DATA_MODEL;
   const records=dataModel?.records||{};
-  const families=window.COQ_VERB_FAMILIES||{};
   const normalize=value=>String(value||'').trim().toLowerCase();
   function canonicalRecord(verb){return records[normalize(verb)]||null;}
   function baseVerb(verb){const record=canonicalRecord(verb);return record?.baseVerbId||normalize(verb);}
   function resolvePattern(verb){return canonicalRecord(verb)?.patternId||null;}
   function resolveRecord(verb){return canonicalRecord(verb);}
-  function familyOptions(){
-    return Object.values(families).map(family=>Object.freeze({...family,verbs:Object.freeze([...family.verbs])}));
-  }
-  function resolveFamily(verb){
-    const record=canonicalRecord(verb);
-    return record?.familyId?families[record.familyId]||null:null;
-  }
-  window.COQ_PATTERN_RESOLVER={normalize,baseVerb,resolvePattern,resolveRecord,familyOptions,resolveFamily};
+  window.COQ_PATTERN_RESOLVER={normalize,baseVerb,resolvePattern,resolveRecord};
 })();
