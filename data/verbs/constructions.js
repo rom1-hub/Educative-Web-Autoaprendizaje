@@ -36,9 +36,11 @@ const COQ_CONSTRUCTION_RESOLVER=Object.freeze({
     if(!compoundTenses.includes(tense))return true;
     const filter=window.COQ_COMPOUND_CONSTRUCTION_FILTERS?.[auxiliary];
     if(!filter)return true;
-    if(filter.pronominal===true)return record?.pronominal===true;
-    if(filter.pronominal===false&&record?.pronominal===true)return false;
-    return Array.isArray(filter.auxiliaires)?filter.auxiliaires.includes(record?.auxiliaire):true;
+    const isPronominal=this.isPronominal(record);
+    if(filter.pronominal===true)return isPronominal;
+    if(filter.pronominal===false&&isPronominal)return false;
+    const effectiveAuxiliary=isPronominal?'être':record?.auxiliaire;
+    return Array.isArray(filter.auxiliaires)?filter.auxiliaires.includes(effectiveAuxiliary):true;
   }
 });
 window.COQ_CONSTRUCTION_RESOLVER=COQ_CONSTRUCTION_RESOLVER;
