@@ -80,4 +80,21 @@
   };
 
   window.COQ_CONJ_DATA_MODEL=Object.freeze(api);
+
+  // Compatibilidad transitoria durante la migración del Pattern Registry.
+  // La fuente sigue siendo exclusivamente el modelo canónico: no se duplica
+  // ningún dato léxico. El acceso legado se consume una sola vez y desaparece.
+  const legacyVariantCatalog=Object.freeze(Object.fromEntries(
+    Object.entries(records)
+      .filter(([,record])=>record.variantes!==null&&record.variantes!==undefined)
+      .map(([verb,record])=>[verb,Object.freeze({variante:record.variantes})])
+  ));
+  Object.defineProperty(window,'COQ_VERB_CONSTRUCTION_CATALOG',{
+    configurable:true,
+    enumerable:false,
+    get(){
+      delete window.COQ_VERB_CONSTRUCTION_CATALOG;
+      return legacyVariantCatalog;
+    }
+  });
 })();
