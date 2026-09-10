@@ -1,6 +1,7 @@
 /* COQ — Práctica de conjugación */
 (function(){
   const U=window.COQ_CONJ_UTILS;
+  const P=window.COQ_CONJ_PRONOUNS;
   const conjugations=U.conjugations, verbGroups=U.verbGroups, verbMeta=U.verbMeta;
   const resolver=window.COQ_PATTERN_RESOLVER;
   const engine=window.COQ_CONJ_ENGINE;
@@ -12,11 +13,7 @@
   const compoundTenses=C?.compoundTenses||[];
   const simpleTenses=C?.simpleTenses||[];
   const allTenses=C?.allTenses||[];
-  const SUBJECT_VARIANTS={
-    je:['je (féminin singulier)','je (masculin singulier)'],tu:['tu (féminin singulier)','tu (masculin singulier)'],il:['il'],elle:['elle'],
-    on:['on (masculin singulier)','on (masculin pluriel)','on (féminin pluriel)'],nous:['nous (masculin pluriel)','nous (féminin pluriel)'],
-    vous:['vous (masculin singulier)','vous (féminin singulier)','vous (masculin pluriel)','vous (féminin pluriel)'],ils:['ils'],elles:['elles']
-  };
+  const subjectVariants=P?.subjectVariants||{};
   let session={questions:[],index:0,correct:0,results:[],locked:false};
   function matchesGroup(v,group){
     if(!group || group==='all')return true;
@@ -33,7 +30,7 @@
     if(!model.displayAnswer)return;
     pool.push({verb,tense,subject,answer:model.displayAnswer,displayAnswer:model.displayAnswer,acceptedAnswers:model.acceptedAnswers});
   }
-  function practiceSubjectKey(subject){return PSubject(subject)||String(subject||'').trim().toLowerCase();}
+  function practiceSubjectKey(subject){return P.baseSubject(subject)||String(subject||'').trim().toLowerCase();}
   function practiceVariantKey(subject){return String(subject||'').trim().toLowerCase();}
   function practiceQuestionKey(q){return [q.verb,q.tense,practiceVariantKey(q.subject),q.displayAnswer||q.answer].join('|');}
   function selectPracticeQuestions(pool,limit){
@@ -74,7 +71,6 @@
       const meta=getRecord(v);
       if(!meta)return;
       if(!verb&&!matchesGroup(v,group))return;
-      if(matchesGroup(v,group)===false)return;
       if(!matchesConstruction(v,construction))return;
       const data=conjugations[v]||{};
       const ts=tense==='Todos los tiempos'?Array.from(new Set([...Object.keys(data),...allTenses])):[tense];
@@ -90,11 +86,11 @@
           if(!rows.length)return;
         }
         U.expandPracticeRows(rows).forEach(r=>{
-          if(isCompound && SUBJECT_VARIANTS[PSubject(String(r.subject||'').split(' (')[0].trim())] && engine&&engine.conjugate){
-            const baseSubject=PSubject(String(r.subject||'').split(' (')[0].trim());
-            SUBJECT_VARIANTS[baseSubject].forEach(subject=>{
+          const baseSubject=P.baseSubject(String(r.subject||'').split(' (')[0].trim());
+          if(isCompound && subjectVariants[baseSubject] && engine&&engine.conjugate){
+            subjectVariants[baseSubject].forEach(subject=>{
               const answer=engine.conjugate(v,t,subject,construction||((meta.pronominal)?'pronominale':'non-pronominale'));
-              if(answer!=null)pushQuestion(pool,v,t,formatPracticeSubject(subject,t,true),answer);
+              if(answer!=null)pushQuestion(pool,v,t,P.subjectForMode(subject,(t==='subjonctif présent'||t==='subjonctif passé')?'subjonctif':'normal',answer),answer);
             });
           }else{
             const answer=(engine&&engine.conjugate)?engine.conjugate(v,t,r.subject,construction||((meta.pronominal)?'pronominale':'non-pronominale')):r.answer;
@@ -109,13 +105,13 @@
     return selectPracticeQuestions(pool,20);
   }
   function formatPracticeSubject(subject,tense,isCompound){
-    const raw=String(subject||'').trim(),base=PSubject(raw),compound=!!isCompound,isSubjonctif=tense==='subjonctif présent'||tense==='subjonctif passé';
-    const variants=compound?SUBJECT_VARIANTS:{};
-    const cleanBase=base||raw,suffix=raw.match(/\s*(\([^)]*\))\s*$/)?.[1]||'';
-    if(isSubjonctif){const prefix={je:'que je',tu:'que tu',il:"qu'il",elle:"qu'elle",on:"qu'on",nous:'que nous',vous:'que vous',ils:"qu'ils",elles:"qu'elles"}[cleanBase];return prefix?prefix+(suffix?' '+suffix:''):raw;}
-    return variants[cleanBase]?.includes(raw)?raw:(variants[cleanBase]?.[0]&&compound?variants[cleanBase][0]:raw);
+    const raw=String(subject||'').trim(),base=P.baseSubject(raw),compound=!!isCompound,isSubjonctif=tense==='subjonctif présent'||tense==='subjonctif passé';
+    const variants=compound?subjectVariants:{};
+    const normalized=P.subjectForMode(raw,isSubjonctif?'subjonctif':'normal','');
+    const suffix=raw.match(/\s*(\([^)]*\))\s*$/)?.[1]||'';
+    if(isSubjonctif)return normalized;
+    return variants[base]?.includes(raw)?raw:(variants[base]?.[0]&&compound?variants[base][0]:raw);
   }
-  function PSubject(subject){let raw=String(subject||'').trim().replace(/\s*\([^)]*\)\s*$/,'').trim().toLowerCase();raw=raw.replace(/^qu['’]/,'').replace(/^que\s+/,'');if(raw==="j'")return 'je';return raw;}
   function matchesConstruction(v,construction){if(!construction)return true;const m=getRecord(v)||{};if(construction==='pronominale')return m.pronominal===true;if(construction==='non-pronominale')return m.pronominal!==true;return true;}
   function matchesAuxiliary(v,tense,auxiliary){
     if(!auxiliary||tense==='Todos los tiempos')return true;
@@ -135,9 +131,9 @@
     if(!group)return;
     if(verb){group.disabled=true;group.innerHTML='<option value="" selected>No necesario: verbo concreto</option>';if(help)help.textContent='';return;}
     group.disabled=false;
-    const options=resolver&&typeof resolver.groupOptions==='function'?resolver.groupOptions():[];
+    const options=resolver&&typeof resolver.categoryOptions==='function'?resolver.categoryOptions():[];
     group.innerHTML='<option value="" selected>-seleccionar-</option>'+options.map(item=>'<option value="'+U.escapeHtml(item.id)+'">'+U.escapeHtml(item.label)+'</option>').join('');
-    if(help)help.textContent='Selecciona un grupo o una familia verbal para afinar el ejercicio.';
+    if(help)help.textContent='Selecciona un grupo o una categoría verbal para afinar el ejercicio.';
   }
   function startSession(){const verb=U.normalizeVerb(document.querySelector('#practiceVerb')?.value),tense=document.querySelector('#practiceTense')?.value,group=document.querySelector('#practiceGroup')?.value,construction=document.querySelector('#practiceConstruction')?.value,auxiliary=document.querySelector('#practiceAuxiliary')?.value,msg=document.querySelector('#practiceMessage');if(!msg)return;if(!tense){msg.className='form-message error';msg.textContent='Debes seleccionar un tiempo verbal para comenzar la práctica.';return;}if(verb&&!getRecord(verb)){msg.className='form-message error';msg.textContent='Ese verbo no puede resolverse todavía con los patrones disponibles.';return;}const questions=buildQuestions(verb,tense,group,construction,auxiliary);if(questions.length<20){msg.className='form-message error';msg.textContent='No hay suficientes preguntas disponibles para crear una sesión de 20 preguntas con esta configuración.';return;}session={questions,index:0,correct:0,results:[],locked:false};document.querySelector('#practiceSession')?.classList.remove('hidden');document.querySelector('#practiceCriteria').textContent=[verb||'grupo',tense,group||'',construction||'',auxiliary||''].filter(Boolean).join(' · ');showQuestion();document.querySelector('#practiceSession')?.scrollIntoView({behavior:'smooth',block:'start'});}
   function showQuestion(){const q=session.questions[session.index];session.locked=false;q.attempts=0;q.firstError='';q.secondError='';q.mustTypeCorrect=false;document.querySelector('#questionVerb').textContent=`${q.verb} · ${q.tense}`;document.querySelector('#questionSubject').textContent=q.subject;const input=document.querySelector('#answerInput');input.value='';input.className='';input.disabled=false;const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box';fb.textContent='';document.querySelector('#practiceProgressText').textContent=`Question ${session.index+1} / 20`;document.querySelector('#practiceProgressBar').style.width=`${(session.index/20)*100}%`;setTimeout(()=>input.focus(),80);}
