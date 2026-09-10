@@ -13,10 +13,10 @@
     'avoir':{id:'avoir',patternId:'avoir',groupe:3,verbs:['avoir']},
 
     // Premier groupe
-    'er-regular':{id:'er-regular',patternId:'regular-er',groupe:1,verbs:['parler']},
+    'er-regular':{id:'er-regular',patternId:'regular-er',groupe:1,verbs:['parler','se parler']},
     'er-ger':{id:'er-ger',patternId:'er-ger',groupe:1,verbs:['manger']},
     'er-cer':{id:'er-cer',patternId:'er-cer',groupe:1,verbs:['commencer']},
-    'er-e-accent':{id:'er-e-accent',patternId:'er-e-accent',groupe:1,verbs:['lever','promener']},
+    'er-e-accent':{id:'er-e-accent',patternId:'er-e-accent',groupe:1,verbs:['lever','promener','se lever','se promener']},
     'er-eler-double':{id:'er-eler-double',patternId:'er-eler',groupe:1,verbs:['appeler','rappeler']},
     'er-eler-accent':{id:'er-eler-accent',patternId:'er-eler',groupe:1,verbs:[]},
     'er-eter-double':{id:'er-eter-double',patternId:'er-eter',groupe:1,verbs:['jeter','projeter','rejeter','déjeter','surjeter']},
@@ -29,6 +29,7 @@
     'ir-regular-2':{id:'ir-regular-2',patternId:'regular-ir',groupe:2,verbs:['finir']},
 
     // Troisième groupe
+    'aller-type':{id:'aller-type',patternId:'aller-type',groupe:3,verbs:['aller']},
     'prendre-type':{id:'prendre-type',patternId:'prendre',groupe:3,verbs:['prendre']},
     'faire-type':{id:'faire-type',patternId:'faire',groupe:3,verbs:['faire']},
     'partir-type':{id:'partir-type',patternId:'partir-type',groupe:3,verbs:['partir','sortir','dormir','servir']},
@@ -55,13 +56,8 @@
   Object.values(families).forEach(family=>{
     familyIndex[family.id]=Object.freeze([...family.verbs]);
     family.verbs.forEach(infinitif=>{
-      if(catalog[infinitif]){
-        throw new Error(`Duplicate family membership for ${infinitif}`);
-      }
-      catalog[infinitif]=Object.freeze({
-        familyId:family.id,
-        patternId:family.patternId
-      });
+      if(catalog[infinitif])throw new Error(`Duplicate family membership for ${infinitif}`);
+      catalog[infinitif]=Object.freeze({familyId:family.id,patternId:family.patternId});
     });
   });
 
