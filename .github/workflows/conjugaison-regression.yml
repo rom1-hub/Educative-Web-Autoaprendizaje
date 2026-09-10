@@ -22,6 +22,8 @@ jobs:
         run: node tests/conjugaison-category-family-coverage.node.js
       - name: Run family resolver ownership regression
         run: node tests/conjugaison-family-resolver.node.js
+      - name: Run pattern ownership regression
+        run: node tests/conjugaison-pattern-ownership.node.js
       - name: Run construction resolver regression
         run: node tests/conjugaison-construction-resolver.node.js
       - name: Run auxiliary resolver regression
