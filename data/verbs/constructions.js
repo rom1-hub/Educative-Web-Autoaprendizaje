@@ -20,3 +20,25 @@ window.COQ_AUXILIARY_OPTIONS=Object.freeze([
   {id:'avec-etre',label:'Avec auxiliaire ÊTRE'},
   {id:'avec-avoir-et-etre',label:'Avec auxiliaire AVOIR et ÊTRE'}
 ]);
+const COQ_CONSTRUCTION_RESOLVER=Object.freeze({
+  isPronominal(record,construction){
+    return construction==='pronominale'||record?.pronominal===true||record?.construction==='pronominale';
+  },
+  matchesConstruction(record,construction){
+    if(!construction)return true;
+    const isPronominal=this.isPronominal(record,construction);
+    if(construction==='pronominale')return isPronominal;
+    if(construction==='non-pronominale')return !isPronominal;
+    return true;
+  },
+  matchesAuxiliary(record,tense,auxiliary,compoundTenses){
+    if(!auxiliary||tense==='Todos los tiempos')return true;
+    if(!compoundTenses.includes(tense))return true;
+    const filter=window.COQ_COMPOUND_CONSTRUCTION_FILTERS?.[auxiliary];
+    if(!filter)return true;
+    if(filter.pronominal===true)return record?.pronominal===true;
+    if(filter.pronominal===false&&record?.pronominal===true)return false;
+    return Array.isArray(filter.auxiliaires)?filter.auxiliaires.includes(record?.auxiliaire):true;
+  }
+});
+window.COQ_CONSTRUCTION_RESOLVER=COQ_CONSTRUCTION_RESOLVER;
