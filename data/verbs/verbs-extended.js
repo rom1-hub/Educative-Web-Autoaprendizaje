@@ -3,8 +3,8 @@
 // Responsabilidad única:
 //   aportar registros léxicos que todavía no están en verbs.js.
 //
-// Las familias no almacenan estos datos: family-catalog.js conserva únicamente
-// la relación Famille → Pattern y la pertenencia explícita de cada verbo.
+// Las familias no almacenan participios ni auxiliares: family-catalog.js conserva
+// únicamente la pertenencia explícita y el pattern compartido.
 (function(){
   const verbs={
     'partir':{id:'partir',infinitif:'partir',infinitif_base:'partir',groupe:3,pattern:'partir-type',auxiliaire:'être',pronominal:false,participePasse:'parti',construction:'non-pronominale',verbeBase:'partir'},
@@ -72,7 +72,42 @@
     'transparaître':{id:'transparaître',infinitif:'transparaître',infinitif_base:'transparaître',groupe:3,pattern:'paraître-type',auxiliaire:'avoir',pronominal:false,participePasse:'transparu',construction:'non-pronominale',verbeBase:'transparaître'},
     'comparaître':{id:'comparaître',infinitif:'comparaître',infinitif_base:'comparaître',groupe:3,pattern:'paraître-type',auxiliaire:'avoir',pronominal:false,participePasse:'comparu',construction:'non-pronominale',verbeBase:'comparaître'},
     'nettoyer':{id:'nettoyer',infinitif:'nettoyer',infinitif_base:'nettoyer',groupe:1,pattern:'yer',auxiliaire:'avoir',pronominal:false,participePasse:'nettoyé',construction:'non-pronominale',verbeBase:'nettoyer'},
-    'essuyer':{id:'essuyer',infinitif:'essuyer',infinitif_base:'essuyer',groupe:1,pattern:'yer',auxiliaire:'avoir',pronominal:false,participePasse:'essuyé',construction:'non-pronominale',verbeBase:'essuyer'}
+    'essuyer':{id:'essuyer',infinitif:'essuyer',infinitif_base:'essuyer',groupe:1,pattern:'yer',auxiliaire:'avoir',pronominal:false,participePasse:'essuyé',construction:'non-pronominale',verbeBase:'essuyer'},
+    'se lever':{id:'se lever',infinitif:'se lever',infinitif_base:'lever',groupe:1,pattern:'regular-er',auxiliaire:'être',pronominal:true,participePasse:'levé',construction:'pronominale',verbeBase:'lever',formePronominale:{infinitif:'se lever'},accord:'sujet',fonctionDeSe:'COD'},
+    'se promener':{id:'se promener',infinitif:'se promener',infinitif_base:'promener',groupe:1,pattern:'regular-er',auxiliaire:'être',pronominal:true,participePasse:'promené',construction:'pronominale',verbeBase:'promener',formePronominale:{infinitif:'se promener'},accord:'sujet',fonctionDeSe:'COD'},
+    'se parler':{id:'se parler',infinitif:'se parler',infinitif_base:'parler',groupe:1,pattern:'regular-er',auxiliaire:'être',pronominal:true,participePasse:'parlé',construction:'pronominale',verbeBase:'parler',formePronominale:{infinitif:'se parler'},accord:'aucun',fonctionDeSe:'COI'},
+    'appeler':{id:'appeler',infinitif:'appeler',infinitif_base:'appeler',groupe:1,pattern:'er-eler',auxiliaire:'avoir',pronominal:false,participePasse:'appelé',construction:'non-pronominale',verbeBase:'appeler',variante:'appeler'},
+    'rappeler':{id:'rappeler',infinitif:'rappeler',infinitif_base:'rappeler',groupe:1,pattern:'er-eler',auxiliaire:'avoir',pronominal:false,participePasse:'rappelé',construction:'non-pronominale',verbeBase:'rappeler',variante:'appeler'},
+    'agneler':{id:'agneler',infinitif:'agneler',infinitif_base:'agneler',groupe:1,pattern:'er-eler',auxiliaire:'avoir',pronominal:false,participePasse:'agnelé',construction:'non-pronominale',verbeBase:'agneler',variante:'eler'},
+    'celer':{id:'celer',infinitif:'celer',infinitif_base:'celer',groupe:1,pattern:'er-eler',auxiliaire:'avoir',pronominal:false,participePasse:'celé',construction:'non-pronominale',verbeBase:'celer',variante:'eler'},
+    'déceler':{id:'déceler',infinitif:'déceler',infinitif_base:'déceler',groupe:1,pattern:'er-eler',auxiliaire:'avoir',pronominal:false,participePasse:'décelé',construction:'non-pronominale',verbeBase:'déceler',variante:'eler'},
+    'receler':{id:'receler',infinitif:'receler',infinitif_base:'receler',groupe:1,pattern:'er-eler',auxiliaire:'avoir',pronominal:false,participePasse:'recelé',construction:'non-pronominale',verbeBase:'receler',variante:'eler'},
+    'ciseler':{id:'ciseler',infinitif:'ciseler',infinitif_base:'ciseler',groupe:1,pattern:'er-eler',auxiliaire:'avoir',pronominal:false,participePasse:'ciselé',construction:'non-pronominale',verbeBase:'ciseler',variante:'eler'},
+    'démanteler':{id:'démanteler',infinitif:'démanteler',infinitif_base:'démanteler',groupe:1,pattern:'er-eler',auxiliaire:'avoir',pronominal:false,participePasse:'démantelé',construction:'non-pronominale',verbeBase:'démanteler',variante:'eler'},
+    'écarteler':{id:'écarteler',infinitif:'écarteler',infinitif_base:'écarteler',groupe:1,pattern:'er-eler',auxiliaire:'avoir',pronominal:false,participePasse:'écartelé',construction:'non-pronominale',verbeBase:'écarteler',variante:'eler'},
+    'encasteler':{id:'encasteler',infinitif:'encasteler',infinitif_base:'encasteler',groupe:1,pattern:'er-eler',auxiliaire:'avoir',pronominal:false,participePasse:'encastelé',construction:'non-pronominale',verbeBase:'encasteler',variante:'eler'},
+    'geler':{id:'geler',infinitif:'geler',infinitif_base:'geler',groupe:1,pattern:'er-eler',auxiliaire:'avoir',pronominal:false,participePasse:'gelé',construction:'non-pronominale',verbeBase:'geler',variante:'eler'},
+    'dégeler':{id:'dégeler',infinitif:'dégeler',infinitif_base:'dégeler',groupe:1,pattern:'er-eler',auxiliaire:'avoir',pronominal:false,participePasse:'dégelé',construction:'non-pronominale',verbeBase:'dégeler',variante:'eler'},
+    'congeler':{id:'congeler',infinitif:'congeler',infinitif_base:'congeler',groupe:1,pattern:'er-eler',auxiliaire:'avoir',pronominal:false,participePasse:'congelé',construction:'non-pronominale',verbeBase:'congeler',variante:'eler'},
+    'surgeler':{id:'surgeler',infinitif:'surgeler',infinitif_base:'surgeler',groupe:1,pattern:'er-eler',auxiliaire:'avoir',pronominal:false,participePasse:'surgelé',construction:'non-pronominale',verbeBase:'surgeler',variante:'eler'},
+    'marteler':{id:'marteler',infinitif:'marteler',infinitif_base:'marteler',groupe:1,pattern:'er-eler',auxiliaire:'avoir',pronominal:false,participePasse:'martelé',construction:'non-pronominale',verbeBase:'marteler',variante:'eler'},
+    'modeler':{id:'modeler',infinitif:'modeler',infinitif_base:'modeler',groupe:1,pattern:'er-eler',auxiliaire:'avoir',pronominal:false,participePasse:'modelé',construction:'non-pronominale',verbeBase:'modeler',variante:'eler'},
+    'peler':{id:'peler',infinitif:'peler',infinitif_base:'peler',groupe:1,pattern:'er-eler',auxiliaire:'avoir',pronominal:false,participePasse:'pelé',construction:'non-pronominale',verbeBase:'peler',variante:'eler'},
+    'ficeler':{id:'ficeler',infinitif:'ficeler',infinitif_base:'ficeler',groupe:1,pattern:'er-eler',auxiliaire:'avoir',pronominal:false,participePasse:'ficelé',construction:'non-pronominale',verbeBase:'ficeler',variante:'double'},
+    'jeter':{id:'jeter',infinitif:'jeter',infinitif_base:'jeter',groupe:1,pattern:'er-eter',auxiliaire:'avoir',pronominal:false,participePasse:'jeté',construction:'non-pronominale',verbeBase:'jeter',variante:'jeter'},
+    'projeter':{id:'projeter',infinitif:'projeter',infinitif_base:'projeter',groupe:1,pattern:'er-eter',auxiliaire:'avoir',pronominal:false,participePasse:'projeté',construction:'non-pronominale',verbeBase:'projeter',variante:'double'},
+    'rejeter':{id:'rejeter',infinitif:'rejeter',infinitif_base:'rejeter',groupe:1,pattern:'er-eter',auxiliaire:'avoir',pronominal:false,participePasse:'rejeté',construction:'non-pronominale',verbeBase:'rejeter',variante:'double'},
+    'déjeter':{id:'déjeter',infinitif:'déjeter',infinitif_base:'déjeter',groupe:1,pattern:'er-eter',auxiliaire:'avoir',pronominal:false,participePasse:'déjeté',construction:'non-pronominale',verbeBase:'déjeter',variante:'double'},
+    'surjeter':{id:'surjeter',infinitif:'surjeter',infinitif_base:'surjeter',groupe:1,pattern:'er-eter',auxiliaire:'avoir',pronominal:false,participePasse:'surjeté',construction:'non-pronominale',verbeBase:'surjeter',variante:'double'},
+    'acheter':{id:'acheter',infinitif:'acheter',infinitif_base:'acheter',groupe:1,pattern:'er-eter',auxiliaire:'avoir',pronominal:false,participePasse:'acheté',construction:'non-pronominale',verbeBase:'acheter',variante:'accent'},
+    'racheter':{id:'racheter',infinitif:'racheter',infinitif_base:'racheter',groupe:1,pattern:'er-eter',auxiliaire:'avoir',pronominal:false,participePasse:'racheté',construction:'non-pronominale',verbeBase:'racheter',variante:'accent'},
+    'bégueter':{id:'bégueter',infinitif:'bégueter',infinitif_base:'bégueter',groupe:1,pattern:'er-eter',auxiliaire:'avoir',pronominal:false,participePasse:'bégueté',construction:'non-pronominale',verbeBase:'bégueter',variante:'accent'},
+    'corseter':{id:'corseter',infinitif:'corseter',infinitif_base:'corseter',groupe:1,pattern:'er-eter',auxiliaire:'avoir',pronominal:false,participePasse:'corseté',construction:'non-pronominale',verbeBase:'corseter',variante:'accent'},
+    'crocheter':{id:'crocheter',infinitif:'crocheter',infinitif_base:'crocheter',groupe:1,pattern:'er-eter',auxiliaire:'avoir',pronominal:false,participePasse:'crocheté',construction:'non-pronominale',verbeBase:'crocheter',variante:'accent'},
+    'fileter':{id:'fileter',infinitif:'fileter',infinitif_base:'fileter',groupe:1,pattern:'er-eter',auxiliaire:'avoir',pronominal:false,participePasse:'fileté',construction:'non-pronominale',verbeBase:'fileter',variante:'accent'},
+    'fureter':{id:'fureter',infinitif:'fureter',infinitif_base:'fureter',groupe:1,pattern:'er-eter',auxiliaire:'avoir',pronominal:false,participePasse:'fureté',construction:'non-pronominale',verbeBase:'fureter',variante:'accent'},
+    'haleter':{id:'haleter',infinitif:'haleter',infinitif_base:'haleter',groupe:1,pattern:'er-eter',auxiliaire:'avoir',pronominal:false,participePasse:'haleté',construction:'non-pronominale',verbeBase:'haleter',variante:'accent'},
+    'feuilleter':{id:'feuilleter',infinitif:'feuilleter',infinitif_base:'feuilleter',groupe:1,pattern:'er-eter',auxiliaire:'avoir',pronominal:false,participePasse:'feuilleté',construction:'non-pronominale',verbeBase:'feuilleter',variante:'double'}
   };
   const target=window.COQ_VERBS||{};
   Object.entries(verbs).forEach(([key,record])=>{if(!target[key])target[key]=record;});
