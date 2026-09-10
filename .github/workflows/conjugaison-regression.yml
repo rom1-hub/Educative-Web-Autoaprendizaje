@@ -22,6 +22,8 @@ jobs:
         run: node tests/conjugaison-category-family-coverage.node.js
       - name: Run construction resolver regression
         run: node tests/conjugaison-construction-resolver.node.js
+      - name: Run auxiliary resolver regression
+        run: node tests/conjugaison-auxiliary-resolver.node.js
       - name: Run subject model regression
         run: node tests/conjugaison-subject-model.node.js
       - name: Run conjugaison regression
