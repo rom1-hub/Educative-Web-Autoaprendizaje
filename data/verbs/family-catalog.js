@@ -44,13 +44,16 @@
     'paraître-type':{id:'paraître-type',patternId:'paraître-type',groupe:3,verbs:['paraître','apparaître','disparaître','reparaître','transparaître','comparaître']}
   };
   const catalog={};
+  const familyIndex={};
   Object.values(families).forEach(family=>{
+    familyIndex[family.id]=Object.freeze([...family.verbs]);
     family.verbs.forEach(infinitif=>{if(catalog[infinitif])throw new Error(`Duplicate family membership for ${infinitif}`);catalog[infinitif]=Object.freeze({familyId:family.id,patternId:family.patternId});});
   });
   const frozenFamilies={};
-  Object.entries(families).forEach(([id,family])=>{frozenFamilies[id]=Object.freeze({id:family.id,patternId:family.patternId,groupe:family.groupe,verbs:Object.freeze([...family.verbs])});});
-  const familyResolver=Object.freeze({normalize(value){return String(value||'').trim().toLowerCase();},options(){return Object.values(frozenFamilies);},resolve(verb){const normalized=this.normalize(verb);const family=Object.values(frozenFamilies).find(entry=>entry.verbs.includes(normalized));return family||null;}});
+  Object.entries(families).forEach(([id,family])=>{frozenFamilies[id]=Object.freeze({id:family.id,patternId:family.patternId,groupe:family.groupe,verbs:familyIndex[id]});});
+  const familyResolver=Object.freeze({normalize(value){return String(value||'').trim().toLowerCase();},options(){return Object.values(frozenFamilies);},resolve(verb){const entry=familyIndex&&Object.entries(familyIndex).find(([,verbs])=>verbs.includes(this.normalize(verb)));return entry?frozenFamilies[entry[0]]||null:null;}});
   window.COQ_VERB_FAMILIES=Object.freeze(frozenFamilies);
   window.COQ_VERB_FAMILY_CATALOG=Object.freeze(catalog);
+  window.COQ_VERB_FAMILY_INDEX=Object.freeze(familyIndex);
   window.COQ_FAMILY_RESOLVER=familyResolver;
 })();
