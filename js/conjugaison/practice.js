@@ -90,11 +90,11 @@
           const baseSubject=P.baseSubject(String(r.subject||'').split(' (')[0].trim());
           if(isCompound && subjectVariants[baseSubject] && engine&&engine.conjugate){
             subjectVariants[baseSubject].forEach(subject=>{
-              const answer=engine.conjugate(v,t,subject,construction||((meta.pronominal)?'pronominale':'non-pronominale'));
+              const answer=engine.conjugate(v,t,subject,construction||((constructionResolver?.isPronominal(meta))?'pronomiale':'non-pronomiale'));
               if(answer!=null)pushQuestion(pool,v,t,P.subjectForMode(subject,(t==='subjonctif présent'||t==='subjonctif passé')?'subjonctif':'normal',answer),answer);
             });
           }else{
-            const answer=(engine&&engine.conjugate)?engine.conjugate(v,t,r.subject,construction||((meta.pronominal)?'pronominale':'non-pronominale')):r.answer;
+            const answer=(engine&&engine.conjugate)?engine.conjugate(v,t,r.subject,construction||((constructionResolver?.isPronominal(meta))?'pronomiale':'non-pronomiale')):r.answer;
             const finalAnswer=answer==null?r.answer:answer;
             if(finalAnswer!=null && String(finalAnswer).trim()!=='')pushQuestion(pool,v,t,formatPracticeSubject(r.subject,t,isCompound),finalAnswer);
           }
