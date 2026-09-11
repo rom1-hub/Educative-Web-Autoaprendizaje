@@ -11,15 +11,15 @@ const expect=(actual,expected,label)=>assert(actual===expected,`${label}: espera
 assert(w.COQ_VERBS['parler'],'Los datos base deben seguir intactos tras cargar el registro extendido.');
 assert(w.COQ_VERBS['sortir'],'Los datos léxicos extendidos deben cargarse antes del modelo canónico.');
 assert(w.COQ_VERBS['prévenir'],'prévenir debe pertenecer al registro léxico de verbos.');
-assert(w.COQ_VERB_REGISTRY['partir'],'El adaptador de compatibilidad debe exponer verbos provenientes del modelo canónico.');
+assert(w.COQ_CONJ_DATA_MODEL.get('partir'),'El modelo canónico debe exponer verbos provenientes del registro léxico.');
 expect(w.COQ_VERB_FAMILY_CATALOG['partir']?.familyId,'partir-type','La pertenencia familiar de partir debe ser explícita.');
 expect(w.COQ_VERB_FAMILY_CATALOG['partir']?.patternId,'partir-type','El pattern de partir debe estar separado de la identidad de familia.');
 expect(w.COQ_VERB_FAMILIES['partir-type']?.patternId,'partir-type','La familia partir-type debe declarar explícitamente su pattern.');
 expect(w.COQ_VERB_FAMILIES['venir-type']?.patternId,'venir-type','La familia venir-type debe declarar explícitamente su pattern.');
 expect(w.COQ_VERB_FAMILY_CATALOG['prévenir']?.familyId,'venir-type','prévenir debe pertenecer explícitamente a la familia venir-type.');
 expect(w.COQ_VERB_FAMILY_CATALOG['prévenir']?.patternId,'venir-type','prévenir debe conservar el pattern venir-type.');
-expect(w.COQ_VERB_REGISTRY['prévenir'].auxiliaire,'avoir','El auxiliar de prévenir debe seguir siendo una propiedad del verbo, no de la familia.');
-expect(w.COQ_VERB_REGISTRY['prévenir'].participePasse,'prévenu','El participio pasado de prévenir debe seguir siendo una propiedad del verbo.');
+expect(w.COQ_CONJ_DATA_MODEL.get('prévenir')?.auxiliaire,'avoir','El auxiliar de prévenir debe seguir siendo una propiedad del verbo, no de la familia.');
+expect(w.COQ_CONJ_DATA_MODEL.get('prévenir')?.participePasse,'prévenu','El participio pasado de prévenir debe seguir siendo una propiedad del verbo.');
 expect(w.COQ_VERB_FAMILY_CATALOG['nettoyer']?.familyId,'yer-oyer-uyer','nettoyer debe pertenecer a la familia -OYER/-UYER.');
 expect(w.COQ_VERB_FAMILY_CATALOG['essuyer']?.familyId,'yer-oyer-uyer','essuyer debe pertenecer a la familia -OYER/-UYER.');
 expect(w.COQ_VERB_FAMILY_CATALOG['nettoyer']?.patternId,'yer','nettoyer debe usar el pattern técnico yer.');
@@ -82,7 +82,7 @@ expect(engine.conjugate('se lever','passé composé','vous (féminin singulier)'
 expect(engine.conjugate('se lever','plus-que-parfait','tu (masculin singulier)','pronominale'),"t'étais levé",'se lever plus-que-parfait');
 expect(engine.conjugate('se parler','passé composé','ils','pronominale'),'se sont parlé','se parler sans accord');
 expect(engine.conjugate('venir','futur antérieur','elles'),'seront venues','venir futur antérieur');
-expect(w.COQ_VERB_REGISTRY['venir'].auxiliaire,'être','venir doit conserver son auxiliaire être dans el registro normalizado');
+expect(w.COQ_CONJ_DATA_MODEL.get('venir')?.auxiliaire,'être','venir debe conservar su auxiliar être en el modelo canónico');
 const canonicalRecords=w.COQ_CONJ_DATA_MODEL.records||{};
 const elerVerbs=Object.keys(canonicalRecords).filter(v=>canonicalRecords[v]?.patternId==='er-eler');
 const eterVerbs=Object.keys(canonicalRecords).filter(v=>canonicalRecords[v]?.patternId==='er-eter');
