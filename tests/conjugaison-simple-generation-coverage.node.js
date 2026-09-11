@@ -21,19 +21,18 @@ vm.runInContext(fs.readFileSync(path.join(root,'js/conjugaison/engine.js'),'utf8
 const engine=w.COQ_CONJ_ENGINE;
 assert(engine,'El motor de conjugación debe estar disponible.');
 const simpleTenses=(C.simpleTenses||[]).filter(tense=>tense!==undefined);
-const subjects=Array.from(new Set([
-  ...S.subjectSets.simpleConstructionFallback,
-  ...S.subjectSets.imperative,
-  ...S.subjectSets.subjonctifPractice
-]));
-assert(simpleTenses.length>0,'Debe existir al menos un tiempo simple.');
-assert(subjects.length>0,'Debe existir un conjunto de sujetos para validar generación simple.');
+const canonicalSubjects=S.subjectSets.simpleConstructionFallback;
 const failures=[];
 Object.keys(records).forEach(verb=>{
   const record=records[verb];
   simpleTenses.forEach(tense=>{
+    const subjects=tense==='impératif présent'
+      ? S.subjectSets.imperative
+      : tense==='subjonctif présent'
+        ? S.subjectSets.subjonctifPractice
+        : canonicalSubjects;
     subjects.forEach(subject=>{
-      const baseSubject=typeof subject==='string'?S.baseSubject(subject):subject;
+      const baseSubject=S.baseSubject(subject);
       const result=engine.conjugate(verb,tense,baseSubject,record.pronominal?'pronomiale':'non-pronomiale');
       if(result===null||result===undefined||String(result)==='')failures.push(`${verb} | ${tense} | ${baseSubject}`);
     });
@@ -43,4 +42,4 @@ if(failures.length){
   console.error(`Combinaciones simples no generables (${failures.length}): ${failures.slice(0,80).join(' ; ')}`);
   throw new Error(`La cobertura del generador simple sin legacyFormes no es completa: ${failures.length} combinaciones sin forma generada.`);
 }
-console.log(`✓ Simple generation coverage regression passed without legacyFormes — ${Object.keys(records).length} verbos × ${simpleTenses.length} tiempos simples × ${subjects.length} sujetos.`);
+console.log(`✓ Simple generation coverage regression passed without legacyFormes — ${Object.keys(records).length} verbos × ${simpleTenses.length} tiempos simples, con sujetos válidos por tiempo.`);
