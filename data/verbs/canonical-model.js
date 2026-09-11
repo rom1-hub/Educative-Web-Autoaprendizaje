@@ -21,7 +21,7 @@
     const patternId=typeof merged.patternId==='string'&&merged.patternId.trim()?merged.patternId.trim():null;
     const baseVerbId=normalizeBaseVerbId(merged,key);
     const variantes=merged.variantes??merged.variante??null;
-    records[key]=deepFreeze({id:merged.id||key,infinitif:merged.infinitif||key,infinitifBase:merged.infinitif_base||key,groupe:Number.isFinite(Number(merged.groupe))?Number(merged.groupe):null,familyId,patternId,auxiliaire:merged.auxiliaire||null,participePasse:merged.participePasse||null,construction:merged.construction||'non-pronominale',baseVerbId,formePronominale:merged.formePronominale||null,formeNonPronominale:merged.formeNonPronominale||null,pronominal:merged.pronominal===true,variantes,exceptions:merged.exceptions||null,legacyPattern:merged.pattern||null,legacyFormes:merged.formes||null});
+    records[key]=deepFreeze({id:merged.id||key,infinitif:merged.infinitif||key,infinitifBase:merged.infinitif_base||key,groupe:Number.isFinite(Number(merged.groupe))?Number(merged.groupe):null,familyId,patternId,auxiliaire:merged.auxiliaire||null,participePasse:merged.participePasse||null,construction:merged.construction||'non-pronominale',baseVerbId,formePronominale:merged.formePronominale||null,formeNonPronominale:merged.formeNonPronominale||null,pronominal:merged.pronominal===true,variantes,exceptions:merged.exceptions||null,legacyPattern:merged.pattern||null});
   });
   const api={version:'1.0.0',records:deepFreeze(records),get(verb){return records[String(verb||'').trim()]||null;}};
   window.COQ_CONJ_DATA_MODEL=Object.freeze(api);
