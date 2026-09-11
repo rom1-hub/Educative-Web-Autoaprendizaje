@@ -5,7 +5,6 @@
 (function(){
   const dataModel=window.COQ_CONJ_DATA_MODEL;
   const records=dataModel?.records||{};
-  const verbData=window.COQ_VERB_DATA||{};
   const registry={};
 
   // Adaptador de compatibilidad: mantiene la forma histórica que todavía
@@ -44,7 +43,6 @@
 
   const api={
     conjugations:Object.freeze(Object.fromEntries(Object.entries(registry).map(([key,record])=>[key,record.formes||{}]))),
-    verbGroups:Object.freeze({...((verbData.verbGroups)||{})}),
     verbMeta:normalizedMeta
   };
   api.normalizeVerb=v=>String(v??'').trim().toLowerCase();
