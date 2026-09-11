@@ -22,6 +22,7 @@ const engine=w.COQ_CONJ_ENGINE;
 assert(engine,'El motor de conjugación debe estar disponible.');
 const simpleTenses=(C.simpleTenses||[]).filter(tense=>tense!==undefined);
 const canonicalSubjects=S.subjectSets.simpleConstructionFallback;
+assert(canonicalSubjects.length===9,'La cobertura simple debe validar los 9 sujetos canónicos.');
 const failures=[];
 Object.keys(records).forEach(verb=>{
   const record=records[verb];
