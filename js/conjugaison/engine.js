@@ -7,8 +7,7 @@
   function baseKey(verb){const canonical=canonicalRecord(verb);if(canonical&&canonical.baseVerbId)return canonical.baseVerbId;return verb;}
   function record(verb){return canonicalRecord(verb);}
   function generatedSimple(verb,tense,subject){const r=record(verb);if(!r||!R||typeof R.generate!=='function')return null;return R.generate(r.patternId,r.infinitifBase,P.baseSubject(subject),tense,r);}
-  function explicitForm(verb,tense,subject){const r=record(verb);const rows=(r?.legacyFormes||{})[tense]||[];const exact=rows.find(r=>r[0]===subject);if(exact)return exact[1];const base=P.baseSubject(subject);const grouped=rows.find(r=>String(r[0]).split('/').map(x=>x.trim()).some(label=>P.baseSubject(label)===base));return grouped?grouped[1]:null;}
-  function simpleForm(verb,tense,subject){const generated=generatedSimple(verb,tense,subject);if(generated!==null&&generated!==undefined&&String(generated)!=='')return generated;return explicitForm(verb,tense,subject);}
+  function simpleForm(verb,tense,subject){return generatedSimple(verb,tense,subject);}
   function participle(verb){const r=record(baseKey(verb));return r&&r.participePasse?r.participePasse:null;}
   function applyAgreement(pp,info,base,isPronominal,auxiliary){
     if(!A)return pp;
