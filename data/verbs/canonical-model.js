@@ -7,9 +7,8 @@
  */
 (function(){
   const rawVerbs=window.COQ_VERBS||{};
-  const familyCatalog=window.COQ_VERB_FAMILY_CATALOG||{};
   const familyResolver=window.COQ_FAMILY_RESOLVER;
-  const sourceKeys=new Set([...Object.keys(rawVerbs),...Object.keys(familyCatalog)]);
+  const sourceKeys=Object.keys(rawVerbs);
   const records={};
   function deepFreeze(value){if(value&&typeof value==='object'&&!Object.isFrozen(value)){Object.values(value).forEach(deepFreeze);Object.freeze(value);}return value;}
   function normalizeBaseVerbId(record,key){const candidate=String(record?.verbeBase||'').trim();return !candidate||candidate===key?null:candidate;}
