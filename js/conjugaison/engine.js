@@ -2,10 +2,10 @@
  * Responsabilidad exclusiva: resolver y generar formas; la UI decide cómo presentarlas.
  */
 (function(){
-  const P=window.COQ_CONJ_PRONOUNS,C=window.COQ_CONJ_COMPOUND,A=window.COQ_CONJ_AGREEMENT,R=window.COQ_PATTERN_REGISTRY,resolver=window.COQ_PATTERN_RESOLVER,dataModel=window.COQ_CONJ_DATA_MODEL,constructionResolver=window.COQ_CONSTRUCTION_RESOLVER,auxiliaryResolver=window.COQ_AUXILIARY_RESOLVER,verbs=window.COQ_VERB_REGISTRY||{},S=P.subjectSets;
+  const P=window.COQ_CONJ_PRONOUNS,C=window.COQ_CONJ_COMPOUND,A=window.COQ_CONJ_AGREEMENT,R=window.COQ_PATTERN_REGISTRY,resolver=window.COQ_PATTERN_RESOLVER,dataModel=window.COQ_CONJ_DATA_MODEL,constructionResolver=window.COQ_CONSTRUCTION_RESOLVER,auxiliaryResolver=window.COQ_AUXILIARY_RESOLVER,S=P.subjectSets;
   function canonicalRecord(verb){return dataModel&&typeof dataModel.get==='function'?dataModel.get(verb):null;}
-  function baseKey(verb){const canonical=canonicalRecord(verb);if(canonical&&canonical.baseVerbId)return canonical.baseVerbId;const v=verbs[verb];if(v&&v.verbeBase&&verbs[v.verbeBase])return v.verbeBase;if(resolver&&typeof resolver.baseVerb==='function')return resolver.baseVerb(verb);return verb;}
-  function record(verb){return canonicalRecord(verb)||(verbs[verb]||(resolver&&typeof resolver.resolveRecord==='function'?resolver.resolveRecord(verb):null));}
+  function baseKey(verb){const canonical=canonicalRecord(verb);if(canonical&&canonical.baseVerbId)return canonical.baseVerbId;if(resolver&&typeof resolver.baseVerb==='function')return resolver.baseVerb(verb);return verb;}
+  function record(verb){return canonicalRecord(verb)||(resolver&&typeof resolver.resolveRecord==='function'?resolver.resolveRecord(verb):null);}
   function generatedSimple(verb,tense,subject){const r=record(verb);if(!r||!R||typeof R.generate!=='function')return null;const pattern=r.patternId||r.pattern;const infinitif=r.infinitifBase||r.infinitif_base||r.infinitif;return R.generate(pattern,infinitif,P.baseSubject(subject),tense,r);}
   function explicitForm(verb,tense,subject){const r=record(verb);const rows=(r?.legacyFormes||r?.formes||{})[tense]||[];const exact=rows.find(r=>r[0]===subject);if(exact)return exact[1];const base=P.baseSubject(subject);const grouped=rows.find(r=>String(r[0]).split('/').map(x=>x.trim()).some(label=>P.baseSubject(label)===base));return grouped?grouped[1]:null;}
   function simpleForm(verb,tense,subject){const generated=generatedSimple(verb,tense,subject);if(generated!==null&&generated!==undefined&&String(generated)!=='')return generated;return explicitForm(verb,tense,subject);}
