@@ -16,7 +16,7 @@
     'er-cer':{id:'er-cer',patternId:'er-cer',groupe:1,verbs:['commencer']},
     'er-e-accent':{id:'er-e-accent',patternId:'er-e-accent',groupe:1,verbs:['lever','promener','se lever','se promener']},
     'er-eler-double':{id:'er-eler-double',patternId:'er-eler',groupe:1,verbs:['appeler','rappeler']},
-    'er-eler-accent':{id:'er-eler-accent',patternId:'er-eler',groupe:1,verbs:['agneler','celer','déceler','receler','ciseler','démanteler','écarteler']},
+    'er-eler-accent':{id:'er-eler-accent',patternId:'er-eler',groupe:1,verbs:['agneler','celer','déceler','receler','ciseler','démanteler','écarteler','encasteler']},
     'er-eter-double':{id:'er-eter-double',patternId:'er-eter',groupe:1,verbs:['jeter','projeter','rejeter','déjeter','surjeter']},
     'er-eter-accent':{id:'er-eter-accent',patternId:'er-eter',groupe:1,verbs:['acheter','racheter']},
     'er-eter-orthographic':{id:'er-eter-orthographic',patternId:'er-eter',groupe:1,verbs:['bégueter','corseter','crocheter','fileter','fureter','haleter','feuilleter']},
@@ -47,18 +47,11 @@
   const familyIndex={};
   Object.values(families).forEach(family=>{
     familyIndex[family.id]=Object.freeze([...family.verbs]);
-    family.verbs.forEach(infinitif=>{
-      if(catalog[infinitif])throw new Error(`Duplicate family membership for ${infinitif}`);
-      catalog[infinitif]=Object.freeze({familyId:family.id,patternId:family.patternId});
-    });
+    family.verbs.forEach(infinitif=>{if(catalog[infinitif])throw new Error(`Duplicate family membership for ${infinitif}`);catalog[infinitif]=Object.freeze({familyId:family.id,patternId:family.patternId});});
   });
   const frozenFamilies={};
   Object.entries(families).forEach(([id,family])=>{frozenFamilies[id]=Object.freeze({id:family.id,patternId:family.patternId,groupe:family.groupe,verbs:familyIndex[id]});});
-  const familyResolver=Object.freeze({
-    normalize(value){return String(value||'').trim().toLowerCase();},
-    options(){return Object.values(frozenFamilies);},
-    resolve(verb){const entry=familyIndex&&Object.entries(familyIndex).find(([,verbs])=>verbs.includes(this.normalize(verb)));return entry?frozenFamilies[entry[0]]||null:null;}
-  });
+  const familyResolver=Object.freeze({normalize(value){return String(value||'').trim().toLowerCase();},options(){return Object.values(frozenFamilies);},resolve(verb){const entry=familyIndex&&Object.entries(familyIndex).find(([,verbs])=>verbs.includes(this.normalize(verb)));return entry?frozenFamilies[entry[0]]||null:null;}});
   window.COQ_VERB_FAMILIES=Object.freeze(frozenFamilies);
   window.COQ_VERB_FAMILY_CATALOG=Object.freeze(catalog);
   window.COQ_VERB_FAMILY_INDEX=Object.freeze(familyIndex);
