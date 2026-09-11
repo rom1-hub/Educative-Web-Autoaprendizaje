@@ -3,7 +3,6 @@
   const U=window.COQ_CONJ_UTILS;
   const P=window.COQ_CONJ_PRONOUNS;
   const dataModel=window.COQ_CONJ_DATA_MODEL;
-  const conjugations=U.conjugations, verbMeta=U.verbMeta;
   const categoryResolver=window.COQ_CATEGORY_RESOLVER;
   const constructionResolver=window.COQ_CONSTRUCTION_RESOLVER;
   const auxiliaryResolver=window.COQ_AUXILIARY_RESOLVER;
