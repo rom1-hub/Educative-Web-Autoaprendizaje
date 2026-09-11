@@ -65,7 +65,6 @@
     'er-eler':elerGenerator,
     'er-eter':eterGenerator,
     'er-e-accent':erEAccent,
-    'e-accent':erEAccent,
     'yer':yerType,
     'avoir':avoirType,
     'être':etreType,
