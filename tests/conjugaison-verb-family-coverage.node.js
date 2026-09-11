@@ -14,17 +14,26 @@ const model=w.COQ_CONJ_DATA_MODEL;
 assert(Object.keys(verbs).length>0,'El registro léxico de verbos no puede estar vacío.');
 assert(Object.keys(families).length>0,'El catálogo de familias no puede estar vacío.');
 assert(model&&model.records,'El modelo canónico debe estar disponible.');
+const missing=[];
+const invalid=[];
 Object.keys(verbs).forEach(verb=>{
   const entry=familyCatalog[verb];
   const record=model.records[verb];
-  assert(entry,`El verbo léxico ${verb} debe tener una familia explícitamente declarada.`);
-  assert(record,`El verbo léxico ${verb} debe existir en el modelo canónico.`);
-  assert(record.familyId===entry.familyId,`La familia canónica de ${verb} debe coincidir con el catálogo.`);
-  assert(record.patternId===entry.patternId,`El pattern canónico de ${verb} debe coincidir con su familia.`);
+  if(!entry){missing.push(verb);return;}
+  if(!record)invalid.push(`${verb}: falta en el modelo canónico`);
+  else {
+    if(record.familyId!==entry.familyId)invalid.push(`${verb}: familyId ${record.familyId} !== ${entry.familyId}`);
+    if(record.patternId!==entry.patternId)invalid.push(`${verb}: patternId ${record.patternId} !== ${entry.patternId}`);
+  }
 });
 Object.entries(familyCatalog).forEach(([verb,entry])=>{
   assert(families[entry.familyId],`La familia del índice de ${verb} no existe: ${entry.familyId}.`);
   assert(verbs[verb],`El índice familiar no debe introducir verbos fuera del registro léxico: ${verb}.`);
 });
+if(missing.length||invalid.length){
+  console.error(`Verbos sin familia (${missing.length}): ${missing.join(', ')||'ninguno'}`);
+  console.error(`Incoherencias (${invalid.length}): ${invalid.join(' | ')||'ninguna'}`);
+  throw new Error(`La cobertura verbo→familia no está completa: ${missing.length} faltantes, ${invalid.length} incoherencias.`);
+}
 const covered=Object.keys(verbs).filter(verb=>familyCatalog[verb]).length;
 console.log(`✓ Verb-family coverage regression passed — ${covered}/${Object.keys(verbs).length} verbos léxicos cubiertos.`);
