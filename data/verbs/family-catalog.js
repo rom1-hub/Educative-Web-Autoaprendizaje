@@ -18,7 +18,7 @@
     'er-cer':{id:'er-cer',patternId:'er-cer',groupe:1,verbs:['commencer']},
     'er-e-accent':{id:'er-e-accent',patternId:'er-e-accent',groupe:1,verbs:['lever','promener','se lever','se promener']},
     'er-eler-double':{id:'er-eler-double',patternId:'er-eler',groupe:1,verbs:['appeler','rappeler']},
-    'er-eler-accent':{id:'er-eler-accent',patternId:'er-eler',groupe:1,verbs:[]},
+    'er-eler-accent':{id:'er-eler-accent',patternId:'er-eler',groupe:1,verbs:['agneler']},
     'er-eter-double':{id:'er-eter-double',patternId:'er-eter',groupe:1,verbs:['jeter','projeter','rejeter','déjeter','surjeter']},
     'er-eter-accent':{id:'er-eter-accent',patternId:'er-eter',groupe:1,verbs:['acheter','racheter']},
     'er-eter-orthographic':{id:'er-eter-orthographic',patternId:'er-eter',groupe:1,verbs:['bégueter','corseter','crocheter','fileter','fureter','haleter','feuilleter']},
