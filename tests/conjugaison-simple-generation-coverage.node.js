@@ -21,7 +21,11 @@ vm.runInContext(fs.readFileSync(path.join(root,'js/conjugaison/engine.js'),'utf8
 const engine=w.COQ_CONJ_ENGINE;
 assert(engine,'El motor de conjugación debe estar disponible.');
 const simpleTenses=(C.simpleTenses||[]).filter(tense=>tense!==undefined);
-const subjects=Array.from(new Set([...(S.simpleFallback||[]),...(S.imperative||[]),...(S.subjonctifSimpleFallback||[])]));
+const subjects=Array.from(new Set([
+  ...S.subjectSets.simpleConstructionFallback,
+  ...S.subjectSets.imperative,
+  ...S.subjectSets.subjonctifPractice
+]));
 assert(simpleTenses.length>0,'Debe existir al menos un tiempo simple.');
 assert(subjects.length>0,'Debe existir un conjunto de sujetos para validar generación simple.');
 const failures=[];
@@ -29,7 +33,7 @@ Object.keys(records).forEach(verb=>{
   const record=records[verb];
   simpleTenses.forEach(tense=>{
     subjects.forEach(subject=>{
-      const baseSubject=typeof subject==='string'?String(subject).split('/')[0].trim():subject;
+      const baseSubject=typeof subject==='string'?S.baseSubject(subject):subject;
       const result=engine.conjugate(verb,tense,baseSubject,record.pronominal?'pronomiale':'non-pronomiale');
       if(result===null||result===undefined||String(result)==='')failures.push(`${verb} | ${tense} | ${baseSubject}`);
     });
