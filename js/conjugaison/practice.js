@@ -2,6 +2,7 @@
 (function(){
   const U=window.COQ_CONJ_UTILS;
   const P=window.COQ_CONJ_PRONOUNS;
+  const dataModel=window.COQ_CONJ_DATA_MODEL;
   const conjugations=U.conjugations, verbMeta=U.verbMeta;
   const categoryResolver=window.COQ_CATEGORY_RESOLVER;
   const constructionResolver=window.COQ_CONSTRUCTION_RESOLVER;
@@ -10,7 +11,7 @@
   const C=window.COQ_CONJ_COMPOUND;
   const constructionOptions=window.COQ_CONSTRUCTION_OPTIONS||[];
   const auxiliaryOptions=window.COQ_AUXILIARY_OPTIONS||[];
-  const getRecord=v=>verbMeta[v]||null;
+  const getRecord=v=>dataModel?.get?.(v)||null;
   const compoundTenses=C?.compoundTenses||[];
   const simpleTenses=C?.simpleTenses||[];
   const allTenses=C?.allTenses||[];
@@ -73,7 +74,7 @@
       if(!meta)return;
       if(!verb&&!matchesCategory(v,category))return;
       if(!matchesConstruction(v,construction))return;
-      const data=conjugations[v]||{};
+      const data=meta.legacyFormes||{};
       const ts=tense==='Todos los tiempos'?Array.from(new Set([...Object.keys(data),...allTenses])):[tense];
       ts.forEach(t=>{
         const hasExplicit=!!data[t];
@@ -101,7 +102,7 @@
         });
       });
     };
-    if(verb)add(verb);else Object.keys(conjugations).forEach(add);
+    if(verb)add(verb);else Object.keys(dataModel?.records||{}).forEach(add);
     if(!pool.length)return [];
     return selectPracticeQuestions(pool,20);
   }
