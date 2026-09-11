@@ -1,0 +1,30 @@
+const fs=require('fs');
+const path=require('path');
+const vm=require('vm');
+const root=path.resolve(__dirname,'..');
+const context=vm.createContext({window:{},document:{querySelector:()=>null,getElementById:()=>null,querySelectorAll:()=>[]},console,Set,Map,Object,Array,Math,String,Number,Boolean,RegExp,JSON});
+const files=['data/verbs/verbs.js','data/verbs/verbs-extended.js','data/verbs/family-catalog.js','data/verbs/canonical-model.js'];
+files.forEach(file=>vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),context,{filename:file}));
+const w=context.window;
+const assert=(condition,message)=>{if(!condition)throw new Error(message);};
+const verbs=w.COQ_VERBS||{};
+const families=w.COQ_VERB_FAMILIES||{};
+const familyCatalog=w.COQ_VERB_FAMILY_CATALOG||{};
+const model=w.COQ_CONJ_DATA_MODEL;
+assert(Object.keys(verbs).length>0,'El registro léxico de verbos no puede estar vacío.');
+assert(Object.keys(families).length>0,'El catálogo de familias no puede estar vacío.');
+assert(model&&model.records,'El modelo canónico debe estar disponible.');
+Object.keys(verbs).forEach(verb=>{
+  const entry=familyCatalog[verb];
+  const record=model.records[verb];
+  assert(entry,`El verbo léxico ${verb} debe tener una familia explícitamente declarada.`);
+  assert(record,`El verbo léxico ${verb} debe existir en el modelo canónico.`);
+  assert(record.familyId===entry.familyId,`La familia canónica de ${verb} debe coincidir con el catálogo.`);
+  assert(record.patternId===entry.patternId,`El pattern canónico de ${verb} debe coincidir con su familia.`);
+});
+Object.entries(familyCatalog).forEach(([verb,entry])=>{
+  assert(families[entry.familyId],`La familia del índice de ${verb} no existe: ${entry.familyId}.`);
+  assert(verbs[verb],`El índice familiar no debe introducir verbos fuera del registro léxico: ${verb}.`);
+});
+const covered=Object.keys(verbs).filter(verb=>familyCatalog[verb]).length;
+console.log(`✓ Verb-family coverage regression passed — ${covered}/${Object.keys(verbs).length} verbos léxicos cubiertos.`);
