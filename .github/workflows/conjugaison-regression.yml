@@ -36,5 +36,7 @@ jobs:
         run: node tests/conjugaison-subject-model.node.js
       - name: Run conjugaison regression
         run: node tests/conjugaison-regression.node.js
+      - name: Run simple generation coverage regression
+        run: node tests/conjugaison-simple-generation-coverage.node.js
       - name: Run practice distribution regression
         run: node tests/conjugaison-practice-distribution.node.js

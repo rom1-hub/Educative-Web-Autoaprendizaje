@@ -12,11 +12,10 @@
   const records={};
   function deepFreeze(value){if(value&&typeof value==='object'&&!Object.isFrozen(value)){Object.values(value).forEach(deepFreeze);Object.freeze(value);}return value;}
   function normalizeBaseVerbId(record,key){const candidate=String(record?.verbeBase||'').trim();return !candidate||candidate===key?null:candidate;}
-  function normalizeLegacyLexicalData(key,merged){if(key==='être'&&merged.pattern==='être'&&merged.participePasse==='été'&&!merged.pronominal)return {...merged,auxiliaire:'avoir'};return merged;}
   sourceKeys.forEach(key=>{
     const raw=rawVerbs[key]||{};
     const family=familyResolver?.resolve(key);
-    const merged=normalizeLegacyLexicalData(key,{...raw,...(family?{familyId:family.id,patternId:family.patternId,groupe:family.groupe}: {})});
+    const merged={...raw,...(family?{familyId:family.id,patternId:family.patternId,groupe:family.groupe}: {})};
     const familyId=typeof merged.familyId==='string'&&merged.familyId.trim()?merged.familyId.trim():null;
     const patternId=typeof merged.patternId==='string'&&merged.patternId.trim()?merged.patternId.trim():null;
     const baseVerbId=normalizeBaseVerbId(merged,key);
