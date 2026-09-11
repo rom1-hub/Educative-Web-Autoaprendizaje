@@ -218,6 +218,9 @@ h3{font-size:25px;margin:0 0 9px}
 .verb-summary .conj-result-head{gap:12px}
 .verb-summary h2{font-size:24px;margin-bottom:4px!important}
 .verb-summary .muted{font-size:12px}
+.verb-summary{background:var(--soft-blue);border-color:#CBEAF4}
+.verb-summary-title{margin-top:10px}
+.audio-form-btn{margin-left:8px}
 
 
 
