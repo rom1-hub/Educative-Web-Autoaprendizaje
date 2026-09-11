@@ -18,6 +18,8 @@ jobs:
         run: node tests/conjugaison-category-api.node.js
       - name: Run family inventory regression
         run: node tests/conjugaison-family-inventory.node.js
+      - name: Run verb-family coverage regression
+        run: node tests/conjugaison-verb-family-coverage.node.js
       - name: Run category-family coverage regression
         run: node tests/conjugaison-category-family-coverage.node.js
       - name: Run family resolver ownership regression
