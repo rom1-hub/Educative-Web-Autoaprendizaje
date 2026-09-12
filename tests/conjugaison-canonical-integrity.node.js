@@ -17,6 +17,8 @@ files.forEach(file => vm.runInContext(fs.readFileSync(file, 'utf8'), context, { 
 const rawVerbs = context.window.COQ_VERBS || {};
 const model = context.window.COQ_CONJ_DATA_MODEL;
 const families = context.window.COQ_VERB_FAMILIES || {};
+const familyCatalog = context.window.COQ_VERB_FAMILY_CATALOG || {};
+const familyIndex = context.window.COQ_VERB_FAMILY_INDEX || {};
 const patterns = context.window.COQ_VERB_PATTERNS || {};
 const registry = context.window.COQ_PATTERN_REGISTRY;
 
@@ -80,6 +82,22 @@ Object.entries(families).forEach(([id, family]) => {
     assert(rawVerbs[verb], `Family ${id} references unknown verb ${verb}`);
     const record = model.get(verb);
     assert(record.familyId === id, `Canonical family mismatch for ${verb}: expected ${id}, got ${record.familyId}`);
+  });
+});
+
+const catalogVerbOwners = new Map();
+Object.entries(familyCatalog).forEach(([verb, entry]) => {
+  assert(entry && families[entry.familyId], `Catalog entry ${verb} points to unknown family ${entry.familyId}`);
+  assert(entry.patternId === families[entry.familyId].patternId, `Catalog pattern mismatch for ${verb}`);
+  assert(familyIndex[entry.familyId] && familyIndex[entry.familyId].includes(verb), `Family index missing catalog verb ${verb}`);
+  assert(!catalogVerbOwners.has(verb), `Duplicate catalog ownership for ${verb}`);
+  catalogVerbOwners.set(verb, entry.familyId);
+});
+Object.entries(familyIndex).forEach(([familyId, verbs]) => {
+  assert(families[familyId], `Family index references unknown family ${familyId}`);
+  verbs.forEach(verb => {
+    assert(familyCatalog[verb], `Family index verb ${verb} is missing from family catalog`);
+    assert(familyCatalog[verb].familyId === familyId, `Family index/catalog mismatch for ${verb}`);
   });
 });
 
