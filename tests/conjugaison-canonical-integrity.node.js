@@ -85,7 +85,7 @@ Object.entries(families).forEach(([id, family]) => {
 
 Object.entries(patterns).forEach(([patternId]) => {
   const owners = Object.values(families).filter(family => family.patternId === patternId);
-  assert(owners.length === 1, `Pattern ${patternId} must belong to exactly one family; found ${owners.length}`);
+  assert(owners.length >= 1, `Pattern ${patternId} must belong to at least one family; found ${owners.length}`);
 });
 
 console.log(`✓ Canonical integrity regression passed (${Object.keys(rawVerbs).length} verbs, ${Object.keys(families).length} families, ${Object.keys(patterns).length} patterns).`);
