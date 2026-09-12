@@ -22,9 +22,15 @@ assert(typeof registry.generate==='function','El registro de generación de patt
 assert(w.COQ_PATTERN_RESOLVER&&typeof w.COQ_PATTERN_RESOLVER.resolvePattern==='function','El resolver de patterns debe existir y exponer resolvePattern.');
 assert(typeof w.COQ_PATTERN_RESOLVER.resolveFamily==='undefined','El resolver de patterns no debe resolver familias.');
 assert(typeof w.COQ_PATTERN_RESOLVER.familyOptions==='undefined','El resolver de patterns no debe exponer opciones de familias.');
+Object.entries(patterns).forEach(([patternId,pattern])=>{
+  assert(pattern&&typeof pattern==='object',`El pattern ${patternId} debe declarar una definición.`);
+  assert(Number.isInteger(Number(pattern.groupe))&&[1,2,3].includes(Number(pattern.groupe)),`El pattern ${patternId} debe declarar un groupe válido.`);
+  assert(typeof pattern.description==='string'&&pattern.description.trim(),`El pattern ${patternId} debe declarar una description válida.`);
+});
 Object.values(families).forEach(family=>{
   const patternId=family.patternId;
   assert(patternId&&patterns[patternId],`La familia ${family.id} debe apuntar a un pattern declarado.`);
+  assert(Number(patterns[patternId].groupe)===Number(family.groupe),`El pattern ${patternId} y la familia ${family.id} deben pertenecer al mismo groupe.`);
   const definition=registry.get(patternId);
   assert(definition&&typeof definition.generate==='function',`El pattern ${patternId} debe tener implementación en el registro.`);
 });
