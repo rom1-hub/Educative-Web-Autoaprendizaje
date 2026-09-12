@@ -53,9 +53,9 @@ Object.keys(rawVerbs).forEach(key => {
   assert(Number(families[record.familyId].groupe) === record.groupe, `Family/groupe mismatch for ${key}`);
   assert(Number(patterns[record.patternId].groupe) === record.groupe, `Pattern/groupe mismatch for ${key}`);
   assert(registry.get(record.patternId), `Pattern without generator for ${key}: ${record.patternId}`);
-  assert(record.construction === 'non-pronomiale' || record.construction === 'pronomiale', `Invalid construction for ${key}`);
+  assert(record.construction === 'non-pronominale' || record.construction === 'pronominale', `Invalid construction for ${key}`);
   assert(typeof record.pronominal === 'boolean', `Invalid pronominal flag for ${key}`);
-  assert(record.pronominal === (record.construction === 'pronomiale'), `Construction/pronominal mismatch for ${key}`);
+  assert(record.pronominal === (record.construction === 'pronominale'), `Construction/pronominal mismatch for ${key}`);
   assert(!Object.prototype.hasOwnProperty.call(record, 'formes'), `Legacy formes leaked into canonical record for ${key}`);
   if (record.pronominal) {
     assert(record.baseVerbId, `Pronominal verb ${key} has no baseVerbId`);
