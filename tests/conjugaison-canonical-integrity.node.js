@@ -57,14 +57,20 @@ Object.keys(rawVerbs).forEach(key => {
   assert(typeof record.pronominal === 'boolean', `Invalid pronominal flag for ${key}`);
   assert(record.pronominal === (record.construction === 'pronominale'), `Construction/pronominal mismatch for ${key}`);
   assert(!Object.prototype.hasOwnProperty.call(record, 'formes'), `Legacy formes leaked into canonical record for ${key}`);
+
   if (record.pronominal) {
     assert(record.baseVerbId, `Pronominal verb ${key} has no baseVerbId`);
     const baseRecord = model.get(record.baseVerbId);
     assert(baseRecord, `Pronominal verb ${key} points to unknown base verb ${record.baseVerbId}`);
+    assert(baseRecord.pronominal === false, `Pronominal base verb ${record.baseVerbId} is itself pronominal`);
+    assert(baseRecord.infinitif === record.infinitifBase, `Pronominal/base infinitif mismatch for ${key}`);
+    assert(record.formeNonPronominale === baseRecord.infinitif, `Pronominal/non-pronominal form mismatch for ${key}`);
     assert(baseRecord.familyId === record.familyId, `Pronominal/base family mismatch for ${key}`);
     assert(baseRecord.patternId === record.patternId, `Pronominal/base pattern mismatch for ${key}`);
     assert(baseRecord.groupe === record.groupe, `Pronominal/base groupe mismatch for ${key}`);
-    assert(baseRecord.pronominal === false, `Pronominal base verb ${record.baseVerbId} is itself pronominal`);
+  } else {
+    assert(record.baseVerbId === null, `Non-pronominal verb ${key} unexpectedly has baseVerbId`);
+    assert(record.infinitifBase === record.infinitif, `Non-pronominal/base infinitif mismatch for ${key}`);
   }
 });
 
