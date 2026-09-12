@@ -18,6 +18,18 @@ assert(w.COQ_CONJ_DATA_MODEL.get('se lever')?.baseVerbId==='lever','se lever deb
 const families=w.COQ_VERB_FAMILIES||{};
 const options=w.COQ_FAMILY_RESOLVER.options();
 assert(options.length===Object.keys(families).length,'options debe reflejar exactamente el catálogo de familias.');
+const familyById=new Map(Object.entries(families));
+options.forEach(option=>{
+  assert(option&&typeof option.id==='string','Cada opción de familia debe declarar un id.');
+  assert(familyById.has(option.id),`Family resolver option references unknown family ${option.id}`);
+  const family=familyById.get(option.id);
+  assert(option.patternId===family.patternId,`Family resolver pattern mismatch for ${option.id}`);
+  assert(Number(option.groupe)===Number(family.groupe),`Family resolver groupe mismatch for ${option.id}`);
+  assert(Array.isArray(option.verbs),'Cada opción de familia debe conservar su lista de verbos.');
+  assert(option.verbs.length===family.verbs.length,`Family resolver verb count mismatch for ${option.id}`);
+  family.verbs.forEach(verb=>assert(option.verbs.includes(verb),`Family resolver lost verb ${verb} from ${option.id}`));
+});
+assert(new Set(options.map(option=>option.id)).size===options.length,'El resolver de familias no debe duplicar opciones.');
 assert(w.COQ_FAMILY_RESOLVER.resolve('parler')?.id==='er-regular','parler debe resolverse en er-regular.');
 assert(w.COQ_FAMILY_RESOLVER.resolve('APPELER')?.id==='er-eler-double','La resolución familiar debe normalizar mayúsculas.');
 assert(w.COQ_FAMILY_RESOLVER.resolve('verbe-inexistant')===null,'Un verbo desconocido no debe resolver una familia.');
