@@ -53,13 +53,18 @@ Object.keys(rawVerbs).forEach(key => {
   assert(Number(families[record.familyId].groupe) === record.groupe, `Family/groupe mismatch for ${key}`);
   assert(Number(patterns[record.patternId].groupe) === record.groupe, `Pattern/groupe mismatch for ${key}`);
   assert(registry.get(record.patternId), `Pattern without generator for ${key}: ${record.patternId}`);
-  assert(record.construction === 'non-pronominale' || record.construction === 'pronominale', `Invalid construction for ${key}`);
+  assert(record.construction === 'non-pronomiale' || record.construction === 'pronomiale', `Invalid construction for ${key}`);
   assert(typeof record.pronominal === 'boolean', `Invalid pronominal flag for ${key}`);
-  assert(record.pronominal === (record.construction === 'pronominale'), `Construction/pronominal mismatch for ${key}`);
+  assert(record.pronominal === (record.construction === 'pronomiale'), `Construction/pronominal mismatch for ${key}`);
   assert(!Object.prototype.hasOwnProperty.call(record, 'formes'), `Legacy formes leaked into canonical record for ${key}`);
   if (record.pronominal) {
     assert(record.baseVerbId, `Pronominal verb ${key} has no baseVerbId`);
-    assert(model.get(record.baseVerbId), `Pronominal verb ${key} points to unknown base verb ${record.baseVerbId}`);
+    const baseRecord = model.get(record.baseVerbId);
+    assert(baseRecord, `Pronominal verb ${key} points to unknown base verb ${record.baseVerbId}`);
+    assert(baseRecord.familyId === record.familyId, `Pronominal/base family mismatch for ${key}`);
+    assert(baseRecord.patternId === record.patternId, `Pronominal/base pattern mismatch for ${key}`);
+    assert(baseRecord.groupe === record.groupe, `Pronominal/base groupe mismatch for ${key}`);
+    assert(baseRecord.pronominal === false, `Pronominal base verb ${record.baseVerbId} is itself pronominal`);
   }
 });
 
