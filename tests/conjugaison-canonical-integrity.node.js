@@ -1,0 +1,71 @@
+const fs = require('fs');
+const vm = require('vm');
+
+const files = [
+  'data/verbs/verbs.js',
+  'data/verbs/verbs-extended.js',
+  'data/verbs/family-catalog.js',
+  'data/verbs/canonical-model.js',
+  'data/verbs/patterns.js',
+  'data/verbs/pattern-registry.js'
+];
+
+const context = { window: {}, console };
+vm.createContext(context);
+files.forEach(file => vm.runInContext(fs.readFileSync(file, 'utf8'), context, { filename: file }));
+
+const rawVerbs = context.window.COQ_VERBS || {};
+const model = context.window.COQ_CONJ_DATA_MODEL;
+const families = context.window.COQ_VERB_FAMILIES || {};
+const patterns = context.window.COQ_VERB_PATTERNS || {};
+const registry = context.window.COQ_PATTERN_REGISTRY;
+
+function assert(condition, message) {
+  if (!condition) throw new Error(message);
+}
+
+assert(model && model.records && typeof model.get === 'function', 'Canonical data model is missing');
+assert(registry && typeof registry.get === 'function', 'Pattern registry is missing');
+
+const familyVerbOwners = new Map();
+Object.values(families).forEach(family => {
+  assert(family && family.id, 'Family must have an id');
+  assert(typeof family.patternId === 'string' && family.patternId, `Family ${family.id} has no patternId`);
+  assert(Number.isFinite(Number(family.groupe)), `Family ${family.id} has no valid groupe`);
+  assert(patterns[family.patternId], `Family ${family.id} points to unknown pattern ${family.patternId}`);
+  assert(registry.get(family.patternId), `Family ${family.id} points to pattern without registry generator: ${family.patternId}`);
+  (family.verbs || []).forEach(verb => {
+    assert(!familyVerbOwners.has(verb), `Duplicate family ownership for ${verb}`);
+    familyVerbOwners.set(verb, family.id);
+  });
+});
+
+Object.keys(rawVerbs).forEach(key => {
+  const record = model.get(key);
+  assert(record, `Missing canonical record for ${key}`);
+  assert(record.id === (rawVerbs[key].id || key), `Canonical id mismatch for ${key}`);
+  assert(record.infinitif, `Missing infinitif for ${key}`);
+  assert(record.infinitifBase, `Missing infinitifBase for ${key}`);
+  assert(Number.isFinite(record.groupe), `Missing numeric groupe for ${key}`);
+  assert(record.familyId && families[record.familyId], `Missing/unknown family for ${key}`);
+  assert(record.patternId && patterns[record.patternId], `Missing/unknown pattern for ${key}`);
+  assert(families[record.familyId].patternId === record.patternId, `Family/pattern mismatch for ${key}`);
+  assert(registry.get(record.patternId), `Pattern without generator for ${key}: ${record.patternId}`);
+  assert(record.construction === 'non-pronomiale' || record.construction === 'pronomiale', `Invalid construction for ${key}`);
+  assert(typeof record.pronominal === 'boolean', `Invalid pronominal flag for ${key}`);
+  assert(!Object.prototype.hasOwnProperty.call(record, 'formes'), `Legacy formes leaked into canonical record for ${key}`);
+  if (record.pronominal) {
+    assert(record.baseVerbId, `Pronominal verb ${key} has no baseVerbId`);
+    assert(model.get(record.baseVerbId), `Pronominal verb ${key} points to unknown base verb ${record.baseVerbId}`);
+  }
+});
+
+Object.entries(families).forEach(([id, family]) => {
+  (family.verbs || []).forEach(verb => {
+    assert(rawVerbs[verb], `Family ${id} references unknown verb ${verb}`);
+    const record = model.get(verb);
+    assert(record.familyId === id, `Canonical family mismatch for ${verb}: expected ${id}, got ${record.familyId}`);
+  });
+});
+
+console.log(`✓ Canonical integrity regression passed (${Object.keys(rawVerbs).length} verbs, ${Object.keys(families).length} families, ${Object.keys(patterns).length} patterns).`);
