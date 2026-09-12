@@ -88,4 +88,14 @@ Object.entries(patterns).forEach(([patternId]) => {
   assert(owners.length >= 1, `Pattern ${patternId} must belong to at least one family; found ${owners.length}`);
 });
 
+const registryGenerators = registry.generators || {};
+Object.keys(registryGenerators).forEach(patternId => {
+  assert(patterns[patternId], `Registry generator ${patternId} has no official pattern definition`);
+  assert(typeof registryGenerators[patternId] === 'function', `Registry generator ${patternId} is not callable`);
+});
+Object.keys(patterns).forEach(patternId => {
+  assert(Object.prototype.hasOwnProperty.call(registryGenerators, patternId), `Official pattern ${patternId} has no registry generator`);
+  assert(typeof registryGenerators[patternId] === 'function', `Official pattern ${patternId} registry generator is not callable`);
+});
+
 console.log(`✓ Canonical integrity regression passed (${Object.keys(rawVerbs).length} verbs, ${Object.keys(families).length} families, ${Object.keys(patterns).length} patterns).`);
