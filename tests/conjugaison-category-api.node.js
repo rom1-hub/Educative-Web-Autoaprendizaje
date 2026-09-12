@@ -11,8 +11,24 @@ assert(w.COQ_CATEGORY_RESOLVER&&typeof w.COQ_CATEGORY_RESOLVER.categoryOptions==
 assert(typeof w.COQ_CATEGORY_RESOLVER.matchesCategory==='function','El resolver de categorías debe exponer matchesCategory.');
 assert(typeof w.COQ_PATTERN_RESOLVER.categoryOptions==='undefined','El resolver de patterns no debe exponer la API de categorías.');
 assert(typeof w.COQ_PATTERN_RESOLVER.matchesGroup==='undefined','El resolver de patterns no debe exponer reglas de categorías con nomenclatura histórica.');
+const catalog=w.COQ_VERB_CATEGORY_CATALOG;
+const ids=new Set();
+catalog.forEach(category=>{
+  assert(category&&typeof category.id==='string'&&category.id,'Cada categoría debe declarar un id válido.');
+  assert(!ids.has(category.id),`Duplicate category id: ${category.id}`);
+  ids.add(category.id);
+  assert(typeof category.label==='string'&&category.label.trim(),'Cada categoría debe declarar un label válido.');
+  if(category.id==='all'){
+    assert(category.groupes===null&&category.familyIds===null,'La categoría all debe permanecer global y sin restricciones.');
+    return;
+  }
+  assert(Array.isArray(category.groupes)&&category.groupes.length>0,`Category ${category.id} must declare groupes.`);
+  assert(Array.isArray(category.familyIds)&&category.familyIds.length>0,`Category ${category.id} must declare familyIds.`);
+  assert(new Set(category.groupes).size===category.groupes.length,`Category ${category.id} has duplicate groupes.`);
+  assert(new Set(category.familyIds).size===category.familyIds.length,`Category ${category.id} has duplicate familyIds.`);
+});
 const options=w.COQ_CATEGORY_RESOLVER.categoryOptions();
-assert(options.length===w.COQ_VERB_CATEGORY_CATALOG.length,'categoryOptions debe reflejar exactamente el catálogo canónico.');
+assert(options.length===catalog.length,'categoryOptions debe reflejar exactamente el catálogo canónico.');
 assert(options.some(category=>category.id==='er-eler'),'categoryOptions debe conservar las categorías pedagógicas existentes.');
 assert(w.COQ_CATEGORY_RESOLVER.matchesCategory('appeler','er-eler'),'appeler debe resolverse dentro de la categoría er-eler.');
 assert(!w.COQ_CATEGORY_RESOLVER.matchesCategory('appeler','er-eter'),'appeler no debe pertenecer a la categoría er-eter.');
