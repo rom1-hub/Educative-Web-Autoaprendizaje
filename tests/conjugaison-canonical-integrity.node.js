@@ -48,6 +48,7 @@ Object.keys(rawVerbs).forEach(key => {
   assert(record.infinitifBase, `Missing infinitifBase for ${key}`);
   assert(Number.isFinite(record.groupe), `Missing numeric groupe for ${key}`);
   assert(record.familyId && families[record.familyId], `Missing/unknown family for ${key}`);
+  assert((families[record.familyId].verbs || []).includes(key), `Family ownership missing for ${key}: ${record.familyId}`);
   assert(record.patternId && patterns[record.patternId], `Missing/unknown pattern for ${key}`);
   assert(families[record.familyId].patternId === record.patternId, `Family/pattern mismatch for ${key}`);
   assert(Number(families[record.familyId].groupe) === record.groupe, `Family/groupe mismatch for ${key}`);
