@@ -7,7 +7,7 @@ const files = [
   'data/verbs/family-catalog.js',
   'data/verbs/canonical-model.js',
   'data/verbs/patterns.js',
-  'data/verbs/pattern-registry.js'
+  'js/conjugaison/pattern-registry.js'
 ];
 
 const context = { window: {}, console };
