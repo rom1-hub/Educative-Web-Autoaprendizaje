@@ -30,13 +30,15 @@ assert(model && model.records && typeof model.get === 'function', 'Canonical dat
 assert(registry && typeof registry.get === 'function', 'Pattern registry is missing');
 
 const familyVerbOwners = new Map();
-Object.values(families).forEach(family => {
+Object.entries(families).forEach(([id, family]) => {
   assert(family && family.id, 'Family must have an id');
+  assert(family.id === id, `Family key/id mismatch for ${id}: got ${family.id}`);
+  assert(Array.isArray(family.verbs), `Family ${id} must declare a verbs array`);
   assert(typeof family.patternId === 'string' && family.patternId, `Family ${family.id} has no patternId`);
   assert(Number.isFinite(Number(family.groupe)), `Family ${family.id} has no valid groupe`);
   assert(patterns[family.patternId], `Family ${family.id} points to unknown pattern ${family.patternId}`);
   assert(registry.get(family.patternId), `Family ${family.id} points to pattern without registry generator: ${family.patternId}`);
-  (family.verbs || []).forEach(verb => {
+  family.verbs.forEach(verb => {
     assert(!familyVerbOwners.has(verb), `Duplicate family ownership for ${verb}`);
     familyVerbOwners.set(verb, family.id);
   });
@@ -78,7 +80,7 @@ Object.keys(rawVerbs).forEach(key => {
 });
 
 Object.entries(families).forEach(([id, family]) => {
-  (family.verbs || []).forEach(verb => {
+  family.verbs.forEach(verb => {
     assert(rawVerbs[verb], `Family ${id} references unknown verb ${verb}`);
     const record = model.get(verb);
     assert(record.familyId === id, `Canonical family mismatch for ${verb}: expected ${id}, got ${record.familyId}`);
