@@ -6,8 +6,27 @@
   function canonicalRecord(verb){return dataModel&&typeof dataModel.get==='function'?dataModel.get(verb):null;}
   function baseKey(verb){const canonical=canonicalRecord(verb);if(canonical&&canonical.baseVerbId)return canonical.baseVerbId;return verb;}
   function record(verb){return canonicalRecord(verb);}
+  function externalSimple(verb,tense,subject){
+    const r=record(verb),forms=r?.formes?.[tense];
+    if(!Array.isArray(forms)||!forms.length)return null;
+    const base=P.baseSubject(subject);
+    const exact=forms.find(row=>String(row?.[0]||'').trim()===base);
+    if(exact)return exact[1]||null;
+    const grouped={
+      il:['il/elle/on','il'],elle:['il/elle/on','elle'],on:['il/elle/on','on'],
+      ils:['ils/elles','ils'],elles:['ils/elles','elles']
+    };
+    const candidates=grouped[base];
+    if(candidates){const row=forms.find(item=>candidates.includes(String(item?.[0]||'').trim()));if(row)return row[1]||null;}
+    const index={je:0,tu:1,il:2,elle:2,on:2,nous:3,vous:4,ils:5,elles:5}[base];
+    return Number.isInteger(index)&&forms[index]?forms[index][1]||null:null;
+  }
   function generatedSimple(verb,tense,subject){const r=record(verb);if(!r||!R||typeof R.generate!=='function')return null;return R.generate(r.patternId,r.infinitifBase,P.baseSubject(subject),tense,r);}
-  function simpleForm(verb,tense,subject){return generatedSimple(verb,tense,subject);}
+  function simpleForm(verb,tense,subject){
+    const external=externalSimple(verb,tense,subject);
+    if(external!=null)return external;
+    return generatedSimple(verb,tense,subject);
+  }
   function participle(verb){const r=record(baseKey(verb));return r&&r.participePasse?r.participePasse:null;}
   function applyAgreement(pp,info,base,isPronominal,auxiliary){
     if(!A)return pp;
@@ -25,6 +44,6 @@
   function rowsForLookup(verb,tense){const r=record(verb);if(!r)return [];if(!(C&&C.isCompound(tense)))return rowsFor(verb,tense);const construction=constructionResolver?.isPronominal(r)?'pronomiale':'non-pronomiale';const subjects=tense==='subjonctif passé'?S.subjonctifPractice:S.lookupCompound;return subjects.map(subject=>[subject,conjugate(verb,tense,P.baseSubject(subject),construction)]).filter(row=>row[1]!=null);}
   function rowsFor(verb,tense){const r=record(verb);if(!r)return [];if(!(C?.isSimple?.(tense)||C?.isCompound?.(tense)))return [];const construction=constructionResolver?.isPronominal(r)?'pronomiale':'non-pronomiale';if(C.isCompound(tense))return practiceCompoundSubjects(tense).map(subject=>[subject,conjugate(verb,tense,subject,construction)]).filter(row=>row[1]!=null);const fallback=tense==='impératif présent'?S.imperative:tense==='subjonctif présent'?S.subjonctifSimpleFallback:S.simpleFallback,rows=fallback.map(subject=>[subject,'']);return rows.map(row=>{const subject=String(row[0]).split('/').map(x=>x.trim()).filter(Boolean)[0],generated=conjugate(verb,tense,subject,construction);return generated!=null?[row[0],generated]:null;}).filter(Boolean);}
   function rowsForConstruction(verb,tense,construction){const r=record(verb);if(!r)return [];if(C?.isCompound?.(tense))return practiceCompoundSubjects(tense).map(subject=>[subject,conjugate(verb,tense,subject,construction)]).filter(row=>row[1]!=null);if(!C?.isSimple?.(tense))return [];const fallback=tense==='impératif présent'?S.imperative:tense==='subjonctif présent'?S.subjonctifConstructionFallback:S.simpleConstructionFallback,rows=fallback.map(subject=>[subject,'']);return rows.map(row=>{const subject=String(row[0]).split('/').map(x=>x.trim()).filter(Boolean)[0],generated=conjugate(verb,tense,subject,construction);return generated!=null?[row[0],generated]:null;}).filter(Boolean);}
-  function canGenerate(verb,tense){const r=record(verb);if(!r)return false;if(C?.isCompound?.(tense))return !!auxiliaryResolver?.resolve(r,constructionResolver);return !!C?.isSimple?.(tense)&&!!R&&typeof R.generate==='function';}
+  function canGenerate(verb,tense){const r=record(verb);if(!r)return false;if(C?.isCompound?.(tense))return !!auxiliaryResolver?.resolve(r,constructionResolver);return !!C?.isSimple?.(tense)&&(!!R&&typeof R.generate==='function'||!!r.formes?.[tense]);}
   window.COQ_CONJ_ENGINE={conjugate,rowsFor,rowsForLookup,rowsForConstruction,canGenerate,subjectInfo:P.subjectInfo};
 })();
