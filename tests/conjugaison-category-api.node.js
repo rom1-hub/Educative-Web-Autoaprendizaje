@@ -25,7 +25,7 @@ catalog.forEach(category=>{
   assert(Array.isArray(category.groupes)&&category.groupes.length>0,`Category ${category.id} must declare groupes.`);
   assert(category.familyIds===null||Array.isArray(category.familyIds),`Category ${category.id} debe declarar familyIds como null o array.`);
   assert(category.subCategories===null||Array.isArray(category.subCategories),`Category ${category.id} debe declarar subCategories como null o array.`);
-  assert(category.endings===undefined||Array.isArray(category.endings),`Category ${category.id} debe declarar endings como array cuando exista.`);
+  assert(category.endings===null||Array.isArray(category.endings),`Category ${category.id} debe declarar endings como null o array.`);
   assert(new Set(category.groupes).size===category.groupes.length,`Category ${category.id} has duplicate groupes.`);
   if(Array.isArray(category.familyIds))assert(new Set(category.familyIds).size===category.familyIds.length,`Category ${category.id} has duplicate familyIds.`);
 });
