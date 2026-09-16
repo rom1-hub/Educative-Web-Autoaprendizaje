@@ -39,7 +39,6 @@
     U.shuffleArray(pool).forEach(q=>{const key=practiceQuestionKey(q);if(seen.has(key))return;seen.add(key);unique.push(q);});
     const target=Math.max(0,Number(limit)||0);
     if(!target||!unique.length)return [];
-    if(unique.length>=target)return unique.slice(0,target);
     const selected=[];
     const counts={subject:new Map(),variant:new Map(),tense:new Map(),verb:new Map()};
     const count=(map,key)=>map.get(key)||0;
