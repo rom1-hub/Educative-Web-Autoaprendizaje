@@ -17,7 +17,7 @@ const COQ_CONSTRUCTION_RESOLVER=Object.freeze({
     if(!construction)return true;
     const isPronominal=this.isPronominal(record,construction);
     if(construction==='pronomiale')return isPronominal;
-    if(construction==='non-pronomiale'||construction==='non-pronomiale')return !isPronominal;
+    if(construction==='non-pronomiale'||construction==='non-pronominale')return !isPronominal;
     return true;
   }
 });
