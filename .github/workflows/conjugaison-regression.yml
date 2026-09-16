@@ -1,8 +1,8 @@
 name: Conjugaison regression
 
-# Regression suite for the local COQ verb database and canonical model.
+# Regression suite for pull requests. Pushes to audit-arquitectura are
+# validated by Build local verb database after regenerating the local DB.
 on:
-  push:
   pull_request:
 
 jobs:
