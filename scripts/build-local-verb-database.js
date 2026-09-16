@@ -164,9 +164,8 @@ function normalize(verbs,templates,local,pronominalCatalog){
   pronominalCatalog.forEach(entry=>{
     const base=out[entry.base];
     if(!base){missing.push(entry.base);return;}
-    const id=`se-${entry.base}`;
     out[entry.base]={...base,formePronominale:entry.infinitif,formePronominaleDisponible:true};
-    out[id]=makePronominalRecord(base,entry);
+    out[entry.infinitif]=makePronominalRecord(base,entry);
   });
   if(missing.length)console.warn(`[COQ] Pronominales sin verbo base en la fuente: ${missing.join(', ')}`);
   return out;
