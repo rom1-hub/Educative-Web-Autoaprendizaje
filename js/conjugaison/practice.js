@@ -147,7 +147,16 @@
     }
     group.disabled=false;
     const options=categoryResolver&&typeof categoryResolver.categoryOptions==='function'?categoryResolver.categoryOptions():[];
-    group.innerHTML='<option value="" selected>-seleccionar-</option>'+options.map(item=>'<option value="'+U.escapeHtml(item.id)+'">'+U.escapeHtml(item.label)+'</option>').join('');
+    const first=options.find(item=>!item.section&&item.id==='all');
+    const sections=[...new Set(options.map(item=>item.section).filter(Boolean))];
+    const optionHtml=item=>'<option value="'+U.escapeHtml(item.id)+'">'+U.escapeHtml(item.label)+'</option>';
+    group.innerHTML=(first?optionHtml(first):'<option value="all">Todos los grupos</option>')+
+      sections.map(section=>'<optgroup label="'+U.escapeHtml(section)+'">'+options.filter(item=>item.section===section).map(optionHtml).join('')+'</optgroup>').join('');
+    const placeholder=document.createElement('option');
+    placeholder.value='';
+    placeholder.selected=true;
+    placeholder.textContent='-seleccionar-';
+    group.insertBefore(placeholder,group.firstChild);
     if(help)help.textContent='Selecciona una categoría verbal para afinar el ejercicio.';
   }
   function clearPracticeVerb(){
