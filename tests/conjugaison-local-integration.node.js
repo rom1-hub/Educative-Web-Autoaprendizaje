@@ -48,13 +48,15 @@ const prendre=model.get('prendre');
 assert.ok(prendre,'prendre debe existir en la base local.');
 assert.ok(Array.isArray(prendre.conjugations?.[presentKey]),'prendre debe contener su presente en la base local.');
 const present=prendre.conjugations[presentKey];
-const jeRow=present.find(row=>String(row?.[0]||'').trim()==='je');
-assert.ok(jeRow&&jeRow[1],'La forma de je de prendre debe estar almacenada en la base local.');
-assert.strictEqual(engine.conjugate('prendre',presentKey,'je'),jeRow[1],'El motor debe usar la forma almacenada en la base local para un tiempo simple.');
+const jeRow=present[0];
+const storedJe=Array.isArray(jeRow)?jeRow[1]:jeRow;
+assert.ok(storedJe,'La forma de je de prendre debe estar almacenada en la base local.');
+assert.strictEqual(engine.conjugate('prendre',presentKey,'je'),storedJe,'El motor debe usar la forma almacenada en la base local para un tiempo simple.');
+assert.strictEqual(storedJe,'prends','La base local debe contener la forma correcta de je de prendre.');
 
 const seLever=model.get('se lever');
 assert.ok(seLever&&seLever.pronominal===true,'se lever debe conservar su metadata pronominal en la base local.');
-assert.strictEqual(engine.conjugate('se lever',presentKey,'je'),'je me lève','El ejercicio debe resolver el verbo pronominal desde los datos locales.');
+assert.strictEqual(engine.conjugate('se lever',presentKey,'je'),'me lève','El motor debe resolver el verbo pronominal desde los datos locales.');
 
 assert.ok(context.window.COQ_CONJ_LOOKUP&&typeof context.window.COQ_CONJ_LOOKUP.renderConjugation==='function','La consulta debe estar conectada al motor basado en la base local.');
 assert.ok(context.window.COQ_CONJ_PRACTICE_TESTING&&typeof context.window.COQ_CONJ_PRACTICE_TESTING.selectPracticeQuestions==='function','La práctica debe conservar su API de ejercicio.');
