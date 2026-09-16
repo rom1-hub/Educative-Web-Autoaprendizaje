@@ -6,8 +6,8 @@ window.COQ_PRONOMINAL_RULES={
   'parler':{fonctionDeSe:'COI',accord:'aucun'}
 };
 window.COQ_CONSTRUCTION_OPTIONS=Object.freeze([
-  {id:'non-pronominale',label:'Verbes non pronominaux'},
-  {id:'pronominale',label:'Verbes pronominaux'}
+  {id:'non-pronominale',label:'Verbos no pronominales'},
+  {id:'pronominale',label:'Verbos pronominales'}
 ]);
 const COQ_CONSTRUCTION_RESOLVER=Object.freeze({
   isPronominal(record,construction){
