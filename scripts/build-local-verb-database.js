@@ -108,6 +108,7 @@ function makePronominalRecord(base,entry){
     id:`se-${base.id}`,
     infinitif:entry.infinitif,
     infinitif_base:base.infinitif_base||base.infinitif,
+    verbeBase:base.infinitif,
     auxiliaire:'être',
     auxiliaires:['être'],
     pronominal:true,
