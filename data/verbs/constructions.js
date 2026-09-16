@@ -10,12 +10,14 @@ window.COQ_CONSTRUCTION_OPTIONS=Object.freeze([
   {id:'pronomiale',label:'Verbos pronominales'}
 ]);
 const COQ_CONSTRUCTION_RESOLVER=Object.freeze({
-  isPronominal(record,construction){
-    return construction==='pronomiale'||record?.pronominal===true||record?.construction==='pronomiale';
+  isPronominal(record){
+    // La pronominalidad es un dato léxico del registro canónico.
+    // Nunca se infiere del texto introducido ni del filtro solicitado.
+    return record?.pronominal===true||record?.construction==='pronomiale'||record?.construction==='pronominale';
   },
   matchesConstruction(record,construction){
     if(!construction)return true;
-    const isPronominal=this.isPronominal(record,construction);
+    const isPronominal=this.isPronominal(record);
     if(construction==='pronomiale')return isPronominal;
     if(construction==='non-pronomiale'||construction==='non-pronominale')return !isPronominal;
     return true;
