@@ -88,10 +88,12 @@
   }
   function subjectForMode(label,mode,form){
     const raw=String(label||'').trim();
-    const context=raw.match(/\s*(\([^)]*\))\s*$/)?.[1]||'';
-    const base=baseSubject(raw);
-    let result=raw;
-    if(mode==='subjonctif')result=subjonctifSubjects[base]||raw;
+    const match=raw.match(/\s*(\([^)]*\))\s*$/);
+    const context=match?.[1]||'';
+    const baseLabel=raw.replace(/\s*\([^)]*\)\s*$/,'').trim();
+    const base=baseSubject(baseLabel);
+    let result=baseLabel;
+    if(mode==='subjonctif')result=subjonctifSubjects[base]||baseLabel;
     if((result==='je'||result==='que je')&&VOWELS.test(String(form||'').trim()))result=result==='que je'?"que j'":"j'";
     return result+(context?' '+context:'');
   }
