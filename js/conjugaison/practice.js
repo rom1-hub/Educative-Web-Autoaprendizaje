@@ -37,18 +37,23 @@
   function selectPracticeQuestions(pool,limit){
     const unique=[],seen=new Set();
     U.shuffleArray(pool).forEach(q=>{const key=practiceQuestionKey(q);if(seen.has(key))return;seen.add(key);unique.push(q);});
-    if(unique.length<=limit)return unique.slice(0,limit);
-    const selected=[],remaining=unique.slice();
+    const target=Math.max(0,Number(limit)||0);
+    if(!target||!unique.length)return [];
+    if(unique.length>=target)return unique.slice(0,target);
+    const selected=[];
     const counts={subject:new Map(),variant:new Map(),tense:new Map(),verb:new Map()};
     const count=(map,key)=>map.get(key)||0;
     const increment=(map,key)=>map.set(key,count(map,key)+1);
-    while(selected.length<limit&&remaining.length){
-      const last=selected[selected.length-1];
+    let previousKey='';
+    while(selected.length<target){
       let bestScore=Infinity,best=[];
-      remaining.forEach((q,index)=>{
+      unique.forEach((q,index)=>{
+        const key=practiceQuestionKey(q);
         const subject=practiceSubjectKey(q.subject),variant=practiceVariantKey(q.subject),tense=q.tense,verb=q.verb;
         let score=count(counts.subject,subject)*6+count(counts.variant,variant)*2+count(counts.tense,tense)*4+count(counts.verb,verb);
-        if(last){
+        if(key===previousKey)score+=1000;
+        if(selected.length){
+          const last=selected[selected.length-1];
           if(practiceSubjectKey(last.subject)===subject)score+=100;
           if(last.tense===tense)score+=12;
           if(last.verb===verb)score+=4;
@@ -57,8 +62,9 @@
         else if(score===bestScore)best.push(index);
       });
       const pickIndex=best[Math.floor(Math.random()*best.length)];
-      const [pick]=remaining.splice(pickIndex,1);
-      selected.push({...pick});
+      const pick={...unique[pickIndex]};
+      selected.push(pick);
+      previousKey=practiceQuestionKey(pick);
       increment(counts.subject,practiceSubjectKey(pick.subject));
       increment(counts.variant,practiceVariantKey(pick.subject));
       increment(counts.tense,pick.tense);
