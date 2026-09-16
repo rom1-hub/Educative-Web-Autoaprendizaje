@@ -100,6 +100,7 @@
     {base:'efforcer',infinitif:"s'efforcer"},
     {base:'empresser',infinitif:"s'empresser"},
     {base:'engager',infinitif:"s'engager"},
+    {base:'essuyer',infinitif:"s'essuyer"},
     {base:'évader',infinitif:"s'évader"},
     {base:'impatienter',infinitif:"s'impatienter"},
     {base:'inspirer',infinitif:"s'inspirer"},
