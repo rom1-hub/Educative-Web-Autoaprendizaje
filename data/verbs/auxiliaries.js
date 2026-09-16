@@ -1,15 +1,15 @@
 // COQ — catálogo declarativo de auxiliares.
 // Este módulo NO almacena datos léxicos de verbos.
 window.COQ_COMPOUND_AUXILIARY_FILTERS={
-  'avec-avoir':{id:'avec-avoir',label:'Avec auxiliaire AVOIR',auxiliaires:['avoir']},
-  'avec-etre':{id:'avec-etre',label:'Avec auxiliaire ÊTRE',auxiliaires:['être']},
-  'avec-avoir-et-etre':{id:'avec-avoir-et-etre',label:'Avec auxiliaire AVOIR et ÊTRE',auxiliaires:['avoir','être']},
-  'verbes-pronominaux':{id:'verbes-pronominaux',label:'Verbes pronominaux',auxiliaires:['être'],pronominal:true}
+  'avec-avoir':{id:'avec-avoir',label:'Con el auxiliar AVOIR',auxiliaires:['avoir']},
+  'avec-etre':{id:'avec-etre',label:'Con el auxiliar ÊTRE',auxiliaires:['être']},
+  'avec-avoir-et-etre':{id:'avec-avoir-et-etre',label:'Con los auxiliares AVOIR y ÊTRE',auxiliaires:['avoir','être']},
+  'verbes-pronominaux':{id:'verbes-pronominaux',label:'Verbos pronominales',auxiliaires:['être'],pronominal:true}
 };
 window.COQ_AUXILIARY_OPTIONS=Object.freeze([
-  {id:'avec-avoir',label:'Avec auxiliaire AVOIR'},
-  {id:'avec-etre',label:'Avec auxiliaire ÊTRE'},
-  {id:'avec-avoir-et-etre',label:'Avec auxiliaire AVOIR et ÊTRE'}
+  {id:'avec-avoir',label:'Con el auxiliar AVOIR'},
+  {id:'avec-etre',label:'Con el auxiliar ÊTRE'},
+  {id:'avec-avoir-et-etre',label:'Con los auxiliares AVOIR y ÊTRE'}
 ]);
 const COQ_AUXILIARY_RESOLVER=Object.freeze({
   resolve(record,constructionResolver){
