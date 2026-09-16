@@ -12,6 +12,7 @@ const VERSION='0.3.4';
 const BASE=`https://cdn.jsdelivr.net/npm/conjugation-fr@${VERSION}/`;
 const URLS={verbs:BASE+'verbs-fr.json',templates:BASE+'conjugation-fr.json'};
 const SOURCE_LOCAL=path.resolve(__dirname,'../data/verbs/verbs.js');
+const SOURCE_PRONOMINAL=path.resolve(__dirname,'../data/verbs/pronominal-catalog.js');
 const OUT=path.resolve(__dirname,'../data/verbs/local-database.js');
 const SIMPLE={
   "présent de l'indicatif":['indicative','present'],
@@ -33,6 +34,11 @@ function readLocalMetadata(){
   const window={};
   vm.runInNewContext(fs.readFileSync(SOURCE_LOCAL,'utf8'),{window,console});
   return window.COQ_VERBS||{};
+}
+function readPronominalCatalog(){
+  const window={};
+  vm.runInNewContext(fs.readFileSync(SOURCE_PRONOMINAL,'utf8'),{window,console});
+  return Array.isArray(window.COQ_PRONOMINAL_CATALOG)?window.COQ_PRONOMINAL_CATALOG:[];
 }
 function groupOf(template,verb){
   if(template==='fin:ir')return 2;
@@ -73,7 +79,46 @@ function applyTemplate(verb,template,value){
   const stem=suffix&&String(verb).endsWith(suffix)?String(verb).slice(0,-suffix.length):String(verb);
   return forms.map(form=>stem+form);
 }
-function normalize(verbs,templates,local){
+function bareForm(value){
+  if(Array.isArray(value))return String(value[1]??value[0]??'');
+  if(value&&typeof value==='object'&&'i' in value)return bareForm(value.i);
+  return String(value??'');
+}
+function reflexivePronoun(index,form){
+  const pronouns=['me','te','se','nous','vous','se'];
+  const p=pronouns[index]||'se';
+  return /^[aeiouyàâäéèêëîïôöùûüÿæœh]/i.test(form)?`${p[0]}'${form}`:`${p} ${form}`;
+}
+function pronominalFormList(values){
+  return values.map((value,index)=>reflexivePronoun(index,bareForm(value)));
+}
+function imperativePronominal(values){
+  const pronouns=['toi','nous','vous'];
+  return values.slice(0,3).map((value,index)=>`${bareForm(value)}-${pronouns[index]}`);
+}
+function makePronominalRecord(base,entry){
+  const formes={};
+  Object.entries(base.formes||{}).forEach(([label,values])=>{
+    if(!Array.isArray(values))return;
+    if(label==='impératif présent')formes[label]=imperativePronominal(values);
+    else if(values.length>=3)formes[label]=pronominalFormList(values.slice(0,6));
+  });
+  return {
+    ...base,
+    id:`se-${base.id}`,
+    infinitif:entry.infinitif,
+    infinitif_base:base.infinitif_base||base.infinitif,
+    auxiliaire:'être',
+    auxiliaires:['être'],
+    pronominal:true,
+    construction:'pronominale',
+    formes,
+    formeNonPronominale:base.infinitif,
+    formePronominale:null,
+    source:{name:'COQ-pronominal-catalog',base:'COQ local + conjugation-fr',catalog:true}
+  };
+}
+function normalize(verbs,templates,local,pronominalCatalog){
   const out={};
   Object.entries(verbs||{}).forEach(([verb,meta])=>{
     const template=meta?.t;
@@ -115,14 +160,24 @@ function normalize(verbs,templates,local){
   Object.entries(local).forEach(([verb,record])=>{
     if(!out[verb])out[verb]={...record,source:{name:'COQ-local',localMetadata:true}};
   });
+  const missing=[];
+  pronominalCatalog.forEach(entry=>{
+    const base=out[entry.base];
+    if(!base){missing.push(entry.base);return;}
+    const id=`se-${entry.base}`;
+    out[entry.base]={...base,formePronominale:entry.infinitif,formePronominaleDisponible:true};
+    out[id]=makePronominalRecord(base,entry);
+  });
+  if(missing.length)console.warn(`[COQ] Pronominales sin verbo base en la fuente: ${missing.join(', ')}`);
   return out;
 }
 function sortObject(value){return Object.fromEntries(Object.keys(value).sort((a,b)=>a.localeCompare(b,'fr')).map(key=>[key,value[key]]));}
 (async()=>{
   const [verbs,templates]=await Promise.all([getJson(URLS.verbs),getJson(URLS.templates)]);
   const local=readLocalMetadata();
-  const data=sortObject(normalize(verbs,templates,local));
-  const payload=`/* AUTO-GENERATED — do not edit manually. Source: conjugation-fr ${VERSION} / Verbiste + COQ local metadata. */\nwindow.COQ_VERBS=${JSON.stringify(data)};\nwindow.COQ_VERB_DATABASE_VERSION=${JSON.stringify(VERSION)};\n`;
+  const pronominalCatalog=readPronominalCatalog();
+  const data=sortObject(normalize(verbs,templates,local,pronominalCatalog));
+  const payload=`/* AUTO-GENERATED — do not edit manually. Source: conjugation-fr ${VERSION} / Verbiste + COQ local metadata + pronominal catalog. */\nwindow.COQ_VERBS=${JSON.stringify(data)};\nwindow.COQ_VERB_DATABASE_VERSION=${JSON.stringify(VERSION)};\n`;
   fs.mkdirSync(path.dirname(OUT),{recursive:true});
   fs.writeFileSync(OUT,payload,'utf8');
   console.log(`Generated ${Object.keys(data).length} verbs at ${OUT}`);
