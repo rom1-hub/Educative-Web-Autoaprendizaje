@@ -159,12 +159,38 @@
     group.insertBefore(placeholder,group.firstChild);
     if(help)help.textContent='Selecciona una categoría verbal para afinar el ejercicio.';
   }
-  function clearPracticeVerb(){
-    const input=document.querySelector('#practiceVerb');
-    if(!input)return;
-    input.value='';
-    input.dispatchEvent(new Event('input',{bubbles:true}));
-    input.focus();
+  function resetPracticeSession(){
+    session={questions:[],index:0,correct:0,results:[],locked:false};
+    document.querySelector('#practiceSession')?.classList.add('hidden');
+    const input=document.querySelector('#answerInput');
+    if(input){input.value='';input.className='';input.disabled=false;}
+    const feedback=document.querySelector('#practiceFeedback');
+    if(feedback){feedback.className='feedback-box';feedback.textContent='';}
+    const progressText=document.querySelector('#practiceProgressText');
+    if(progressText)progressText.textContent='Pregunta 1 / 20';
+    const progressBar=document.querySelector('#practiceProgressBar');
+    if(progressBar)progressBar.style.width='0%';
+    const criteria=document.querySelector('#practiceCriteria');
+    if(criteria)criteria.textContent='—';
+  }
+  function clearPracticeForm(){
+    const verbInput=document.querySelector('#practiceVerb');
+    if(verbInput)verbInput.value='';
+    const tense=document.querySelector('#practiceTense');
+    if(tense){tense.value='';if(tense.options.length)tense.selectedIndex=0;}
+    const group=document.querySelector('#practiceGroup');
+    if(group)group.value='';
+    const construction=document.querySelector('#practiceConstruction');
+    if(construction)construction.value='';
+    const auxiliary=document.querySelector('#practiceAuxiliary');
+    if(auxiliary)auxiliary.value='';
+    const message=document.querySelector('#practiceMessage');
+    if(message){message.className='form-message';message.textContent='';}
+    resetPracticeSession();
+    updatePracticeGroupState();
+    updatePracticeConstructionOptions();
+    updatePracticeAuxiliaryOptions();
+    verbInput?.focus();
   }
   function startSession(){const verb=U.normalizeVerb(document.querySelector('#practiceVerb')?.value),tense=document.querySelector('#practiceTense')?.value,group=document.querySelector('#practiceGroup')?.value,construction=document.querySelector('#practiceConstruction')?.value,auxiliary=document.querySelector('#practiceAuxiliary')?.value,msg=document.querySelector('#practiceMessage');if(!msg)return;if(!tense){msg.className='form-message error';msg.textContent='Debes seleccionar un tiempo verbal para comenzar la práctica.';return;}if(verb&&!getRecord(verb)){msg.className='form-message error';msg.textContent='Ese verbo no puede resolverse todavía con los patrones disponibles.';return;}const questions=buildQuestions(verb,tense,group,construction,auxiliary);if(questions.length<20){msg.className='form-message error';msg.textContent='No hay suficientes preguntas disponibles para crear una sesión de 20 preguntas con esta configuración.';return;}session={questions,index:0,correct:0,results:[],locked:false};document.querySelector('#practiceSession')?.classList.remove('hidden');document.querySelector('#practiceCriteria').textContent=[verb||'grupo',tense,group||'',construction||'',auxiliary||''].filter(Boolean).join(' · ');showQuestion();document.querySelector('#practiceSession')?.scrollIntoView({behavior:'smooth',block:'start'});}
   function showQuestion(){const q=session.questions[session.index];session.locked=false;q.attempts=0;q.firstError='';q.secondError='';q.mustTypeCorrect=false;document.querySelector('#questionVerb').textContent=`${q.verb} · ${q.tense}`;document.querySelector('#questionSubject').textContent=q.subject;const input=document.querySelector('#answerInput');input.value='';input.className='';input.disabled=false;const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box';fb.textContent='';document.querySelector('#practiceProgressText').textContent=`Pregunta ${session.index+1} / 20`;document.querySelector('#practiceProgressBar').style.width=`${(session.index/20)*100}%`;setTimeout(()=>input.focus(),80);}
@@ -172,9 +198,8 @@
   function validateAnswer(){if(session.locked)return;const q=session.questions[session.index],input=document.querySelector('#answerInput'),value=input.value.trim();if(!value)return;if(q.mustTypeCorrect){if(samePracticeAnswer(value,q)){input.className='success';const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box ok';fb.textContent='✓ Correcto. Pasamos a la siguiente pregunta.';session.locked=true;setTimeout(()=>{session.index++;session.index>=20?finishSession():showQuestion()},650);}else{input.className='error-second';renderSecondErrorFeedback(q);input.focus();}return;}q.attempts++;if(samePracticeAnswer(value,q)){input.className='success';if(q.attempts===1)session.correct+=1;else if(q.attempts===2)session.correct+=0.5;let outcome;if(q.attempts===1)outcome='correct-first';else if(q.attempts===2)outcome='correct-after-first-error';else outcome='correct-after-help';session.results.push({question:q,finalAnswer:value,outcome});session.locked=true;const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box ok';fb.textContent=q.attempts===1?'✓ Correcto.':'✓ Correcto en el segundo intento.';setTimeout(()=>{session.index++;session.index>=20?finishSession():showQuestion()},650);return;}input.className='error-first';if(q.attempts===1){q.firstError=value;const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box warn';fb.textContent='Respuesta incorrecta. Corrige tu respuesta e inténtalo de nuevo.';input.focus();return;}q.secondError=value;q.mustTypeCorrect=true;session.results.push({question:q,finalAnswer:'',outcome:'incorrect-twice',firstError:q.firstError,secondError:q.secondError});renderSecondErrorFeedback(q);input.focus();}
   function finishSession(){document.querySelector('#practiceProgressBar').style.width='100%';const errors=session.results.filter(r=>r.outcome!=='correct-first').length;document.dispatchEvent(new CustomEvent('coq:practice-finished',{detail:{results:session.results,correct:session.results.filter(r=>r.outcome==='correct-first').length,errors,score:session.correct}}));}
   function bind(){
-    const button=document.querySelector('#startPractice');
-    button?.addEventListener('click',startSession);
-    document.querySelector('#clearVerb')?.addEventListener('click',clearPracticeVerb);
+    document.querySelector('#startPractice')?.addEventListener('click',startSession);
+    document.querySelector('#clearVerb')?.addEventListener('click',clearPracticeForm);
     document.querySelector('#answerInput')?.addEventListener('keydown',e=>{if(e.key==='Enter')validateAnswer();});
     document.querySelector('#validateAnswer')?.addEventListener('click',validateAnswer);
     document.querySelector('#practiceVerb')?.addEventListener('input',()=>{updatePracticeGroupState();updatePracticeConstructionOptions();updatePracticeAuxiliaryOptions();});
@@ -183,5 +208,5 @@
     updatePracticeGroupState();updatePracticeConstructionOptions();updatePracticeAuxiliaryOptions();
   }
   window.COQ_CONJ_PRACTICE_TESTING={selectPracticeQuestions};
-  window.COQ_CONJ_PRACTICE={buildQuestions,startSession,bind};
+  window.COQ_CONJ_PRACTICE={bind,clear:clearPracticeForm};
 })();
