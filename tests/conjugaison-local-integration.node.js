@@ -54,9 +54,19 @@ assert.ok(storedJe,'La forma de je de prendre debe estar almacenada en la base l
 assert.strictEqual(engine.conjugate('prendre',presentKey,'je'),storedJe,'El motor debe usar la forma almacenada en la base local para un tiempo simple.');
 assert.strictEqual(storedJe,'prends','La base local debe contener la forma correcta de je de prendre.');
 
-const seLever=model.get('se lever');
-assert.ok(seLever&&seLever.pronominal===true,'se lever debe conservar su metadata pronominal en la base local.');
-assert.strictEqual(engine.conjugate('se lever',presentKey,'je'),'me lève','El motor debe resolver el verbo pronominal desde los datos locales.');
+const pronominalExpectations={
+  'se lever':{subject:'je',answer:'me lève'},
+  'se laver':{subject:'je',answer:'me lave'},
+  'se réveiller':{subject:'je',answer:"me réveille"},
+  'se baisser':{subject:'elle',answer:'se baisse'},
+  "s'endormir":{subject:'elle',answer:"s'endort"},
+};
+Object.entries(pronominalExpectations).forEach(([verb,expected])=>{
+  const record=model.get(verb);
+  assert.ok(record&&record.pronominal===true,`${verb} debe conservar su metadata pronominal en la base local.`);
+  assert.ok(record.baseVerbId,`${verb} debe apuntar explícitamente a su verbo base.`);
+  assert.strictEqual(engine.conjugate(verb,presentKey,expected.subject),expected.answer,`${verb} debe generar ${expected.answer} sin duplicar el pronombre pronominal.`);
+});
 
 assert.ok(context.window.COQ_CONJ_LOOKUP&&typeof context.window.COQ_CONJ_LOOKUP.renderConjugation==='function','La consulta debe estar conectada al motor basado en la base local.');
 assert.ok(context.window.COQ_CONJ_PRACTICE_TESTING&&typeof context.window.COQ_CONJ_PRACTICE_TESTING.selectPracticeQuestions==='function','La práctica debe conservar su API de ejercicio.');
