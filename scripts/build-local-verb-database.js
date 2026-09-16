@@ -2,14 +2,16 @@
  * Fuente: conjugation-fr / Verbiste.
  * La aplicación no consulta la fuente externa en producción.
  * Este script descarga los dos datasets, los normaliza al contrato COQ y
- * escribe data/verbs/local-database.js para versionarlo en el repositorio.
+ * conserva los metadatos locales de construcción/pronominalidad.
  */
 const fs=require('fs');
 const path=require('path');
+const vm=require('vm');
 
 const VERSION='0.3.4';
 const BASE=`https://cdn.jsdelivr.net/npm/conjugation-fr@${VERSION}/`;
 const URLS={verbs:BASE+'verbs-fr.json',templates:BASE+'conjugation-fr.json'};
+const SOURCE_LOCAL=path.resolve(__dirname,'../data/verbs/verbs.js');
 const OUT=path.resolve(__dirname,'../data/verbs/local-database.js');
 const SIMPLE={
   "présent de l'indicatif":['indicative','present'],
@@ -21,12 +23,16 @@ const SIMPLE={
   'subjonctif imparfait':['subjunctive','imperfect'],
   'impératif présent':['imperative','imperative-present']
 };
-const PRONOUNS=['je','tu','il/elle/on','nous','vous','ils/elles'];
 
 async function getJson(url){
   const response=await fetch(url,{headers:{'user-agent':'COQ-local-database-builder'}});
   if(!response.ok)throw new Error(`${url} HTTP ${response.status}`);
   return response.json();
+}
+function readLocalMetadata(){
+  const window={};
+  vm.runInNewContext(fs.readFileSync(SOURCE_LOCAL,'utf8'),{window,console});
+  return window.COQ_VERBS||{};
 }
 function groupOf(template,verb){
   if(template==='fin:ir')return 2;
@@ -67,7 +73,7 @@ function applyTemplate(verb,template,value){
   const stem=suffix&&String(verb).endsWith(suffix)?String(verb).slice(0,-suffix.length):String(verb);
   return forms.map(form=>stem+form);
 }
-function normalize(verbs,templates){
+function normalize(verbs,templates,local){
   const out={};
   Object.entries(verbs||{}).forEach(([verb,meta])=>{
     const template=meta?.t;
@@ -82,35 +88,41 @@ function normalize(verbs,templates){
       formes[label]=rows.slice(0,6).map((row)=>applyTemplate(verb,template,row?.i??row)[0]||'');
     }
     const pp=applyTemplate(verb,template,data?.participle?.['past-participle']?.[0]?.i??data?.participle?.['past-participle']?.[0]??'')[0]||null;
+    const old=local[verb]||{};
     out[verb]={
+      ...old,
       id:verb,
       infinitif:verb,
-      infinitif_base:verb,
+      infinitif_base:old.infinitif_base||verb,
       groupe:group,
-      familyId:familyId(group,category(verb,group)),
-      sub_category:category(verb,group),
+      familyId:old.familyId||familyId(group,category(verb,group)),
+      sub_category:old.sub_category||category(verb,group),
       pattern:template,
-      patternId:template,
-      auxiliaire:aux[0]||null,
-      auxiliaires:aux,
-      pronominal:false,
-      construction:'non-pronominale',
-      participePasse:pp,
-      formes,
-      variantes:null,
-      exceptions:null,
-      formePronominale:null,
-      formeNonPronominale:null,
-      source:{name:'conjugation-fr',version:VERSION,base:'Verbiste'}
+      patternId:old.patternId||template,
+      auxiliaire:old.auxiliaire||aux[0]||null,
+      auxiliaires:old.auxiliaires||aux,
+      pronominal:old.pronominal===true,
+      construction:old.construction||'non-pronominale',
+      participePasse:old.participePasse||pp,
+      formes:{...formes,...(old.formes||{})},
+      variantes:old.variantes??null,
+      exceptions:old.exceptions??null,
+      formePronominale:old.formePronominale||null,
+      formeNonPronominale:old.formeNonPronominale||null,
+      source:{name:'conjugation-fr',version:VERSION,base:'Verbiste',localMetadata:Boolean(local[verb])}
     };
+  });
+  Object.entries(local).forEach(([verb,record])=>{
+    if(!out[verb])out[verb]={...record,source:{name:'COQ-local',localMetadata:true}};
   });
   return out;
 }
 function sortObject(value){return Object.fromEntries(Object.keys(value).sort((a,b)=>a.localeCompare(b,'fr')).map(key=>[key,value[key]]));}
 (async()=>{
   const [verbs,templates]=await Promise.all([getJson(URLS.verbs),getJson(URLS.templates)]);
-  const data=sortObject(normalize(verbs,templates));
-  const payload=`/* AUTO-GENERATED — do not edit manually. Source: conjugation-fr ${VERSION} / Verbiste. */\nwindow.COQ_VERBS_LOCAL=${JSON.stringify(data)};\nwindow.COQ_VERB_DATABASE_VERSION=${JSON.stringify(VERSION)};\n`;
+  const local=readLocalMetadata();
+  const data=sortObject(normalize(verbs,templates,local));
+  const payload=`/* AUTO-GENERATED — do not edit manually. Source: conjugation-fr ${VERSION} / Verbiste + COQ local metadata. */\nwindow.COQ_VERBS=${JSON.stringify(data)};\nwindow.COQ_VERB_DATABASE_VERSION=${JSON.stringify(VERSION)};\n`;
   fs.mkdirSync(path.dirname(OUT),{recursive:true});
   fs.writeFileSync(OUT,payload,'utf8');
   console.log(`Generated ${Object.keys(data).length} verbs at ${OUT}`);
