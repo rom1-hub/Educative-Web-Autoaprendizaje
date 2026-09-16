@@ -14,6 +14,8 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: 24
+      - name: Run local database regression
+        run: node tests/conjugaison-local-database.node.js
       - name: Run canonical data integrity regression
         run: node tests/conjugaison-canonical-integrity.node.js
       - name: Run category API regression
