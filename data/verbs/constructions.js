@@ -3,6 +3,8 @@
 window.COQ_PRONOMINAL_RULES={
   'lever':{fonctionDeSe:'COD',accord:'sujet'},
   'promener':{fonctionDeSe:'COD',accord:'sujet'},
+  'inscrire':{fonctionDeSe:'COD',accord:'sujet'},
+  'réveiller':{fonctionDeSe:'COD',accord:'sujet'},
   'parler':{fonctionDeSe:'COI',accord:'aucun'}
 };
 window.COQ_CONSTRUCTION_OPTIONS=Object.freeze([
