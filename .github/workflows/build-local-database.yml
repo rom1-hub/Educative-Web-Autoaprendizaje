@@ -2,7 +2,7 @@ name: Build local verb database
 
 on:
   push:
-    branches: [test-base-datos]
+    branches: [audit-arquitectura, test-base-datos]
 
 permissions:
   contents: write
