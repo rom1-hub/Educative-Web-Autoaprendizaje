@@ -1,5 +1,12 @@
 // COQ — catálogo pedagógico de categorías de grupos verbales.
 (function(){
+  const commonThirdGroupVerbs=[
+    'être','avoir','aller','faire','dire','voir','savoir','pouvoir','vouloir','devoir',
+    'venir','prendre','mettre','tenir','partir','sortir','dormir','lire','écrire','vivre',
+    'suivre','croire','connaître','comprendre','apprendre','attendre','entendre','répondre','perdre','recevoir',
+    'ouvrir','offrir','courir','mourir','naître','boire','rire','conduire','construire','produire',
+    'traduire','découvrir','couvrir','sentir','servir','revenir','devenir','reprendre','battre','résoudre'
+  ];
   const categories=[
     {id:'all',label:'Todos los grupos',section:null,groupes:null,familyIds:null,subCategories:null},
     {id:'groupe-1-all',label:'Todos los verbos',section:'Primer grupo',groupes:[1],familyIds:null,subCategories:null},
@@ -17,13 +24,14 @@
     {id:'groupe-3-uire',label:'-UIRE',section:'Tercer grupo',groupes:[3],familyIds:['conduire-type'],subCategories:['UIRE'],endings:['uire']},
     {id:'groupe-3-aitre',label:'-AÎTRE',section:'Tercer grupo',groupes:[3],familyIds:['connaître-type','paraître-type'],subCategories:['AITRE'],endings:['aître']},
     {id:'groupe-3-eindre-aindre-oindre',label:'-EINDRE / -AINDRE / -OINDRE',section:'Tercer grupo',groupes:[3],familyIds:null,subCategories:['EINDRE_AINDRE_OINDRE'],endings:['eindre','aindre','oindre']},
-    {id:'groupe-3-common',label:'Verbos más comunes',section:'Tercer grupo',groupes:[3],familyIds:['être','avoir','aller-type','prendre-type','faire-type','partir-type','venir-type','tenir-type','mettre-type','lire-type','connaître-type','paraître-type'],subCategories:['IRREGULAR']}
+    {id:'groupe-3-common',label:'Verbos más comunes',section:'Tercer grupo',groupes:[3],familyIds:null,subCategories:null,verbIds:commonThirdGroupVerbs}
   ];
   const frozen=Object.freeze(categories.map(category=>Object.freeze({...category,
     groupes:category.groupes?Object.freeze([...category.groupes]):null,
     familyIds:category.familyIds?Object.freeze([...category.familyIds]):null,
     subCategories:category.subCategories?Object.freeze([...category.subCategories]):null,
-    endings:category.endings?Object.freeze([...category.endings]):null
+    endings:category.endings?Object.freeze([...category.endings]):null,
+    verbIds:category.verbIds?Object.freeze([...category.verbIds]):null
   })));
   const canonicalRecord=verb=>{
     const records=window.COQ_CONJ_DATA_MODEL?.records||{};
@@ -34,7 +42,8 @@
       groupes:category.groupes?Object.freeze([...category.groupes]):null,
       familyIds:category.familyIds?Object.freeze([...category.familyIds]):null,
       subCategories:category.subCategories?Object.freeze([...category.subCategories]):null,
-      endings:category.endings?Object.freeze([...category.endings]):null
+      endings:category.endings?Object.freeze([...category.endings]):null,
+      verbIds:category.verbIds?Object.freeze([...category.verbIds]):null
     }));
   }
   function matchesCategory(verb,categoryId){
@@ -43,6 +52,10 @@
     const record=canonicalRecord(verb);if(!record)return false;
     const groupeMatches=!category.groupes?.length||category.groupes.includes(Number(record.groupe));
     if(!groupeMatches)return false;
+    if(category.verbIds?.length){
+      const infinitif=String(record.infinitif||verb||'').trim().toLowerCase();
+      return category.verbIds.includes(infinitif);
+    }
     if(category.familyIds?.includes(record.familyId))return true;
     if(category.subCategories?.includes(record.subCategory))return true;
     if(category.endings?.length){
