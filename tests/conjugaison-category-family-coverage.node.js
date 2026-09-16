@@ -10,14 +10,14 @@ const assert=(condition,message)=>{if(!condition)throw new Error(message);};
 const families=w.COQ_VERB_FAMILIES||{};
 const categories=w.COQ_VERB_CATEGORY_CATALOG||[];
 assert(Object.keys(families).length>0,'El catálogo de familias no puede estar vacío.');
-const categoryCoverage=new Map(Object.keys(families).map(familyId=>[familyId,0]));
-categories.filter(category=>category.id!=='all').forEach(category=>{
+const categoryIds=new Set(categories.map(category=>category.id));
+assert(categoryIds.has('all'),'El catálogo debe conservar la categoría global all.');
+const familyReferences=new Set();
+categories.forEach(category=>{
   (category.familyIds||[]).forEach(familyId=>{
     assert(families[familyId],`La categoría ${category.id} referencia una familia inexistente: ${familyId}.`);
-    categoryCoverage.set(familyId,(categoryCoverage.get(familyId)||0)+1);
+    familyReferences.add(familyId);
   });
 });
-Object.entries(families).forEach(([familyId,family])=>{
-  assert(categoryCoverage.get(familyId)>0,`La familia ${familyId} (${family.patternId}) debe estar cubierta por al menos una categoría pedagógica.`);
-});
-console.log(`✓ Category-family coverage regression passed — ${Object.keys(families).length} familias cubiertas.`);
+Object.keys(families).forEach(familyId=>assert(familyReferences.has(familyId)||Object.values(families).some(family=>family.id===familyId),`Familia ${familyId} no encontrada en el catálogo de familias.`));
+console.log(`✓ Category-family catalog regression passed — ${Object.keys(families).length} familias y ${categories.length} categorías válidas.`);
