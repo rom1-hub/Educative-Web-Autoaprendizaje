@@ -21,7 +21,7 @@
     const record=canonicalRecord(verb);if(!record)return false;
     if(category.familyIds&&category.familyIds.includes(record.familyId))return true;
     if(category.subCategories&&category.subCategories.includes(record.subCategory))return true;
-    if(category.groupes&&category.groupes.length&&category.groupes.includes(Number(record.groupe)))return true;
+    if((category.id==='groupe-2'||category.id==='groupe-3')&&category.groupes?.length&&category.groupes.includes(Number(record.groupe)))return true;
     return false;
   }
   window.COQ_VERB_CATEGORY_CATALOG=frozen;
