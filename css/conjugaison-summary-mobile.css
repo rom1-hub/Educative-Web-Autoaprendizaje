@@ -1,4 +1,8 @@
 /* COQ — Responsive de Conjugaison en móvil. */
+
+/* Ajustes visuales de la consulta de conjugación. */
+.suggestions,
+.lookup-status{display:none!important}
 @import url("./conjugaison-mobile.css");
 
 @media (max-width:700px){
