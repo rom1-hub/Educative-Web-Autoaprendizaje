@@ -10,6 +10,11 @@
     const r=record(verb),forms=r?.formes?.[tense];
     if(!Array.isArray(forms)||!forms.length)return null;
     const base=P.baseSubject(subject);
+    if(tense==='impératif présent'){
+      const imperativeIndex={tu:0,nous:1,vous:2};
+      const index=imperativeIndex[base];
+      return Number.isInteger(index)&&forms[index]?forms[index][1]||null:null;
+    }
     const exact=forms.find(row=>String(row?.[0]||'').trim()===base);
     if(exact)return exact[1]||null;
     const grouped={
