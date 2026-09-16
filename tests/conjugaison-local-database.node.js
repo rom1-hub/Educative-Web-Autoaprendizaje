@@ -13,8 +13,16 @@ assert(keys.length>=7000,`La base local debe contener el catálogo completo; enc
 assert(verbs['servir']&&!verbs['servir'].pronominal,'servir no debe clasificarse como pronominal.');
 assert(verbs['se lever']&&verbs['se lever'].pronominal===true,'se lever debe estar marcado como pronominal en la base.');
 assert(verbs['se lever'].construction==='pronominale','se lever debe tener construcción pronominale.');
+for(const infinitif of ['se laver','se réveiller','se baisser',"s'endormir"]){
+  const record=verbs[infinitif];
+  assert(record&&record.pronominal===true,`${infinitif} debe estar en la base local como pronominal.`);
+  assert(record.construction==='pronominale',`${infinitif} debe tener construcción pronominale.`);
+  assert(record.infinitif_base,'Falta infinitif_base en '+infinitif);
+  assert(record.auxiliaire==='être',`${infinitif} debe usar être.`);
+  assert(record.formes&&record.formes["présent de l'indicatif"],`Falta el presente de ${infinitif}.`);
+}
 const pronominal=keys.filter(key=>verbs[key]?.pronominal===true);
-assert(pronominal.length>0,'La base local debe contener entradas pronominales.');
+assert(pronominal.length>=50,`La base debe contener el catálogo pronominal pedagógico; encontrados ${pronominal.length}.`);
 for(const key of pronominal){
   const record=verbs[key];
   assert(record.construction==='pronominale',`Entrada pronominal sin construcción canónica: ${key}`);
