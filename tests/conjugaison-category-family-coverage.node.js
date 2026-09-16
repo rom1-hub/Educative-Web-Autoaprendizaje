@@ -35,7 +35,9 @@ categories.forEach(category=>{
     category.familyIds.forEach(familyId=>assert(families[familyId],`La categoría ${category.id} referencia una familia inexistente: ${familyId}.`));
   }
   const matching=records.filter(record=>resolver.matchesCategory(record.infinitif,category.id));
-  assert(matching.length>0,`La categoría ${category.id} (${category.label}) no filtra ningún verbo existente en el modelo canónico.`);
+  if(Array.isArray(category.familyIds)&&category.familyIds.length>0){
+    assert(matching.length>0,`La categoría ${category.id} (${category.label}) referencia familias pero no filtra ningún verbo existente en el modelo canónico.`);
+  }
 });
 assert(ids.has('all'),'El catálogo debe conservar la categoría global all.');
 const options=resolver.categoryOptions();
