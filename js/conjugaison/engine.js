@@ -7,7 +7,7 @@
   function baseKey(verb){const canonical=canonicalRecord(verb);if(canonical&&canonical.baseVerbId)return canonical.baseVerbId;return verb;}
   function record(verb){return canonicalRecord(verb);}
   function externalSimple(verb,tense,subject){
-    const r=record(verb),forms=r?.formes?.[tense];
+    const r=record(verb),forms=r?.conjugations?.[tense];
     if(!Array.isArray(forms)||!forms.length)return null;
     const base=P.baseSubject(subject);
     if(tense==='impératif présent'){
@@ -49,6 +49,6 @@
   function rowsForLookup(verb,tense){const r=record(verb);if(!r)return [];if(!(C&&C.isCompound(tense)))return rowsFor(verb,tense);const construction=constructionResolver?.isPronominal(r)?'pronomiale':'non-pronomiale';const subjects=tense==='subjonctif passé'?S.subjonctifPractice:S.lookupCompound;return subjects.map(subject=>[subject,conjugate(verb,tense,P.baseSubject(subject),construction)]).filter(row=>row[1]!=null);}
   function rowsFor(verb,tense){const r=record(verb);if(!r)return [];if(!(C?.isSimple?.(tense)||C?.isCompound?.(tense)))return [];const construction=constructionResolver?.isPronominal(r)?'pronomiale':'non-pronomiale';if(C.isCompound(tense))return practiceCompoundSubjects(tense).map(subject=>[subject,conjugate(verb,tense,subject,construction)]).filter(row=>row[1]!=null);const fallback=tense==='impératif présent'?S.imperative:tense==='subjonctif présent'?S.subjonctifSimpleFallback:S.simpleFallback,rows=fallback.map(subject=>[subject,'']);return rows.map(row=>{const subject=String(row[0]).split('/').map(x=>x.trim()).filter(Boolean)[0],generated=conjugate(verb,tense,subject,construction);return generated!=null?[row[0],generated]:null;}).filter(Boolean);}
   function rowsForConstruction(verb,tense,construction){const r=record(verb);if(!r)return [];if(C?.isCompound?.(tense))return practiceCompoundSubjects(tense).map(subject=>[subject,conjugate(verb,tense,subject,construction)]).filter(row=>row[1]!=null);if(!C?.isSimple?.(tense))return [];const fallback=tense==='impératif présent'?S.imperative:tense==='subjonctif présent'?S.subjonctifConstructionFallback:S.simpleConstructionFallback,rows=fallback.map(subject=>[subject,'']);return rows.map(row=>{const subject=String(row[0]).split('/').map(x=>x.trim()).filter(Boolean)[0],generated=conjugate(verb,tense,subject,construction);return generated!=null?[row[0],generated]:null;}).filter(Boolean);}
-  function canGenerate(verb,tense){const r=record(verb);if(!r)return false;if(C?.isCompound?.(tense))return !!auxiliaryResolver?.resolve(r,constructionResolver);return !!C?.isSimple?.(tense)&&(!!R&&typeof R.generate==='function'||!!r.formes?.[tense]);}
+  function canGenerate(verb,tense){const r=record(verb);if(!r)return false;if(C?.isCompound?.(tense))return !!auxiliaryResolver?.resolve(r,constructionResolver);return !!C?.isSimple?.(tense)&&(!!R&&typeof R.generate==='function'||!!r.conjugations?.[tense]);}
   window.COQ_CONJ_ENGINE={conjugate,rowsFor,rowsForLookup,rowsForConstruction,canGenerate,subjectInfo:P.subjectInfo};
 })();
