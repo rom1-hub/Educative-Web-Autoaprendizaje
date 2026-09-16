@@ -5,7 +5,50 @@
 .suggestions,
 .lookup-status{display:none!important}
 
+/* Escritorio: mantener el verbo separado de las acciones y compactar los botones. */
+@media (min-width:701px){
+  .verb-summary .conj-result-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+  }
+
+  .verb-summary .conj-result-head>div:first-child{
+    flex:1 1 auto;
+    min-width:0;
+  }
+
+  .verb-summary .conj-actions{
+    flex:0 0 auto;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:flex-end;
+    gap:8px;
+    max-width:58%;
+  }
+
+  .verb-summary .conj-actions .btn{
+    padding:8px 12px;
+    font-size:.9rem;
+    line-height:1.2;
+    white-space:nowrap;
+  }
+
+  .verb-summary #togglePronominal{
+    margin:0;
+  }
+}
+
 @media (max-width:700px){
+  /* El botón mantiene la organización vertical actual, pero con el mismo tamaño visual que las demás acciones. */
+  .verb-summary #togglePronominal{
+    padding:8px 12px;
+    font-size:.9rem;
+    line-height:1.2;
+  }
+
   .result-modal{padding:10px;align-items:center}
   .result-window{width:100%;max-width:100%;max-height:calc(100vh - 20px);padding:16px;border-radius:20px;overflow-y:auto;overflow-x:hidden}
   .result-window h2{font-size:32px}
