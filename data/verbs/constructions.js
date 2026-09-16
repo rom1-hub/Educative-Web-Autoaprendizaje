@@ -6,18 +6,18 @@ window.COQ_PRONOMINAL_RULES={
   'parler':{fonctionDeSe:'COI',accord:'aucun'}
 };
 window.COQ_CONSTRUCTION_OPTIONS=Object.freeze([
-  {id:'non-pronominale',label:'Verbos no pronominales'},
-  {id:'pronominale',label:'Verbos pronominales'}
+  {id:'non-pronomiale',label:'Verbos no pronominales'},
+  {id:'pronomiale',label:'Verbos pronominales'}
 ]);
 const COQ_CONSTRUCTION_RESOLVER=Object.freeze({
   isPronominal(record,construction){
-    return construction==='pronominale'||record?.pronominal===true||record?.construction==='pronominale';
+    return construction==='pronomiale'||record?.pronominal===true||record?.construction==='pronomiale';
   },
   matchesConstruction(record,construction){
     if(!construction)return true;
     const isPronominal=this.isPronominal(record,construction);
-    if(construction==='pronominale')return isPronominal;
-    if(construction==='non-pronominale')return !isPronominal;
+    if(construction==='pronomiale')return isPronominal;
+    if(construction==='non-pronomiale'||construction==='non-pronomiale')return !isPronominal;
     return true;
   }
 });
