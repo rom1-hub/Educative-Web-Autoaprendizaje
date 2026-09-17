@@ -101,11 +101,14 @@ window.COQ_PRONOMINAL_RULES=Object.freeze({
   'impatienter':{fonctionDeSe:'aucune',accord:'sujet'},
   'inspirer':{fonctionDeSe:'COD',accord:'sujet'},
   'remettre':{fonctionDeSe:'COD',accord:'sujet'},
-  'parler':{fonctionDeSe:'COI',accord:'aucun'}
+  'parler':{fonctionDeSe:'COI',accord:'aucun'},
+  'joindre':{fonctionDeSe:'COD',accord:'sujet'},
+  'rejoindre':{fonctionDeSe:'COD',accord:'sujet'},
+  'étendre':{fonctionDeSe:'COD',accord:'sujet'}
 });
 window.COQ_CONSTRUCTION_OPTIONS=Object.freeze([
   {id:'non-pronomiale',label:'Verbos no pronominales'},
-  {id:'pronomiale',label:'Verbos pronominales'}
+  {id:'pronomiale',label:'Verbos pronomiales'}
 ]);
 const COQ_CONSTRUCTION_RESOLVER=Object.freeze({
   isPronominal(record){
@@ -115,7 +118,7 @@ const COQ_CONSTRUCTION_RESOLVER=Object.freeze({
     if(!construction)return true;
     const isPronominal=this.isPronominal(record);
     if(construction==='pronomiale')return isPronominal;
-    if(construction==='non-pronomiale'||construction==='non-pronominale')return !isPronominal;
+    if(construction==='non-pronomiale'||construction==='non-pronomiale')return !isPronominal;
     return true;
   }
 });
