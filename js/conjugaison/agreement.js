@@ -34,7 +34,7 @@
   function formatLookupCompoundForm(form,subject,record,verb){
     const value=String(form||'');
     const meta=record||{};
-    const agreementSensitive=meta.pronominal===true||meta.construction==='pronominale'||meta.auxiliaire==='être';
+    const agreementSensitive=meta.pronominal===true||meta.construction==='pronomiale'||meta.construction==='pronominale'||meta.auxiliaire==='être';
     if(!agreementSensitive)return value;
     const pp=String(meta.participePasse||'').trim();
     if(!pp)return value;
@@ -42,13 +42,18 @@
     const ppIndex=withoutMarkers.lastIndexOf(pp);
     if(ppIndex===-1)return value;
     const prefix=withoutMarkers.slice(0,ppIndex);
+    const ruleBase=meta.baseVerbId||meta.verbeBase||verb;
+    const isPronominal=meta.pronominal===true||meta.construction==='pronomiale'||meta.construction==='pronominale';
+    if(isPronominal){
+      const rule=rules[ruleBase];
+      if(!rule || rule.accord==='aucun')return prefix+pp;
+    }
     const base=lookupSubject(subject);
     const genericNotation=LOOKUP_NOTATION[base];
     if(genericNotation)return prefix+pp+genericNotation;
     const context=lookupAgreementContext(subject);
     if(!context)return value;
-    const ruleBase=meta.baseVerbId||meta.verbeBase||verb;
-    const agreed=agree(pp,context,{type:meta.pronominal?'pronominale':'non-pronominale',baseVerb:ruleBase,auxiliaire:meta.auxiliaire});
+    const agreed=agree(pp,context,{type:isPronominal?'pronomiale':'non-pronomiale',baseVerb:ruleBase,auxiliaire:meta.auxiliaire});
     return prefix+agreed;
   }
   window.COQ_CONJ_AGREEMENT={agree,applySubjectAgreement,stripAgreementMarkers,lookupAgreementContext,formatLookupCompoundForm};
