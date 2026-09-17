@@ -10,7 +10,7 @@
     const raw=rawVerbs||{},records={};
     const familyResolver=window.COQ_FAMILY_RESOLVER;
     Object.keys(raw).forEach(key=>{
-      const item=raw[key]||{},family=familyResolver?.resolve(key),merged={...item,...(family?{familyId:family.id,patternId:family.patternId,groupe:family.groupe}: {})},baseCandidate=String(merged.verbeBase||'').trim();
+      const item=raw[key]||{},family=familyResolver?.resolve(key),merged={...item,...(family?{familyId:family.id,patternId:family.patternId,groupe:family.groupe}: {})},baseCandidate=String(merged.verbeBase||merged.infinitif_base||'').trim();
       records[key]=deepFreeze({
         id:merged.id||key,
         infinitif:merged.infinitif||key,
