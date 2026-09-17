@@ -83,19 +83,39 @@
   }
 
   function resetVocabulary() {
+    // Reinicio completo del estado de Vocabulario.
     selectedItem = null;
+    mode = 'learn';
+
+    // Borrar búsqueda y todas las sugerencias/selecciones.
     searchInput.value = '';
     results.innerHTML = '';
+    searchInput.setAttribute('aria-expanded', 'false');
+
+    // Cerrar y vaciar por completo el selector de categorías, incluidos
+    // cualquier categoría o subcategoría que estuviera desplegada.
     topicsPanel.innerHTML = '';
     topicsPanel.classList.add('hidden');
-    searchInput.setAttribute('aria-expanded', 'false');
     browseButton.setAttribute('aria-expanded', 'false');
+
+    // Eliminar el contenido seleccionado y volver al estado inicial.
     learnContent.innerHTML = '';
     practiceContent.innerHTML = '';
     learnContent.appendChild(learnEmptyState);
     practiceContent.appendChild(practiceEmptyState);
     learnEmptyState.classList.remove('hidden');
     practiceEmptyState.classList.remove('hidden');
+
+    // Reiniciar también el modo para que el botón deje la página
+    // exactamente en su estado inicial.
+    document.querySelectorAll('[data-vocabulary-tab]').forEach((item) => {
+      const active = item.dataset.vocabularyTab === 'learn';
+      item.classList.toggle('active', active);
+      item.setAttribute('aria-selected', String(active));
+    });
+    document.getElementById('vocabularyLearnPanel').classList.remove('hidden');
+    document.getElementById('vocabularyPracticePanel').classList.add('hidden');
+
     searchInput.focus();
   }
 
