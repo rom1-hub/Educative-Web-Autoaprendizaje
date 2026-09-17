@@ -32,6 +32,7 @@ jobs:
           node tests/conjugaison-family-resolver.node.js
           node tests/conjugaison-pattern-ownership.node.js
           node tests/conjugaison-construction-resolver.node.js
+          node tests/conjugaison-pronominal-agreement-coverage.node.js
           node tests/conjugaison-auxiliary-resolver.node.js
           node tests/conjugaison-tense-rules.node.js
           node tests/conjugaison-subject-model.node.js
