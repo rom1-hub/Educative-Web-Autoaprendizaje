@@ -42,7 +42,7 @@
     const ppIndex=withoutMarkers.lastIndexOf(pp);
     if(ppIndex===-1)return value;
     const prefix=withoutMarkers.slice(0,ppIndex);
-    const ruleBase=meta.baseVerbId||meta.verbeBase||verb;
+    const ruleBase=meta.baseVerbId||meta.infinitifBase||meta.verbeBase||meta.infinitif_base||verb;
     const isPronominal=meta.pronominal===true||meta.construction==='pronomiale'||meta.construction==='pronominale';
     if(isPronominal){
       const rule=rules[ruleBase];
