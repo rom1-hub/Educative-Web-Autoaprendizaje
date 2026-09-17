@@ -68,6 +68,17 @@ Object.entries(pronominalExpectations).forEach(([verb,expected])=>{
   assert.strictEqual(engine.conjugate(verb,presentKey,expected.subject),expected.answer,`${verb} debe generar ${expected.answer} sin duplicar el pronombre pronominal.`);
 });
 
+const coiCompoundExpectations={
+  'se parler':{subject:'elle',answer:'s’est parlé'},
+  'se téléphoner':{subject:'elles',answer:'se sont téléphoné'},
+};
+Object.entries(coiCompoundExpectations).forEach(([verb,expected])=>{
+  const record=model.get(verb);
+  assert.ok(record&&record.pronominal===true,`${verb} debe conservar su metadata pronominal.`);
+  assert.strictEqual(record.baseVerbId,verb.replace(/^se /,'').replace(/^s'/,''),`${verb} debe apuntar a su verbo base.`);
+  assert.strictEqual(engine.conjugate(verb,'passé composé',expected.subject),expected.answer,`${verb} debe mantener el participio invariable por COI.`);
+});
+
 assert.ok(context.window.COQ_CONJ_LOOKUP&&typeof context.window.COQ_CONJ_LOOKUP.renderConjugation==='function','La consulta debe estar conectada al motor basado en la base local.');
 assert.ok(context.window.COQ_CONJ_PRACTICE_TESTING&&typeof context.window.COQ_CONJ_PRACTICE_TESTING.selectPracticeQuestions==='function','La práctica debe conservar su API de ejercicio.');
 
