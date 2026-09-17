@@ -112,7 +112,7 @@ function makePronominalRecord(base,entry){
     auxiliaire:'être',
     auxiliaires:['être'],
     pronominal:true,
-    construction:'pronominale',
+    construction:'pronomiale',
     formes,
     formeNonPronominale:base.infinitif,
     formePronominale:null,
@@ -148,7 +148,7 @@ function normalize(verbs,templates,local,pronominalCatalog){
       auxiliaire:old.auxiliaire||aux[0]||null,
       auxiliaires:old.auxiliaires||aux,
       pronominal:old.pronominal===true,
-      construction:old.construction||'non-pronominale',
+      construction:old.construction||'non-pronomiale',
       participePasse:old.participePasse||pp,
       formes:{...formes,...(old.formes||{})},
       variantes:old.variantes??null,
@@ -166,7 +166,17 @@ function normalize(verbs,templates,local,pronominalCatalog){
     const base=out[entry.base];
     if(!base){missing.push(entry.base);return;}
     out[entry.base]={...base,formePronominale:entry.infinitif,formePronominaleDisponible:true};
-    out[entry.infinitif]=makePronominalRecord(base,entry);
+    const pronominalRecord=makePronominalRecord(base,entry);
+    // La entrada del catálogo es la fuente de verdad para la construcción:
+    // el registro generado debe conservar obligatoriamente estos metadatos,
+    // incluso si el verbo base trae metadatos locales previos.
+    out[entry.infinitif]={
+      ...pronominalRecord,
+      pronominal:true,
+      construction:'pronomiale',
+      auxiliaire:'être',
+      auxiliaires:['être']
+    };
   });
   if(missing.length)console.warn(`[COQ] Pronominales sin verbo base en la fuente: ${missing.join(', ')}`);
   return out;
