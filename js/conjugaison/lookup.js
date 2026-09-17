@@ -16,10 +16,14 @@
   }
   function normalizedRows(rows,tense,verb){
     const output=[];
+    const recordMeta=meta(verb),construction=recordMeta.pronominal?'pronomiale':'non-pronomiale';
     (rows||[]).forEach(row=>{
       const form=String(row?.[1]??'').trim();if(!form)return;
       const rawSubject=String(row?.[0]||'').trim();
-      expandSubjects(rawSubject,form,tense).forEach(subject=>output.push([subject,isCompound(tense)?A.formatLookupCompoundForm(form,subject,meta(verb),verb):form]));
+      expandSubjects(rawSubject,form,tense).forEach(subject=>{
+        const resolvedForm=isCompound(tense)&&engine?.conjugate?.(verb,tense,subject,construction)||form;
+        output.push([subject,isCompound(tense)?A.formatLookupCompoundForm(resolvedForm,subject,recordMeta,verb):resolvedForm]);
+      });
     });
     return output;
   }
