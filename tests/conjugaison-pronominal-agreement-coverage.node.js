@@ -6,7 +6,7 @@ vm.createContext(context);
 const catalog=context.window.COQ_PRONOMINAL_CATALOG||[];
 const rules=context.window.COQ_PRONOMINAL_RULES||{};
 const assert=(condition,message)=>{if(!condition)throw new Error(message);};
-assert(catalog.length===98,`El catálogo pronominal debe contener 98 verbos; obtenido ${catalog.length}.`);
+assert(catalog.length===99,`El catálogo pronominal debe contener 99 verbos; obtenido ${catalog.length}.`);
 assert(Object.keys(rules).length===catalog.length,`Cada pronominal debe tener una regla explícita de concordancia: ${Object.keys(rules).length}/${catalog.length}.`);
 for(const entry of catalog){
   const rule=rules[entry.base];
