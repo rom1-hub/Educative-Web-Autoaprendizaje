@@ -105,6 +105,10 @@
     {base:'évader',infinitif:"s'évader"},
     {base:'impatienter',infinitif:"s'impatienter"},
     {base:'inspirer',infinitif:"s'inspirer"},
-    {base:'remettre',infinitif:'se remettre'}
+    {base:'remettre',infinitif:'se remettre'},
+    {base:'joindre',infinitif:'se joindre'},
+    {base:'rejoindre',infinitif:'se rejoindre'},
+    {base:'étendre',infinitif:"s'étendre"},
+    {base:'détendre',infinitif:'se détendre'}
   ]);
 })();
