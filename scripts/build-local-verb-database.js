@@ -11,7 +11,10 @@ const vm=require('vm');
 const VERSION='0.3.4';
 const BASE=`https://cdn.jsdelivr.net/npm/conjugation-fr@${VERSION}/`;
 const URLS={verbs:BASE+'verbs-fr.json',templates:BASE+'conjugation-fr.json'};
-const SOURCE_LOCAL=path.resolve(__dirname,'../data/verbs/verbs.js');
+const SOURCES_LOCAL=[
+  path.resolve(__dirname,'../data/verbs/verbs.js'),
+  path.resolve(__dirname,'../data/verbs/verbs-extended.js')
+];
 const SOURCE_PRONOMINAL=path.resolve(__dirname,'../data/verbs/pronominal-catalog.js');
 const OUT=path.resolve(__dirname,'../data/verbs/local-database.js');
 const SIMPLE={
@@ -32,8 +35,13 @@ async function getJson(url){
 }
 function readLocalMetadata(){
   const window={};
-  vm.runInNewContext(fs.readFileSync(SOURCE_LOCAL,'utf8'),{window,console});
-  return window.COQ_VERBS||{};
+  const merged={};
+  for(const source of SOURCES_LOCAL){
+    if(!fs.existsSync(source))continue;
+    vm.runInNewContext(fs.readFileSync(source,'utf8'),{window,console});
+    Object.assign(merged,window.COQ_VERBS||{});
+  }
+  return merged;
 }
 function readPronominalCatalog(){
   const window={};
@@ -167,9 +175,6 @@ function normalize(verbs,templates,local,pronominalCatalog){
     if(!base){missing.push(entry.base);return;}
     out[entry.base]={...base,formePronominale:entry.infinitif,formePronominaleDisponible:true};
     const pronominalRecord=makePronominalRecord(base,entry);
-    // La entrada del catálogo es la fuente de verdad para la construcción:
-    // el registro generado debe conservar obligatoriamente estos metadatos,
-    // incluso si el verbo base trae metadatos locales previos.
     out[entry.infinitif]={
       ...pronominalRecord,
       pronominal:true,
@@ -178,9 +183,6 @@ function normalize(verbs,templates,local,pronominalCatalog){
       auxiliaires:['être']
     };
   });
-  // Contrato canónico: cualquier registro marcado como pronominal debe
-  // conservar una construcción pronomiale y el auxiliar être, incluso si
-  // procede de metadatos locales históricos que no están en el catálogo.
   Object.values(out).forEach(record=>{
     if(record?.pronominal===true){
       record.construction='pronomiale';
