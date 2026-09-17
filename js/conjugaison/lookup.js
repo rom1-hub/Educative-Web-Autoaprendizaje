@@ -5,7 +5,17 @@
   const U=window.COQ_CONJ_UTILS,P=window.COQ_CONJ_PRONOUNS,dataModel=window.COQ_CONJ_DATA_MODEL,engine=window.COQ_CONJ_ENGINE,C=window.COQ_CONJ_COMPOUND,A=window.COQ_CONJ_AGREEMENT;
   const record=v=>dataModel?.get?.(v)||null;
   const meta=v=>record(v)||{},verbExists=verb=>!!record(verb),isCompound=tense=>!!C?.isCompound?.(tense);
-  function counterpart(verb){const m=meta(verb);if(m.pronominal&&m.baseVerbId&&record(m.baseVerbId))return m.baseVerbId;if(!m.pronominal&&m.formePronominale?.infinitif&&record(m.formePronominale.infinitif))return m.formePronominale.infinitif;return null;}
+  function counterpart(verb){
+    const m=meta(verb);
+    if(m.pronominal&&m.baseVerbId&&record(m.baseVerbId))return m.baseVerbId;
+    if(!m.pronominal&&m.formePronominale?.infinitif&&record(m.formePronominale.infinitif))return m.formePronominale.infinitif;
+    if(!m.pronominal){
+      const catalog=Array.isArray(window.COQ_PRONOMINAL_CATALOG)?window.COQ_PRONOMINAL_CATALOG:[];
+      const entry=catalog.find(item=>String(item?.base||'').trim()===String(verb||'').trim());
+      if(entry?.infinitif&&record(entry.infinitif))return entry.infinitif;
+    }
+    return null;
+  }
   function toggleLabel(verb){return meta(verb).pronominal?'Ver su forma no pronominal':'Ver su forma pronominal';}
   function rowsForTense(verb,tense){return engine?.rowsForLookup?engine.rowsForLookup(verb,tense):[];}
   function stripMetadata(value){return String(value||'').replace(/\s*\([^)]*\)\s*/g,'').trim();}
