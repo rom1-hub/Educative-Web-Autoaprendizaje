@@ -1,11 +1,12 @@
 /*
  * COQ — Controlador de Vocabulario
- * La página consume exclusivamente la base de datos de Vocabulario.
  *
  * Jerarquía de navegación:
  * categoría → subcategoría → tema
  *
- * Los ejercicios se resuelven por subcategoría y/o por tema.
+ * El menú de búsqueda y categorías es común a los dos modos:
+ * aprender vocabulario → mostrar contenido
+ * practicar vocabulario → abrir ejercicios
  */
 (function () {
   'use strict';
@@ -14,18 +15,18 @@
   const results = document.getElementById('vocabularyResults');
   const browseButton = document.getElementById('vocabularyBrowse');
   const topicsPanel = document.getElementById('vocabularyTopics');
-  const featured = document.getElementById('featuredVocabularyTopics');
-  const emptyState = document.getElementById('vocabularyEmptyState');
-  const topicView = document.getElementById('vocabularyTopicView');
-  const practiceView = document.getElementById('vocabularyPracticeView');
+  const learnContent = document.getElementById('vocabularyLearnContent');
+  const practiceContent = document.getElementById('vocabularyPracticeContent');
+  const learnEmptyState = document.getElementById('vocabularyEmptyState');
+  const practiceEmptyState = document.getElementById('vocabularyPracticeEmptyState');
 
-  if (!searchInput || !results || !browseButton || !topicsPanel || !featured || !emptyState || !topicView || !practiceView) return;
+  if (!searchInput || !results || !browseButton || !topicsPanel || !learnContent || !practiceContent || !learnEmptyState || !practiceEmptyState) return;
 
   const database = window.COQ_VOCABULARY_DATABASE;
   if (!database || !Array.isArray(database.categories)) return;
 
   let selectedItem = null;
-  let mode = 'topic';
+  let mode = 'learn';
 
   function escapeHtml(value) {
     return String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
@@ -49,9 +50,24 @@
     return items;
   }
 
+  function getEntries(item) {
+    if (!item) return [];
+    if (item.type === 'topic') return Array.isArray(item.data.entries) ? item.data.entries : [];
+    if (item.type === 'subcategory') return (item.data.topics || []).flatMap((topic) => Array.isArray(topic.entries) ? topic.entries : []);
+    if (item.type === 'category') return (item.data.subcategories || []).flatMap((subcategory) => (subcategory.topics || []).flatMap((topic) => Array.isArray(topic.entries) ? topic.entries : []));
+    return [];
+  }
+
+  function getExercises(item) {
+    if (!item) return [];
+    if (item.type === 'topic') return Array.isArray(item.data.exercises) ? item.data.exercises : [];
+    if (item.type === 'subcategory') return (item.data.topics || []).flatMap((topic) => Array.isArray(topic.exercises) ? topic.exercises : []).concat(Array.isArray(item.data.exercises) ? item.data.exercises : []);
+    return [];
+  }
+
   function searchableText(item) {
     const data = item.data || {};
-    const entries = Array.isArray(data.entries) ? data.entries.map((entry) => `${entry.word || ''} ${entry.translation || ''}`).join(' ') : '';
+    const entries = getEntries(item).map((entry) => `${entry.word || ''} ${entry.translation || ''} ${entry.definition || ''}`).join(' ');
     return normalize(`${item.title} ${item.category} ${data.description || ''} ${entries}`);
   }
 
@@ -65,57 +81,58 @@
     renderContent();
   }
 
-  function getExercises(item) {
-    if (!item || (item.type !== 'subcategory' && item.type !== 'topic')) return [];
-    return Array.isArray(item.data && item.data.exercises) ? item.data.exercises : [];
+  function renderEntries(entries) {
+    if (!entries.length) return '<p class="vocabulary-no-results">Este contenido todavía no tiene palabras cargadas.</p>';
+    return `<div class="vocabulary-entry-list">${entries.map((entry) => `<article class="vocabulary-entry"><div><strong>${escapeHtml(entry.word || '')}</strong>${entry.translation ? `<span>${escapeHtml(entry.translation)}</span>` : ''}</div>${entry.definition ? `<p>${escapeHtml(entry.definition)}</p>` : ''}</article>`).join('')}</div>`;
+  }
+
+  function renderLearn(item) {
+    const title = escapeHtml(item.title);
+    const data = item.data || {};
+
+    if (item.type === 'category') {
+      const subcategories = data.subcategories || [];
+      learnContent.innerHTML = `<div class="vocabulary-result-content"><div class="section-head"><div><span class="tag">Categoría</span><h2>${title}</h2></div><p>Selecciona una subcategoría para ver su vocabulario.</p></div><div class="vocabulary-topics">${subcategories.map((subcategory) => `<button type="button" class="vocabulary-topic-option" data-id="${escapeHtml(subcategory.id)}"><strong>${escapeHtml(subcategory.title)}</strong><small>${(subcategory.topics || []).length} temas</small></button>`).join('')}</div></div>`;
+      bindItemButtons(learnContent);
+      return;
+    }
+
+    if (item.type === 'subcategory') {
+      const topics = data.topics || [];
+      learnContent.innerHTML = `<div class="vocabulary-result-content"><div class="section-head"><div><span class="tag">Subcategoría</span><h2>${title}</h2></div><p>${escapeHtml(item.parent.title)}</p></div>${topics.length ? `<div class="vocabulary-topics">${topics.map((topic) => `<button type="button" class="vocabulary-topic-option" data-id="${escapeHtml(topic.id)}"><strong>${escapeHtml(topic.title)}</strong><small>${(topic.entries || []).length} palabras</small></button>`).join('')}</div>` : renderEntries(getEntries(item))}</div>`;
+      bindItemButtons(learnContent);
+      return;
+    }
+
+    learnContent.innerHTML = `<div class="vocabulary-result-content"><div class="section-head"><div><span class="tag">Tema</span><h2>${title}</h2></div><p>${escapeHtml(data.description || '')}</p></div>${renderEntries(getEntries(item))}</div>`;
+  }
+
+  function renderPractice(item) {
+    const title = escapeHtml(item.title);
+    const exercises = getExercises(item);
+
+    if (item.type === 'category') {
+      practiceContent.innerHTML = `<div class="vocabulary-result-content"><div class="section-head"><div><span class="tag">Práctica</span><h2>${title}</h2></div><p>Selecciona una subcategoría para abrir sus ejercicios.</p></div><div class="vocabulary-topics">${(item.data.subcategories || []).map((subcategory) => `<button type="button" class="vocabulary-topic-option" data-id="${escapeHtml(subcategory.id)}"><strong>${escapeHtml(subcategory.title)}</strong><small>${getExercises({ type: 'subcategory', data: subcategory }).length} ejercicios</small></button>`).join('')}</div></div>`;
+      bindItemButtons(practiceContent);
+      return;
+    }
+
+    practiceContent.innerHTML = `<div class="vocabulary-result-content"><div class="section-head"><div><span class="tag">Práctica</span><h2>${title}</h2></div><p>Ejercicios de ${item.type === 'subcategory' ? 'esta subcategoría' : 'este tema'}.</p></div><div class="vocabulary-practice-card"><strong>${exercises.length ? `${exercises.length} ejercicios disponibles` : 'Ejercicios próximamente'}</strong><p>${exercises.length ? 'La sesión de práctica se abrirá desde este contenido.' : 'Todavía no hay ejercicios configurados para este contenido.'}</p>${exercises.length ? '<button class="btn blue" type="button">Comenzar ejercicios →</button>' : ''}</div></div>`;
+  }
+
+  function bindItemButtons(container) {
+    container.querySelectorAll('[data-id]').forEach((button) => button.addEventListener('click', () => {
+      const item = getItems().find((entry) => entry.id === button.dataset.id);
+      if (item) selectItem(item);
+    }));
   }
 
   function renderContent() {
     if (!selectedItem) return;
-
-    emptyState.classList.add('hidden');
-    const title = escapeHtml(selectedItem.title);
-    const data = selectedItem.data || {};
-
-    if (mode === 'practice') {
-      topicView.classList.add('hidden');
-      practiceView.classList.remove('hidden');
-
-      if (selectedItem.type === 'category') {
-        practiceView.innerHTML = `<div class="exercise"><h3>Hacer ejercicios · ${title}</h3><p>Selecciona una subcategoría para practicar. Los ejercicios se organizan por subcategoría y, cuando corresponda, por tema.</p></div>`;
-        return;
-      }
-
-      const exercises = getExercises(selectedItem);
-      const scope = selectedItem.type === 'subcategory' ? 'esta subcategoría' : 'este tema';
-      practiceView.innerHTML = `<div class="exercise"><h3>Ejercicios · ${title}</h3><p>Ámbito: ${scope}.</p><p>${exercises.length ? `${exercises.length} ejercicios configurados.` : 'Todavía no hay ejercicios configurados para este contenido.'}</p></div>`;
-      return;
-    }
-
-    practiceView.classList.add('hidden');
-    topicView.classList.remove('hidden');
-
-    if (selectedItem.type === 'category') {
-      const subcategories = data.subcategories || [];
-      topicView.innerHTML = `<div class="exercise"><h3>${title}</h3><p>Selecciona una subcategoría.</p><div class="vocabulary-topics">${subcategories.map((subcategory) => `<button type="button" class="vocabulary-topic-option" data-id="${escapeHtml(subcategory.id)}"><strong>${escapeHtml(subcategory.title)}</strong><small>${(subcategory.topics || []).length} temas · ${(subcategory.exercises || []).length} ejercicios</small></button>`).join('')}</div></div>`;
-      topicView.querySelectorAll('[data-id]').forEach((button) => button.addEventListener('click', () => {
-        const item = getItems().find((entry) => entry.id === button.dataset.id);
-        if (item) selectItem(item);
-      }));
-      return;
-    }
-
-    if (selectedItem.type === 'subcategory') {
-      const topics = data.topics || [];
-      topicView.innerHTML = `<div class="exercise"><h3>${title}</h3><p>${escapeHtml(selectedItem.parent.title)} · subcategoría</p>${topics.length ? `<div class="vocabulary-topics">${topics.map((topic) => `<button type="button" class="vocabulary-topic-option" data-id="${escapeHtml(topic.id)}"><strong>${escapeHtml(topic.title)}</strong><small>${(topic.exercises || []).length} ejercicios</small></button>`).join('')}</div>` : '<p>Esta subcategoría está preparada para recibir sus temas de vocabulario.</p>'}</div>`;
-      topicView.querySelectorAll('[data-id]').forEach((button) => button.addEventListener('click', () => {
-        const item = getItems().find((entry) => entry.id === button.dataset.id);
-        if (item) selectItem(item);
-      }));
-      return;
-    }
-
-    topicView.innerHTML = `<div class="exercise"><h3>${title}</h3><p>${escapeHtml(data.description || 'Contenido del tema de vocabulario.')}</p></div>`;
+    learnEmptyState.classList.add('hidden');
+    practiceEmptyState.classList.add('hidden');
+    if (mode === 'learn') renderLearn(selectedItem);
+    else renderPractice(selectedItem);
   }
 
   function renderResults(query) {
@@ -128,7 +145,7 @@
 
     const matches = getItems().filter((item) => searchableText(item).includes(term));
     results.innerHTML = matches.length
-      ? matches.map((item, index) => `<button type="button" class="vocabulary-result" role="option" data-result-index="${index}"><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.category)} · ${escapeHtml(item.type)}</small></button>`).join('')
+      ? matches.map((item, index) => `<button type="button" class="vocabulary-result" role="option" data-result-index="${index}"><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.category)}</small></button>`).join('')
       : '<div class="vocabulary-no-results">No hay coincidencias.</div>';
 
     results.querySelectorAll('[data-result-index]').forEach((button) => button.addEventListener('click', () => selectItem(matches[Number(button.dataset.resultIndex)])));
@@ -161,15 +178,6 @@
     }));
   }
 
-  function renderFeatured() {
-    const categories = database.categories.slice(0, 6);
-    featured.innerHTML = categories.map((category) => `<article class="card vocabulary-featured-card"><div class="word">${escapeHtml(category.title)}</div><small>${(category.subcategories || []).length} subcategorías</small><button class="btn secondary" type="button" data-featured-id="${escapeHtml(category.id)}">Explorar</button></article>`).join('');
-    featured.querySelectorAll('[data-featured-id]').forEach((button) => button.addEventListener('click', () => {
-      const item = getItems().find((entry) => entry.id === button.dataset.featuredId);
-      if (item) selectItem(item);
-    }));
-  }
-
   searchInput.addEventListener('input', () => renderResults(searchInput.value));
 
   browseButton.addEventListener('click', () => {
@@ -179,15 +187,15 @@
     if (!open) renderAllCategories();
   });
 
-  document.querySelectorAll('[data-vocabulary-mode]').forEach((button) => button.addEventListener('click', () => {
-    mode = button.dataset.vocabularyMode;
-    document.querySelectorAll('[data-vocabulary-mode]').forEach((item) => {
+  document.querySelectorAll('[data-vocabulary-tab]').forEach((button) => button.addEventListener('click', () => {
+    mode = button.dataset.vocabularyTab;
+    document.querySelectorAll('[data-vocabulary-tab]').forEach((item) => {
       const active = item === button;
       item.classList.toggle('active', active);
-      item.setAttribute('aria-pressed', String(active));
+      item.setAttribute('aria-selected', String(active));
     });
+    document.getElementById('vocabularyLearnPanel').classList.toggle('hidden', mode !== 'learn');
+    document.getElementById('vocabularyPracticePanel').classList.toggle('hidden', mode !== 'practice');
     renderContent();
   }));
-
-  renderFeatured();
 })();
