@@ -178,6 +178,16 @@ function normalize(verbs,templates,local,pronominalCatalog){
       auxiliaires:['être']
     };
   });
+  // Contrato canónico: cualquier registro marcado como pronominal debe
+  // conservar una construcción pronomiale y el auxiliar être, incluso si
+  // procede de metadatos locales históricos que no están en el catálogo.
+  Object.values(out).forEach(record=>{
+    if(record?.pronominal===true){
+      record.construction='pronomiale';
+      record.auxiliaire='être';
+      record.auxiliaires=['être'];
+    }
+  });
   if(missing.length)console.warn(`[COQ] Pronominales sin verbo base en la fuente: ${missing.join(', ')}`);
   return out;
 }
