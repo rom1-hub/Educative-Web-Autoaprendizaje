@@ -1,6 +1,11 @@
 /*
  * COQ — Controlador de Vocabulario
  * La página consume exclusivamente la base de datos de Vocabulario.
+ *
+ * Jerarquía de navegación:
+ * categoría → subcategoría → tema
+ *
+ * Los ejercicios se resuelven por subcategoría y/o por tema.
  */
 (function () {
   'use strict';
@@ -60,6 +65,11 @@
     renderContent();
   }
 
+  function getExercises(item) {
+    if (!item || (item.type !== 'subcategory' && item.type !== 'topic')) return [];
+    return Array.isArray(item.data && item.data.exercises) ? item.data.exercises : [];
+  }
+
   function renderContent() {
     if (!selectedItem) return;
 
@@ -70,7 +80,15 @@
     if (mode === 'practice') {
       topicView.classList.add('hidden');
       practiceView.classList.remove('hidden');
-      practiceView.innerHTML = `<div class="exercise"><h3>Ejercicios · ${title}</h3><p>Los ejercicios se añadirán a esta categoría o subcategoría mediante la base de datos de Vocabulario.</p></div>`;
+
+      if (selectedItem.type === 'category') {
+        practiceView.innerHTML = `<div class="exercise"><h3>Hacer ejercicios · ${title}</h3><p>Selecciona una subcategoría para practicar. Los ejercicios se organizan por subcategoría y, cuando corresponda, por tema.</p></div>`;
+        return;
+      }
+
+      const exercises = getExercises(selectedItem);
+      const scope = selectedItem.type === 'subcategory' ? 'esta subcategoría' : 'este tema';
+      practiceView.innerHTML = `<div class="exercise"><h3>Ejercicios · ${title}</h3><p>Ámbito: ${scope}.</p><p>${exercises.length ? `${exercises.length} ejercicios configurados.` : 'Todavía no hay ejercicios configurados para este contenido.'}</p></div>`;
       return;
     }
 
@@ -79,7 +97,7 @@
 
     if (selectedItem.type === 'category') {
       const subcategories = data.subcategories || [];
-      topicView.innerHTML = `<div class="exercise"><h3>${title}</h3><p>Selecciona una subcategoría.</p><div class="vocabulary-topics">${subcategories.map((subcategory) => `<button type="button" class="vocabulary-topic-option" data-id="${escapeHtml(subcategory.id)}"><strong>${escapeHtml(subcategory.title)}</strong><small>${(subcategory.topics || []).length} temas</small></button>`).join('')}</div></div>`;
+      topicView.innerHTML = `<div class="exercise"><h3>${title}</h3><p>Selecciona una subcategoría.</p><div class="vocabulary-topics">${subcategories.map((subcategory) => `<button type="button" class="vocabulary-topic-option" data-id="${escapeHtml(subcategory.id)}"><strong>${escapeHtml(subcategory.title)}</strong><small>${(subcategory.topics || []).length} temas · ${(subcategory.exercises || []).length} ejercicios</small></button>`).join('')}</div></div>`;
       topicView.querySelectorAll('[data-id]').forEach((button) => button.addEventListener('click', () => {
         const item = getItems().find((entry) => entry.id === button.dataset.id);
         if (item) selectItem(item);
@@ -89,7 +107,7 @@
 
     if (selectedItem.type === 'subcategory') {
       const topics = data.topics || [];
-      topicView.innerHTML = `<div class="exercise"><h3>${title}</h3><p>${escapeHtml(selectedItem.parent.title)} · subcategoría</p>${topics.length ? `<div class="vocabulary-topics">${topics.map((topic) => `<button type="button" class="vocabulary-topic-option" data-id="${escapeHtml(topic.id)}"><strong>${escapeHtml(topic.title)}</strong></button>`).join('')}</div>` : '<p>Esta subcategoría está preparada para recibir sus temas de vocabulario.</p>'}</div>`;
+      topicView.innerHTML = `<div class="exercise"><h3>${title}</h3><p>${escapeHtml(selectedItem.parent.title)} · subcategoría</p>${topics.length ? `<div class="vocabulary-topics">${topics.map((topic) => `<button type="button" class="vocabulary-topic-option" data-id="${escapeHtml(topic.id)}"><strong>${escapeHtml(topic.title)}</strong><small>${(topic.exercises || []).length} ejercicios</small></button>`).join('')}</div>` : '<p>Esta subcategoría está preparada para recibir sus temas de vocabulario.</p>'}</div>`;
       topicView.querySelectorAll('[data-id]').forEach((button) => button.addEventListener('click', () => {
         const item = getItems().find((entry) => entry.id === button.dataset.id);
         if (item) selectItem(item);
@@ -118,7 +136,25 @@
   }
 
   function renderAllCategories() {
-    topicsPanel.innerHTML = database.categories.map((category) => `<section class="vocabulary-category-group"><h3>${escapeHtml(category.title)}</h3>${(category.subcategories || []).map((subcategory) => `<button type="button" class="vocabulary-topic-option" data-id="${escapeHtml(subcategory.id)}"><strong>${escapeHtml(subcategory.title)}</strong><small>${(subcategory.topics || []).length} temas</small></button>`).join('')}</section>`).join('');
+    topicsPanel.innerHTML = database.categories.map((category, index) => `
+      <section class="vocabulary-category-group">
+        <button type="button" class="vocabulary-category-option" data-category-id="${escapeHtml(category.id)}" aria-expanded="${index === 0 ? 'true' : 'false'}">
+          <strong>${escapeHtml(category.title)}</strong><span aria-hidden="true">▾</span>
+        </button>
+        <div class="vocabulary-subcategories ${index === 0 ? '' : 'hidden'}" data-subcategories-for="${escapeHtml(category.id)}">
+          ${(category.subcategories || []).map((subcategory) => `<button type="button" class="vocabulary-topic-option" data-id="${escapeHtml(subcategory.id)}"><strong>${escapeHtml(subcategory.title)}</strong><small>${(subcategory.topics || []).length} temas</small></button>`).join('')}
+        </div>
+      </section>`).join('');
+
+    topicsPanel.querySelectorAll('[data-category-id]').forEach((button) => button.addEventListener('click', () => {
+      const categoryId = button.dataset.categoryId;
+      const subcategories = topicsPanel.querySelector(`[data-subcategories-for="${CSS.escape(categoryId)}"]`);
+      if (!subcategories) return;
+      const open = !subcategories.classList.contains('hidden');
+      subcategories.classList.toggle('hidden', open);
+      button.setAttribute('aria-expanded', String(!open));
+    }));
+
     topicsPanel.querySelectorAll('[data-id]').forEach((button) => button.addEventListener('click', () => {
       const item = getItems().find((entry) => entry.id === button.dataset.id);
       if (item) selectItem(item);
