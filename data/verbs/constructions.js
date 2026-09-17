@@ -107,7 +107,7 @@ window.COQ_PRONOMINAL_RULES=Object.freeze({
   'étendre':{fonctionDeSe:'COD',accord:'sujet'}
 });
 window.COQ_CONSTRUCTION_OPTIONS=Object.freeze([
-  {id:'non-pronomiale',label:'Verbos no pronominales'},
+  {id:'non-pronomiale',label:'Verbos no pronomiales'},
   {id:'pronomiale',label:'Verbos pronomiales'}
 ]);
 const COQ_CONSTRUCTION_RESOLVER=Object.freeze({
@@ -118,7 +118,7 @@ const COQ_CONSTRUCTION_RESOLVER=Object.freeze({
     if(!construction)return true;
     const isPronominal=this.isPronominal(record);
     if(construction==='pronomiale')return isPronominal;
-    if(construction==='non-pronomiale'||construction==='non-pronomiale')return !isPronominal;
+    if(construction==='non-pronomiale'||construction==='non-pronominale')return !isPronominal;
     return true;
   }
 });
