@@ -12,10 +12,12 @@
 .vocabulary-result small,.vocabulary-topic-option small{display:block;margin-top:3px;opacity:.68}
 .vocabulary-topics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1)}
 .vocabulary-category-group{display:block;margin-top:0}
-.vocabulary-category-option{display:flex;align-items:center;justify-content:space-between;font-weight:700}
+.vocabulary-category-option{display:flex;align-items:center;justify-content:space-between;font-weight:700;transition:background .15s ease,border-color .15s ease,box-shadow .15s ease}
+.vocabulary-category-option:hover,.vocabulary-category-option[aria-expanded="true"]{background:rgba(255,255,255,.11);border-color:rgba(255,255,255,.28);box-shadow:0 0 0 2px rgba(255,255,255,.05)}
 .vocabulary-category-option span{margin-left:12px;transition:transform .15s ease}
 .vocabulary-category-option[aria-expanded="true"] span{transform:rotate(180deg)}
 .vocabulary-subcategories{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px;padding-left:12px}
+.vocabulary-subcategories .vocabulary-topic-option{background:rgba(255,255,255,.06)}
 .vocabulary-mode{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:18px}
 .vocabulary-mode>span{margin-right:4px;font-weight:700}
 .mode-button{padding:9px 13px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:transparent;color:inherit;cursor:pointer;font:inherit}
