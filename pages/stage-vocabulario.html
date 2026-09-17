@@ -27,15 +27,34 @@
 <main class="container">
   <div class="breadcrumb"><a href="../index.html">Inicio</a> / Vocabulario</div>
   <section class="hero"><span class="eyebrow">Vocabulaire</span><h1>Explora el vocabulario francés</h1><p class="lead">Busca una palabra, explora un tema o practica el vocabulario que quieras aprender.</p></section>
-  <section class="section vocabulary-hub" aria-labelledby="vocab-search-title">
+  <section class="section vocabulary-hub" aria-labelledby="vocab-title">
     <div class="vocabulary-search-panel">
-      <label for="vocabularySearch">Buscar una palabra o un tema</label>
-      <div class="vocabulary-search-row">
-        <input id="vocabularySearch" type="search" autocomplete="off" placeholder="Ej.: animaux, chien, maison…" aria-controls="vocabularyResults" aria-expanded="false">
-        <button id="vocabularyBrowse" class="btn secondary" type="button" aria-expanded="false" aria-controls="vocabularyTopics">Todas las categorías ▾</button>
+      <div class="tabs vocabulary-tabs" role="tablist" aria-label="Modo de vocabulario">
+        <button class="tab active" id="vocabularyLearnTab" type="button" role="tab" aria-selected="true" aria-controls="vocabularyLearnPanel" data-vocabulary-tab="learn">Aprender vocabulario</button>
+        <button class="tab" id="vocabularyPracticeTab" type="button" role="tab" aria-selected="false" aria-controls="vocabularyPracticePanel" data-vocabulary-tab="practice">Practicar vocabulario</button>
       </div>
-      <div id="vocabularyResults" class="vocabulary-results" role="listbox" aria-label="Resultados de vocabulario"></div>
-      <div id="vocabularyTopics" class="vocabulary-topics hidden" aria-label="Categorías y subcategorías"></div>
+
+      <div class="vocabulary-controls">
+        <label for="vocabularySearch">Buscar una palabra</label>
+        <div class="vocabulary-search-row">
+          <input id="vocabularySearch" type="search" autocomplete="off" placeholder="Escribe una palabra en francés o español…" aria-controls="vocabularyResults" aria-expanded="false">
+          <button id="vocabularyBrowse" class="btn secondary" type="button" aria-expanded="false" aria-controls="vocabularyTopics">Todas las categorías ▾</button>
+        </div>
+        <div id="vocabularyResults" class="vocabulary-results" role="listbox" aria-label="Resultados de vocabulario"></div>
+        <div id="vocabularyTopics" class="vocabulary-topics hidden" aria-label="Categorías y subcategorías"></div>
+      </div>
+
+      <div id="vocabularyLearnPanel" class="vocabulary-tab-panel" role="tabpanel" aria-labelledby="vocabularyLearnTab">
+        <div id="vocabularyLearnContent" class="vocabulary-content" aria-live="polite">
+          <div id="vocabularyEmptyState" class="exercise"><h3>Selecciona una categoría o busca una palabra</h3><p>El vocabulario aparecerá aquí.</p></div>
+        </div>
+      </div>
+
+      <div id="vocabularyPracticePanel" class="vocabulary-tab-panel hidden" role="tabpanel" aria-labelledby="vocabularyPracticeTab">
+        <div id="vocabularyPracticeContent" class="vocabulary-content" aria-live="polite">
+          <div id="vocabularyPracticeEmptyState" class="exercise"><h3>Selecciona una categoría o busca una palabra</h3><p>Los ejercicios aparecerán aquí.</p></div>
+        </div>
+      </div>
     </div>
   </section>
 </main>
