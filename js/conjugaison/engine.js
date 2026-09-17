@@ -37,7 +37,7 @@
   function applyAgreement(pp,info,base,isPronominal,auxiliary,recordMeta){
     if(!A)return pp;
     if(isPronominal){
-      const ruleBase=recordMeta?.baseVerbId||recordMeta?.verbeBase||base;
+      const ruleBase=recordMeta?.baseVerbId||recordMeta?.infinitifBase||recordMeta?.verbeBase||recordMeta?.infinitif_base||base;
       const rule=window.COQ_PRONOMINAL_RULES?.[ruleBase];
       if(rule?.accord==='sujet'&&typeof A.applySubjectAgreement==='function')return A.applySubjectAgreement(pp,{gender:info.gender,number:info.number});
       return typeof A.stripAgreementMarkers==='function'?A.stripAgreementMarkers(pp):pp;
