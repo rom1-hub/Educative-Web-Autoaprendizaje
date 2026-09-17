@@ -14,13 +14,14 @@
   const searchInput = document.getElementById('vocabularySearch');
   const results = document.getElementById('vocabularyResults');
   const browseButton = document.getElementById('vocabularyBrowse');
+  const resetButton = document.getElementById('vocabularyReset');
   const topicsPanel = document.getElementById('vocabularyTopics');
   const learnContent = document.getElementById('vocabularyLearnContent');
   const practiceContent = document.getElementById('vocabularyPracticeContent');
   const learnEmptyState = document.getElementById('vocabularyEmptyState');
   const practiceEmptyState = document.getElementById('vocabularyPracticeEmptyState');
 
-  if (!searchInput || !results || !browseButton || !topicsPanel || !learnContent || !practiceContent || !learnEmptyState || !practiceEmptyState) return;
+  if (!searchInput || !results || !browseButton || !resetButton || !topicsPanel || !learnContent || !practiceContent || !learnEmptyState || !practiceEmptyState) return;
 
   const database = window.COQ_VOCABULARY_DATABASE;
   if (!database || !Array.isArray(database.categories)) return;
@@ -79,6 +80,23 @@
     topicsPanel.classList.add('hidden');
     browseButton.setAttribute('aria-expanded', 'false');
     renderContent();
+  }
+
+  function resetVocabulary() {
+    selectedItem = null;
+    searchInput.value = '';
+    results.innerHTML = '';
+    topicsPanel.innerHTML = '';
+    topicsPanel.classList.add('hidden');
+    searchInput.setAttribute('aria-expanded', 'false');
+    browseButton.setAttribute('aria-expanded', 'false');
+    learnContent.innerHTML = '';
+    practiceContent.innerHTML = '';
+    learnContent.appendChild(learnEmptyState);
+    practiceContent.appendChild(practiceEmptyState);
+    learnEmptyState.classList.remove('hidden');
+    practiceEmptyState.classList.remove('hidden');
+    searchInput.focus();
   }
 
   function renderEntries(entries) {
@@ -186,6 +204,8 @@
     browseButton.setAttribute('aria-expanded', String(!open));
     if (!open) renderAllCategories();
   });
+
+  resetButton.addEventListener('click', resetVocabulary);
 
   document.querySelectorAll('[data-vocabulary-tab]').forEach((button) => button.addEventListener('click', () => {
     mode = button.dataset.vocabularyTab;
