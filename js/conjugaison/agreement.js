@@ -49,12 +49,11 @@
       if(!rule || rule.accord==='aucun')return prefix+pp;
     }
     const base=lookupSubject(subject);
+    const explicitContext=lookupAgreementContext(subject);
+    if(explicitContext)return value;
     const genericNotation=LOOKUP_NOTATION[base];
     if(genericNotation)return prefix+pp+genericNotation;
-    const context=lookupAgreementContext(subject);
-    if(!context)return value;
-    const agreed=agree(pp,context,{type:isPronominal?'pronomiale':'non-pronomiale',baseVerb:ruleBase,auxiliaire:meta.auxiliaire});
-    return prefix+agreed;
+    return value;
   }
   window.COQ_CONJ_AGREEMENT={agree,applySubjectAgreement,stripAgreementMarkers,lookupAgreementContext,formatLookupCompoundForm};
 })();
