@@ -40,6 +40,7 @@
     imperative:Object.freeze(['tu','nous','vous'])
   });
   const VOWELS=/^[aeiouàâäéèêëîïôöùûüÿœæ]/i;
+  const VOWELS_OR_MUTE_H=/^[aeiouàâäéèêëîïôöùûüÿœæh]/i;
   function baseSubject(label){
     const s=String(label||'').trim();
     const withoutGender=s.replace(/\s*\([^)]*\)\s*$/,'').trim();
@@ -94,7 +95,7 @@
     const base=baseSubject(baseLabel);
     let result=baseLabel;
     if(mode==='subjonctif')result=subjonctifSubjects[base]||baseLabel;
-    if((result==='je'||result==='que je')&&VOWELS.test(String(form||'').trim()))result=result==='que je'?"que j'":"j'";
+    if((result==='je'||result==='que je')&&VOWELS_OR_MUTE_H.test(String(form||'').trim()))result=result==='que je'?"que j'":"j'";
     return result+(context?' '+context:'');
   }
   window.COQ_CONJ_PRONOUNS={subjectPronouns,baseSubject,subjectInfo,subjectVariants,imperativePronouns,subjonctifSubjects,subjectGroupFor,subjectSets,pronounFor,imperativePronounFor,contractPronoun,apply,subjectForMode};
