@@ -108,7 +108,6 @@
     {base:'remettre',infinitif:'se remettre'},
     {base:'joindre',infinitif:'se joindre'},
     {base:'rejoindre',infinitif:'se rejoindre'},
-    {base:'étendre',infinitif:"s'étendre"},
-    {base:'détendre',infinitif:'se détendre'}
+    {base:'étendre',infinitif:"s'étendre"}
   ]);
 })();
