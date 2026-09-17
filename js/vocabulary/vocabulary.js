@@ -136,12 +136,12 @@
   }
 
   function renderAllCategories() {
-    topicsPanel.innerHTML = database.categories.map((category, index) => `
+    topicsPanel.innerHTML = database.categories.map((category) => `
       <section class="vocabulary-category-group">
-        <button type="button" class="vocabulary-category-option" data-category-id="${escapeHtml(category.id)}" aria-expanded="${index === 0 ? 'true' : 'false'}">
+        <button type="button" class="vocabulary-category-option" data-category-id="${escapeHtml(category.id)}" aria-expanded="false">
           <strong>${escapeHtml(category.title)}</strong><span aria-hidden="true">▾</span>
         </button>
-        <div class="vocabulary-subcategories ${index === 0 ? '' : 'hidden'}" data-subcategories-for="${escapeHtml(category.id)}">
+        <div class="vocabulary-subcategories hidden" data-subcategories-for="${escapeHtml(category.id)}">
           ${(category.subcategories || []).map((subcategory) => `<button type="button" class="vocabulary-topic-option" data-id="${escapeHtml(subcategory.id)}"><strong>${escapeHtml(subcategory.title)}</strong><small>${(subcategory.topics || []).length} temas</small></button>`).join('')}
         </div>
       </section>`).join('');
