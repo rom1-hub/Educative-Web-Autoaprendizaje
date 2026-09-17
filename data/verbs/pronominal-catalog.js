@@ -39,6 +39,7 @@
     {base:'réveiller',infinitif:'se réveiller'},
     {base:'sentir',infinitif:'se sentir'},
     {base:'téléphoner',infinitif:'se téléphoner'},
+    {base:'parler',infinitif:'se parler'},
     {base:'arrêter',infinitif:"s'arrêter"},
     {base:'baisser',infinitif:'se baisser'},
     {base:'balader',infinitif:'se balader'},
