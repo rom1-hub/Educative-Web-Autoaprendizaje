@@ -69,7 +69,7 @@ Object.entries(pronominalExpectations).forEach(([verb,expected])=>{
 });
 
 const coiCompoundExpectations={
-  'se parler':{subject:'elle',answer:'s’est parlé'},
+  'se parler':{subject:'elle',answer:"s'est parlé"},
   'se téléphoner':{subject:'elles',answer:'se sont téléphoné'},
 };
 Object.entries(coiCompoundExpectations).forEach(([verb,expected])=>{
