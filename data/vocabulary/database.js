@@ -6,7 +6,7 @@
  * data/vocabulary/categories/.
  *
  * Camino:
- * categoría → subcategoría → tema → entrada
+ * categoría → subcategoría → entrada
  *
  * Los ejercicios no se almacenan aquí: reutilizarán los identificadores
  * de las entradas mediante el motor común de ejercicios.
@@ -19,7 +19,7 @@
     : [];
 
   const database = Object.freeze({
-    version: '2.0.0',
+    version: '3.0.0',
     categories: Object.freeze(categories)
   });
 
