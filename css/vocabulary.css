@@ -1,6 +1,6 @@
 /* Vocabulario: estilos exclusivos de la página dinámica */
 .vocabulary-hub{position:relative}
-.vocabulary-search-panel{margin-top:20px;padding:24px;border:1px solid rgba(255,255,255,.12);border-radius:18px;background:rgba(255,255,255,.035)}
+.vocabulary-search-panel{margin-top:20px;padding:24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--paper);box-shadow:0 8px 25px rgba(6,27,74,.045)}
 .vocabulary-tabs{margin-bottom:22px}
 .vocabulary-tabs .tab{cursor:pointer}
 .vocabulary-controls{padding-top:2px}
