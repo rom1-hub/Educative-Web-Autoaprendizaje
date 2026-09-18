@@ -6,8 +6,7 @@
 .vocabulary-controls{padding-top:2px}
 .vocabulary-controls>label{display:block;margin-bottom:9px;font-weight:700}
 .vocabulary-search-row{display:flex;gap:12px;align-items:stretch}
-.vocabulary-search-row input{flex:1;min-width:0;padding:14px 16px;border:1px solid rgba(255,255,255,.18);border-radius:12px;background:rgba(0,0,0,.12);color:inherit;font:inherit}
-.vocabulary-search-row input:focus{outline:2px solid var(--cyan);outline-offset:1px}
+.vocabulary-search-row input{flex:1;min-width:0;padding:12px;border:1px solid var(--line);border-radius:13px;background:#fff;outline:none;color:var(--ink);font:inherit}
 .vocabulary-results{display:grid;gap:8px;margin-top:10px}
 .vocabulary-result,.vocabulary-topic-option,.vocabulary-category-option{width:100%;padding:13px 15px;border:1px solid var(--line);border-radius:14px;background:var(--paper);color:var(--ink);text-align:left;cursor:pointer;font:inherit;box-shadow:0 4px 14px rgba(6,27,74,.045);transition:transform .18s ease,background .18s ease,border-color .18s ease,box-shadow .18s ease}
 .vocabulary-result:hover,.vocabulary-topic-option:hover,.vocabulary-category-option:hover{transform:translateY(-1px);background:var(--soft-blue);border-color:#B9DCEB;box-shadow:0 8px 20px rgba(6,27,74,.08)}
