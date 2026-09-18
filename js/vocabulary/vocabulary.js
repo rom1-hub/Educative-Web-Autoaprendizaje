@@ -4,7 +4,7 @@
  * Arquitectura:
  * categoría → subcategoría → entradas → ejercicios universales
  *
- * Los cuatro ejercicios reutilizan exclusivamente las entradas de la
+ * Los ejercicios reutilizan exclusivamente las entradas de la
  * subcategoría seleccionada. No existen listas de vocabulario duplicadas
  * dentro de la lógica de ejercicios.
  */
@@ -64,7 +64,9 @@
   }
 
   function displayWord(entry) {
-    return escapeHtml(entry.word || '');
+    const article = String(entry.articleFr || '').trim();
+    const word = String(entry.word || '').trim();
+    return escapeHtml([article, word].filter(Boolean).join(' '));
   }
 
   function getItems() {
@@ -645,7 +647,7 @@
     if (activeExercise === 'match') renderMatchExercise(entries);
     else if (activeExercise === 'write') renderWriteExercise(entries);
     else if (activeExercise === 'audio') renderAudioExercise(entries);
-    else renderMemoryExercise(entries);
+    else renderMatchExercise(entries);
   }
 
   function renderPractice(item) {
