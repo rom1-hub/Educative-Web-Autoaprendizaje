@@ -114,7 +114,7 @@
             matches.push({
               type: 'entry',
               id: entry.id,
-              title: `${entry.articleFr || ''} ${entry.word || ''}`.trim(),
+              title: `${entry.articleFr || ''} ${entry.word || ''} / ${entry.articleEs || ''} ${entry.translation || ''}`.trim(),
               category: `${category.title} · ${subcategory.title}`,
               parent: subcategory,
               categoryData: category,
