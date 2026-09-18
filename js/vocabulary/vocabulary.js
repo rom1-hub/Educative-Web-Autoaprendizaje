@@ -224,7 +224,7 @@
     return `<div class="vocabulary-entry-list">${entries.map((entry) => `
       <article class="vocabulary-entry">
         <div>
-          <strong>${escapeHtml(entry.articleFr || '')} ${escapeHtml(entry.word || '')}</strong>
+          <strong>${entry.emoji ? escapeHtml(entry.emoji) + ' ' : ''}${escapeHtml(entry.articleFr || '')} ${escapeHtml(entry.word || '')}</strong>
           <span>${escapeHtml(entry.articleEs || '')} ${escapeHtml(entry.translation || '')}</span>
         </div>
       </article>`).join('')}</div>`;
