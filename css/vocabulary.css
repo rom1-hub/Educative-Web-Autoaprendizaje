@@ -219,8 +219,19 @@
   font-size:2rem;
   color:var(--navy);
 }
-.vocabulary-write-input{
+.vocabulary-write-answer-label{
+  display:block;
   width:min(100%,420px);
+  margin:0 auto 7px;
+  color:var(--ink);
+  font-size:.94rem;
+  font-weight:600;
+  text-align:left;
+}
+.vocabulary-write-input{
+  display:block;
+  width:min(100%,420px);
+  margin:0 auto;
   padding:13px 15px;
   border:1px solid var(--line);
   border-radius:12px;
