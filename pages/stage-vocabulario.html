@@ -6,7 +6,7 @@
   <meta name="description" content="Coq — explorar y practicar vocabulario de francés.">
   <title>Vocabulario · Coq</title>
   <link rel="stylesheet" href="../css/styles.css">
-  <link rel="stylesheet" href="../css/vocabulary.css?v=20260919-6">
+  <link rel="stylesheet" href="../css/vocabulary.css?v=20260919-7">
 </head>
 <body>
 <header class="header"><nav class="nav">
@@ -37,10 +37,12 @@
       <div class="vocabulary-controls">
         <label for="vocabularySearch">Buscar una palabra</label>
         <div class="vocabulary-search-row">
-          <input id="vocabularySearch" type="search" autocomplete="off" placeholder="Escribe una palabra en francés o español…" aria-controls="vocabularyResults" aria-expanded="false">
+          <div class="vocabulary-search-input-wrap">
+            <input id="vocabularySearch" type="search" autocomplete="off" placeholder="Escribe una palabra en francés o español…" aria-controls="vocabularyResults" aria-expanded="false">
+            <div id="vocabularyResults" class="vocabulary-results" role="listbox" aria-label="Resultados de vocabulario"></div>
+          </div>
           <button id="vocabularyBrowse" class="btn secondary" type="button" aria-expanded="false" aria-controls="vocabularyTopics">Todas las categorías ▾</button>
           <button id="vocabularyReset" class="btn secondary" type="button">Reiniciar</button>
-          <div id="vocabularyResults" class="vocabulary-results" role="listbox" aria-label="Resultados de vocabulario"></div>
         </div>
       </div>
     </div>
