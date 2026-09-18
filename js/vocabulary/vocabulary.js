@@ -219,7 +219,7 @@
           parent: found.category,
           data: found.subcategory
         };
-        searchInput.value = found.subcategory.title;
+        searchInput.value = item.data.word;
         renderPracticeSubcategory(selectedItem);
         return;
       }
@@ -694,6 +694,24 @@
     if (!selectedItem) return;
 
     if (selectedItem.type === 'entry') {
+      if (mode === 'practice' && selectedItem.parent) {
+        const found = getSubcategoryById(selectedItem.parent.id);
+        if (found) {
+          const entryWord = selectedItem.data.word;
+          selectedItem = {
+            type: 'subcategory',
+            id: found.subcategory.id,
+            title: found.subcategory.title,
+            category: found.category.title,
+            parent: found.category,
+            data: found.subcategory
+          };
+          searchInput.value = entryWord;
+          renderPracticeSubcategory(selectedItem);
+          return;
+        }
+      }
+
       renderWordResult(selectedItem);
       return;
     }
