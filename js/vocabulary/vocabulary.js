@@ -65,7 +65,7 @@
   }
 
   function displayWord(entry) {
-    return `${entry.articleFr ? escapeHtml(entry.articleFr) + ' ' : ''}${escapeHtml(entry.word || '')}`.trim();
+    return escapeHtml(entry.word || '');
   }
 
   function getItems() {
