@@ -486,11 +486,14 @@
     let correctCount = 0;
 
     practiceContent.innerHTML = `${exerciseHeader(EXERCISES[1])}
-      <div class="vocabulary-exercise-meta"><span>15 palabras</span><span class="vocabulary-write-progress">1 / ${selected.length}</span></div>
+      <div class="vocabulary-exercise-meta">
+        <span>15 palabras</span>
+        <span class="vocabulary-write-progress">1 / ${selected.length}</span>
+      </div>
       <div class="vocabulary-write-card">
         <span class="vocabulary-write-label">Escribe en francés:</span>
         <strong class="vocabulary-write-prompt"></strong>
-        <label class="sr-only" for="vocabularyWriteInput">Respuesta en francés</label>
+        <label class="vocabulary-write-answer-label" for="vocabularyWriteInput">Respuesta en francés</label>
         <input id="vocabularyWriteInput" class="vocabulary-write-input" type="text" autocomplete="off" spellcheck="false">
         <button type="button" class="btn primary" data-check-write>Comprobar</button>
         <div class="vocabulary-write-feedback" aria-live="polite"></div>
@@ -525,6 +528,7 @@
 
     function submit() {
       if (input.disabled) return;
+
       const entry = selected[index];
       const answer = normalize(input.value);
       const expected = normalize(entry.word);
@@ -551,6 +555,7 @@
     input.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') submit();
     });
+
     showQuestion();
   }
 
