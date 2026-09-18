@@ -360,7 +360,7 @@
     results.innerHTML = matches.map((item, index) => {
       if (item.type === 'entry') {
         return `<button type="button" class="vocabulary-result" data-result-index="${index}">
-          <strong>${item.data.emoji ? escapeHtml(item.data.emoji) + " " : ""}${escapeHtml(item.title)} / ${escapeHtml(item.data.articleEs || "")} ${escapeHtml(item.data.translation || "")}</strong>
+          <strong>${item.data.emoji ? escapeHtml(item.data.emoji) + " " : ""}${escapeHtml(item.title)}</strong>
           <small>${escapeHtml(item.category)}</small>
         </button>`;
       }
