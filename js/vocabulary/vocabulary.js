@@ -129,9 +129,7 @@
     }
 
     if (item.type === 'subcategory') {
-      const topics = data.topics || [];
-      learnContent.innerHTML = `<div class="vocabulary-result-content"><div class="section-head"><div><span class="tag">Subcategoría</span><h2>${title}</h2></div><p>${escapeHtml(item.parent.title)}</p></div>${topics.length ? `<div class="vocabulary-topics">${topics.map((topic) => `<button type="button" class="vocabulary-topic-option" data-id="${escapeHtml(topic.id)}"><strong>${escapeHtml(topic.title)}</strong><small>${(topic.entries || []).length} palabras</small></button>`).join('')}</div>` : renderEntries(getEntries(item))}</div>`;
-      bindItemButtons(learnContent);
+      learnContent.innerHTML = `<div class="vocabulary-result-content"><div class="section-head"><div><span class="tag">Subcategoría</span><h2>${title}</h2></div><p>${escapeHtml(item.parent.title)}</p></div>${renderEntries(getEntries(item))}</div>`;
       return;
     }
 
