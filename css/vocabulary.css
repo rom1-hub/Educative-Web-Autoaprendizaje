@@ -196,15 +196,16 @@
   text-align:center;
 }
 
-.vocabulary-match-list{
+.vocabulary-match-single .vocabulary-match-list{
   display:grid;
   gap:10px;
 }
 
-.vocabulary-match-card{
+.vocabulary-match-single .vocabulary-match-card{
   position:relative;
   display:flex;
   align-items:center;
+  justify-content:center;
   width:100%;
   min-height:54px;
   padding:12px 15px;
@@ -215,23 +216,18 @@
   font:inherit;
   font-weight:700;
   cursor:pointer;
-  text-align:left;
+  text-align:center;
   box-shadow:0 2px 8px rgba(6,27,74,.025);
   transition:transform .16s ease,background .16s ease,border-color .16s ease,box-shadow .16s ease,opacity .16s ease;
 }
 
-.vocabulary-match-target{
-  justify-content:center;
-  text-align:center;
-}
-
-.vocabulary-match-card:hover{
+.vocabulary-match-single .vocabulary-match-card:hover{
   transform:translateY(-1px);
   border-color:#b8d4e2;
   box-shadow:0 7px 16px rgba(6,27,74,.07);
 }
 
-.vocabulary-match-card.matched{
+.vocabulary-match-single .vocabulary-match-card.matched{
   background:#f1faf3;
   border-color:#8bc59a;
   color:#23643a;
@@ -239,68 +235,13 @@
   cursor:default;
 }
 
-.vocabulary-match-card.wrong{
+.vocabulary-match-single .vocabulary-match-card.wrong{
   border-color:#e3a0a0;
   background:#fff8f8;
   animation:vocabulary-shake .35s ease;
 }
 
-@keyframes vocabulary-shake{
-  0%,100%{transform:translateX(0)}
-  25%{transform:translateX(-4px)}
-  75%{transform:translateX(4px)}
-}
-
-@media (max-width:760px){
-  .vocabulary-exercise-tabs{
-    grid-template-columns:1fr;
-    gap:6px;
-    border-bottom:0;
-  }
-
-  .vocabulary-exercise-tab{
-    min-height:58px;
-    border-bottom:1px solid var(--line);
-    border-radius:13px;
-    text-align:left;
-  }
-
-  .vocabulary-exercise-tab.active::after{
-    left:0;
-    top:9px;
-    right:auto;
-    bottom:9px;
-    width:3px;
-    height:auto;
-    border-radius:0 4px 4px 0;
-  }
-
-  .vocabulary-exercise-head{
-    display:block;
-    padding-top:22px;
-  }
-
-  .vocabulary-exercise-head p{
-    margin-top:8px;
-  }
-
-  .vocabulary-exercise-meta{
-    margin-top:10px;
-  }
-
-  .vocabulary-exercise-actions{
-    justify-content:center;
-  }
-
-  .vocabulary-match-board{
-    grid-template-columns:1fr;
-  }
-
-  .vocabulary-match-column{
-    padding:15px;
-  }
-
-  .vocabulary-write-card,
+.vocabulary-write-card,
   .vocabulary-audio-card{
     padding:26px 18px 24px;
     border-radius:17px;
