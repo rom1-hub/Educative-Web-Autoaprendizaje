@@ -1,7 +1,7 @@
 /* Vocabulario: estilos exclusivos de la página dinámica */
 .vocabulary-hub{position:relative}
 .vocabulary-search-panel{margin-top:20px;padding:24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--paper);box-shadow:0 8px 25px rgba(6,27,74,.045)}
-.vocabulary-tabs{margin-bottom:22px}
+.vocabulary-tabs{margin-bottom:28px}
 .vocabulary-tabs .tab{cursor:pointer}
 .vocabulary-controls{padding-top:2px}
 .vocabulary-controls>label{display:block;margin-bottom:9px;font-weight:700}
@@ -24,7 +24,7 @@
 .vocabulary-subcategories{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px;padding-left:12px}
 .vocabulary-subcategories .vocabulary-topic-option{background:var(--paper)}
 .vocabulary-subcategories .vocabulary-topic-option:hover{background:var(--soft-blue)}
-.vocabulary-tab-panel{margin-top:20px}
+.vocabulary-tab-panel{margin-top:0}
 .vocabulary-result-content{padding-top:4px}
 .vocabulary-entry-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
 .vocabulary-entry{padding:15px 16px;border:1px solid var(--line);border-radius:14px;background:var(--paper);box-shadow:0 4px 14px rgba(6,27,74,.045)}
