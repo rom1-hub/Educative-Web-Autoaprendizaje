@@ -1,35 +1,28 @@
 /*
- * COQ — Base de datos de Vocabulario
+ * COQ — Registro de la base de datos de Vocabulario
  *
- * Fuente de verdad estructural del vocabulario.
- * La interfaz no contiene categorías ni subcategorías hardcodeadas.
+ * Este archivo compone las categorías disponibles.
+ * El contenido de cada categoría vive en su propio archivo dentro de
+ * data/vocabulary/categories/.
  *
- * Jerarquía:
- * categoría → subcategoría → tema → palabras
- * Los ejercicios pertenecen a una subcategoría y/o a un tema.
+ * Camino:
+ * categoría → subcategoría → tema → entrada
+ *
+ * Los ejercicios no se almacenan aquí: reutilizarán los identificadores
+ * de las entradas mediante el motor común de ejercicios.
  */
 (function () {
   'use strict';
 
-  const database = {
-    version: '1.1.0',
-    categories: [
-      {
-        id: 'animals',
-        title: 'Animales',
-        subcategories: [
-          { id: 'animals-domestic', title: 'Animales domésticos', topics: [], exercises: [] },
-          { id: 'animals-farm', title: 'Animales de granja', topics: [], exercises: [] },
-          { id: 'animals-wild', title: 'Animales salvajes', topics: [], exercises: [] },
-          { id: 'animals-marine', title: 'Animales marinos', topics: [], exercises: [] },
-          { id: 'animals-birds', title: 'Aves', topics: [], exercises: [] },
-          { id: 'animals-insects', title: 'Insectos', topics: [], exercises: [] },
-          { id: 'animals-reptiles-amphibians', title: 'Reptiles y anfibios', topics: [], exercises: [] }
-        ]
-      }
-    ]
-  };
+  const categories = Array.isArray(window.COQ_VOCABULARY_CATEGORIES)
+    ? window.COQ_VOCABULARY_CATEGORIES
+    : [];
 
-  window.COQ_VOCABULARY_DATABASE = Object.freeze(database);
+  const database = Object.freeze({
+    version: '2.0.0',
+    categories: Object.freeze(categories)
+  });
+
+  window.COQ_VOCABULARY_DATABASE = database;
   window.COQ_VOCABULARY_DATABASE_READY = Promise.resolve(database);
 })();
