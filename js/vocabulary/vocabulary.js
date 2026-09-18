@@ -395,105 +395,88 @@
 
   function renderMatchExercise(entries) {
     const selected = sampleEntries(entries);
-    const french = shuffle(selected);
-    const spanish = shuffle(selected);
+    let index = 0;
+    let matched = 0;
 
     practiceContent.innerHTML = `${exerciseHeader(EXERCISES[0])}
-      <div class="vocabulary-exercise-meta"><span>15 palabras</span><span class="vocabulary-match-progress">0 / ${selected.length} asociadas</span></div>
-      <div class="vocabulary-match-board" data-match-board>
-        <div class="vocabulary-match-column">
-          <h3>Français</h3>
-          <div class="vocabulary-match-list">
-            ${french.map((entry) => `
-              <button type="button" class="vocabulary-match-card vocabulary-match-source"
-                draggable="true" data-match-id="${escapeHtml(entry.id)}">
-                ${displayWord(entry)}
-              </button>`).join('')}
-          </div>
+      <div class="vocabulary-exercise-meta">
+        <span>15 palabras</span>
+        <span class="vocabulary-match-progress">0 / ${selected.length} asociadas</span>
+      </div>
+      <div class="vocabulary-match-single" data-match-board>
+        <div class="vocabulary-match-current">
+          <span class="vocabulary-match-label">Français</span>
+          <button type="button" class="vocabulary-match-card vocabulary-match-source" data-current-source disabled></button>
+          <p class="vocabulary-match-instruction">Selecciona su traducción en español.</p>
         </div>
-        <div class="vocabulary-match-column">
-          <h3>Español</h3>
-          <div class="vocabulary-match-list">
-            ${spanish.map((entry) => `
-              <button type="button" class="vocabulary-match-card vocabulary-match-target"
-                data-match-id="${escapeHtml(entry.id)}">
-                ${escapeHtml(entry.articleEs || '')} ${escapeHtml(entry.translation || '')}
-              </button>`).join('')}
-          </div>
+        <div class="vocabulary-match-target-panel">
+          <span class="vocabulary-match-label">Español</span>
+          <div class="vocabulary-match-list" data-match-options></div>
         </div>
       </div>
-      <div class="vocabulary-exercise-actions"><button type="button" class="btn secondary" data-restart-exercise>Generar otras palabras</button></div>`;
+      <div class="vocabulary-exercise-actions">
+        <button type="button" class="btn secondary" data-restart-exercise>Generar otras palabras</button>
+      </div>`;
 
-    let matched = 0;
-    let draggingId = null;
-    const board = practiceContent.querySelector('[data-match-board]');
+    const source = practiceContent.querySelector('[data-current-source]');
+    const options = practiceContent.querySelector('[data-match-options]');
+    const progress = practiceContent.querySelector('.vocabulary-match-progress');
 
-    function tryMatch(source, target) {
-      if (!source || !target || source.disabled || target.disabled) return;
-      const correct = source.dataset.matchId === target.dataset.matchId;
-      if (correct) {
-        source.disabled = true;
-        target.disabled = true;
-        source.classList.add('matched');
-        target.classList.add('matched');
-        matched += 1;
-        practiceContent.querySelector('.vocabulary-match-progress').textContent = `${matched} / ${selected.length} asociadas`;
-        if (matched === selected.length) {
-          practiceContent.querySelector('.vocabulary-exercise-complete')?.remove();
-          practiceContent.insertAdjacentHTML('beforeend', '<div class="vocabulary-exercise-complete" role="status">Completado: todas las parejas están asociadas.</div>');
-        }
-      } else {
-        source.classList.add('wrong');
-        target.classList.add('wrong');
-        window.setTimeout(() => {
-          source.classList.remove('wrong');
-          target.classList.remove('wrong');
-        }, 450);
-      }
+    function buildOptions(entry) {
+      const distractors = shuffle(selected.filter((item) => item.id !== entry.id)).slice(0, Math.min(3, selected.length - 1));
+      return shuffle([entry, ...distractors]);
     }
 
-    board.querySelectorAll('.vocabulary-match-source').forEach((source) => {
-      source.addEventListener('dragstart', (event) => {
-        draggingId = source.dataset.matchId;
-        event.dataTransfer.setData('text/plain', draggingId);
-        source.classList.add('dragging');
-      });
-      source.addEventListener('dragend', () => {
-        draggingId = null;
-        source.classList.remove('dragging');
-      });
-    });
+    function showQuestion() {
+      const entry = selected[index];
+      source.innerHTML = displayWord(entry);
+      source.dataset.matchId = entry.id;
+      options.innerHTML = buildOptions(entry).map((option) => `
+        <button type="button" class="vocabulary-match-card vocabulary-match-target" data-match-id="${escapeHtml(option.id)}">
+          ${escapeHtml(option.articleEs || '')} ${escapeHtml(option.translation || '')}
+        </button>`).join('');
 
-    board.querySelectorAll('.vocabulary-match-target').forEach((target) => {
-      target.addEventListener('dragover', (event) => {
-        event.preventDefault();
-        target.classList.add('drag-over');
-      });
-      target.addEventListener('dragleave', () => target.classList.remove('drag-over'));
-      target.addEventListener('drop', (event) => {
-        event.preventDefault();
-        target.classList.remove('drag-over');
-        const id = event.dataTransfer.getData('text/plain') || draggingId;
-        const source = board.querySelector(`.vocabulary-match-source[data-match-id="${CSS.escape(id)}"]`);
-        tryMatch(source, target);
-      });
-      target.addEventListener('click', () => {
-        const source = board.querySelector('.vocabulary-match-source.selected');
-        if (source) {
-          source.classList.remove('selected');
-          tryMatch(source, target);
-        }
-      });
-    });
+      options.querySelectorAll('.vocabulary-match-target').forEach((target) => {
+        target.addEventListener('click', () => {
+          if (target.disabled) return;
 
-    board.querySelectorAll('.vocabulary-match-source').forEach((source) => {
-      source.addEventListener('click', () => {
-        if (source.disabled) return;
-        board.querySelectorAll('.vocabulary-match-source.selected').forEach((item) => item.classList.remove('selected'));
-        source.classList.add('selected');
-      });
-    });
+          const correct = target.dataset.matchId === entry.id;
 
+          if (correct) {
+            target.disabled = true;
+            target.classList.add('matched');
+            source.classList.add('matched');
+            matched += 1;
+            progress.textContent = `${matched} / ${selected.length} asociadas`;
+
+            window.setTimeout(() => {
+              index += 1;
+              if (index >= selected.length) finish();
+              else {
+                source.classList.remove('matched');
+                showQuestion();
+              }
+            }, 450);
+          } else {
+            target.classList.add('wrong');
+            window.setTimeout(() => target.classList.remove('wrong'), 400);
+          }
+        });
+      });
+    }
+
+    function finish() {
+      practiceContent.querySelector('[data-match-board]').innerHTML = `
+        <div class="vocabulary-exercise-final">
+          <strong>Ejercicio terminado</strong>
+          <p>Todas las parejas están asociadas.</p>
+          <p>Resultado: ${matched} / ${selected.length}</p>
+          <button type="button" class="btn secondary" data-restart-exercise>Generar otras palabras</button>
+        </div>`;
+      bindRestartButton();
+    }
+
+    showQuestion();
     bindRestartButton();
   }
 
