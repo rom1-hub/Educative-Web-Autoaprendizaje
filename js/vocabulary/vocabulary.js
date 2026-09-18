@@ -203,12 +203,30 @@
   }
 
   function selectEntry(item) {
-    selectedItem = item;
     results.innerHTML = '';
-    searchInput.value = item.data.word;
     searchInput.setAttribute('aria-expanded', 'false');
     topicsPanel.classList.add('hidden');
     browseButton.setAttribute('aria-expanded', 'false');
+
+    if (mode === 'practice' && item.parent) {
+      const found = getSubcategoryById(item.parent.id);
+      if (found) {
+        selectedItem = {
+          type: 'subcategory',
+          id: found.subcategory.id,
+          title: found.subcategory.title,
+          category: found.category.title,
+          parent: found.category,
+          data: found.subcategory
+        };
+        searchInput.value = found.subcategory.title;
+        renderPracticeSubcategory(selectedItem);
+        return;
+      }
+    }
+
+    selectedItem = item;
+    searchInput.value = item.data.word;
     renderWordResult(item);
   }
 
