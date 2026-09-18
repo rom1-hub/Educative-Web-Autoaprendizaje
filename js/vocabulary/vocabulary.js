@@ -18,10 +18,7 @@
   const topicsPanel = document.getElementById('vocabularyTopics');
   const learnContent = document.getElementById('vocabularyLearnContent');
   const practiceContent = document.getElementById('vocabularyPracticeContent');
-  const learnEmptyState = document.getElementById('vocabularyEmptyState');
-  const practiceEmptyState = document.getElementById('vocabularyPracticeEmptyState');
-
-  if (!searchInput || !results || !browseButton || !resetButton || !topicsPanel || !learnContent || !practiceContent || !learnEmptyState || !practiceEmptyState) return;
+  if (!searchInput || !results || !browseButton || !resetButton || !topicsPanel || !learnContent || !practiceContent) return;
 
   const database = window.COQ_VOCABULARY_DATABASE;
   if (!database || !Array.isArray(database.categories)) return;
@@ -98,13 +95,9 @@
     topicsPanel.classList.add('hidden');
     browseButton.setAttribute('aria-expanded', 'false');
 
-    // Eliminar el contenido seleccionado y volver al estado inicial.
+    // Eliminar el contenido seleccionado y dejar ambos paneles vacíos.
     learnContent.innerHTML = '';
     practiceContent.innerHTML = '';
-    learnContent.appendChild(learnEmptyState);
-    practiceContent.appendChild(practiceEmptyState);
-    learnEmptyState.classList.remove('hidden');
-    practiceEmptyState.classList.remove('hidden');
 
     // Reiniciar también el modo para que el botón deje la página
     // exactamente en su estado inicial.
@@ -167,8 +160,6 @@
 
   function renderContent() {
     if (!selectedItem) return;
-    learnEmptyState.classList.add('hidden');
-    practiceEmptyState.classList.add('hidden');
     if (mode === 'learn') renderLearn(selectedItem);
     else renderPractice(selectedItem);
   }
