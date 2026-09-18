@@ -12,7 +12,9 @@
 .vocabulary-result:hover,.vocabulary-topic-option:hover,.vocabulary-category-option:hover{transform:translateY(-1px);background:var(--soft-blue);border-color:#B9DCEB;box-shadow:0 8px 20px rgba(6,27,74,.08)}
 .vocabulary-result strong,.vocabulary-topic-option strong,.vocabulary-category-option strong{display:block}
 .vocabulary-result small,.vocabulary-topic-option small{display:block;margin-top:3px;color:var(--muted);opacity:1}
-.vocabulary-topics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1)}
+.vocabulary-topics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:20px}
+.vocabulary-topics-panel{margin-bottom:8px}
+.vocabulary-results:empty{display:none}
 #vocabularyBrowse{transition:transform .18s ease,background .18s ease,border-color .18s ease,box-shadow .18s ease}
 #vocabularyBrowse:hover{transform:translateY(-1px)}
 #vocabularyBrowse[aria-expanded="true"]{background:var(--soft-blue);color:var(--blue);border-color:#B9DCEB;box-shadow:0 6px 18px rgba(0,123,216,.09)}
@@ -25,7 +27,7 @@
 .vocabulary-subcategories .vocabulary-topic-option{background:var(--paper)}
 .vocabulary-subcategories .vocabulary-topic-option:hover{background:var(--soft-blue)}
 .vocabulary-tab-panel{margin-top:0}
-.vocabulary-result-content{padding-top:4px}
+.vocabulary-result-content{padding-top:20px}
 .vocabulary-entry-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
 .vocabulary-entry{padding:15px 16px;border:1px solid var(--line);border-radius:14px;background:var(--paper);box-shadow:0 4px 14px rgba(6,27,74,.045)}
 .vocabulary-entry strong{display:block;font-size:1.05rem;color:var(--navy)}
