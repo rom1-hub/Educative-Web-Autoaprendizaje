@@ -114,7 +114,7 @@
 
   function renderEntries(entries) {
     if (!entries.length) return '<p class="vocabulary-no-results">Este contenido todavía no tiene palabras cargadas.</p>';
-    return `<div class="vocabulary-entry-list">${entries.map((entry) => `<article class="vocabulary-entry"><div><strong>${escapeHtml(entry.word || '')}</strong>${entry.translation ? `<span>${escapeHtml(entry.translation)}</span>` : ''}</div>${entry.definition ? `<p>${escapeHtml(entry.definition)}</p>` : ''}</article>`).join('')}</div>`;
+    return `<div class="vocabulary-entry-list">${entries.map((entry) => `<article class="vocabulary-entry"><div><strong>${escapeHtml(entry.articleFr || '')} ${escapeHtml(entry.word || '')}</strong>${entry.translation ? `<span>${escapeHtml(entry.articleEs || '')} ${escapeHtml(entry.translation)}</span>` : ''}</div></article>`).join('')}</div>`;
   }
 
   function renderLearn(item) {
