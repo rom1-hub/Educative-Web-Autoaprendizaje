@@ -32,7 +32,7 @@
 .vocabulary-entry{padding:15px 16px;border:1px solid var(--line);border-radius:14px;background:var(--paper);box-shadow:0 4px 14px rgba(6,27,74,.045)}
 .vocabulary-entry strong{display:block;font-size:1.05rem;color:var(--navy)}
 .vocabulary-entry span{display:block;margin-top:3px;color:var(--blue)}
-.vocabulary-entry p{margin:8px 0 0;color:var(--muted);font-size:.92rem}
+.vocabulary-word-context{margin-top:14px}
 .vocabulary-practice-card{margin-top:16px;padding:20px;border:1px solid var(--line);border-radius:16px;background:var(--paper)}
 .vocabulary-practice-card strong{display:block;color:var(--navy)}
 .vocabulary-practice-card p{margin:7px 0 14px;color:var(--muted)}
