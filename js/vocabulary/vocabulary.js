@@ -275,7 +275,7 @@
       </div>
       <div class="vocabulary-entry-list">
         <article class="vocabulary-entry">
-          <strong>${escapeHtml(entry.articleFr || '')} ${escapeHtml(entry.word || '')}</strong>
+          <strong>${entry.emoji ? escapeHtml(entry.emoji) + ' ' : ''}${escapeHtml(entry.articleFr || '')} ${escapeHtml(entry.word || '')}</strong>
           <span>${escapeHtml(entry.articleEs || '')} ${escapeHtml(entry.translation || '')}</span>
         </article>
       </div>
