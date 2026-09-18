@@ -29,8 +29,7 @@
   const EXERCISES = [
     { id: 'match', label: 'Ejercicio 1', title: 'Asociar palabras', description: 'Arrastra cada palabra francesa hasta su traducción.' },
     { id: 'write', label: 'Ejercicio 2', title: 'Escribir la palabra', description: 'Escribe en francés la palabra que aparece en español.' },
-    { id: 'audio', label: 'Ejercicio 3', title: 'Escuchar y reconocer', description: 'Escucha la palabra y selecciona la forma escrita correcta.' },
-    { id: 'memory', label: 'Ejercicio 4', title: 'Memoria', description: 'Encuentra las parejas francés ↔ español.' }
+    { id: 'audio', label: 'Ejercicio 3', title: 'Escuchar y reconocer', description: 'Escucha la palabra y selecciona la forma escrita correcta.' }
   ];
 
   let selectedItem = null;
@@ -629,74 +628,6 @@
 
     play.addEventListener('click', speakCurrent);
     showQuestion();
-  }
-
-  function renderMemoryExercise(entries) {
-    const selected = sampleEntries(entries);
-    const cards = shuffle(selected.flatMap((entry) => [
-      { key: `${entry.id}-fr`, pairId: entry.id, language: 'fr', text: displayWord(entry) },
-      { key: `${entry.id}-es`, pairId: entry.id, language: 'es', text: `${entry.articleEs || ''} ${entry.translation || ''}`.trim() }
-    ]));
-
-    practiceContent.innerHTML = `${exerciseHeader(EXERCISES[3])}
-      <div class="vocabulary-exercise-meta"><span>${selected.length} parejas</span><span class="vocabulary-memory-progress">0 / ${selected.length} parejas</span></div>
-      <div class="vocabulary-memory-board" data-memory-board></div>
-      <div class="vocabulary-exercise-actions"><button type="button" class="btn secondary" data-restart-exercise>Generar otras palabras</button></div>`;
-
-    const board = practiceContent.querySelector('[data-memory-board]');
-    board.innerHTML = cards.map((card) => `
-      <button type="button" class="vocabulary-memory-card" data-pair-id="${escapeHtml(card.pairId)}" data-language="${card.language}" data-key="${escapeHtml(card.key)}">
-        <span class="vocabulary-memory-card-inner">
-          <span class="vocabulary-memory-back" aria-hidden="true">?</span>
-          <span class="vocabulary-memory-front">${card.text}</span>
-        </span>
-      </button>`).join('');
-
-    let first = null;
-    let lock = false;
-    let matched = 0;
-
-    board.querySelectorAll('.vocabulary-memory-card').forEach((card) => {
-      card.addEventListener('click', () => {
-        if (lock || card.classList.contains('flipped') || card.classList.contains('matched')) return;
-
-        card.classList.add('flipped');
-
-        if (!first) {
-          first = card;
-          return;
-        }
-
-        const second = card;
-        lock = true;
-        const isPair = first.dataset.pairId === second.dataset.pairId &&
-          first.dataset.language !== second.dataset.language;
-
-        if (isPair) {
-          first.classList.add('matched');
-          second.classList.add('matched');
-          matched += 1;
-          practiceContent.querySelector('.vocabulary-memory-progress').textContent = `${matched} / ${selected.length} parejas`;
-          first = null;
-          lock = false;
-
-          if (matched === selected.length) {
-            practiceContent.insertAdjacentHTML('beforeend', '<div class="vocabulary-exercise-complete" role="status">Completado: encontraste todas las parejas.</div>');
-          }
-        } else {
-          first.classList.add('wrong');
-          second.classList.add('wrong');
-          window.setTimeout(() => {
-            first.classList.remove('flipped', 'wrong');
-            second.classList.remove('flipped', 'wrong');
-            first = null;
-            lock = false;
-          }, 800);
-        }
-      });
-    });
-
-    bindRestartButton();
   }
 
   function renderPracticeSubcategory(item) {
