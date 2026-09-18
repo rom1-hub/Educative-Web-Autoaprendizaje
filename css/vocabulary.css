@@ -82,12 +82,7 @@
 }
 
 .vocabulary-exercise-tab small{
-  display:block;
-  margin-top:5px;
-  color:inherit;
-  font-size:.82rem;
-  font-weight:600;
-  opacity:.68;
+  display:none;
 }
 
 .vocabulary-exercise-tab.active{
