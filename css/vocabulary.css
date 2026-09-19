@@ -31,6 +31,43 @@
 .vocabulary-result-content{padding-top:20px}
 .vocabulary-entry-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
 .vocabulary-entry{padding:15px 16px;border:1px solid var(--line);border-radius:14px;background:var(--paper);box-shadow:0 4px 14px rgba(6,27,74,.045)}
+.vocabulary-entry-word{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.vocabulary-entry-word strong{
+  flex:1;
+  min-width:0;
+}
+.vocabulary-pronunciation-button{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:34px;
+  height:34px;
+  padding:0;
+  border:1px solid #B9DCEB;
+  border-radius:50%;
+  background:var(--soft-blue);
+  color:var(--blue);
+  font:inherit;
+  font-size:.95rem;
+  cursor:pointer;
+  transition:transform .16s ease,background .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+.vocabulary-pronunciation-button:hover{
+  transform:translateY(-1px);
+  background:#DFF3FB;
+  border-color:#9ED3E8;
+  box-shadow:0 5px 12px rgba(0,123,216,.10);
+}
+.vocabulary-pronunciation-button:focus-visible{
+  outline:3px solid rgba(0,123,216,.16);
+  outline-offset:2px;
+}
+
 .vocabulary-entry strong{display:block;font-size:1.05rem;color:var(--navy)}
 .vocabulary-entry span{display:block;margin-top:3px;color:var(--blue)}
 .vocabulary-word-context{margin-top:14px}
