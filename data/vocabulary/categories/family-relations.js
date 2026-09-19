@@ -90,6 +90,15 @@
         entries: [
           {id:'family-classmate-m',word:'camarade',translation:'compañero / compañera',articleFr:'un',articleEs:'un'},
           {id:'family-acquaintance',word:'connaissance',translation:'conocido / conocida',articleFr:'une',articleEs:'una'},
+          {id:'family-friend-m',word:'ami',translation:'amigo',articleFr:'un',articleEs:'un'},
+          {id:'family-friend-f',word:'amie',translation:'amiga',articleFr:'une',articleEs:'una'},
+          {id:'family-copain-m',word:'copain',translation:'amigo',articleFr:'un',articleEs:'un'},
+          {id:'family-copine-f',word:'copine',translation:'amiga',articleFr:'une',articleEs:'una'},
+          {id:'family-boyfriend-informal-m',word:'petit copain',translation:'novio',articleFr:'un',articleEs:'un'},
+          {id:'family-girlfriend-informal-f',word:'petite copine',translation:'novia',articleFr:'une',articleEs:'una'},
+          {id:'family-widower-m',word:'veuf',translation:'viudo',articleFr:'un',articleEs:'un'},
+          {id:'family-widow-f',word:'veuve',translation:'viuda',articleFr:'une',articleEs:'una'},
+          {id:'family-colleague',word:'collègue',translation:'colega / compañero / compañera',articleFr:'un / une',articleEs:'un / una'},
           {id:'family-partner',word:'partenaire',translation:'compañero / pareja',articleFr:'un',articleEs:'un'}
         ]
       }
