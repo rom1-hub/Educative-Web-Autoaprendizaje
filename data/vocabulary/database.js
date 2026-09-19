@@ -153,11 +153,28 @@
     categories.forEach(assertCategory);
 
     const categoryIds = new Set();
+    const subcategoryIds = new Set();
+    const entryIds = new Set();
+
     categories.forEach((category) => {
       if (categoryIds.has(category.id)) {
         throw new Error('Vocabulario: id de categoría duplicado: "' + category.id + '".');
       }
       categoryIds.add(category.id);
+
+      (category.subcategories || []).forEach((subcategory) => {
+        if (subcategoryIds.has(subcategory.id)) {
+          throw new Error('Vocabulario: id de subcategoría duplicado globalmente: "' + subcategory.id + '".');
+        }
+        subcategoryIds.add(subcategory.id);
+
+        (subcategory.entries || []).forEach((entry) => {
+          if (entryIds.has(entry.id)) {
+            throw new Error('Vocabulario: id de entrada duplicado globalmente: "' + entry.id + '".');
+          }
+          entryIds.add(entry.id);
+        });
+      });
     });
 
     const database = Object.freeze({
