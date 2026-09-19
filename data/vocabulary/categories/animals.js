@@ -111,7 +111,7 @@
 { id: 'animal-dolphin', word: 'dauphin', translation: 'delfín', articleFr: 'un', articleEs: 'un' , emoji: '🐬' },
 { id: 'animal-whale', word: 'baleine', translation: 'ballena', articleFr: 'une', articleEs: 'una' , emoji: '🐋' },
 { id: 'animal-orca', word: 'orque', translation: 'orca', articleFr: 'une', articleEs: 'una' , emoji: '🐋' },
-{ id: 'animal-seahorse', word: 'hippocampe', translation: 'caballito de mar', articleFr: 'un', articleEs: 'un' , emoji: '🐴' },
+{ id: 'animal-seahorse', word: 'hippocampe', translation: 'caballito de mar', articleFr: 'un', articleEs: 'un' , emoji: null },
 { id: 'animal-octopus', word: 'pieuvre', translation: 'pulpo', articleFr: 'une', articleEs: 'un' , emoji: '🐙' },
 { id: 'animal-squid', word: 'calmar', translation: 'calamar', articleFr: 'un', articleEs: 'un' , emoji: '🦑' },
 { id: 'animal-jellyfish', word: 'méduse', translation: 'medusa', articleFr: 'une', articleEs: 'una' , emoji: '🪼' },
