@@ -18,6 +18,31 @@
       id: 'animals',
       title: 'Animales',
       src: '../data/vocabulary/categories/animals.js?v=20260919-arch'
+    }),
+    Object.freeze({
+      id: 'body-person',
+      title: 'Cuerpo y persona',
+      src: '../data/vocabulary/categories/body.js?v=20260919-6'
+    }),
+    Object.freeze({
+      id: 'house',
+      title: 'Casa',
+      src: '../data/vocabulary/categories/house.js?v=20260919-6'
+    }),
+    Object.freeze({
+      id: 'food',
+      title: 'Alimentación',
+      src: '../data/vocabulary/categories/food.js?v=20260919-6'
+    }),
+    Object.freeze({
+      id: 'clothing',
+      title: 'Ropa',
+      src: '../data/vocabulary/categories/clothing.js?v=20260919-6'
+    }),
+    Object.freeze({
+      id: 'city',
+      title: 'Ciudad',
+      src: '../data/vocabulary/categories/city.js?v=20260919-6'
     })
   ]);
 
@@ -63,6 +88,7 @@
 
     const subcategoryIds = new Set();
     const entryIds = new Set();
+    const lexicalForms = new Set();
 
     category.subcategories.forEach((subcategory) => {
       if (!subcategory || typeof subcategory !== 'object') {
@@ -94,10 +120,22 @@
     return category;
   }
 
+  function normalizeLexicalForm(entry) {
+    return [entry.articleFr, entry.word]
+      .filter(Boolean)
+      .join(' ')
+      .normalize('NFD')
+      .replace(/[\\u0300-\\u036f]/g, '')
+      .toLowerCase()
+      .replace(/\\s+/g, ' ')
+      .trim();
+  }
+
   function validateLoadedRegistry() {
     const categoryIds = new Set();
     const subcategoryIds = new Set();
     const entryIds = new Set();
+    const lexicalForms = new Set();
 
     registry.forEach((category) => {
       assertCategory(category);
@@ -210,7 +248,7 @@
   }
 
   const database = {
-    version: '5.0.0',
+    version: '5.1.0',
     schemaVersion: '1.0',
     categories: [],
     index: [],
