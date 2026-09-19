@@ -411,9 +411,6 @@
           <span class="vocabulary-match-label">Español</span>
           <div class="vocabulary-match-list" data-match-options></div>
         </div>
-      </div>
-      <div class="vocabulary-exercise-actions">
-        <button type="button" class="btn secondary" data-restart-exercise>Generar otras palabras</button>
       </div>`;
 
     const source = practiceContent.querySelector('[data-current-source]');
