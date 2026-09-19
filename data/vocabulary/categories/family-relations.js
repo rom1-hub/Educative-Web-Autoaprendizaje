@@ -10,6 +10,11 @@
         id: 'family-close',
         title: 'Familia cercana',
         entries: [
+          {id:'person-father',word:'père',translation:'padre',articleFr:'un',articleEs:'un'},
+          {id:'person-mother',word:'mère',translation:'madre',articleFr:'une',articleEs:'una'},
+          {id:'person-girl',word:'fille',translation:'hija',articleFr:'une',articleEs:'una'},
+          {id:'person-brother',word:'frère',translation:'hermano',articleFr:'un',articleEs:'un'},
+          {id:'person-sister',word:'sœur',translation:'hermana',articleFr:'une',articleEs:'una'},
           {id:'family-son',word:'fils',translation:'hijo',articleFr:'un',articleEs:'un'},
           {id:'family-grandfather',word:'grand-père',translation:'abuelo',articleFr:'un',articleEs:'un'},
           {id:'family-grandmother',word:'grand-mère',translation:'abuela',articleFr:'une',articleEs:'una'},
@@ -66,6 +71,7 @@
         title: 'Parentesco y generaciones',
         entries: [
           {id:'family-family',word:'famille',translation:'familia',articleFr:'une',articleEs:'una'},
+          {id:'family-generation',word:'génération',translation:'generación',articleFr:'une',articleEs:'una'},
           {id:'family-kin-member',word:'membre de la famille',translation:'miembro de la familia',articleFr:'un',articleEs:'un'},
           {id:'family-ancestor',word:'ancêtre',translation:'antepasado',articleFr:'un',articleEs:'un'},
           {id:'family-descendant',word:'descendant',translation:'descendiente',articleFr:'un',articleEs:'un'},
