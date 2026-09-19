@@ -56,14 +56,11 @@
           { id:'body-waist', word:'taille', translation:'estatura / cintura / talla', articleFr:'une', articleEs:'una' },
           { id:'body-hip', word:'hanche', translation:'cadera', articleFr:'une', articleEs:'una' },
           { id:'body-pelvis', word:'bassin', translation:'pelvis', articleFr:'un', articleEs:'una' },
-          { id:'body-leg', word:'jambe', translation:'pierna', articleFr:'une', articleEs:'una' },
-          { id:'body-thigh', word:'cuisse', translation:'muslo', articleFr:'une', articleEs:'un' },
-          { id:'body-knee', word:'genou', translation:'rodilla', articleFr:'un', articleEs:'una' },
-          { id:'body-calf', word:'mollet', translation:'pantorrilla', articleFr:'un', articleEs:'una' },
-          { id:'body-ankle', word:'cheville', translation:'tobillo', articleFr:'une', articleEs:'un' },
-          { id:'body-foot', word:'pied', translation:'pie', articleFr:'un', articleEs:'un' },
-          { id:'body-heel', word:'talon', translation:'talón', articleFr:'un', articleEs:'un' },
-          { id:'body-toe', word:'orteil', translation:'dedo del pie', articleFr:'un', articleEs:'un' },
+          { id:'body-abdomen', word:'abdomen', translation:'abdomen', articleFr:'un', articleEs:'un' },
+          { id:'body-stomach', word:'estomac', translation:'estómago', articleFr:'un', articleEs:'un' },
+          { id:'body-liver', word:'foie', translation:'hígado', articleFr:'un', articleEs:'un' },
+          { id:'body-kidney', word:'rein', translation:'riñón', articleFr:'un', articleEs:'un' },
+          { id:'body-intestine', word:'intestin', translation:'intestino', articleFr:'un', articleEs:'un' },
           { id:'body-muscle', word:'muscle', translation:'músculo', articleFr:'un', articleEs:'un' },
           { id:'body-bone', word:'os', translation:'hueso', articleFr:'un', articleEs:'un' },
           { id:'body-skeleton', word:'squelette', translation:'esqueleto', articleFr:'un', articleEs:'un' },
@@ -159,7 +156,6 @@
           { id:'person-appearance', word:'apparence', translation:'apariencia', articleFr:'une', articleEs:'una' },
           { id:'person-beauty', word:'beauté', translation:'belleza', articleFr:'une', articleEs:'una' },
           { id:'person-ugliness', word:'laideur', translation:'fealdad', articleFr:'une', articleEs:'una' },
-          { id:'person-size', word:'taille', translation:'tamaño / estatura / cintura / talla', articleFr:'une', articleEs:'una' },
           { id:'person-weight', word:'poids', translation:'peso', articleFr:'un', articleEs:'un' },
           { id:'person-height', word:'hauteur', translation:'altura', articleFr:'une', articleEs:'una' },
           { id:'person-shape', word:'forme', translation:'forma', articleFr:'une', articleEs:'una' },
@@ -174,7 +170,8 @@
           { id:'person-birth', word:'naissance', translation:'nacimiento', articleFr:'une', articleEs:'un' },
           { id:'person-youth', word:'jeunesse', translation:'juventud', articleFr:'une', articleEs:'la' },
           { id:'person-adulthood', word:'âge adulte', translation:'edad adulta', articleFr:'un', articleEs:'la' },
-          { id:'person-old-age', word:'vieillesse', translation:'vejez', articleFr:'une', articleEs:'la' }
+          { id:'person-old-age', word:'vieillesse', translation:'vejez', articleFr:'une', articleEs:'la' },
+          { id:'person-silhouette', word:'silhouette', translation:'silueta', articleFr:'une', articleEs:'una' }
         ]
       },
       {
@@ -200,7 +197,7 @@
           { id:'personal-passport', word:'passeport', translation:'pasaporte', articleFr:'un', articleEs:'un' },
           { id:'personal-signature', word:'signature', translation:'firma', articleFr:'une', articleEs:'una' },
           { id:'personal-photo', word:'photo', translation:'foto', articleFr:'une', articleEs:'una' },
-          { id:'personal-contact', word:'contact', translation:'contacto', articleFr:'un', articleEs:'un' }
+          { id:'personal-coordinates', word:'coordonnées', translation:'datos de contacto', articleFr:'les', articleEs:'los' }
         ]
       }
     ]
