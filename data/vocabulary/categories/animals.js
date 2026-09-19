@@ -241,7 +241,7 @@
           { id: 'animal-litter', word: 'litière', translation: 'arena para gatos', articleFr: 'une', articleEs: 'una' },
           { id: 'animal-litter-box', word: 'bac à litière', translation: 'arenero', articleFr: 'un', articleEs: 'un' },
           { id: 'animal-litter-scoop', word: 'pelle à litière', translation: 'pala para arena', articleFr: 'une', articleEs: 'una' },
-          { id: 'animal-mat', word: 'tapis', translation: 'alfombra', articleFr: 'un', articleEs: 'una' },
+          { id: 'animal-mat', word: 'tapis pour animaux', translation: 'alfombra para animales', articleFr: 'un', articleEs: 'una' },
           { id: 'animal-blanket', word: 'couverture', translation: 'manta', articleFr: 'une', articleEs: 'una' },
           { id: 'animal-cushion', word: 'coussin', translation: 'cojín', articleFr: 'un', articleEs: 'un' },
           { id: 'animal-toy', word: 'jouet', translation: 'juguete', articleFr: 'un', articleEs: 'un' },
