@@ -53,6 +53,11 @@
       id: 'transport',
       title: 'Transporte y desplazamientos',
       src: '../data/vocabulary/categories/transport.js?v=20260919-1'
+    }),
+    Object.freeze({
+      id: 'travel-tourism',
+      title: 'Viajes y turismo',
+      src: '../data/vocabulary/categories/travel-tourism.js?v=20260919-1'
     })
   ]);
 
