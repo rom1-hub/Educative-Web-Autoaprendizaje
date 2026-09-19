@@ -251,6 +251,17 @@
   color:var(--muted);
   font-weight:700;
 }
+.vocabulary-write-instruction{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  margin:0 0 18px;
+  color:var(--muted);
+  line-height:1.45;
+}
+.vocabulary-write-instruction span{
+  display:block;
+}
 .vocabulary-write-prompt{
   display:block;
   margin:10px 0 24px;
