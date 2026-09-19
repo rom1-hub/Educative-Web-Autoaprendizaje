@@ -66,8 +66,8 @@
     assertString(entry.id, 'id de entrada');
     assertString(entry.word, 'palabra de "' + entry.id + '"');
     assertString(entry.translation, 'traducción de "' + entry.id + '"');
-    assertString(entry.articleFr, 'articleFr de "' + entry.id + '"');
-    assertString(entry.articleEs, 'articleEs de "' + entry.id + '"');
+    assertString(entry.articleFr, 'articleFr de "' + entry.id + '"', false);
+    assertString(entry.articleEs, 'articleEs de "' + entry.id + '"', false);
 
     if (entry.emoji != null && typeof entry.emoji !== 'string') {
       throw new Error('Vocabulario: emoji de "' + entry.id + '" debe ser texto o null.');
@@ -248,8 +248,8 @@
   }
 
   const database = {
-    version: '5.1.0',
-    schemaVersion: '1.0',
+    version: '5.2.0',
+    schemaVersion: '1.1',
     categories: [],
     index: [],
     manifest: MANIFEST,
