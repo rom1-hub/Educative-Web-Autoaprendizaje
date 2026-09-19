@@ -266,3 +266,183 @@ h3{font-size:25px;margin:0 0 9px}
   .result-table tbody,.result-table tr,.result-table td{max-width:100%;box-sizing:border-box}
   .result-table td{overflow-wrap:anywhere;word-break:break-word}
 }
+
+
+/* Coq — navegación v1: interacción visual e iconos */
+@media (min-width:901px){
+  .navlinks{
+    gap:4px;
+    align-items:center;
+  }
+
+  .navlinks > a,
+  .navlinks > .nav-item > .nav-button{
+    position:relative;
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    min-height:40px;
+    padding:8px 12px;
+    border-radius:12px;
+    color:var(--ink);
+    z-index:1;
+    transition:
+      color .2s ease,
+      transform .2s ease,
+      background-color .2s ease;
+  }
+
+  .navlinks > a::before,
+  .navlinks > .nav-item > .nav-button::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:-1;
+    border-radius:12px;
+    background:var(--soft-blue);
+    opacity:0;
+    transform:scale(.88);
+    transition:
+      opacity .2s ease,
+      transform .2s cubic-bezier(.2,.8,.2,1);
+  }
+
+  .navlinks > a::after,
+  .navlinks > .nav-item > .nav-button::after{
+    bottom:4px;
+    left:50%;
+    right:auto;
+    width:0;
+    height:3px;
+    transform:translateX(-50%);
+    transition:width .2s ease;
+  }
+
+  .navlinks > a:hover,
+  .navlinks > .nav-item > .nav-button:hover{
+    color:var(--blue);
+    transform:translateY(-1px);
+  }
+
+  .navlinks > a:hover::before,
+  .navlinks > .nav-item > .nav-button:hover::before,
+  .navlinks > a.active::before,
+  .navlinks > .nav-item > .nav-button.active::before{
+    opacity:1;
+    transform:scale(1);
+  }
+
+  .navlinks > a:hover::after,
+  .navlinks > .nav-item > .nav-button:hover::after,
+  .navlinks > a.active::after,
+  .navlinks > .nav-item > .nav-button.active::after{
+    width:22px;
+    background:var(--blue);
+  }
+
+  .navlinks > a::first-letter,
+  .navlinks > .nav-item > .nav-button::first-letter{
+    color:var(--blue);
+  }
+
+  /* Iconos delante de cada sección. Solo presentación: no altera textos ni enlaces. */
+  .navlinks > a:nth-of-type(1)::after{
+    content:"⌂";
+    position:static;
+    width:auto;
+    height:auto;
+    transform:none;
+    background:none;
+    order:-1;
+    font-size:15px;
+    line-height:1;
+    color:currentColor;
+    transition:transform .2s ease;
+  }
+
+  .navlinks > .nav-item > .nav-button::after{
+    content:"◈";
+    position:static;
+    width:auto;
+    height:auto;
+    transform:none;
+    background:none;
+    order:-1;
+    font-size:13px;
+    line-height:1;
+    color:currentColor;
+    transition:transform .2s ease;
+  }
+
+  .navlinks > a:nth-of-type(2)::after{
+    content:"Aa";
+    position:static;
+    width:auto;
+    height:auto;
+    transform:none;
+    background:none;
+    order:-1;
+    font-size:11px;
+    font-weight:900;
+    line-height:1;
+    color:currentColor;
+  }
+
+  .navlinks > a:nth-of-type(3)::after{
+    content:"≡";
+    position:static;
+    width:auto;
+    height:auto;
+    transform:none;
+    background:none;
+    order:-1;
+    font-size:16px;
+    line-height:1;
+    color:currentColor;
+  }
+
+  .navlinks > a:nth-of-type(4)::after{
+    content:"◇";
+    position:static;
+    width:auto;
+    height:auto;
+    transform:none;
+    background:none;
+    order:-1;
+    font-size:15px;
+    line-height:1;
+    color:currentColor;
+  }
+
+  .navlinks > a:nth-of-type(5)::after{
+    content:"✦";
+    position:static;
+    width:auto;
+    height:auto;
+    transform:none;
+    background:none;
+    order:-1;
+    font-size:13px;
+    line-height:1;
+    color:currentColor;
+  }
+
+  .navlinks > a:hover::after,
+  .navlinks > .nav-item > .nav-button:hover::after{
+    transform:scale(1.08);
+  }
+
+  .navlinks > a.active::after{
+    transform:scale(1.08);
+  }
+}
+
+/* Mantener el menú móvil funcional y limpio; los iconos aparecen solo en desktop. */
+@media (max-width:900px){
+  .navlinks > a::before,
+  .navlinks > a::after,
+  .navlinks > .nav-item > .nav-button::before,
+  .navlinks > .nav-item > .nav-button::after{
+    display:none;
+  }
+}
