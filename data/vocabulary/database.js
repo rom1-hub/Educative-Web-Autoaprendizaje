@@ -48,6 +48,11 @@
       id: 'family-relations',
       title: 'Familia y relaciones',
       src: '../data/vocabulary/categories/family-relations.js?v=20260919-1'
+    }),
+    Object.freeze({
+      id: 'transport',
+      title: 'Transporte y desplazamientos',
+      src: '../data/vocabulary/categories/transport.js?v=20260919-1'
     })
   ]);
 
