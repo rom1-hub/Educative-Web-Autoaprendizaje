@@ -48,7 +48,7 @@
 
   const EXERCISES = [
     { id: 'match', label: 'Ejercicio 1', title: 'Asociar palabras', description: 'Elige la traducción de la palabra francesa.' },
-    { id: 'write', label: 'Ejercicio 2', title: 'Escribir la palabra', description: 'Escribe en francés la palabra que aparece en español. Si es un sustantivo, incluye el artículo; si es un adjetivo, escribe solo el adjetivo.' },
+    { id: 'write', label: 'Ejercicio 2', title: 'Escribir la palabra', description: 'Escribe en francés la palabra que aparece en español.' },
     { id: 'audio', label: 'Ejercicio 3', title: 'Escuchar y reconocer', description: 'Escucha la palabra y selecciona la forma escrita correcta.' }
   ];
 
