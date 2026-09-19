@@ -296,6 +296,10 @@
     ]
   };
 
+  if (!window.COQ_VOCABULARY_DATABASE_API || typeof window.COQ_VOCABULARY_DATABASE_API.registerCategory !== 'function') {
+    throw new Error('COQ Vocabulario: el registro de base de datos debe cargarse antes de las categorías.');
+  }
+
   window.COQ_VOCABULARY_ANIMALS = Object.freeze(animals);
-  window.COQ_VOCABULARY_CATEGORIES = Object.freeze([animals]);
+  window.COQ_VOCABULARY_DATABASE_API.registerCategory(animals);
 })();
