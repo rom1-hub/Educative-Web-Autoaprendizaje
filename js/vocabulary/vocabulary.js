@@ -89,6 +89,21 @@
     return escapeHtml([article, word].filter(Boolean).join(' '));
   }
 
+  function pronunciationButton(entry, label) {
+    const phrase = [entry.articleFr, entry.word].filter(Boolean).join(' ').trim();
+    if (!phrase) return '';
+    return `<button type="button" class="vocabulary-pronunciation-button"
+      data-say="${escapeHtml(phrase)}"
+      aria-label="${escapeHtml(label || ('Escuchar ' + phrase))}"
+      title="Escuchar pronunciación">🔊</button>`;
+  }
+
+  function bindAudio(container) {
+    if (window.Coqaudio && typeof window.Coqaudio.bind === 'function') {
+      window.Coqaudio.bind(container);
+    }
+  }
+
   function getItems() {
     const items = [];
 
@@ -277,7 +292,10 @@
     return `<div class="vocabulary-entry-list">${entries.map((entry) => `
       <article class="vocabulary-entry">
         <div>
-          <strong>${entry.emoji ? escapeHtml(entry.emoji) + ' ' : ''}${displayWord(entry)}</strong>
+          <div class="vocabulary-entry-word">
+            <strong>${entry.emoji ? escapeHtml(entry.emoji) + ' ' : ''}${displayWord(entry)}</strong>
+            ${pronunciationButton(entry)}
+          </div>
           <span>${escapeHtml(entry.articleEs || '')} ${escapeHtml(entry.translation || '')}</span>
         </div>
       </article>`).join('')}</div>`;
@@ -313,6 +331,7 @@
         </div>
         ${renderEntries(getEntries(item))}
       </div>`;
+      bindAudio(learnContent);
     }
   }
 
@@ -326,7 +345,10 @@
       </div>
       <div class="vocabulary-entry-list">
         <article class="vocabulary-entry">
-          <strong>${entry.emoji ? escapeHtml(entry.emoji) + ' ' : ''}${displayWord(entry)}</strong>
+          <div class="vocabulary-entry-word">
+            <strong>${entry.emoji ? escapeHtml(entry.emoji) + ' ' : ''}${displayWord(entry)}</strong>
+            ${pronunciationButton(entry)}
+          </div>
           <span>${escapeHtml(entry.articleEs || '')} ${escapeHtml(entry.translation || '')}</span>
         </article>
       </div>
@@ -336,6 +358,8 @@
         </button>
       </div>
     </div>`;
+
+    bindAudio(learnContent);
 
     const button = learnContent.querySelector('[data-word-subcategory]');
     if (button) {
