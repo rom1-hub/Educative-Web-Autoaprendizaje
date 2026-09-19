@@ -108,7 +108,6 @@
           { id:'person-adult', word:'adulte', translation:'adulto / adulta', articleFr:'un / une', articleEs:'un / una' },
           { id:'person-young-person', word:'jeune', translation:'joven', articleFr:'un / une', articleEs:'un / una' },
           { id:'person-elderly-person', word:'personne âgée', translation:'persona mayor', articleFr:'une', articleEs:'una' },
-          { id:'person-parent', word:'parent', translation:'padre / madre', articleFr:'un / une', articleEs:'un / una' },
           { id:'person-friend-male', word:'ami', translation:'amigo', articleFr:'un', articleEs:'un' },
           { id:'person-friend-female', word:'amie', translation:'amiga', articleFr:'une', articleEs:'una' },
           { id:'person-neighbor', word:'voisin', translation:'vecino', articleFr:'un', articleEs:'un' },
