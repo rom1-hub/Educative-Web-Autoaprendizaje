@@ -2,14 +2,13 @@
  * COQ — Registro y cargador de la base de datos de Vocabulario
  *
  * Arquitectura:
- * - El catálogo de categorías es pequeño y estable.
- * - Cada categoría vive en su propio chunk JS y se carga una sola vez.
- * - El contenido pedagógico nunca se duplica en la lógica de interfaz.
- * - La API admite carga bajo demanda aunque la vista actual pueda pedir
- *   todas las categorías para mantener el comportamiento existente.
+ * - El manifiesto contiene únicamente metadatos de navegación y rutas.
+ * - Las categorías se cargan bajo demanda.
+ * - Cada categoría se valida al registrarse.
+ * - El índice de búsqueda se actualiza únicamente con categorías cargadas.
  *
  * Camino:
- * catálogo → categoría → subcategoría → entrada
+ * manifiesto → categoría → subcategoría → entrada
  */
 (function () {
   'use strict';
@@ -17,6 +16,7 @@
   const MANIFEST = Object.freeze([
     Object.freeze({
       id: 'animals',
+      title: 'Animales',
       src: '../data/vocabulary/categories/animals.js?v=20260919-arch'
     })
   ]);
@@ -24,13 +24,39 @@
   const registry = new Map();
   const loadCache = new Map();
 
+  function assertString(value, label, required = true) {
+    if (required && (!value || typeof value !== 'string')) {
+      throw new Error('Vocabulario: ' + label + ' inválido.');
+    }
+    if (!required && value != null && typeof value !== 'string') {
+      throw new Error('Vocabulario: ' + label + ' debe ser texto o null.');
+    }
+  }
+
+  function assertEntry(entry, subcategoryId) {
+    if (!entry || typeof entry !== 'object') {
+      throw new Error('Vocabulario: entrada inválida en "' + subcategoryId + '".');
+    }
+
+    assertString(entry.id, 'id de entrada');
+    assertString(entry.word, 'palabra de "' + entry.id + '"');
+    assertString(entry.translation, 'traducción de "' + entry.id + '"');
+    assertString(entry.articleFr, 'articleFr de "' + entry.id + '"');
+    assertString(entry.articleEs, 'articleEs de "' + entry.id + '"');
+
+    if (entry.emoji != null && typeof entry.emoji !== 'string') {
+      throw new Error('Vocabulario: emoji de "' + entry.id + '" debe ser texto o null.');
+    }
+  }
+
   function assertCategory(category) {
     if (!category || typeof category !== 'object') {
       throw new Error('Vocabulario: categoría inválida.');
     }
-    if (!category.id || typeof category.id !== 'string') {
-      throw new Error('Vocabulario: una categoría no tiene un id válido.');
-    }
+
+    assertString(category.id, 'id de categoría');
+    assertString(category.title, 'título de categoría');
+
     if (!Array.isArray(category.subcategories)) {
       throw new Error('Vocabulario: la categoría "' + category.id + '" no tiene subcategorías válidas.');
     }
@@ -39,9 +65,13 @@
     const entryIds = new Set();
 
     category.subcategories.forEach((subcategory) => {
-      if (!subcategory || typeof subcategory !== 'object' || !subcategory.id) {
+      if (!subcategory || typeof subcategory !== 'object') {
         throw new Error('Vocabulario: subcategoría inválida en "' + category.id + '".');
       }
+
+      assertString(subcategory.id, 'id de subcategoría');
+      assertString(subcategory.title, 'título de subcategoría "' + subcategory.id + '"');
+
       if (subcategoryIds.has(subcategory.id)) {
         throw new Error('Vocabulario: id de subcategoría duplicado: "' + subcategory.id + '".');
       }
@@ -52,9 +82,8 @@
       }
 
       subcategory.entries.forEach((entry) => {
-        if (!entry || typeof entry !== 'object' || !entry.id) {
-          throw new Error('Vocabulario: entrada inválida en "' + subcategory.id + '".');
-        }
+        assertEntry(entry, subcategory.id);
+
         if (entryIds.has(entry.id)) {
           throw new Error('Vocabulario: id de entrada duplicado en "' + category.id + '": "' + entry.id + '".');
         }
@@ -65,13 +94,50 @@
     return category;
   }
 
+  function validateLoadedRegistry() {
+    const categoryIds = new Set();
+    const subcategoryIds = new Set();
+    const entryIds = new Set();
+
+    registry.forEach((category) => {
+      assertCategory(category);
+
+      if (categoryIds.has(category.id)) {
+        throw new Error('Vocabulario: id de categoría duplicado: "' + category.id + '".');
+      }
+      categoryIds.add(category.id);
+
+      (category.subcategories || []).forEach((subcategory) => {
+        if (subcategoryIds.has(subcategory.id)) {
+          throw new Error('Vocabulario: id de subcategoría duplicado globalmente: "' + subcategory.id + '".');
+        }
+        subcategoryIds.add(subcategory.id);
+
+        (subcategory.entries || []).forEach((entry) => {
+          if (entryIds.has(entry.id)) {
+            throw new Error('Vocabulario: id de entrada duplicado globalmente: "' + entry.id + '".');
+          }
+          entryIds.add(entry.id);
+        });
+      });
+    });
+  }
+
   function registerCategory(category) {
     assertCategory(category);
+
+    const descriptor = MANIFEST.find((item) => item.id === category.id);
+    if (!descriptor) {
+      throw new Error('Vocabulario: la categoría "' + category.id + '" no existe en el manifiesto.');
+    }
+
     const previous = registry.get(category.id);
     if (previous && previous !== category) {
       throw new Error('Vocabulario: la categoría "' + category.id + '" fue registrada más de una vez.');
     }
+
     registry.set(category.id, category);
+    validateLoadedRegistry();
     return category;
   }
 
@@ -83,7 +149,10 @@
       script.src = src;
       script.async = true;
       script.onload = () => resolve();
-      script.onerror = () => reject(new Error('No se pudo cargar el módulo de vocabulario: ' + src));
+      script.onerror = () => {
+        loadCache.delete(src);
+        reject(new Error('No se pudo cargar el módulo de vocabulario: ' + src));
+      };
       document.head.appendChild(script);
     });
 
@@ -91,21 +160,12 @@
     return promise;
   }
 
-  async function loadCategory(id) {
-    const descriptor = MANIFEST.find((item) => item.id === id);
-    if (!descriptor) throw new Error('Vocabulario: categoría no registrada en el catálogo: "' + id + '".');
-
-    if (!registry.has(id)) await loadScript(descriptor.src);
-
-    const category = registry.get(id);
-    if (!category) throw new Error('Vocabulario: el módulo "' + id + '" no registró ninguna categoría.');
-    return Object.freeze(category);
-  }
-
-  async function loadAll() {
-    await Promise.all(MANIFEST.map((item) => loadCategory(item.id)));
-    const categories = MANIFEST.map((item) => registry.get(item.id)).filter(Boolean);
-    return Object.freeze(categories.slice());
+  function getLoadedCategories() {
+    return Object.freeze(
+      MANIFEST
+        .map((item) => registry.get(item.id))
+        .filter(Boolean)
+    );
   }
 
   function buildSearchIndex(categories) {
@@ -149,53 +209,59 @@
     return Object.freeze(index);
   }
 
-  const ready = loadAll().then((categories) => {
-    categories.forEach(assertCategory);
+  const database = {
+    version: '5.0.0',
+    schemaVersion: '1.0',
+    categories: [],
+    index: [],
+    manifest: MANIFEST,
+    loadCategory,
+    loadAll,
+    getLoadedCategories
+  };
 
-    const categoryIds = new Set();
-    const subcategoryIds = new Set();
-    const entryIds = new Set();
-
-    categories.forEach((category) => {
-      if (categoryIds.has(category.id)) {
-        throw new Error('Vocabulario: id de categoría duplicado: "' + category.id + '".');
-      }
-      categoryIds.add(category.id);
-
-      (category.subcategories || []).forEach((subcategory) => {
-        if (subcategoryIds.has(subcategory.id)) {
-          throw new Error('Vocabulario: id de subcategoría duplicado globalmente: "' + subcategory.id + '".');
-        }
-        subcategoryIds.add(subcategory.id);
-
-        (subcategory.entries || []).forEach((entry) => {
-          if (entryIds.has(entry.id)) {
-            throw new Error('Vocabulario: id de entrada duplicado globalmente: "' + entry.id + '".');
-          }
-          entryIds.add(entry.id);
-        });
-      });
-    });
-
-    const database = Object.freeze({
-      version: '4.0.0',
-      categories,
-      index: buildSearchIndex(categories),
-      manifest: MANIFEST,
-      loadCategory,
-      loadAll
-    });
-
-    window.COQ_VOCABULARY_DATABASE = database;
+  function refreshDatabaseIndex() {
+    const categories = getLoadedCategories();
+    database.categories = categories;
+    database.index = buildSearchIndex(categories);
     return database;
-  });
+  }
 
+  async function loadCategory(id) {
+    const descriptor = MANIFEST.find((item) => item.id === id);
+    if (!descriptor) {
+      throw new Error('Vocabulario: categoría no registrada en el catálogo: "' + id + '".');
+    }
+
+    if (!registry.has(id)) {
+      await loadScript(descriptor.src);
+    }
+
+    const category = registry.get(id);
+    if (!category) {
+      throw new Error('Vocabulario: el módulo "' + id + '" no registró ninguna categoría.');
+    }
+
+    refreshDatabaseIndex();
+    return Object.freeze(category);
+  }
+
+  async function loadAll() {
+    await Promise.all(MANIFEST.map((item) => loadCategory(item.id)));
+    validateLoadedRegistry();
+    refreshDatabaseIndex();
+    return database.categories;
+  }
+
+  window.COQ_VOCABULARY_DATABASE = database;
   window.COQ_VOCABULARY_DATABASE_API = Object.freeze({
     manifest: MANIFEST,
     registerCategory,
     loadCategory,
-    loadAll
+    loadAll,
+    getLoadedCategories,
+    refreshDatabaseIndex
   });
 
-  window.COQ_VOCABULARY_DATABASE_READY = ready;
+  window.COQ_VOCABULARY_DATABASE_READY = Promise.resolve(database);
 })();
