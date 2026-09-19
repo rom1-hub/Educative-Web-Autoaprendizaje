@@ -331,7 +331,7 @@ h3{font-size:25px;margin:0 0 9px}
 
   /* Conjugación — transformación/conjugación */
   .navlinks > a:nth-of-type(2)::before{
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 7h11'/%3E%3Cpath d='m14 4 3 3-3 3'/%3E%3Cpath d='M18 17H7'/%3E%3Cpath d='m10 14-3 3 3 3'/%3E%3C/svg%3E");
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 6h14'/%3E%3Cpath d='M7 10h10'/%3E%3Cpath d='M8.5 14h7'/%3E%3Cpath d='M10 18h4'/%3E%3C/svg%3E");
   }
 
   /* Gramática — libro */
