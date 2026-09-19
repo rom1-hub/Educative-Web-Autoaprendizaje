@@ -34,7 +34,7 @@
 
   const EXERCISES = [
     { id: 'match', label: 'Ejercicio 1', title: 'Asociar palabras', description: 'Elige la traducción de la palabra francesa.' },
-    { id: 'write', label: 'Ejercicio 2', title: 'Escribir la palabra', description: 'Escribe en francés la palabra que aparece en español.' },
+    { id: 'write', label: 'Ejercicio 2', title: 'Escribir la palabra', description: 'Escribe la palabra en francés con su artículo (un o une).' },
     { id: 'audio', label: 'Ejercicio 3', title: 'Escuchar y reconocer', description: 'Escucha la palabra y selecciona la forma escrita correcta.' }
   ];
 
@@ -502,7 +502,7 @@
 
     function showQuestion() {
       const entry = selected[index];
-      prompt.textContent = entry.translation;
+      prompt.textContent = [entry.articleEs, entry.translation].filter(Boolean).join(' ');
       input.value = '';
       input.disabled = false;
       check.disabled = false;
@@ -526,7 +526,7 @@
 
       const entry = selected[index];
       const answer = normalize(input.value);
-      const expected = normalize(entry.word);
+      const expected = normalize([entry.articleFr, entry.word].filter(Boolean).join(' '));
       const correct = answer === expected;
 
       if (correct) {
