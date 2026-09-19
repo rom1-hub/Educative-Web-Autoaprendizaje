@@ -476,3 +476,51 @@ h3{font-size:25px;margin:0 0 9px}
     padding-left:42px;
   }
 }
+
+
+/* Coq — ajuste de escala del menú para ordenador y tablet */
+@media (min-width:901px) and (max-width:1180px){
+  .nav{
+    padding-left:16px;
+    padding-right:16px;
+    gap:12px;
+  }
+  .navlinks{
+    gap:1px;
+    font-size:13px;
+  }
+  .navlinks > a,
+  .navlinks > .nav-item > .nav-button{
+    min-height:38px;
+    padding:7px 9px;
+    gap:6px;
+  }
+  .navlinks > a::before,
+  .navlinks > .nav-item > .nav-button::before{
+    width:16px;
+    height:16px;
+    flex-basis:16px;
+  }
+  .logo{
+    width:62px;
+  }
+  .logo img{
+    width:60px;
+    height:60px;
+  }
+  .search{
+    min-width:205px;
+    padding:7px 11px;
+  }
+}
+
+@media (min-width:1181px){
+  .navlinks{
+    font-size:13.5px;
+  }
+  .navlinks > a,
+  .navlinks > .nav-item > .nav-button{
+    padding-left:10px;
+    padding-right:10px;
+  }
+}
