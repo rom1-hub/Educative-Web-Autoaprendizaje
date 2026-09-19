@@ -126,31 +126,23 @@
   }
 
   function findWordMatches(query) {
-    const term = normalize(query);
-    if (!term) return [];
+    return searchService.query(query)
+      .filter((item) => item.type === 'entry')
+      .map((item) => {
+        const parent = getSubcategoryById(item.parentId);
+        if (!parent) return null;
 
-    const matches = [];
-
-    database.categories.forEach((category) => {
-      (category.subcategories || []).forEach((subcategory) => {
-        (subcategory.entries || []).forEach((entry) => {
-          const haystack = normalize(`${entry.word || ''} ${entry.translation || ''}`);
-          if (haystack.includes(term)) {
-            matches.push({
-              type: 'entry',
-              id: entry.id,
-              title: `${entry.articleFr || ''} ${entry.word || ''} / ${entry.articleEs || ''} ${entry.translation || ''}`.trim(),
-              category: `${category.title} · ${subcategory.title}`,
-              parent: subcategory,
-              categoryData: category,
-              data: entry
-            });
-          }
-        });
-      });
-    });
-
-    return matches;
+        return {
+          type: 'entry',
+          id: item.id,
+          title: `${item.title} / ${item.translation}`.trim(),
+          category: item.category,
+          parent: parent.subcategory,
+          categoryData: parent.category,
+          data: item.data
+        };
+      })
+      .filter(Boolean);
   }
 
   function searchableItems(query) {
