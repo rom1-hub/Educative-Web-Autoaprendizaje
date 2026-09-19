@@ -45,16 +45,19 @@
     window.speechSynthesis.speak(utterance);
   }
 
-  window.Coqaudio={speak:speak};
-
-  function initAudio(){
-    document.querySelectorAll('[data-say]').forEach(function(button){
+  function bind(root){
+    const scope=root&&root.querySelectorAll?root:document;
+    scope.querySelectorAll('[data-say]').forEach(function(button){
       if(button.dataset.coqAudioReady==='1') return;
       button.dataset.coqAudioReady='1';
-      button.addEventListener('click',function(){speak(button.dataset.say);});
+      button.addEventListener('click',function(){
+        speak(button.dataset.say);
+      });
     });
   }
 
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initAudio);
-  else initAudio();
+  window.Coqaudio={speak:speak,bind:bind};
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){bind(document);});
+  else bind(document);
 })();
