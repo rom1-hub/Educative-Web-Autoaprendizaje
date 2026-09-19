@@ -185,8 +185,6 @@
           { id:'personal-email', word:'adresse e-mail', translation:'dirección de correo electrónico', articleFr:'une', articleEs:'una' },
           { id:'personal-country', word:'pays', translation:'país', articleFr:'un', articleEs:'un' },
           { id:'personal-nationality', word:'nationalité', translation:'nacionalidad', articleFr:'une', articleEs:'una' },
-          { id:'personal-language', word:'langue', translation:'idioma / lengua', articleFr:'une', articleEs:'un' },
-          { id:'personal-mother-tongue', word:'langue maternelle', translation:'lengua materna', articleFr:'une', articleEs:'una' },
           { id:'personal-place-of-birth', word:'lieu de naissance', translation:'lugar de nacimiento', articleFr:'un', articleEs:'un' },
           { id:'personal-date-of-birth', word:'date de naissance', translation:'fecha de nacimiento', articleFr:'une', articleEs:'una' },
           { id:'personal-birthday', word:'anniversaire', translation:'cumpleaños', articleFr:'un', articleEs:'un' },
@@ -197,7 +195,9 @@
           { id:'personal-passport', word:'passeport', translation:'pasaporte', articleFr:'un', articleEs:'un' },
           { id:'personal-signature', word:'signature', translation:'firma', articleFr:'une', articleEs:'una' },
           { id:'personal-photo', word:'photo', translation:'foto', articleFr:'une', articleEs:'una' },
-          { id:'personal-coordinates', word:'coordonnées', translation:'datos de contacto', articleFr:'les', articleEs:'los' }
+          { id:'personal-coordinates', word:'coordonnées', translation:'datos de contacto', articleFr:'les', articleEs:'los' },
+          { id:'personal-postal-code', word:'code postal', translation:'código postal', articleFr:'un', articleEs:'un' },
+          { id:'personal-domicile', word:'domicile', translation:'domicilio', articleFr:'un', articleEs:'un' }
         ]
       }
     ]
