@@ -43,6 +43,11 @@
       id: 'city',
       title: 'Ciudad',
       src: '../data/vocabulary/categories/city.js?v=20260919-6'
+    }),
+    Object.freeze({
+      id: 'family-relations',
+      title: 'Familia y relaciones',
+      src: '../data/vocabulary/categories/family-relations.js?v=20260919-1'
     })
   ]);
 
