@@ -489,7 +489,6 @@
         <span class="vocabulary-write-label">Escribe en francés:</span>
         <strong class="vocabulary-write-prompt"></strong>
         <p class="vocabulary-write-instruction">Escribe la palabra en francés con su artículo (un o une).</p>
-        <label class="vocabulary-write-answer-label" for="vocabularyWriteInput">Respuesta en francés</label>
         <input id="vocabularyWriteInput" class="vocabulary-write-input" type="text" autocomplete="off" spellcheck="false">
         <button type="button" class="btn primary" data-check-write>Comprobar</button>
         <div class="vocabulary-write-feedback" aria-live="polite"></div>
