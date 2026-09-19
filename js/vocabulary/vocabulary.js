@@ -27,10 +27,24 @@
   if (!databaseReady || typeof databaseReady.then !== 'function') return;
 
   const database = await databaseReady;
-  if (!database || !Array.isArray(database.categories)) return;
+  if (!database || !database.manifest) return;
 
   const searchService = window.COQ_VOCABULARY_SEARCH && window.COQ_VOCABULARY_SEARCH.create(database);
   if (!searchService) return;
+
+  const databaseApi = window.COQ_VOCABULARY_DATABASE_API;
+  if (!databaseApi || typeof databaseApi.loadCategory !== 'function' || typeof databaseApi.loadAll !== 'function') return;
+
+  async function ensureAllLoaded() {
+    await databaseApi.loadAll();
+    searchService.refresh();
+  }
+
+  async function ensureCategoryLoaded(id) {
+    const category = await databaseApi.loadCategory(id);
+    searchService.refresh();
+    return category;
+  }
 
   const EXERCISES = [
     { id: 'match', label: 'Ejercicio 1', title: 'Asociar palabras', description: 'Elige la traducción de la palabra francesa.' },
@@ -531,9 +545,9 @@
 
       if (correct) {
         correctCount += 1;
-        feedback.innerHTML = feedbackHtml(true, entry.word);
+        feedback.innerHTML = feedbackHtml(true, [entry.articleFr, entry.word].filter(Boolean).join(' '));
       } else {
-        feedback.innerHTML = feedbackHtml(false, entry.word);
+        feedback.innerHTML = feedbackHtml(false, [entry.articleFr, entry.word].filter(Boolean).join(' '));
       }
 
       input.disabled = true;
@@ -584,7 +598,8 @@
         const phrase = [entry.articleFr, entry.word].filter(Boolean).join(' ');
         window.Coqaudio.speak(phrase);
       } else if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(entry.word);
+        const phrase = [entry.articleFr, entry.word].filter(Boolean).join(' ');
+        const utterance = new SpeechSynthesisUtterance(phrase);
         utterance.lang = 'fr-FR';
         window.speechSynthesis.cancel();
         window.speechSynthesis.speak(utterance);
@@ -610,7 +625,7 @@
             const right = options.querySelector(`[data-answer-id="${CSS.escape(entry.id)}"]`);
             if (right) right.classList.add('correct');
           }
-          feedback.innerHTML = feedbackHtml(correct, entry.word);
+          feedback.innerHTML = feedbackHtml(correct, [entry.articleFr, entry.word].filter(Boolean).join(' '));
           window.setTimeout(() => {
             index += 1;
             if (index >= selected.length) finish();
@@ -704,7 +719,17 @@
     else renderPractice(selectedItem);
   }
 
-  function renderResults(query) {
+  async function renderResults(query) {
+    const term = normalize(query);
+    if (!term) {
+      results.innerHTML = '';
+      searchInput.setAttribute('aria-expanded', 'false');
+      return;
+    }
+
+    await ensureAllLoaded();
+    if (normalize(searchInput.value) !== term) return;
+
     const matches = searchableItems(query);
 
     if (!matches.length) {
@@ -739,33 +764,48 @@
   }
 
   function renderAllCategories() {
-    topicsPanel.innerHTML = database.categories.map((category) => `
+    topicsPanel.innerHTML = database.manifest.map((descriptor) => `
       <section class="vocabulary-category-group">
-        <button type="button" class="vocabulary-category-option" data-category-id="${escapeHtml(category.id)}" aria-expanded="false">
-          <strong>${escapeHtml(category.title)}</strong><span aria-hidden="true">▾</span>
+        <button type="button" class="vocabulary-category-option" data-category-id="${escapeHtml(descriptor.id)}" aria-expanded="false">
+          <strong>${escapeHtml(descriptor.title)}</strong><span aria-hidden="true">▾</span>
         </button>
-        <div class="vocabulary-subcategories hidden" data-subcategories-for="${escapeHtml(category.id)}">
-          ${(category.subcategories || []).map((subcategory) => `
-            <button type="button" class="vocabulary-topic-option" data-id="${escapeHtml(subcategory.id)}">
-              <strong>${escapeHtml(subcategory.title)}</strong>
-              <small>${(subcategory.entries || []).length} palabras</small>
-            </button>`).join('')}
-        </div>
+        <div class="vocabulary-subcategories hidden" data-subcategories-for="${escapeHtml(descriptor.id)}"></div>
       </section>`).join('');
 
     topicsPanel.querySelectorAll('[data-category-id]').forEach((button) => {
-      button.addEventListener('click', () => {
+      button.addEventListener('click', async () => {
         const categoryId = button.dataset.categoryId;
         const subcategories = topicsPanel.querySelector(`[data-subcategories-for="${CSS.escape(categoryId)}"]`);
         if (!subcategories) return;
 
         const open = !subcategories.classList.contains('hidden');
-        subcategories.classList.toggle('hidden', open);
-        button.setAttribute('aria-expanded', String(!open));
+        if (open) {
+          subcategories.classList.add('hidden');
+          button.setAttribute('aria-expanded', 'false');
+          return;
+        }
+
+        button.disabled = true;
+        try {
+          const category = await ensureCategoryLoaded(categoryId);
+          subcategories.innerHTML = (category.subcategories || []).map((subcategory) => `
+            <button type="button" class="vocabulary-topic-option" data-id="${escapeHtml(subcategory.id)}">
+              <strong>${escapeHtml(subcategory.title)}</strong>
+              <small>${(subcategory.entries || []).length} palabras</small>
+            </button>`).join('');
+          bindSubcategoryButtons(subcategories);
+          subcategories.classList.remove('hidden');
+          button.setAttribute('aria-expanded', 'true');
+        } catch (error) {
+          subcategories.innerHTML = '<p class="vocabulary-no-results">No se pudo cargar esta categoría.</p>';
+          subcategories.classList.remove('hidden');
+          button.setAttribute('aria-expanded', 'true');
+          console.error(error);
+        } finally {
+          button.disabled = false;
+        }
       });
     });
-
-    bindSubcategoryButtons(topicsPanel);
   }
 
   searchInput.addEventListener('input', () => {
@@ -774,7 +814,11 @@
       searchInput.setAttribute('aria-expanded', 'false');
       return;
     }
-    renderResults(searchInput.value);
+    renderResults(searchInput.value).catch((error) => {
+      results.innerHTML = '<div class="vocabulary-no-results">No se pudo realizar la búsqueda.</div>';
+      searchInput.setAttribute('aria-expanded', 'true');
+      console.error(error);
+    });
   });
 
   browseButton.addEventListener('click', () => {
