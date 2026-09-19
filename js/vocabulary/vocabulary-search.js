@@ -17,8 +17,8 @@
 
   function tokenize(value) {
     return normalize(value)
+      .replace(/[^a-z0-9œæç]+/g, ' ')
       .split(/\s+/)
-      .map((token) => token.replace(/[^a-z0-9œæç]+/g, ''))
       .filter(Boolean);
   }
 
