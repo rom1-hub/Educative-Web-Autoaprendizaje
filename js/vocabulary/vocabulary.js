@@ -48,7 +48,7 @@
 
   const EXERCISES = [
     { id: 'match', label: 'Ejercicio 1', title: 'Asociar palabras', description: 'Elige la traducción de la palabra francesa.' },
-    { id: 'write', label: 'Ejercicio 2', title: 'Escribir la palabra', description: 'Escribe en francés la palabra que aparece en español.' },
+    { id: 'write', label: 'Ejercicio 2', title: 'Escribir la palabra', description: 'Escribe en francés la palabra que aparece en español. Si es un sustantivo, incluye el artículo; si es un adjetivo, escribe solo el adjetivo.' },
     { id: 'audio', label: 'Ejercicio 3', title: 'Escuchar y reconocer', description: 'Escucha la palabra y selecciona la forma escrita correcta.' }
   ];
 
@@ -526,7 +526,7 @@
       <div class="vocabulary-write-card">
         <span class="vocabulary-write-label">Escribe en francés:</span>
         <strong class="vocabulary-write-prompt"></strong>
-        <p class="vocabulary-write-instruction">Escribe la palabra en francés con su artículo (un o une).</p>
+        <p class="vocabulary-write-instruction">Escribe la palabra en francés. Si es un sustantivo, incluye el artículo; si es un adjetivo, escribe solo el adjetivo.</p>
         <input id="vocabularyWriteInput" class="vocabulary-write-input" type="text" autocomplete="off" spellcheck="false">
         <button type="button" class="btn primary" data-check-write>Comprobar</button>
         <div class="vocabulary-write-feedback" aria-live="polite"></div>
