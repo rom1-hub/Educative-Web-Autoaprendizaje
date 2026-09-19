@@ -559,15 +559,15 @@ h3{font-size:25px;margin:0 0 9px}
   width:18px;
   height:18px;
   flex:0 0 18px;
-  color:#64748B;
+  color:#5F6B7A;
   stroke:currentColor;
-  stroke-width:1.8;
+  stroke-width:1.5;
   stroke-linecap:round;
-  transition:color .2s ease, transform .2s ease;
+  transition:none;
 }
 .search:focus-within .search-icon{
-  color:var(--blue);
-  transform:scale(1.03);
+  color:#5F6B7A;
+  transform:none;
 }
 .search input{
   min-width:0;
