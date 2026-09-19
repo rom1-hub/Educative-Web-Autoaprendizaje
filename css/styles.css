@@ -524,3 +524,147 @@ h3{font-size:25px;margin:0 0 9px}
     padding-right:10px;
   }
 }
+
+
+/* Coq — barra de búsqueda v1: limpia, moderna y responsive */
+.search-wrap{
+  position:relative;
+  margin-left:auto;
+  width:270px;
+  flex:0 1 270px;
+}
+.search{
+  width:100%;
+  min-width:0;
+  height:42px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:0 14px 0 15px;
+  background:rgba(255,255,255,.96);
+  border:1px solid var(--line);
+  border-radius:999px;
+  box-shadow:0 2px 8px rgba(6,27,74,.025);
+  transition:border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+}
+.search:hover{
+  border-color:#B9C9DC;
+}
+.search:focus-within{
+  background:var(--paper);
+  border-color:#4A9BDE;
+  box-shadow:0 0 0 4px rgba(0,123,216,.11);
+}
+.search .search-icon{
+  width:18px;
+  height:18px;
+  flex:0 0 18px;
+  color:#64748B;
+  stroke:currentColor;
+  stroke-width:1.8;
+  stroke-linecap:round;
+  transition:color .2s ease, transform .2s ease;
+}
+.search:focus-within .search-icon{
+  color:var(--blue);
+  transform:scale(1.03);
+}
+.search input{
+  min-width:0;
+  height:100%;
+  padding:0;
+  font-size:13px;
+  font-weight:500;
+}
+.search input::placeholder{
+  color:#8795A8;
+  opacity:1;
+}
+.search-results{
+  top:49px;
+  width:min(520px,calc(100vw - 30px));
+  padding:8px;
+  border-radius:16px;
+  box-shadow:0 18px 42px rgba(6,27,74,.14);
+}
+.search-results.open{
+  animation:coqSearchResultsIn .16s ease-out;
+}
+@keyframes coqSearchResultsIn{
+  from{opacity:0;transform:translateY(-4px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.search-results .result{
+  padding:10px 11px;
+  border-radius:10px;
+  transition:background-color .16s ease, color .16s ease;
+}
+.search-results .result:hover{
+  background:var(--soft-blue);
+  color:var(--blue);
+}
+.search-results .result small{
+  margin-top:2px;
+  font-size:11px;
+}
+
+/* La búsqueda permanece junto al botón de menú en tablet y móvil. */
+@media(max-width:900px){
+  .nav{
+    gap:10px;
+  }
+  .nav .search-wrap{
+    display:block!important;
+    width:auto;
+    flex:1 1 auto;
+    min-width:0;
+    margin-left:auto;
+    order:2;
+  }
+  .nav .menu{
+    order:3;
+    flex:0 0 44px;
+  }
+  .nav .logo{
+    order:1;
+  }
+  .nav .search{
+    width:100%;
+  }
+  .nav .search-results{
+    left:auto;
+    right:0;
+    width:min(520px,calc(100vw - 30px));
+  }
+}
+@media(max-width:560px){
+  .nav{
+    padding-left:12px;
+    padding-right:12px;
+    gap:8px;
+  }
+  .nav .logo{
+    width:58px;
+  }
+  .nav .logo img{
+    width:55px;
+    height:55px;
+  }
+  .nav .search-wrap{
+    flex:1 1 auto;
+  }
+  .nav .search{
+    height:40px;
+    padding-left:13px;
+    padding-right:11px;
+    gap:8px;
+  }
+  .nav .search .search-icon{
+    width:17px;
+    height:17px;
+    flex-basis:17px;
+  }
+  .nav .search input{
+    font-size:12.5px;
+  }
+}
