@@ -27,11 +27,11 @@
         {id:'food-bread',word:'pain',translation:'pan',articleFr:'un',articleEs:'un'},
         {id:'food-cheese',word:'fromage',translation:'queso',articleFr:'un',articleEs:'un'},
         {id:'food-egg',word:'œuf',translation:'huevo',articleFr:'un',articleEs:'un'},
-        {id:'food-milk',word:'lait',translation:'leche',articleFr:'du',articleEs:'—'},
-        {id:'food-butter',word:'beurre',translation:'mantequilla',articleFr:'du',articleEs:'—'},
-        {id:'food-rice',word:'riz',translation:'arroz',articleFr:'du',articleEs:'—'},
-        {id:'food-pasta',word:'pâtes',translation:'pasta',articleFr:'des',articleEs:'—'},
-        {id:'food-sugar',word:'sucre',translation:'azúcar',articleFr:'du',articleEs:'—'}
+        {id:'food-yogurt',word:'yaourt',translation:'yogur',articleFr:'un',articleEs:'un'},
+        {id:'food-cake',word:'gâteau',translation:'pastel / torta',articleFr:'un',articleEs:'una'},
+        {id:'food-sandwich',word:'sandwich',translation:'sándwich',articleFr:'un',articleEs:'un'},
+        {id:'food-biscuit',word:'biscuit',translation:'galleta',articleFr:'un',articleEs:'una'},
+        {id:'food-chocolate',word:'chocolat',translation:'chocolate',articleFr:'un',articleEs:'un'}
       ]}
     ]
   };
