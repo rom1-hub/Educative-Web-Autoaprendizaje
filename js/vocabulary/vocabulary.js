@@ -23,8 +23,14 @@
   if (!searchInput || !results || !browseButton || !resetButton || !topicsPanel ||
       !learnContent || !practiceContent || !exerciseTabs) return;
 
-  const database = window.COQ_VOCABULARY_DATABASE;
+  const databaseReady = window.COQ_VOCABULARY_DATABASE_READY;
+  if (!databaseReady || typeof databaseReady.then !== 'function') return;
+
+  const database = await databaseReady;
   if (!database || !Array.isArray(database.categories)) return;
+
+  const searchService = window.COQ_VOCABULARY_SEARCH && window.COQ_VOCABULARY_SEARCH.create(database);
+  if (!searchService) return;
 
   const EXERCISES = [
     { id: 'match', label: 'Ejercicio 1', title: 'Asociar palabras', description: 'Arrastra cada palabra francesa hasta su traducción.' },
