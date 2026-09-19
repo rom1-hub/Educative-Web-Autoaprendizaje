@@ -15,6 +15,7 @@
           {id:'person-girl',word:'fille',translation:'hija',articleFr:'une',articleEs:'una'},
           {id:'person-brother',word:'frère',translation:'hermano',articleFr:'un',articleEs:'un'},
           {id:'person-sister',word:'sœur',translation:'hermana',articleFr:'une',articleEs:'una'},
+          {id:'family-parents',word:'parents',translation:'padres',articleFr:'des',articleEs:'unos'},
           {id:'family-son',word:'fils',translation:'hijo',articleFr:'un',articleEs:'un'},
           {id:'family-grandfather',word:'grand-père',translation:'abuelo',articleFr:'un',articleEs:'un'},
           {id:'family-grandmother',word:'grand-mère',translation:'abuela',articleFr:'une',articleEs:'una'},
