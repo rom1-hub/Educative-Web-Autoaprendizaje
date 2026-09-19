@@ -581,7 +581,8 @@
     function speakCurrent() {
       const entry = selected[index];
       if (window.Coqaudio && typeof window.Coqaudio.speak === 'function') {
-        window.Coqaudio.speak(entry.word);
+        const phrase = [entry.articleFr, entry.word].filter(Boolean).join(' ');
+        window.Coqaudio.speak(phrase);
       } else if ('speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance(entry.word);
         utterance.lang = 'fr-FR';
