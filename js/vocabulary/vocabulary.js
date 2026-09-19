@@ -8,7 +8,7 @@
  * subcategoría seleccionada. No existen listas de vocabulario duplicadas
  * dentro de la lógica de ejercicios.
  */
-(function () {
+(async function () {
   'use strict';
 
   const searchInput = document.getElementById('vocabularySearch');
@@ -400,7 +400,7 @@
 
     practiceContent.innerHTML = `${exerciseHeader(EXERCISES[0])}
       <div class="vocabulary-exercise-meta">
-        <span>15 palabras</span>
+        <span>${selected.length} palabras</span>
         <span class="vocabulary-match-progress">0 / ${selected.length} asociadas</span>
       </div>
       <div class="vocabulary-match-single" data-match-board>
@@ -487,7 +487,7 @@
 
     practiceContent.innerHTML = `${exerciseHeader(EXERCISES[1])}
       <div class="vocabulary-exercise-meta">
-        <span>15 palabras</span>
+        <span>${selected.length} palabras</span>
         <span class="vocabulary-write-progress">1 / ${selected.length}</span>
       </div>
       <div class="vocabulary-write-card">
@@ -570,7 +570,7 @@
     let correctCount = 0;
 
     practiceContent.innerHTML = `${exerciseHeader(EXERCISES[2])}
-      <div class="vocabulary-exercise-meta"><span>15 palabras</span><span class="vocabulary-audio-progress">1 / ${selected.length}</span></div>
+      <div class="vocabulary-exercise-meta"><span>${selected.length} palabras</span><span class="vocabulary-audio-progress">1 / ${selected.length}</span></div>
       <div class="vocabulary-audio-card">
         <p>Escucha y selecciona la palabra correcta.</p>
         <button type="button" class="vocabulary-audio-button" data-audio-play aria-label="Reproducir palabra">▶ Escuchar</button>
