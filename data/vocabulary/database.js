@@ -68,6 +68,11 @@
       id: 'weather-climate',
       title: 'Clima y tiempo',
       src: '../data/vocabulary/categories/weather-climate.js?v=20260920-1'
+    }),
+    Object.freeze({
+      id: 'education',
+      title: 'Educación',
+      src: '../data/vocabulary/categories/education.js?v=20260920-1'
     })
   ]);
 
