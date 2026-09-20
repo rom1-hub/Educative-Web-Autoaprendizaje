@@ -1,6 +1,11 @@
 /* Vocabulario: estilos exclusivos de la página dinámica */
 .vocabulary-hub{position:relative}
 .vocabulary-search-panel{margin-top:20px;padding:24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--paper);box-shadow:0 8px 25px rgba(6,27,74,.045)}
+.vocabulary-mode-context{margin-bottom:24px}
+.vocabulary-mode-head{display:none}
+.vocabulary-tabs:has(.tab[data-vocabulary-tab="learn"].active) + .vocabulary-search-panel .vocabulary-mode-head[data-mode="learn"],
+.vocabulary-tabs:has(.tab[data-vocabulary-tab="practice"].active) + .vocabulary-search-panel .vocabulary-mode-head[data-mode="practice"]{display:block}
+.vocabulary-mode-head .section-head{margin:0}
 .vocabulary-tabs{margin-bottom:28px}
 .vocabulary-tabs .tab{cursor:pointer}
 .vocabulary-controls{padding-top:2px}
