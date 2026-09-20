@@ -42,7 +42,7 @@
     Object.freeze({
       id: 'city',
       title: 'Ciudad',
-      src: '../data/vocabulary/categories/city.js?v=20260919-6'
+      src: '../data/vocabulary/categories/city.js?v=20260920-10'
     }),
     Object.freeze({
       id: 'family-relations',
