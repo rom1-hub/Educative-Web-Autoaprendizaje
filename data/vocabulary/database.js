@@ -73,6 +73,11 @@
       id: 'education',
       title: 'Educación',
       src: '../data/vocabulary/categories/education.js?v=20260920-1'
+    }),
+    Object.freeze({
+      id: 'work-professions',
+      title: 'Trabajo y profesiones',
+      src: '../data/vocabulary/categories/work-professions.js?v=20260920-1'
     })
   ]);
 
