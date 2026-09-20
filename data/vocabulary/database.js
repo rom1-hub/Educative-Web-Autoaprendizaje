@@ -32,7 +32,7 @@
     Object.freeze({
       id: 'food',
       title: 'Alimentación',
-      src: '../data/vocabulary/categories/food.js?v=20260919-6'
+      src: '../data/vocabulary/categories/food.js?v=20260920-9'
     }),
     Object.freeze({
       id: 'clothing',
