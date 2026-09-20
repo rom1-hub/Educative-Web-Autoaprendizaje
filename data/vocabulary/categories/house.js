@@ -71,7 +71,6 @@
         {id:'house-pillow',word:'oreiller',translation:'almohada',articleFr:'un',articleEs:'una'},
         {id:'house-mattress',word:'matelas',translation:'colchón',articleFr:'un',articleEs:'un'},
         {id:'house-towel',word:'serviette',translation:'toalla',articleFr:'une',articleEs:'una'},
-        {id:'house-bathrobe',word:'peignoir',translation:'albornoz',articleFr:'un',articleEs:'un'},
         {id:'house-wall-clock',word:'horloge',translation:'reloj de pared',articleFr:'une',articleEs:'un'},
         {id:'house-alarm-clock',word:'réveil',translation:'despertador',articleFr:'un',articleEs:'un'},
         {id:'house-decoration',word:'décoration',translation:'decoración',articleFr:'une',articleEs:'una'},
