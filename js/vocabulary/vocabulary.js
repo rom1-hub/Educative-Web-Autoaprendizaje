@@ -749,10 +749,7 @@
 
   function resultContextKey(item) {
     if (!item || item.type !== 'entry') return '';
-    return [
-      normalize(item.data.word),
-      normalize(item.data.translation)
-    ].join('|');
+    return normalize(item.data.word);
   }
 
   function shouldShowEntryContext(item, entryMatches) {
