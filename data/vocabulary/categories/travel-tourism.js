@@ -77,7 +77,6 @@
           {id:'travel-luggage',word:'bagage',translation:'equipaje',articleFr:'un',articleEs:'un'},
           {id:'travel-suitcase',word:'valise',translation:'maleta',articleFr:'une',articleEs:'una'},
           {id:'travel-backpack',word:'sac à dos',translation:'mochila',articleFr:'un',articleEs:'una'},
-          {id:'travel-bag',word:'sac',translation:'bolso / bolsa',articleFr:'un',articleEs:'un / una'},
           {id:'travel-travel-bag',word:'sac de voyage',translation:'bolso de viaje',articleFr:'un',articleEs:'un'},
           {id:'travel-wallet',word:'portefeuille',translation:'cartera',articleFr:'un',articleEs:'una'},
           {id:'travel-map',word:'carte',translation:'mapa',articleFr:'une',articleEs:'un'},
@@ -93,16 +92,13 @@
         title: 'Turismo y lugares',
         entries: [
           {id:'travel-monument',word:'monument',translation:'monumento',articleFr:'un',articleEs:'un'},
-          {id:'travel-museum',word:'musée',translation:'museo',articleFr:'un',articleEs:'un'},
           {id:'travel-castle',word:'château',translation:'castillo',articleFr:'un',articleEs:'un'},
           {id:'travel-cathedral',word:'cathédrale',translation:'catedral',articleFr:'une',articleEs:'una'},
           {id:'travel-church',word:'église',translation:'iglesia',articleFr:'une',articleEs:'una'},
           {id:'travel-palace',word:'palais',translation:'palacio',articleFr:'un',articleEs:'un'},
-          {id:'travel-square',word:'place',translation:'plaza',articleFr:'une',articleEs:'una'},
           {id:'travel-historic-center',word:'centre historique',translation:'centro histórico',articleFr:'un',articleEs:'un'},
           {id:'travel-tourist-site',word:'site touristique',translation:'sitio turístico',articleFr:'un',articleEs:'un'},
           {id:'travel-tourist-attraction',word:'attraction touristique',translation:'atracción turística',articleFr:'une',articleEs:'una'},
-          {id:'travel-park',word:'parc',translation:'parque',articleFr:'un',articleEs:'un'},
           {id:'travel-beach',word:'plage',translation:'playa',articleFr:'une',articleEs:'una'}
         ]
       },
