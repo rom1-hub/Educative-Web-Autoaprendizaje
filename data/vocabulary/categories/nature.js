@@ -51,7 +51,7 @@
           {id:'nature-sea',word:'mer',translation:'mar',articleFr:'une',articleEs:'una'},
           {id:'nature-ocean',word:'océan',translation:'océano',articleFr:'un',articleEs:'un'},
           {id:'nature-river',word:'rivière',translation:'río',articleFr:'une',articleEs:'un'},
-          {id:'nature-large-river',word:'fleuve',translation:'río',articleFr:'un',articleEs:'un'},
+          {id:'nature-large-river',word:'fleuve',translation:'río afluente al mar',articleFr:'un',articleEs:'un'},
           {id:'nature-stream',word:'ruisseau',translation:'arroyo',articleFr:'un',articleEs:'un'},
           {id:'nature-lake',word:'lac',translation:'lago',articleFr:'un',articleEs:'un'},
           {id:'nature-waterfall',word:'cascade',translation:'cascada',articleFr:'une',articleEs:'una'},
@@ -79,7 +79,7 @@
           {id:'nature-petal',word:'pétale',translation:'pétalo',articleFr:'un',articleEs:'un'},
           {id:'nature-thorn',word:'épine',translation:'espina',articleFr:'une',articleEs:'una'},
           {id:'nature-bud',word:'bourgeon',translation:'brote',articleFr:'un',articleEs:'un'},
-          {id:'nature-moss',word:'mousse',translation:'musgo',articleFr:'un',articleEs:'un'},
+          {id:'nature-moss',word:'mousse',translation:'musgo',articleFr:'une',articleEs:'un'},
           {id:'nature-algae',word:'algue',translation:'alga',articleFr:'une',articleEs:'una'},
           {id:'nature-mushroom',word:'champignon',translation:'seta / hongo',articleFr:'un',articleEs:'una'}
         ]
