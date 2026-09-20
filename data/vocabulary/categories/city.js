@@ -12,8 +12,7 @@
         {id:'city-pharmacy',word:'pharmacie',translation:'farmacia',articleFr:'une',articleEs:'una'},
         {id:'city-bank',word:'banque',translation:'banco',articleFr:'une',articleEs:'un'},
         {id:'city-post-office',word:'poste',translation:'oficina de correos',articleFr:'une',articleEs:'una'},
-        {id:'city-station',word:'gare',translation:'estación',articleFr:'une',articleEs:'una'},
-        {id:'city-airport',word:'aéroport',translation:'aeropuerto',articleFr:'un',articleEs:'un'}
+                {id:'city-airport',word:'aéroport',translation:'aeropuerto',articleFr:'un',articleEs:'un'}
       ]},
       {id:'city-shops',title:'Comercios',entries:[
         {id:'city-store',word:'magasin',translation:'tienda',articleFr:'un',articleEs:'una'},
