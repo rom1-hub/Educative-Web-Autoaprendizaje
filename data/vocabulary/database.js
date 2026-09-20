@@ -83,6 +83,11 @@
       id: 'shopping-commerce',
       title: 'Compras y comercio',
       src: '../data/vocabulary/categories/shopping-commerce.js?v=20260920-1'
+    }),
+    Object.freeze({
+      id: 'money-banking',
+      title: 'Dinero y banca',
+      src: '../data/vocabulary/categories/money-banking.js?v=20260920-1'
     })
   ]);
 
