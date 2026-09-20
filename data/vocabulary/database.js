@@ -78,6 +78,11 @@
       id: 'work-professions',
       title: 'Trabajo y profesiones',
       src: '../data/vocabulary/categories/work-professions.js?v=20260920-1'
+    }),
+    Object.freeze({
+      id: 'shopping-commerce',
+      title: 'Compras y comercio',
+      src: '../data/vocabulary/categories/shopping-commerce.js?v=20260920-1'
     })
   ]);
 
