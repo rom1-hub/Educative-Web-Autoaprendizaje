@@ -69,7 +69,7 @@
           {id:'nature-tree',word:'arbre',translation:'árbol',articleFr:'un',articleEs:'un'},
           {id:'nature-flower',word:'fleur',translation:'flor',articleFr:'une',articleEs:'una'},
           {id:'nature-grass',word:'herbe',translation:'hierba',articleFr:'une',articleEs:'una'},
-          {id:'nature-leaf',word:'feuille',translation:'hoja / folio',articleFr:'une',articleEs:'una'},
+          {id:'nature-leaf',word:'feuille',translation:'hoja',articleFr:'une',articleEs:'una'},
           {id:'nature-branch',word:'branche',translation:'rama',articleFr:'une',articleEs:'una'},
           {id:'nature-trunk',word:'tronc',translation:'tronco',articleFr:'un',articleEs:'un'},
           {id:'nature-root',word:'racine',translation:'raíz',articleFr:'une',articleEs:'una'},
