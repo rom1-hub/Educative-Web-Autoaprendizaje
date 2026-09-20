@@ -39,18 +39,15 @@
           {id:'travel-hotel',word:'hôtel',translation:'hotel',articleFr:'un',articleEs:'un'},
           {id:'travel-inn',word:'auberge',translation:'albergue / posada',articleFr:'une',articleEs:'un / una'},
           {id:'travel-hostel',word:'auberge de jeunesse',translation:'albergue juvenil',articleFr:'une',articleEs:'un'},
-          {id:'travel-room',word:'chambre',translation:'habitación',articleFr:'une',articleEs:'una'},
           {id:'travel-single-room',word:'chambre simple',translation:'habitación individual',articleFr:'une',articleEs:'una'},
           {id:'travel-double-room',word:'chambre double',translation:'habitación doble',articleFr:'une',articleEs:'una'},
           {id:'travel-suite',word:'suite',translation:'suite',articleFr:'une',articleEs:'una'},
-          {id:'travel-apartment',word:'appartement',translation:'apartamento',articleFr:'un',articleEs:'un'},
           {id:'travel-guesthouse',word:'maison d’hôtes',translation:'casa de huéspedes',articleFr:'une',articleEs:'una'},
           {id:'travel-camping',word:'camping',translation:'camping',articleFr:'un',articleEs:'un'},
           {id:'travel-tent',word:'tente',translation:'tienda de campaña',articleFr:'une',articleEs:'una'},
           {id:'travel-pitch',word:'emplacement',translation:'parcela',articleFr:'un',articleEs:'una'},
           {id:'travel-lodging',word:'logement',translation:'alojamiento',articleFr:'un',articleEs:'un'},
           {id:'travel-reception',word:'réception',translation:'recepción',articleFr:'une',articleEs:'una'},
-          {id:'travel-key',word:'clé',translation:'llave',articleFr:'une',articleEs:'una'}
         ]
       },
       {
