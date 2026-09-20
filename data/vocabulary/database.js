@@ -58,6 +58,11 @@
       id: 'travel-tourism',
       title: 'Viajes y turismo',
       src: '../data/vocabulary/categories/travel-tourism.js?v=20260919-1'
+    }),
+    Object.freeze({
+      id: 'nature',
+      title: 'Naturaleza',
+      src: '../data/vocabulary/categories/nature.js?v=20260920-1'
     })
   ]);
 
