@@ -27,7 +27,7 @@
     Object.freeze({
       id: 'house',
       title: 'Casa',
-      src: '../data/vocabulary/categories/house.js?v=20260919-6'
+      src: '../data/vocabulary/categories/house.js?v=20260920-7'
     }),
     Object.freeze({
       id: 'food',
