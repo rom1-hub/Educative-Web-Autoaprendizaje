@@ -528,7 +528,7 @@
         <strong class="vocabulary-write-prompt"></strong>
         <p class="vocabulary-write-instruction">
           <span>Escribe la palabra en francés.</span>
-          <span>Si es un sustantivo, incluye el artículo <strong>« un »</strong> o <strong>« une »</strong>.</span>
+          <span>Si es un sustantivo, traduce también el artículo que aparece con la palabra.</span>
           <span>Si es un adjetivo, escribe solo el adjetivo.</span>
         </p>
         <input id="vocabularyWriteInput" class="vocabulary-write-input" type="text" autocomplete="off" spellcheck="false">
