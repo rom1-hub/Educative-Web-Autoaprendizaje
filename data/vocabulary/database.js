@@ -37,7 +37,7 @@
     Object.freeze({
       id: 'clothing',
       title: 'Ropa',
-      src: '../data/vocabulary/categories/clothing.js?v=20260919-6'
+      src: '../data/vocabulary/categories/clothing.js?v=20260920-8'
     }),
     Object.freeze({
       id: 'city',
