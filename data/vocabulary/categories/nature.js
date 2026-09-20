@@ -39,24 +39,27 @@
           {id:'nature-cave',word:'grotte',translation:'cueva',articleFr:'une',articleEs:'una'},
           {id:'nature-volcano',word:'volcan',translation:'volcán',articleFr:'un',articleEs:'un'},
           {id:'nature-glacier',word:'glacier',translation:'glaciar',articleFr:'un',articleEs:'un'},
-          {id:'nature-summit',word:'sommet',translation:'cima / cumbre',articleFr:'un',articleEs:'una'}
+          {id:'nature-summit',word:'sommet',translation:'cima / cumbre',articleFr:'un',articleEs:'una'},
+          {id:'nature-mountain-slope',word:'flanc de montagne',translation:'falda o declive de la montaña',articleFr:'un',articleEs:'una'}
         ]
       },
       {
         id: 'nature-water',
         title: 'Agua y medios acuáticos',
         entries: [
-          {id:'nature-water',word:'eau',translation:'agua',articleFr:'l’',articleEs:'el'},
-          {id:'nature-sea',word:'mer',translation:'mar',articleFr:'la',articleEs:'el'},
+          {id:'nature-water',word:'eau',translation:'agua',articleFr:'une',articleEs:'una'},
+          {id:'nature-sea',word:'mer',translation:'mar',articleFr:'une',articleEs:'una'},
           {id:'nature-ocean',word:'océan',translation:'océano',articleFr:'un',articleEs:'un'},
           {id:'nature-river',word:'rivière',translation:'río',articleFr:'une',articleEs:'un'},
+          {id:'nature-large-river',word:'fleuve',translation:'río',articleFr:'un',articleEs:'un'},
           {id:'nature-stream',word:'ruisseau',translation:'arroyo',articleFr:'un',articleEs:'un'},
           {id:'nature-lake',word:'lac',translation:'lago',articleFr:'un',articleEs:'un'},
           {id:'nature-waterfall',word:'cascade',translation:'cascada',articleFr:'une',articleEs:'una'},
           {id:'nature-pond',word:'étang',translation:'estanque',articleFr:'un',articleEs:'un'},
           {id:'nature-island',word:'île',translation:'isla',articleFr:'une',articleEs:'una'},
           {id:'nature-coast',word:'côte',translation:'costa',articleFr:'une',articleEs:'una'},
-          {id:'nature-shore',word:'rivage',translation:'orilla / litoral',articleFr:'un',articleEs:'una'}
+          {id:'nature-shore',word:'rivage',translation:'orilla / litoral',articleFr:'un',articleEs:'una'},
+          {id:'nature-estuary',word:'embouchure',translation:'desembocadura',articleFr:'une',articleEs:'una'}
         ]
       },
       {
@@ -76,7 +79,7 @@
           {id:'nature-petal',word:'pétale',translation:'pétalo',articleFr:'un',articleEs:'un'},
           {id:'nature-thorn',word:'épine',translation:'espina',articleFr:'une',articleEs:'una'},
           {id:'nature-bud',word:'bourgeon',translation:'brote',articleFr:'un',articleEs:'un'},
-          {id:'nature-moss',word:'mousse',translation:'musgo',articleFr:'une',articleEs:'una'},
+          {id:'nature-moss',word:'mousse',translation:'musgo',articleFr:'un',articleEs:'un'},
           {id:'nature-algae',word:'algue',translation:'alga',articleFr:'une',articleEs:'una'},
           {id:'nature-mushroom',word:'champignon',translation:'seta / hongo',articleFr:'un',articleEs:'una'}
         ]
