@@ -58,6 +58,7 @@
           {id:'education-notebook-small',word:'carnet',translation:'libreta',articleFr:'un',articleEs:'una'},
           {id:'education-folder-binder',word:'classeur',translation:'carpeta de anillas',articleFr:'un',articleEs:'una'},
           {id:'education-folder',word:'dossier',translation:'carpeta',articleFr:'un',articleEs:'una'},
+          {id:'education-sheet',word:'feuille',translation:'folio',articleFr:'une',articleEs:'un'},
           {id:'education-pen',word:'stylo',translation:'bolígrafo',articleFr:'un',articleEs:'un'},
           {id:'education-pencil',word:'crayon',translation:'lápiz',articleFr:'un',articleEs:'un'},
           {id:'education-colored-pencil',word:'crayon de couleur',translation:'lápiz de color',articleFr:'un',articleEs:'un'},
