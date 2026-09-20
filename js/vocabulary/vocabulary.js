@@ -747,6 +747,39 @@
     else renderPractice(selectedItem);
   }
 
+  function resultContextKey(item) {
+    if (!item || item.type !== 'entry') return '';
+    return [
+      normalize(item.data.word),
+      normalize(item.data.translation)
+    ].join('|');
+  }
+
+  function shouldShowEntryContext(item, entryMatches) {
+    if (!item || item.type !== 'entry') return false;
+
+    const key = resultContextKey(item);
+    return entryMatches.filter((match) => resultContextKey(match) === key).length > 1;
+  }
+
+  function renderEntryResult(item, index, showContext) {
+    const entry = item.data;
+    const word = [entry.articleFr, entry.word].filter(Boolean).join(' ');
+    const translation = [entry.articleEs, entry.translation].filter(Boolean).join(' ');
+    const context = showContext
+      ? `<small class="vocabulary-result-context">${escapeHtml(item.category)}</small>`
+      : '';
+
+    return `<button type="button" class="vocabulary-result vocabulary-result-entry" data-result-index="${index}">
+      <span class="vocabulary-result-main">
+        <strong>${entry.emoji ? escapeHtml(entry.emoji) + ' ' : ''}${escapeHtml(word)}</strong>
+        <span class="vocabulary-result-separator">/</span>
+        <span class="vocabulary-result-translation">${escapeHtml(translation)}</span>
+      </span>
+      ${context}
+    </button>`;
+  }
+
   async function renderResults(query) {
     const term = normalize(query);
     if (!term) {
@@ -766,12 +799,15 @@
       return;
     }
 
+    const entryMatches = matches.filter((item) => item.type === 'entry');
+
     results.innerHTML = matches.map((item, index) => {
       if (item.type === 'entry') {
-        return `<button type="button" class="vocabulary-result" data-result-index="${index}">
-          <strong>${item.data.emoji ? escapeHtml(item.data.emoji) + ' ' : ''}${escapeHtml(item.title)}</strong>
-          <small>${escapeHtml(item.category)}</small>
-        </button>`;
+        return renderEntryResult(
+          item,
+          index,
+          shouldShowEntryContext(item, entryMatches)
+        );
       }
 
       return `<button type="button" class="vocabulary-result" data-result-index="${index}">
