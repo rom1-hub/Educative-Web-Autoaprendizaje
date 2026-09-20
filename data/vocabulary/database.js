@@ -62,7 +62,12 @@
     Object.freeze({
       id: 'nature',
       title: 'Naturaleza',
-      src: '../data/vocabulary/categories/nature.js?v=20260920-1'
+      src: '../data/vocabulary/categories/nature.js?v=20260920-2'
+    }),
+    Object.freeze({
+      id: 'weather-climate',
+      title: 'Clima y tiempo',
+      src: '../data/vocabulary/categories/weather-climate.js?v=20260920-1'
     })
   ]);
 
