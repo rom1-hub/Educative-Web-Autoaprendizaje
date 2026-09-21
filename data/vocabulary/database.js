@@ -31,7 +31,8 @@
     Object.freeze({id:'money-banking',title:'Dinero y banca',src:'../data/vocabulary/categories/money-banking.js?v=20260920-1'}),
     Object.freeze({id:'health-medicine',title:'Salud y medicina',src:'../data/vocabulary/categories/health-medicine.js?v=20260920-1'}),
     Object.freeze({id:'daily-life-routines',title:'Vida cotidiana y rutinas',src:'../data/vocabulary/categories/daily-life-routines.js?v=20260921-1'}),
-    Object.freeze({id:'leisure-entertainment',title:'Ocio y entretenimiento',src:'../data/vocabulary/categories/leisure-entertainment.js?v=20260921-1'})
+    Object.freeze({id:'leisure-entertainment',title:'Ocio y entretenimiento',src:'../data/vocabulary/categories/leisure-entertainment.js?v=20260921-1'}),
+    Object.freeze({id:'sports',title:'Deportes',src:'../data/vocabulary/categories/sports.js?v=20260921-2'})
   ]);
 
   const registry = new Map();
