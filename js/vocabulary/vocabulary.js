@@ -83,14 +83,34 @@
     return shuffle(entries).slice(0, Math.min(count, entries.length));
   }
 
+  function formatFrenchWord(entry) {
+    const article = String(entry && entry.articleFr || '').trim();
+    let word = String(entry && entry.word || '').trim();
+
+    if (!article) return word;
+
+    const normalizedArticle = normalize(article);
+    const normalizedWord = normalize(word);
+
+    if (normalizedWord === normalizedArticle) {
+      word = '';
+    } else if (normalizedWord.startsWith(normalizedArticle + ' ')) {
+      word = word.slice(article.length).trim();
+    } else if (normalizedArticle.endsWith("'") && normalizedWord.startsWith(normalizedArticle)) {
+      word = word.slice(article.length).trim();
+    }
+
+    if (!word) return article;
+    if (article.endsWith("'")) return article + word;
+    return article + ' ' + word;
+  }
+
   function displayWord(entry) {
-    const article = String(entry.articleFr || '').trim();
-    const word = String(entry.word || '').trim();
-    return escapeHtml([article, word].filter(Boolean).join(' '));
+    return escapeHtml(formatFrenchWord(entry));
   }
 
   function pronunciationButton(entry, label) {
-    const phrase = [entry.articleFr, entry.word].filter(Boolean).join(' ').trim();
+    const phrase = formatFrenchWord(entry).trim();
     if (!phrase) return '';
     return `<button type="button" class="vocabulary-pronunciation-button"
       data-say="${escapeHtml(phrase)}"
@@ -568,14 +588,14 @@
 
       const entry = selected[index];
       const answer = normalize(input.value);
-      const expected = normalize([entry.articleFr, entry.word].filter(Boolean).join(' '));
+      const expected = normalize(formatFrenchWord(entry));
       const correct = answer === expected;
 
       if (correct) {
         correctCount += 1;
-        feedback.innerHTML = feedbackHtml(true, [entry.articleFr, entry.word].filter(Boolean).join(' '));
+        feedback.innerHTML = feedbackHtml(true, formatFrenchWord(entry));
       } else {
-        feedback.innerHTML = feedbackHtml(false, [entry.articleFr, entry.word].filter(Boolean).join(' '));
+        feedback.innerHTML = feedbackHtml(false, formatFrenchWord(entry));
       }
 
       input.disabled = true;
@@ -623,7 +643,7 @@
     function speakCurrent() {
       const entry = selected[index];
       if (window.Coqaudio && typeof window.Coqaudio.speak === 'function') {
-        const phrase = [entry.articleFr, entry.word].filter(Boolean).join(' ');
+        const phrase = formatFrenchWord(entry);
         window.Coqaudio.speak(phrase);
       } else if ('speechSynthesis' in window) {
         const phrase = [entry.articleFr, entry.word].filter(Boolean).join(' ');
@@ -761,7 +781,7 @@
 
   function renderEntryResult(item, index, showContext) {
     const entry = item.data;
-    const word = [entry.articleFr, entry.word].filter(Boolean).join(' ');
+    const word = formatFrenchWord(entry);
     const translation = [entry.articleEs, entry.translation].filter(Boolean).join(' ');
     const context = showContext
       ? `<small class="vocabulary-result-context">${escapeHtml(item.category)}</small>`
