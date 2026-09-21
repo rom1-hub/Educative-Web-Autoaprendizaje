@@ -96,12 +96,12 @@
       word = '';
     } else if (normalizedWord.startsWith(normalizedArticle + ' ')) {
       word = word.slice(article.length).trim();
-    } else if (normalizedArticle.endsWith("'") && normalizedWord.startsWith(normalizedArticle)) {
+    } else if (/['’]$/.test(article) && normalizedWord.startsWith(normalizedArticle)) {
       word = word.slice(article.length).trim();
     }
 
     if (!word) return article;
-    if (article.endsWith("'")) return article + word;
+    if (/['’]$/.test(article)) return article + word;
     return article + ' ' + word;
   }
 
