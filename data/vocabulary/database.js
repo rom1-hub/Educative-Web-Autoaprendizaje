@@ -87,13 +87,31 @@
     loadCache.set(src,promise); return promise;
   }
   function getLoadedCategories(){return Object.freeze(MANIFEST.map((item)=>registry.get(item.id)).filter(Boolean));}
+  function formatFrenchWord(entry){
+    const article=String(entry&&entry.articleFr||'').trim();
+    let word=String(entry&&entry.word||'').trim();
+    if(!article)return word;
+    const normalizedArticle=article.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase();
+    const normalizedWord=word.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase();
+    if(normalizedWord===normalizedArticle){
+      word='';
+    }else if(normalizedWord.startsWith(normalizedArticle+' ')){
+      word=word.slice(article.length).trim();
+    }else if(normalizedArticle.endsWith("'")&&normalizedWord.startsWith(normalizedArticle)){
+      word=word.slice(article.length).trim();
+    }
+    if(!word)return article;
+    if(article.endsWith("'"))return article+word;
+    return article+' '+word;
+  }
+
   function buildSearchIndex(categories){
     const index=[];
     categories.forEach((category)=>{
       index.push({type:'category',id:category.id,title:category.title,category:category.title,parentId:null,data:category});
       (category.subcategories||[]).forEach((subcategory)=>{
         index.push({type:'subcategory',id:subcategory.id,title:subcategory.title,category:category.title,parentId:category.id,data:subcategory});
-        (subcategory.entries||[]).forEach((entry)=>index.push({type:'entry',id:entry.id,title:[entry.articleFr,entry.word].filter(Boolean).join(' '),translation:[entry.articleEs,entry.translation].filter(Boolean).join(' '),category:category.title+' · '+subcategory.title,parentId:subcategory.id,categoryId:category.id,data:entry}));
+        (subcategory.entries||[]).forEach((entry)=>index.push({type:'entry',id:entry.id,title:formatFrenchWord(entry),translation:[entry.articleEs,entry.translation].filter(Boolean).join(' '),category:category.title+' · '+subcategory.title,parentId:subcategory.id,categoryId:category.id,data:entry}));
       });
     }); return Object.freeze(index);
   }
