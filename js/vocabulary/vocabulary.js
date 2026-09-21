@@ -803,7 +803,7 @@
         return renderEntryResult(
           item,
           index,
-          shouldShowEntryContext(item, entryMatches)
+          true
         );
       }
 
