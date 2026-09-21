@@ -646,7 +646,7 @@
         const phrase = formatFrenchWord(entry);
         window.Coqaudio.speak(phrase);
       } else if ('speechSynthesis' in window) {
-        const phrase = [entry.articleFr, entry.word].filter(Boolean).join(' ');
+        const phrase = formatFrenchWord(entry);
         const utterance = new SpeechSynthesisUtterance(phrase);
         utterance.lang = 'fr-FR';
         window.speechSynthesis.cancel();
@@ -673,7 +673,7 @@
             const right = options.querySelector(`[data-answer-id="${CSS.escape(entry.id)}"]`);
             if (right) right.classList.add('correct');
           }
-          feedback.innerHTML = feedbackHtml(correct, [entry.articleFr, entry.word].filter(Boolean).join(' '));
+          feedback.innerHTML = feedbackHtml(correct, formatFrenchWord(entry));
           window.setTimeout(() => {
             index += 1;
             if (index >= selected.length) finish();
