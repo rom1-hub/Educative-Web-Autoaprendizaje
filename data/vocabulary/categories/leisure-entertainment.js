@@ -50,7 +50,6 @@
           ['réalisatrice','une réalisatrice','una directora','une','una'],
           ['personnage','un personnage','un personaje','un','un'],
           ['scène','une scène','una escena','une','una'],
-          ['histoire-cinema','une histoire','una historia','une','una'],
           ['scénario','un scénario','un guion','un','un'],
           ['écran','un écran','una pantalla','un','una'],
           ['émission','une émission','un programa','une','un'],
