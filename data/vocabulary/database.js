@@ -29,7 +29,8 @@
     Object.freeze({id:'work-professions',title:'Trabajo y profesiones',src:'../data/vocabulary/categories/work-professions.js?v=20260920-1'}),
     Object.freeze({id:'shopping-commerce',title:'Compras y comercio',src:'../data/vocabulary/categories/shopping-commerce.js?v=20260920-1'}),
     Object.freeze({id:'money-banking',title:'Dinero y banca',src:'../data/vocabulary/categories/money-banking.js?v=20260920-1'}),
-    Object.freeze({id:'health-medicine',title:'Salud y medicina',src:'../data/vocabulary/categories/health-medicine.js?v=20260920-1'})
+    Object.freeze({id:'health-medicine',title:'Salud y medicina',src:'../data/vocabulary/categories/health-medicine.js?v=20260920-1'}),
+    Object.freeze({id:'daily-life-routines',title:'Vida cotidiana y rutinas',src:'../data/vocabulary/categories/daily-life-routines.js?v=20260921-1'})
   ]);
 
   const registry = new Map();
