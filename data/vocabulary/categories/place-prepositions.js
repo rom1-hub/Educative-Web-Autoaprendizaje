@@ -31,7 +31,7 @@
           ['outside-of','à l’extérieur de','fuera de'],
           ['outside','à l’extérieur','fuera'],
           ['outside-of-elsewhere','en dehors de','fuera de'],
-          ['outside-of','hors de','fuera de'],
+          ['outside-of-domain','hors de','fuera de'],
           ['in-there','dedans','dentro'],
           ['out-there','dehors','fuera'],
           ['outside-area','au-dehors','en el exterior'],
