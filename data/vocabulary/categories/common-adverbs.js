@@ -81,7 +81,7 @@
           ['sans-doute','sans doute','sin duda / probablemente'],['evidemment','évidemment','evidentemente'],
           ['apparemment','apparemment','aparentemente'],['effectivement','effectivement','efectivamente'],
           ['vraisemblablement','vraisemblablement','probablemente'],['absolument','absolument','absolutamente'],
-          ['certainement-pas','certainement pas','de ninguna manera'],['jamais','jamais','nunca']
+          ['certainement-pas','certainement pas','de ninguna manera'],['nullement','nullement','de ninguna manera']
         ]
       },
       {
@@ -91,13 +91,11 @@
           ['personnellement','personnellement','personalmente'],['franchement','franchement','sinceramente'],
           ['heureusement','heureusement','afortunadamente / por suerte'],
           ['malheureusement','malheureusement','desgraciadamente / por desgracia'],
-          ['naturellement','naturellement','naturalmente'],['heureusement-que','heureusement','por suerte'],
-          ['sincèrement','sincèrement','sinceramente'],['curieusement','curieusement','curiosamente'],
-          ['heureusement-2','heureusement','afortunadamente'],['heureusement-3','heureusement','por suerte'],
+          ['naturellement','naturellement','naturalmente'],['sincèrement','sincèrement','sinceramente'],['curieusement','curieusement','curiosamente'],
           ['notamment','notamment','especialmente / en particular'],
           ['particulierement','particulièrement','particularmente'],
           ['principalement','principalement','principalmente'],['globalement','globalement','en general'],
-          ['visiblement','visiblement','visiblemente'],['apparemment-2','apparemment','aparentemente']
+          ['visiblement','visiblement','visiblemente']
         ]
       },
       {
@@ -108,9 +106,9 @@
           ['seulement','seulement','solamente'],['uniquement','uniquement','únicamente'],
           ['davantage-2','davantage','más'],['beaucoup-plus','beaucoup plus','mucho más'],
           ['beaucoup-moins','beaucoup moins','mucho menos'],['un-peu','un peu','un poco'],
-          ['presque-2','presque','casi'],['environ-2','environ','aproximadamente'],
+          
           ['quasiment','quasiment','casi / prácticamente'],['pratiquement','pratiquement','prácticamente'],
-          ['exactement-2','exactement','exactamente'],['a-peu-pres','à peu près','más o menos / aproximadamente'],
+          ['a-peu-pres','à peu près','más o menos / aproximadamente'],
           ['de-plus-en-plus','de plus en plus','cada vez más'],['de-moins-en-moins','de moins en moins','cada vez menos']
         ]
       }
