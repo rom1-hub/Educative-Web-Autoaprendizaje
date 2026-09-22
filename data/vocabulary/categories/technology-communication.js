@@ -19,7 +19,7 @@
           ['clavier','clavier','teclado','un','el'],
           ['souris','souris','ratón','une','el'],
           ['imprimante','imprimante','impresora','une','la'],
-          ['casque','casque','auriculares','un','los'],
+          ['casque','casque','auriculares','un','unos'],
           ['haut-parleur','haut-parleur','altavoz','un','el'],
           ['webcam','webcam','cámara web','une','la'],
           ['chargeur','chargeur','cargador','un','el'],
