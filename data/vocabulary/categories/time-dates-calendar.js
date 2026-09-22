@@ -253,8 +253,6 @@
           ['same-day','jour même','mismo día','le','el'],
           ['following-week','semaine suivante','semana siguiente','la','la'],
           ['previous-week','semaine précédente','semana anterior','la','la'],
-          ['following-month','mois suivant','mes siguiente','le','el'],
-          ['previous-month','mois précédent','mes anterior','le','el'],
           ['following-year','année suivante','año siguiente','l’','el'],
           ['previous-year','année précédente','año anterior','l’','el']
         ]
