@@ -104,7 +104,7 @@
         entries: [
           ['plutot','plutôt','más bien'],['aussi','aussi','también / tan'],['egalement','également','igualmente / también'],
           ['seulement','seulement','solamente'],['uniquement','uniquement','únicamente'],
-          ['davantage-2','davantage','más'],['beaucoup-plus','beaucoup plus','mucho más'],
+          ['beaucoup-plus','beaucoup plus','mucho más'],
           ['beaucoup-moins','beaucoup moins','mucho menos'],['un-peu','un peu','un poco'],
           
           ['quasiment','quasiment','casi / prácticamente'],['pratiquement','pratiquement','prácticamente'],
