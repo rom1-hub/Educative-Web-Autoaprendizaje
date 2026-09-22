@@ -41,6 +41,7 @@
     Object.freeze({id:'place-prepositions',title:'Preposiciones de lugar',src:'../data/vocabulary/categories/place-prepositions.js?v=20260922-2'}),
     Object.freeze({id:'avoir-expressions',title:'Expresiones con avoir',src:'../data/vocabulary/categories/avoir-expressions.js?v=20260922-1'}),
     Object.freeze({id:'numbers-cardinal-ordinal',title:'Números cardinales y ordinales',src:'../data/vocabulary/categories/numbers-cardinal-ordinal.js?v=20260922-1'}),
+    Object.freeze({id:'figurative-idiomatic-expressions',title:'Expresiones figuradas e idiomáticas',src:'../data/vocabulary/categories/figurative-idiomatic-expressions.js?v=20260922-1'}),
   ]);
 
   const registry = new Map();
