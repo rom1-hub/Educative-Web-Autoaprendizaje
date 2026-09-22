@@ -810,12 +810,31 @@
     return entryMatches.filter((match) => resultContextKey(match) === key).length > 1;
   }
 
-  function renderEntryResult(item, index, showContext) {
+  function renderEntryResult(item, index) {
     const entry = item.data;
     const word = formatFrenchWord(entry);
     const translation = [entry.articleEs, entry.translation].filter(Boolean).join(' ');
-    const context = showContext
-      ? `<small class="vocabulary-result-context">${escapeHtml(item.category)}</small>`
+
+    const contexts = Array.isArray(item.contexts) ? item.contexts : [];
+    const uniqueContexts = [];
+    const seenContexts = new Set();
+
+    contexts.forEach((context) => {
+      if (!context || !context.category || !context.subcategory) return;
+
+      const key = context.category.id + '|' + context.subcategory.id;
+      if (seenContexts.has(key)) return;
+
+      seenContexts.add(key);
+      uniqueContexts.push(context);
+    });
+
+    const contextHtml = uniqueContexts.length
+      ? `<div class="vocabulary-result-context" aria-label="Categoría y subcategoría">
+          ${uniqueContexts.map((context) => `
+            <span>${escapeHtml(context.category.title)} · ${escapeHtml(context.subcategory.title)}</span>
+          `).join('')}
+        </div>`
       : '';
 
     return `<button type="button" class="vocabulary-result vocabulary-result-entry" data-result-index="${index}">
@@ -824,7 +843,7 @@
         <span class="vocabulary-result-separator">/</span>
         <span class="vocabulary-result-translation">${escapeHtml(translation)}</span>
       </span>
-      ${context}
+      ${contextHtml}
     </button>`;
   }
 
@@ -849,11 +868,7 @@
 
     results.innerHTML = matches.map((item, index) => {
       if (item.type === 'entry') {
-        return renderEntryResult(
-          item,
-          index,
-          false
-        );
+        return renderEntryResult(item, index);
       }
 
       return `<button type="button" class="vocabulary-result" data-result-index="${index}">
