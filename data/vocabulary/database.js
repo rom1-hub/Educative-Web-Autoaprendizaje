@@ -43,6 +43,7 @@
     Object.freeze({id:'numbers-cardinal-ordinal',title:'Números cardinales y ordinales',src:'../data/vocabulary/categories/numbers-cardinal-ordinal.js?v=20260922-1'}),
     Object.freeze({id:'figurative-idiomatic-expressions',title:'Expresiones figuradas e idiomáticas',src:'../data/vocabulary/categories/figurative-idiomatic-expressions.js?v=20260922-1'}),
     Object.freeze({id:'common-adverbs',title:'Adverbios más usados',src:'../data/vocabulary/categories/common-adverbs.js?v=20260922-1'}),
+    Object.freeze({id:'connectors',title:'Conectores',src:'../data/vocabulary/categories/connectors.js?v=20260922-1'}),
   ]);
 
   const registry = new Map();
