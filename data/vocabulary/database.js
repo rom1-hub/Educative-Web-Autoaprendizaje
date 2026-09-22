@@ -34,7 +34,8 @@
     Object.freeze({id:'leisure-entertainment',title:'Ocio y entretenimiento',src:'../data/vocabulary/categories/leisure-entertainment.js?v=20260921-1'}),
     Object.freeze({id:'sports',title:'Deportes',src:'../data/vocabulary/categories/sports.js?v=20260921-2'}),
     Object.freeze({id:'technology-communication',title:'Tecnología y comunicación',src:'../data/vocabulary/categories/technology-communication.js?v=20260922-2'}),
-    Object.freeze({id:'emotions-feelings',title:'Emociones y sentimientos',src:'../data/vocabulary/categories/emotions-feelings.js?v=20260922-1'})
+    Object.freeze({id:'emotions-feelings',title:'Emociones y sentimientos',src:'../data/vocabulary/categories/emotions-feelings.js?v=20260922-1'}),
+    Object.freeze({id:'society-social-life',title:'Sociedad y vida social',src:'../data/vocabulary/categories/society-social-life.js?v=20260922-1'})
   ]);
 
   const registry = new Map();
