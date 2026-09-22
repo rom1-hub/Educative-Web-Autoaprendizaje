@@ -32,7 +32,8 @@
     Object.freeze({id:'health-medicine',title:'Salud y medicina',src:'../data/vocabulary/categories/health-medicine.js?v=20260920-1'}),
     Object.freeze({id:'daily-life-routines',title:'Vida cotidiana y rutinas',src:'../data/vocabulary/categories/daily-life-routines.js?v=20260921-1'}),
     Object.freeze({id:'leisure-entertainment',title:'Ocio y entretenimiento',src:'../data/vocabulary/categories/leisure-entertainment.js?v=20260921-1'}),
-    Object.freeze({id:'sports',title:'Deportes',src:'../data/vocabulary/categories/sports.js?v=20260921-2'})
+    Object.freeze({id:'sports',title:'Deportes',src:'../data/vocabulary/categories/sports.js?v=20260921-2'}),
+    Object.freeze({id:'technology-communication',title:'Tecnología y comunicación',src:'../data/vocabulary/categories/technology-communication.js?v=20260922-2'})
   ]);
 
   const registry = new Map();
