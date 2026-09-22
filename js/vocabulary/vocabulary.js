@@ -181,25 +181,42 @@
   }
 
   function findWordMatches(query) {
-    return searchService.query(query)
+    const groups = new Map();
+
+    searchService.query(query)
       .filter((item) => item.type === 'entry')
-      .map((item) => {
+      .forEach((item) => {
         const parent = getSubcategoryById(item.parentId);
-        if (!parent) return null;
+        if (!parent) return;
 
-        return {
-          type: 'entry',
-          id: item.id,
-          title: `${item.title} / ${item.translation}`.trim(),
-          category: item.category,
-          parent: parent.subcategory,
-          categoryData: parent.category,
-          data: item.data
-        };
-      })
-      .filter(Boolean);
+        const entry = item.data;
+        const key = normalize([
+          formatFrenchWord(entry),
+          entry.articleEs || '',
+          entry.translation || ''
+        ].join('|'));
+
+        if (!groups.has(key)) {
+          groups.set(key, {
+            type: 'entry',
+            id: item.id,
+            title: item.title + ' / ' + item.translation,
+            category: item.category,
+            parent: parent.subcategory,
+            categoryData: parent.category,
+            data: entry,
+            contexts: []
+          });
+        }
+
+        groups.get(key).contexts.push({
+          category: parent.category,
+          subcategory: parent.subcategory
+        });
+      });
+
+    return [...groups.values()];
   }
-
   function searchableItems(query) {
     const term = normalize(query);
     if (!term) return [];
@@ -357,11 +374,24 @@
 
   function renderWordResult(item) {
     const entry = item.data;
+    const contexts = Array.isArray(item.contexts) && item.contexts.length
+      ? item.contexts
+      : [{ category: item.categoryData || item.category, subcategory: item.parent }];
+
+    const uniqueContexts = [];
+    const seenContexts = new Set();
+    contexts.forEach((context) => {
+      const key = context.category.id + '|' + context.subcategory.id;
+      if (!seenContexts.has(key)) {
+        seenContexts.add(key);
+        uniqueContexts.push(context);
+      }
+    });
 
     learnContent.innerHTML = `<div class="vocabulary-result-content">
       <div class="section-head">
         <div><span class="tag">Palabra</span><h2>${escapeHtml(entry.word)}</h2></div>
-        <p>${escapeHtml(item.category)}</p>
+        <p>${escapeHtml(uniqueContexts.length === 1 ? uniqueContexts[0].category.title : 'Selecciona el contexto que quieres consultar.')}</p>
       </div>
       <div class="vocabulary-entry-list">
         <article class="vocabulary-entry">
@@ -373,24 +403,23 @@
         </article>
       </div>
       <div class="vocabulary-word-context">
-        <button type="button" class="btn secondary" data-word-subcategory="${escapeHtml(item.parent.id)}">
-          Ver toda la subcategoría →
-        </button>
+        ${uniqueContexts.map((context) => `
+          <button type="button" class="btn secondary" data-word-subcategory="${escapeHtml(context.subcategory.id)}">
+            ${escapeHtml(context.category.title)} · ${escapeHtml(context.subcategory.title)} →
+          </button>`).join('')}
       </div>
     </div>`;
 
     bindAudio(learnContent);
 
-    const button = learnContent.querySelector('[data-word-subcategory]');
-    if (button) {
+    learnContent.querySelectorAll('[data-word-subcategory]').forEach((button) => {
       button.addEventListener('click', () => selectSubcategoryById(button.dataset.wordSubcategory));
-    }
+    });
 
     practiceContent.innerHTML = '';
     exerciseTabs.innerHTML = '';
     exerciseTabs.classList.add('hidden');
   }
-
   function renderPracticeCategory(item) {
     practiceContent.innerHTML = `<div class="vocabulary-result-content">
       <div class="section-head">
@@ -816,14 +845,12 @@
       return;
     }
 
-    const entryMatches = matches.filter((item) => item.type === 'entry');
-
     results.innerHTML = matches.map((item, index) => {
       if (item.type === 'entry') {
         return renderEntryResult(
           item,
           index,
-          true
+          false
         );
       }
 
