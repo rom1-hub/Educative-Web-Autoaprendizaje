@@ -96,18 +96,12 @@
         ])
       },
       {
-        id: 'ordinal-tens',
-        title: 'Ordinales de las decenas',
-        entries: makeEntries('ordinal-tens', [
+        id: 'ordinal-tens-and-1000',
+        title: 'Ordinales de las decenas y 1000',
+        entries: makeEntries('ordinal-tens-and-1000', [
           ['vingtième','vigésimo'],['trentième','trigésimo'],['quarantième','cuadragésimo'],
           ['cinquantième','quincuagésimo'],['soixantième','sexagésimo'],['soixante-dixième','septuagésimo'],
-          ['quatre-vingtième','octogésimo'],['quatre-vingt-dixième','nonagésimo'],['centième','centésimo']
-        ])
-      },
-      {
-        id: 'ordinal-1000',
-        title: 'Ordinal 1000',
-        entries: makeEntries('ordinal-1000', [
+          ['quatre-vingtième','octogésimo'],['quatre-vingt-dixième','nonagésimo'],['centième','centésimo'],
           ['millième','milésimo']
         ])
       }
