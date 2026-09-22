@@ -388,6 +388,8 @@
       }
     });
 
+    const categoryCount = new Set(uniqueContexts.map((context) => context.category.id)).size;
+
     learnContent.innerHTML = `<div class="vocabulary-result-content">
       <div class="section-head">
         <div><span class="tag">Palabra</span><h2>${escapeHtml(entry.word)}</h2></div>
@@ -405,7 +407,7 @@
       <div class="vocabulary-word-context">
         ${uniqueContexts.map((context) => `
           <button type="button" class="btn secondary" data-word-subcategory="${escapeHtml(context.subcategory.id)}">
-            ${escapeHtml(context.category.title)} · ${escapeHtml(context.subcategory.title)} →
+            ${escapeHtml(categoryCount > 1 ? context.category.title + ' · ' : '')}${escapeHtml(context.subcategory.title)} →
           </button>`).join('')}
       </div>
     </div>`;
