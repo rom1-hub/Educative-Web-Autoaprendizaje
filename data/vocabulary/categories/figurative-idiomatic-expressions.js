@@ -19,7 +19,11 @@
           ['faire-bande-a-part','faire bande à part','ir por separado'],
           ['tirer-les-vers-du-nez','tirer les vers du nez','sacarle información a alguien'],
           ['mettre-quelqu-un-a-l-aise','mettre quelqu’un à l’aise','hacer que alguien se sienta cómodo'],
-          ['tenir-compagnie','tenir compagnie','hacer compañía']
+          ['tenir-compagnie','tenir compagnie','hacer compañía'],
+          ['se-foutre-de-quelqu-un','se foutre de quelqu’un','burlarse de alguien / que alguien te importe un bledo'],
+          ['tomber-sur-quelqu-un','tomber sur quelqu’un','encontrarse con alguien por casualidad'],
+          ['mettre-un-rateau','mettre un râteau','rechazar a alguien / dar calabazas'],
+          ['casser-les-oreilles','casser les oreilles','molestar / hacer ruido insoportable']
         ]
       },
       {
@@ -36,7 +40,8 @@
           ['avoir-le-coeur-leger','avoir le cœur léger','sentirse aliviado / despreocupado'],
           ['etre-rouge-de-honte','être rouge de honte','estar rojo de vergüenza'],
           ['etre-vert-de-rage','être vert de rage','estar verde de rabia'],
-          ['avoir-un-coup-de-foudre','avoir un coup de foudre','enamorarse a primera vista / sentir un flechazo']
+          ['avoir-un-coup-de-foudre','avoir un coup de foudre','enamorarse a primera vista / sentir un flechazo'],
+          ['humour-noir','l’humour noir','humor negro']
         ]
       },
       {
@@ -51,7 +56,9 @@
           ['prendre-un-pot','prendre un pot','tomar algo juntos'],
           ['faire-les-quatre-cents-coups','faire les quatre cents coups','hacer de las suyas'],
           ['mettre-les-pieds-dans-le-plat','mettre les pieds dans le plat','meter la pata'],
-          ['faire-tout-un-plat','faire tout un plat de quelque chose','hacer un drama de algo']
+          ['faire-tout-un-plat','faire tout un plat de quelque chose','hacer un drama de algo'],
+          ['mettre-les-petits-plats-dans-les-grands','mettre les petits plats dans les grands','esmerarse / poner toda la carne en el asador'],
+          ['avoir-des-fourmis-dans-les-jambes','avoir des fourmis dans les jambes','tener hormigueo en las piernas']
         ]
       },
       {
@@ -66,7 +73,8 @@
           ['faire-fausse-route','faire fausse route','equivocarse de camino / ir por mal camino'],
           ['mettre-la-charrue-avant-les-boeufs','mettre la charrue avant les bœufs','poner el carro delante de los bueyes'],
           ['jeter-de-l-huile-sur-le-feu','jeter de l’huile sur le feu','echar leña al fuego'],
-          ['mettre-de-l-eau-dans-son-vin','mettre de l’eau dans son vin','moderar sus exigencias']
+          ['mettre-de-l-eau-dans-son-vin','mettre de l’eau dans son vin','moderar sus exigencias'],
+          ['mettre-du-beurre-dans-les-epinards','mettre du beurre dans les épinards','mejorar la situación económica / conseguir un ingreso extra']
         ]
       },
       {
@@ -81,6 +89,9 @@
           ['dire-ses-quatre-verites','dire ses quatre vérités à quelqu’un','decirle a alguien sus cuatro verdades'],
           ['tenir-sa-langue','tenir sa langue','mantener la boca cerrada'],
           ['avoir-la-langue-bien-pendue','avoir la langue bien pendue','tener mucha facilidad para hablar'],
+          ['avoir-un-mot-sur-le-bout-de-la-langue','avoir un mot sur le bout de la langue','tener una palabra en la punta de la lengua'],
+          ['passer-un-coup-de-fil','passer un coup de fil','hacer una llamada telefónica'],
+          ['jeter-un-oeil','jeter un œil sur quelque chose','echar un vistazo a algo'],
           ['mettre-les-bouchees-doubles','mettre les bouchées doubles','redoblar los esfuerzos'],
           ['appeler-un-chat-un-chat','appeler un chat un chat','llamar a las cosas por su nombre'],
           ['chercher-midi-a-quatorze-heures','chercher midi à quatorze heures','buscarle tres pies al gato'],
@@ -96,6 +107,8 @@
           ['jeter-l-argent-par-les-fenetres','jeter l’argent par les fenêtres','tirar el dinero'],
           ['vivre-au-dessus-de-ses-moyens','vivre au-dessus de ses moyens','vivir por encima de sus posibilidades'],
           ['mettre-la-main-a-la-pate','mettre la main à la pâte','poner manos a la obra'],
+          ['faire-quelque-chose-les-doigts-dans-le-nez','faire quelque chose les doigts dans le nez','hacer algo con los ojos cerrados / muy fácilmente'],
+          ['se-couper-en-quatre','se couper en quatre','desvivirse por alguien / hacer todo lo posible'],
           ['retrousser-ses-manches','retrousser ses manches','ponerse manos a la obra'],
           ['travailler-d-arrache-pied','travailler d’arrache-pied','trabajar duramente'],
           ['faire-des-pieds-et-des-mains','faire des pieds et des mains','hacer todo lo posible'],
