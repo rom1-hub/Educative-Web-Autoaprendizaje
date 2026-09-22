@@ -831,7 +831,8 @@
 
     const contextHtml = uniqueContexts.length
       ? `<div class="vocabulary-result-context" aria-label="Categoría y subcategoría">
-          ${uniqueContexts.map((context) => `
+          ${uniqueContexts.map((context, contextIndex) => `
+            ${contextIndex > 0 ? '<span class="vocabulary-result-context-separator"> / </span>' : ''}
             <span>${escapeHtml(context.category.title)} · ${escapeHtml(context.subcategory.title)}</span>
           `).join('')}
         </div>`
