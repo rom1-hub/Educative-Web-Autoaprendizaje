@@ -139,7 +139,10 @@
           { id:'courtesy-excuse-moi', word:'excuse-moi', translation:'disculpa', emoji:'🙏' },
           { id:'courtesy-pardon', word:'pardon', translation:'perdón / disculpe', emoji:'🙏' },
           { id:'courtesy-desole-m', word:'désolé', translation:'lo siento (masculino)', emoji:'🙏' },
-          { id:'courtesy-desolee-f', word:'désolée', translation:'lo siento (femenino)', emoji:'🙏' }
+          { id:'courtesy-desolee-f', word:'désolée', translation:'lo siento (femenino)', emoji:'🙏' },
+          { id:'courtesy-tu-habites-ou', word:'tu habites où ?', translation:'¿dónde vives?', emoji:'🏠' },
+          { id:'courtesy-vous-habitez-ou', word:'vous habitez où ?', translation:'¿dónde vive?', emoji:'🏠' },
+          { id:'courtesy-jhabite-a', word:"j'habite à", translation:'vivo en', emoji:'🏠' }
         ]
       }
     ]
