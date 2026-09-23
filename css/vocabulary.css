@@ -499,6 +499,41 @@
   line-height:1.25;
   text-align:center;
 }
+.vocabulary-subcategory-nav-button,
+.vocabulary-word-context-button{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.vocabulary-subcategory-nav-button{
+  justify-content:space-between;
+}
+.vocabulary-subcategory-nav-button-previous{
+  text-align:left;
+}
+.vocabulary-subcategory-nav-button-next{
+  text-align:right;
+}
+.vocabulary-nav-label{
+  flex:1 1 auto;
+  min-width:0;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+.vocabulary-nav-arrow{
+  flex:0 0 1.25em;
+  width:1.25em;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  line-height:1;
+  font-weight:900;
+}
+.vocabulary-word-context-button{
+  justify-content:space-between;
+  width:100%;
+  text-align:left;
+}
 .vocabulary-subcategory-navigation .btn:disabled,
 .vocabulary-exercise-navigation .btn:disabled{
   opacity:.45;
@@ -543,6 +578,18 @@
     overflow-wrap:anywhere;
     word-break:break-word;
     line-height:1.2;
+    text-align:left;
+  }
+  .vocabulary-subcategory-nav-button,
+  .vocabulary-word-context-button{
+    gap:10px;
+    text-align:left;
+  }
+  .vocabulary-nav-arrow{
+    flex-basis:1.5em;
+    width:1.5em;
+  }
+  .vocabulary-subcategory-nav-button-next{
     text-align:left;
   }
   .vocabulary-exercise-navigation{
