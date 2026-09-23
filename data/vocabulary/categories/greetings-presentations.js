@@ -107,5 +107,7 @@
     ]
   };
 
-  window.COQ_VOCABULARY_REGISTER_CATEGORY(category);
+  if (window.COQ_VOCABULARY_DATABASE_API) {
+    window.COQ_VOCABULARY_DATABASE_API.registerCategory(category);
+  }
 })();
