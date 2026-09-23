@@ -493,7 +493,11 @@
 .vocabulary-subcategory-navigation .btn,
 .vocabulary-exercise-navigation .btn{
   min-width:145px;
-  white-space:nowrap;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  line-height:1.25;
+  text-align:center;
 }
 .vocabulary-subcategory-navigation .btn:disabled,
 .vocabulary-exercise-navigation .btn:disabled{
@@ -531,8 +535,14 @@
   .vocabulary-exercise-navigation .btn{
     min-width:0;
     width:100%;
+    min-height:48px;
+    height:auto;
     padding:10px 11px;
     font-size:.85rem;
+    white-space:normal;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+    line-height:1.25;
   }
   .vocabulary-exercise-navigation{
     display:grid;
