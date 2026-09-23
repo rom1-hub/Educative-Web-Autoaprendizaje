@@ -44,7 +44,7 @@
     Object.freeze({id:'figurative-idiomatic-expressions',title:'Expresiones figuradas e idiomáticas',src:'../data/vocabulary/categories/figurative-idiomatic-expressions.js?v=20260922-1'}),
     Object.freeze({id:'common-adverbs',title:'Adverbios más usados',src:'../data/vocabulary/categories/common-adverbs.js?v=20260922-1'}),
     Object.freeze({id:'connectors',title:'Conectores',src:'../data/vocabulary/categories/connectors.js?v=20260922-1'}),
-    Object.freeze({id:'greetings-presentations',title:'Saludos y presentaciones',src:'../data/vocabulary/categories/greetings-presentations.js?v=20260922-1'}),
+    Object.freeze({id:'greetings-presentations',title:'Saludos y presentaciones',src:'../data/vocabulary/categories/greetings-presentations.js?v=20260922-2'}),
   ]);
 
   const registry = new Map();
