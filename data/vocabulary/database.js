@@ -46,6 +46,7 @@
     Object.freeze({id:'connectors',title:'Conectores',src:'../data/vocabulary/categories/connectors.js?v=20260922-1'}),
     Object.freeze({id:'greetings-presentations',title:'Saludos y presentaciones',src:'../data/vocabulary/categories/greetings-presentations.js?v=20260922-2'}),
     Object.freeze({id:'planets-space',title:'Planetas y el espacio',src:'../data/vocabulary/categories/planets-space.js?v=20260922-1'}),
+    Object.freeze({id:'politics',title:'Política',src:'../data/vocabulary/categories/politics.js?v=20260923-1'}),
   ]);
 
   const registry = new Map();
