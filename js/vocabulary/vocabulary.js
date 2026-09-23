@@ -230,7 +230,17 @@
       activeExercise = button.dataset.exerciseNav;
       renderExerciseTabs();
       renderPracticeSubcategory(selectedItem);
+      scrollVocabularyContentTop(practiceContent);
     }));
+  }
+
+  function scrollVocabularyContentTop(container) {
+    if (!container) return;
+    requestAnimationFrame(() => {
+      const rect = container.getBoundingClientRect();
+      const top = Math.max(0, window.scrollY + rect.top - 18);
+      window.scrollTo({ top, behavior: 'smooth' });
+    });
   }
   function getEntries(item) {
     if (!item) return [];
@@ -304,6 +314,7 @@
     topicsPanel.classList.add('hidden');
     browseButton.setAttribute('aria-expanded', 'false');
     renderContent();
+    scrollVocabularyContentTop(mode === 'practice' ? practiceContent : learnContent);
   }
 
   function selectSubcategoryById(id) {
@@ -353,6 +364,7 @@
         };
         searchInput.value = item.data.word;
         renderPracticeSubcategory(selectedItem);
+        scrollVocabularyContentTop(practiceContent);
         return;
       }
     }
