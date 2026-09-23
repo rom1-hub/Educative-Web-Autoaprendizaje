@@ -511,7 +511,7 @@
 .vocabulary-subcategory-nav-button-previous{
   text-align:left;
 }
-.vocabulary-subcategory-nav-button-next{
+.vocabulary-subcategory-nav-button-next.btn.blue{
   text-align:right;
   background:var(--soft-blue);
   color:var(--blue);
