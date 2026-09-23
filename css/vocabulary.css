@@ -513,6 +513,14 @@
 }
 .vocabulary-subcategory-nav-button-next{
   text-align:right;
+  background:var(--soft-blue);
+  color:var(--blue);
+  border-color:#B9DCEB;
+}
+.vocabulary-subcategory-nav-button-next:hover{
+  background:#DFF3FB;
+  border-color:#9ED3E8;
+  box-shadow:0 8px 20px rgba(6,27,74,.08);
 }
 .vocabulary-nav-label{
   flex:1 1 auto;
