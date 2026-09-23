@@ -31,8 +31,8 @@
         id: 'greetings-how-are-you',
         title: 'Preguntar y decir cómo está alguien',
         entries: [
-          { id:'how-ca-va', word:'ça va', translation:'¿cómo estás?', emoji:'🙂' },
-          { id:'how-comment-ca-va', word:'comment ça va', translation:'¿cómo estás?', emoji:'🙂' },
+          { id:'how-ca-va', word:'ça va', translation:'¿cómo estás? (1.ª forma)', emoji:'🙂' },
+          { id:'how-comment-ca-va', word:'comment ça va', translation:'¿cómo estás? (2.ª forma)', emoji:'🙂' },
           { id:'how-bof', word:'bof', translation:'más o menos', emoji:'😐' },
           { id:'how-bien', word:'bien', translation:'bien', emoji:'🙂' },
           { id:'how-tres-bien', word:'très bien', translation:'muy bien', emoji:'😄' },
