@@ -538,11 +538,12 @@
     min-height:48px;
     height:auto;
     padding:10px 11px;
-    font-size:.85rem;
+    font-size:.82rem;
     white-space:normal;
     overflow-wrap:anywhere;
     word-break:break-word;
-    line-height:1.25;
+    line-height:1.2;
+    text-align:left;
   }
   .vocabulary-exercise-navigation{
     display:grid;
@@ -552,7 +553,7 @@
   .vocabulary-exercise-navigation span{
     grid-column:1 / -1;
     grid-row:1;
-    text-align:center;
+    text-align:left;
   }
   .vocabulary-exercise-navigation .btn:first-of-type{grid-column:1;grid-row:2}
   .vocabulary-exercise-navigation .btn:last-of-type{grid-column:2;grid-row:2}
