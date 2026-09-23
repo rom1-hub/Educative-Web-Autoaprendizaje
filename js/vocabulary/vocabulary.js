@@ -183,7 +183,11 @@
   function openAllCategories() {
     navigateToVocabularyRoot(); renderAllCategories();
     topicsPanel.classList.remove('hidden'); browseButton.setAttribute('aria-expanded', 'true');
-    topicsPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    requestAnimationFrame(() => {
+      const rect = topicsPanel.getBoundingClientRect();
+      const top = Math.max(0, window.scrollY + rect.top - 18);
+      window.scrollTo({ top, behavior: 'smooth' });
+    });
   }
 
   function vocabularyBreadcrumb(item) {
