@@ -91,7 +91,7 @@
           {id:'politics-political-movement',word:'mouvement politique',translation:'movimiento político',articleFr:'un',articleEs:'un'},
           {id:'politics-political-ideology',word:'idéologie politique',translation:'ideología política',articleFr:'une',articleEs:'una'},
           {id:'politics-left',word:'gauche',translation:'izquierda',articleFr:'la',articleEs:'la'},
-          {id:'politics-right',word:'droite',translation:'derecha',articleFr:'la',articleEs:'la'},
+          {id:'politics-political-right',word:'droite',translation:'derecha',articleFr:'la',articleEs:'la'},
           {id:'politics-center',word:'centre',translation:'centro',articleFr:'le',articleEs:'el'},
           {id:'politics-coalition',word:'coalition',translation:'coalición',articleFr:'une',articleEs:'una'},
           {id:'politics-party-member-card',word:'carte de membre',translation:'carné de afiliado',articleFr:'une',articleEs:'un'}
@@ -128,8 +128,8 @@
           {id:'politics-term-of-office',word:'mandat électoral',translation:'mandato electoral',articleFr:'un',articleEs:'un'},
           {id:'politics-office',word:'fonction publique',translation:'cargo público',articleFr:'une',articleEs:'un'},
           {id:'politics-public-office-holder',word:'responsable politique',translation:'responsable político / responsable política',articleFr:'un',articleEs:'un'},
-          {id:'politics-opposition',word:'opposition',translation:'oposición',articleFr:'l’',articleEs:'la'},
-          {id:'politics-majority',word:'majorité',translation:'mayoría',articleFr:'la',articleEs:'la'}
+          {id:'politics-political-opposition',word:'opposition',translation:'oposición',articleFr:'l’',articleEs:'la'},
+          {id:'politics-political-majority',word:'majorité',translation:'mayoría',articleFr:'la',articleEs:'la'}
         ]
       },
       {
