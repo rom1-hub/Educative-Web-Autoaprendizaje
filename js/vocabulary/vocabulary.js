@@ -211,9 +211,9 @@
     const navigation = getSubcategoryNavigation(item);
     if (!navigation) return '';
     return '<nav class="vocabulary-subcategory-navigation" aria-label="Navegación entre subcategorías">' +
-      '<button type="button" class="btn secondary" ' + (navigation.previous ? 'data-subcategory-nav="' + escapeHtml(navigation.previous.id) + '"' : 'disabled') + '>← ' + (navigation.previous ? escapeHtml(navigation.previous.title) : 'Anterior') + '</button>' +
+      '<button type="button" class="btn secondary vocabulary-subcategory-nav-button vocabulary-subcategory-nav-button-previous" ' + (navigation.previous ? 'data-subcategory-nav="' + escapeHtml(navigation.previous.id) + '"' : 'disabled') + '><span class="vocabulary-nav-arrow" aria-hidden="true">←</span><span class="vocabulary-nav-label">' + (navigation.previous ? escapeHtml(navigation.previous.title) : 'Anterior') + '</span></button>' +
       '<button type="button" class="vocabulary-navigation-categories" data-vocabulary-categories>Todas las categorías</button>' +
-      '<button type="button" class="btn blue" ' + (navigation.next ? 'data-subcategory-nav="' + escapeHtml(navigation.next.id) + '"' : 'disabled') + '>' + (navigation.next ? escapeHtml(navigation.next.title) : 'Siguiente') + ' →</button>' +
+      '<button type="button" class="btn blue vocabulary-subcategory-nav-button vocabulary-subcategory-nav-button-next" ' + (navigation.next ? 'data-subcategory-nav="' + escapeHtml(navigation.next.id) + '"' : 'disabled') + '><span class="vocabulary-nav-label">' + (navigation.next ? escapeHtml(navigation.next.title) : 'Siguiente') + '</span><span class="vocabulary-nav-arrow" aria-hidden="true">→</span></button>' +
     '</nav>';
   }
 
@@ -496,8 +496,9 @@
       </div>
       <div class="vocabulary-word-context">
         ${uniqueContexts.map((context) => `
-          <button type="button" class="btn secondary" data-word-subcategory="${escapeHtml(context.subcategory.id)}">
-            ${escapeHtml(categoryCount > 1 ? context.category.title + ' · ' : '')}${escapeHtml(context.subcategory.title)} →
+          <button type="button" class="btn secondary vocabulary-word-context-button" data-word-subcategory="${escapeHtml(context.subcategory.id)}">
+            <span class="vocabulary-nav-label">${escapeHtml(categoryCount > 1 ? context.category.title + ' · ' : '')}${escapeHtml(context.subcategory.title)}</span>
+            <span class="vocabulary-nav-arrow" aria-hidden="true">→</span>
           </button>`).join('')}
       </div>
     </div>`;
