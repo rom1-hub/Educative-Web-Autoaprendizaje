@@ -185,7 +185,7 @@
     topicsPanel.classList.remove('hidden'); browseButton.setAttribute('aria-expanded', 'true');
     requestAnimationFrame(() => {
       const rect = topicsPanel.getBoundingClientRect();
-      const top = Math.max(0, window.scrollY + rect.top - 18);
+      const top = Math.max(0, window.scrollY + rect.top - 80);
       window.scrollTo({ top, behavior: 'smooth' });
     });
   }
