@@ -115,6 +115,25 @@
         ]
       },
       {
+        id: 'nature-orientation-earth-references',
+        title: 'Orientación y referencias terrestres',
+        entries: [
+          {id:'nature-north',word:'nord',translation:'norte',articleFr:'le',articleEs:'el'},
+          {id:'nature-south',word:'sud',translation:'sur',articleFr:'le',articleEs:'el'},
+          {id:'nature-east',word:'est',translation:'este',articleFr:'l’',articleEs:'el'},
+          {id:'nature-west',word:'ouest',translation:'oeste',articleFr:'l’',articleEs:'el'},
+          {id:'nature-hemisphere',word:'hémisphère',translation:'hemisferio',articleFr:'un',articleEs:'un'},
+          {id:'nature-equator',word:'équateur',translation:'ecuador',articleFr:'l’',articleEs:'el'},
+          {id:'nature-tropic-cancer',word:'tropique du Cancer',translation:'trópico de Cáncer',articleFr:'le',articleEs:'el'},
+          {id:'nature-tropic-capricorn',word:'tropique du Capricorne',translation:'trópico de Capricornio',articleFr:'le',articleEs:'el'},
+          {id:'nature-polar-circle',word:'cercle polaire',translation:'círculo polar',articleFr:'un',articleEs:'un'},
+          {id:'nature-summer-solstice',word:'solstice d’été',translation:'solsticio de verano',articleFr:'le',articleEs:'el'},
+          {id:'nature-winter-solstice',word:'solstice d’hiver',translation:'solsticio de invierno',articleFr:'le',articleEs:'el'},
+          {id:'nature-spring-equinox',word:'équinoxe de printemps',translation:'equinoccio de primavera',articleFr:'l’',articleEs:'el'},
+          {id:'nature-autumn-equinox',word:'équinoxe d’automne',translation:'equinoccio de otoño',articleFr:'l’',articleEs:'el'}
+        ]
+      },
+      {
         id: 'nature-environment',
         title: 'Medio ambiente y conservación',
         entries: [
