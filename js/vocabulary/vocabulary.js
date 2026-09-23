@@ -164,6 +164,74 @@
     return null;
   }
 
+  function getSubcategoryNavigation(item) {
+    if (!item || item.type !== 'subcategory' || !item.parent) return null;
+    const subcategories = item.parent.subcategories || [];
+    const index = subcategories.findIndex((subcategory) => subcategory.id === item.id);
+    if (index < 0) return null;
+    return { index, total: subcategories.length, previous: index > 0 ? subcategories[index - 1] : null, next: index < subcategories.length - 1 ? subcategories[index + 1] : null };
+  }
+
+  function navigateToVocabularyRoot() {
+    selectedItem = null; searchInput.value = ''; results.innerHTML = '';
+    searchInput.setAttribute('aria-expanded', 'false'); topicsPanel.innerHTML = '';
+    topicsPanel.classList.add('hidden'); browseButton.setAttribute('aria-expanded', 'false');
+    learnContent.innerHTML = ''; practiceContent.innerHTML = ''; exerciseTabs.innerHTML = '';
+    exerciseTabs.classList.add('hidden');
+  }
+
+  function openAllCategories() {
+    navigateToVocabularyRoot(); renderAllCategories();
+    topicsPanel.classList.remove('hidden'); browseButton.setAttribute('aria-expanded', 'true');
+    topicsPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function vocabularyBreadcrumb(item) {
+    if (!item) return '<nav class="vocabulary-breadcrumb" aria-label="Ubicación"><span>Vocabulario</span></nav>';
+    if (item.type === 'category') return '<nav class="vocabulary-breadcrumb" aria-label="Ubicación"><button type="button" data-vocabulary-root>Vocabulario</button><span aria-hidden="true">›</span><strong>' + escapeHtml(item.title) + '</strong></nav>';
+    if (item.type === 'subcategory') return '<nav class="vocabulary-breadcrumb" aria-label="Ubicación"><button type="button" data-vocabulary-root>Vocabulario</button><span aria-hidden="true">›</span><button type="button" data-vocabulary-category="' + escapeHtml(item.parent.id) + '">' + escapeHtml(item.parent.title) + '</button><span aria-hidden="true">›</span><strong>' + escapeHtml(item.title) + '</strong></nav>';
+    return '';
+  }
+
+  function bindVocabularyNavigation(container) {
+    const rootButton = container.querySelector('[data-vocabulary-root]');
+    if (rootButton) rootButton.addEventListener('click', navigateToVocabularyRoot);
+    const categoryButton = container.querySelector('[data-vocabulary-category]');
+    if (categoryButton) categoryButton.addEventListener('click', () => selectCategoryById(categoryButton.dataset.vocabularyCategory));
+    container.querySelectorAll('[data-subcategory-nav]').forEach((button) => button.addEventListener('click', () => selectSubcategoryById(button.dataset.subcategoryNav)));
+    const categoriesButton = container.querySelector('[data-vocabulary-categories]');
+    if (categoriesButton) categoriesButton.addEventListener('click', openAllCategories);
+  }
+
+  function subcategoryNavigation(item) {
+    const navigation = getSubcategoryNavigation(item);
+    if (!navigation) return '';
+    return '<nav class="vocabulary-subcategory-navigation" aria-label="Navegación entre subcategorías">' +
+      '<button type="button" class="btn secondary" ' + (navigation.previous ? 'data-subcategory-nav="' + escapeHtml(navigation.previous.id) + '"' : 'disabled') + '>← ' + (navigation.previous ? escapeHtml(navigation.previous.title) : 'Anterior') + '</button>' +
+      '<button type="button" class="vocabulary-navigation-categories" data-vocabulary-categories>Todas las categorías</button>' +
+      '<button type="button" class="btn blue" ' + (navigation.next ? 'data-subcategory-nav="' + escapeHtml(navigation.next.id) + '"' : 'disabled') + '>' + (navigation.next ? escapeHtml(navigation.next.title) : 'Siguiente') + ' →</button>' +
+    '</nav>';
+  }
+
+  function exerciseNavigation() {
+    const currentIndex = EXERCISES.findIndex((exercise) => exercise.id === activeExercise);
+    const previous = currentIndex > 0 ? EXERCISES[currentIndex - 1] : null;
+    const next = currentIndex < EXERCISES.length - 1 ? EXERCISES[currentIndex + 1] : null;
+    return '<nav class="vocabulary-exercise-navigation" aria-label="Navegación entre ejercicios">' +
+      '<button type="button" class="btn secondary" data-exercise-nav="' + (previous ? previous.id : '') + '" ' + (previous ? '' : 'disabled') + '>← ' + (previous ? escapeHtml(previous.label) : 'Anterior') + '</button>' +
+      '<span>Ejercicio ' + (currentIndex + 1) + ' de ' + EXERCISES.length + '</span>' +
+      '<button type="button" class="btn blue" data-exercise-nav="' + (next ? next.id : '') + '" ' + (next ? '' : 'disabled') + '>' + (next ? escapeHtml(next.label) : 'Siguiente') + ' →</button>' +
+    '</nav>';
+  }
+
+  function bindExerciseNavigation() {
+    practiceContent.querySelectorAll('[data-exercise-nav]').forEach((button) => button.addEventListener('click', () => {
+      if (!button.dataset.exerciseNav) return;
+      activeExercise = button.dataset.exerciseNav;
+      renderExerciseTabs();
+      renderPracticeSubcategory(selectedItem);
+    }));
+  }
   function getEntries(item) {
     if (!item) return [];
 
@@ -344,6 +412,7 @@
     if (item.type === 'category') {
       const subcategories = item.data.subcategories || [];
       learnContent.innerHTML = `<div class="vocabulary-result-content">
+        ${vocabularyBreadcrumb(item)}
         <div class="section-head">
           <div><span class="tag">Categoría</span><h2>${title}</h2></div>
           <p>Selecciona una subcategoría para ver su vocabulario.</p>
@@ -357,18 +426,22 @@
         </div>
       </div>`;
       bindSubcategoryButtons(learnContent);
+      bindVocabularyNavigation(learnContent);
       return;
     }
 
     if (item.type === 'subcategory') {
       learnContent.innerHTML = `<div class="vocabulary-result-content">
+        ${vocabularyBreadcrumb(item)}
         <div class="section-head">
           <div><span class="tag">Subcategoría</span><h2>${title}</h2></div>
           <p>${escapeHtml(item.parent.title)}</p>
         </div>
         ${renderEntries(getEntries(item))}
+        ${subcategoryNavigation(item)}
       </div>`;
       bindAudio(learnContent);
+      bindVocabularyNavigation(learnContent);
     }
   }
 
@@ -391,6 +464,7 @@
     const categoryCount = new Set(uniqueContexts.map((context) => context.category.id)).size;
 
     learnContent.innerHTML = `<div class="vocabulary-result-content">
+      ${uniqueContexts.length === 1 ? vocabularyBreadcrumb({ type: 'subcategory', id: uniqueContexts[0].subcategory.id, title: uniqueContexts[0].subcategory.title, parent: uniqueContexts[0].category }) : ''}
       <div class="section-head">
         <div><span class="tag">Palabra</span><h2>${escapeHtml(entry.word)}</h2></div>
         <p>${escapeHtml(uniqueContexts.length === 1 ? uniqueContexts[0].category.title : 'Selecciona el contexto que quieres consultar.')}</p>
@@ -413,6 +487,7 @@
     </div>`;
 
     bindAudio(learnContent);
+    bindVocabularyNavigation(learnContent);
 
     learnContent.querySelectorAll('[data-word-subcategory]').forEach((button) => {
       button.addEventListener('click', () => selectSubcategoryById(button.dataset.wordSubcategory));
@@ -424,6 +499,7 @@
   }
   function renderPracticeCategory(item) {
     practiceContent.innerHTML = `<div class="vocabulary-result-content">
+      ${vocabularyBreadcrumb(item)}
       <div class="section-head">
         <div><span class="tag">Práctica</span><h2>${escapeHtml(item.title)}</h2></div>
         <p>Selecciona una subcategoría para practicar su vocabulario.</p>
@@ -437,6 +513,7 @@
       </div>
     </div>`;
     bindSubcategoryButtons(practiceContent);
+    bindVocabularyNavigation(practiceContent);
     exerciseTabs.innerHTML = '';
     exerciseTabs.classList.add('hidden');
   }
@@ -485,7 +562,7 @@
     let index = 0;
     let matched = 0;
 
-    practiceContent.innerHTML = `${exerciseHeader(EXERCISES[0])}
+    practiceContent.innerHTML = `${vocabularyBreadcrumb(selectedItem)}${exerciseHeader(EXERCISES[0])}
       <div class="vocabulary-exercise-meta">
         <span>${selected.length} palabras</span>
         <span class="vocabulary-match-progress">0 / ${selected.length} asociadas</span>
@@ -562,6 +639,9 @@
 
     showQuestion();
     bindRestartButton();
+    practiceContent.insertAdjacentHTML('beforeend', exerciseNavigation());
+    bindVocabularyNavigation(practiceContent);
+    bindExerciseNavigation();
   }
 
   function renderWriteExercise(entries) {
@@ -569,7 +649,7 @@
     let index = 0;
     let correctCount = 0;
 
-    practiceContent.innerHTML = `${exerciseHeader(EXERCISES[1])}
+    practiceContent.innerHTML = `${vocabularyBreadcrumb(selectedItem)}${exerciseHeader(EXERCISES[1])}
       <div class="vocabulary-exercise-meta">
         <span>${selected.length} palabras</span>
         <span class="vocabulary-write-progress">1 / ${selected.length}</span>
@@ -645,6 +725,9 @@
     });
 
     showQuestion();
+    practiceContent.insertAdjacentHTML('beforeend', exerciseNavigation());
+    bindVocabularyNavigation(practiceContent);
+    bindExerciseNavigation();
   }
 
   function buildAudioOptions(entry, entries) {
@@ -657,7 +740,7 @@
     let index = 0;
     let correctCount = 0;
 
-    practiceContent.innerHTML = `${exerciseHeader(EXERCISES[2])}
+    practiceContent.innerHTML = `${vocabularyBreadcrumb(selectedItem)}${exerciseHeader(EXERCISES[2])}
       <div class="vocabulary-exercise-meta"><span>${selected.length} palabras</span><span class="vocabulary-audio-progress">1 / ${selected.length}</span></div>
       <div class="vocabulary-audio-card">
         <p>Escucha y selecciona la palabra correcta.</p>
@@ -726,6 +809,9 @@
 
     play.addEventListener('click', speakCurrent);
     showQuestion();
+    practiceContent.insertAdjacentHTML('beforeend', exerciseNavigation());
+    bindVocabularyNavigation(practiceContent);
+    bindExerciseNavigation();
   }
 
   function renderPracticeSubcategory(item) {
