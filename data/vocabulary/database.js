@@ -14,40 +14,40 @@
   'use strict';
 
   const MANIFEST = Object.freeze([
-    Object.freeze({id:'animals',title:'Animales',src:'../data/vocabulary/categories/animals.js?v=20260919-arch'}),
+    Object.freeze({id:'greetings-presentations',title:'Saludos y presentaciones',src:'../data/vocabulary/categories/greetings-presentations.js?v=20260922-2'}),
+    Object.freeze({id:'numbers-cardinal-ordinal',title:'Números cardinales y ordinales',src:'../data/vocabulary/categories/numbers-cardinal-ordinal.js?v=20260922-1'}),
+    Object.freeze({id:'family-relations',title:'Familia y relaciones',src:'../data/vocabulary/categories/family-relations.js?v=20260919-1'}),
     Object.freeze({id:'body-person',title:'Cuerpo y persona',src:'../data/vocabulary/categories/body.js?v=20260919-6'}),
     Object.freeze({id:'house',title:'Casa',src:'../data/vocabulary/categories/house.js?v=20260920-8'}),
+    Object.freeze({id:'daily-life-routines',title:'Vida cotidiana y rutinas',src:'../data/vocabulary/categories/daily-life-routines.js?v=20260921-1'}),
+    Object.freeze({id:'time-dates-calendar',title:'Tiempo, fechas y calendario',src:'../data/vocabulary/categories/time-dates-calendar.js?v=20260922-1'}),
     Object.freeze({id:'food',title:'Alimentación',src:'../data/vocabulary/categories/food.js?v=20260920-9'}),
     Object.freeze({id:'clothing',title:'Ropa',src:'../data/vocabulary/categories/clothing.js?v=20260920-8'}),
     Object.freeze({id:'city',title:'Ciudad',src:'../data/vocabulary/categories/city.js?v=20260920-10'}),
-    Object.freeze({id:'family-relations',title:'Familia y relaciones',src:'../data/vocabulary/categories/family-relations.js?v=20260919-1'}),
-    Object.freeze({id:'transport',title:'Transporte y desplazamientos',src:'../data/vocabulary/categories/transport.js?v=20260919-1'}),
-    Object.freeze({id:'travel-tourism',title:'Viajes y turismo',src:'../data/vocabulary/categories/travel-tourism.js?v=20260919-1'}),
-    Object.freeze({id:'nature',title:'Naturaleza',src:'../data/vocabulary/categories/nature.js?v=20260922-3'}),
+    Object.freeze({id:'place-prepositions',title:'Preposiciones de lugar',src:'../data/vocabulary/categories/place-prepositions.js?v=20260922-2'}),
+    Object.freeze({id:'common-adverbs',title:'Adverbios más usados',src:'../data/vocabulary/categories/common-adverbs.js?v=20260922-1'}),
+    Object.freeze({id:'animals',title:'Animales',src:'../data/vocabulary/categories/animals.js?v=20260919-arch'}),
     Object.freeze({id:'weather-climate',title:'Clima y tiempo',src:'../data/vocabulary/categories/weather-climate.js?v=20260920-1'}),
-    Object.freeze({id:'education',title:'Educación',src:'../data/vocabulary/categories/education.js?v=20260920-1'}),
-    Object.freeze({id:'work-professions',title:'Trabajo y profesiones',src:'../data/vocabulary/categories/work-professions.js?v=20260920-1'}),
     Object.freeze({id:'shopping-commerce',title:'Compras y comercio',src:'../data/vocabulary/categories/shopping-commerce.js?v=20260920-1'}),
     Object.freeze({id:'money-banking',title:'Dinero y banca',src:'../data/vocabulary/categories/money-banking.js?v=20260920-1'}),
-    Object.freeze({id:'health-medicine',title:'Salud y medicina',src:'../data/vocabulary/categories/health-medicine.js?v=20260920-1'}),
-    Object.freeze({id:'daily-life-routines',title:'Vida cotidiana y rutinas',src:'../data/vocabulary/categories/daily-life-routines.js?v=20260921-1'}),
+    Object.freeze({id:'transport',title:'Transporte y desplazamientos',src:'../data/vocabulary/categories/transport.js?v=20260919-1'}),
+    Object.freeze({id:'travel-tourism',title:'Viajes y turismo',src:'../data/vocabulary/categories/travel-tourism.js?v=20260919-1'}),
     Object.freeze({id:'leisure-entertainment',title:'Ocio y entretenimiento',src:'../data/vocabulary/categories/leisure-entertainment.js?v=20260921-1'}),
     Object.freeze({id:'sports',title:'Deportes',src:'../data/vocabulary/categories/sports.js?v=20260921-2'}),
+    Object.freeze({id:'cooking-food-preparation',title:'Cocina y preparación de alimentos',src:'../data/vocabulary/categories/cooking-food-preparation.js?v=20260922-1'}),
+    Object.freeze({id:'nature',title:'Naturaleza',src:'../data/vocabulary/categories/nature.js?v=20260922-3'}),
+    Object.freeze({id:'education',title:'Educación',src:'../data/vocabulary/categories/education.js?v=20260920-1'}),
+    Object.freeze({id:'work-professions',title:'Trabajo y profesiones',src:'../data/vocabulary/categories/work-professions.js?v=20260920-1'}),
+    Object.freeze({id:'health-medicine',title:'Salud y medicina',src:'../data/vocabulary/categories/health-medicine.js?v=20260920-1'}),
     Object.freeze({id:'technology-communication',title:'Tecnología y comunicación',src:'../data/vocabulary/categories/technology-communication.js?v=20260922-2'}),
     Object.freeze({id:'emotions-feelings',title:'Emociones y sentimientos',src:'../data/vocabulary/categories/emotions-feelings.js?v=20260922-1'}),
-    Object.freeze({id:'society-social-life',title:'Sociedad y vida social',src:'../data/vocabulary/categories/society-social-life.js?v=20260922-1'}),
-    Object.freeze({id:'cooking-food-preparation',title:'Cocina y preparación de alimentos',src:'../data/vocabulary/categories/cooking-food-preparation.js?v=20260922-1'}),
-    Object.freeze({id:'time-dates-calendar',title:'Tiempo, fechas y calendario',src:'../data/vocabulary/categories/time-dates-calendar.js?v=20260922-1'}),
-    Object.freeze({id:'place-prepositions',title:'Preposiciones de lugar',src:'../data/vocabulary/categories/place-prepositions.js?v=20260922-2'}),
     Object.freeze({id:'avoir-expressions',title:'Expresiones con avoir',src:'../data/vocabulary/categories/avoir-expressions.js?v=20260922-1'}),
-    Object.freeze({id:'numbers-cardinal-ordinal',title:'Números cardinales y ordinales',src:'../data/vocabulary/categories/numbers-cardinal-ordinal.js?v=20260922-1'}),
-    Object.freeze({id:'figurative-idiomatic-expressions',title:'Expresiones figuradas e idiomáticas',src:'../data/vocabulary/categories/figurative-idiomatic-expressions.js?v=20260922-1'}),
-    Object.freeze({id:'common-adverbs',title:'Adverbios más usados',src:'../data/vocabulary/categories/common-adverbs.js?v=20260922-1'}),
+    Object.freeze({id:'society-social-life',title:'Sociedad y vida social',src:'../data/vocabulary/categories/society-social-life.js?v=20260922-1'}),
     Object.freeze({id:'connectors',title:'Conectores',src:'../data/vocabulary/categories/connectors.js?v=20260922-1'}),
-    Object.freeze({id:'greetings-presentations',title:'Saludos y presentaciones',src:'../data/vocabulary/categories/greetings-presentations.js?v=20260922-2'}),
-    Object.freeze({id:'planets-space',title:'Planetas y el espacio',src:'../data/vocabulary/categories/planets-space.js?v=20260922-1'}),
+    Object.freeze({id:'figurative-idiomatic-expressions',title:'Expresiones figuradas e idiomáticas',src:'../data/vocabulary/categories/figurative-idiomatic-expressions.js?v=20260922-1'}),
     Object.freeze({id:'politics',title:'Política',src:'../data/vocabulary/categories/politics.js?v=20260923-1'}),
     Object.freeze({id:'science',title:'Ciencia',src:'../data/vocabulary/categories/science.js?v=20260923-1'}),
+    Object.freeze({id:'planets-space',title:'Planetas y el espacio',src:'../data/vocabulary/categories/planets-space.js?v=20260922-1'}),
   ]);
 
   const registry = new Map();
@@ -107,8 +107,8 @@
     const article=String(entry&&entry.articleFr||'').trim();
     let word=String(entry&&entry.word||'').trim();
     if(!article)return word;
-    const normalizedArticle=article.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase();
-    const normalizedWord=word.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase();
+    const normalizedArticle=article.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+    const normalizedWord=word.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
     if(normalizedWord===normalizedArticle){
       word='';
     }else if(normalizedWord.startsWith(normalizedArticle+' ')){
