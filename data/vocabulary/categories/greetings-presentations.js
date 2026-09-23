@@ -56,8 +56,6 @@
           { id:'intro-je-suis', word:'je suis', translation:'soy', emoji:'🙋' },
           { id:'intro-moi-cest', word:"moi, c'est", translation:'yo soy / yo me llamo', emoji:'🙋' },
           { id:'intro-mon-nom-est', word:'mon nom est', translation:'mi nombre es', emoji:'🪪' },
-          { id:'intro-enchante-m', word:'enchanté', translation:'encantado (masculino)', emoji:'🤝' },
-          { id:'intro-enchantee-f', word:'enchantée', translation:'encantada (femenino)', emoji:'🤝' }
         ]
       },
       {
@@ -87,10 +85,6 @@
         id: 'greetings-meet-contact',
         title: 'Conocer y establecer contacto',
         entries: [
-          { id:'contact-ravi-m', word:'ravi', translation:'encantado / feliz (masculino)', emoji:'😊' },
-          { id:'contact-ravie-f', word:'ravie', translation:'encantada / feliz (femenino)', emoji:'😊' },
-          { id:'contact-enchante-m', word:'enchanté', translation:'encantado (masculino)', emoji:'🤝' },
-          { id:'contact-enchantee-f', word:'enchantée', translation:'encantada (femenino)', emoji:'🤝' },
           { id:'contact-au-plaisir', word:'au plaisir', translation:'hasta luego / será un placer', emoji:'🤝' }
         ]
       },
