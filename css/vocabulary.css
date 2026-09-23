@@ -448,3 +448,102 @@
     grid-template-columns:1fr;
   }
 }
+
+/* Navegación contextual de Vocabulario */
+.vocabulary-breadcrumb{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:7px;
+  margin:0 0 18px;
+  color:var(--muted);
+  font-size:.85rem;
+  font-weight:700;
+}
+.vocabulary-breadcrumb button{
+  border:0;
+  padding:0;
+  background:transparent;
+  color:var(--blue);
+  font:inherit;
+  font-weight:800;
+  cursor:pointer;
+}
+.vocabulary-breadcrumb button:hover{text-decoration:underline}
+.vocabulary-breadcrumb strong{color:var(--navy)}
+.vocabulary-subcategory-navigation{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:28px 0 8px;
+  padding-top:20px;
+  border-top:1px solid var(--line);
+}
+.vocabulary-subcategory-navigation .vocabulary-navigation-categories{
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  font:inherit;
+  font-size:.85rem;
+  font-weight:800;
+  cursor:pointer;
+}
+.vocabulary-subcategory-navigation .vocabulary-navigation-categories:hover{color:var(--blue)}
+.vocabulary-subcategory-navigation .btn,
+.vocabulary-exercise-navigation .btn{
+  min-width:145px;
+  white-space:nowrap;
+}
+.vocabulary-subcategory-navigation .btn:disabled,
+.vocabulary-exercise-navigation .btn:disabled{
+  opacity:.45;
+  cursor:default;
+  transform:none;
+}
+.vocabulary-exercise-navigation{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin:26px 0 8px;
+  padding-top:18px;
+  border-top:1px solid var(--line);
+}
+.vocabulary-exercise-navigation span{
+  color:var(--muted);
+  font-size:.85rem;
+  font-weight:800;
+}
+@media(max-width:760px){
+  .vocabulary-subcategory-navigation{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .vocabulary-subcategory-navigation .vocabulary-navigation-categories{
+    grid-column:1 / -1;
+    grid-row:1;
+    justify-self:center;
+    order:-1;
+  }
+  .vocabulary-subcategory-navigation .btn,
+  .vocabulary-exercise-navigation .btn{
+    min-width:0;
+    width:100%;
+    padding:10px 11px;
+    font-size:.85rem;
+  }
+  .vocabulary-exercise-navigation{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .vocabulary-exercise-navigation span{
+    grid-column:1 / -1;
+    grid-row:1;
+    text-align:center;
+  }
+  .vocabulary-exercise-navigation .btn:first-of-type{grid-column:1;grid-row:2}
+  .vocabulary-exercise-navigation .btn:last-of-type{grid-column:2;grid-row:2}
+}
