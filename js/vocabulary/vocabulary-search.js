@@ -60,6 +60,41 @@
       return api;
     }
 
+    function getItemTokens(item) {
+      return tokenize(item && item.title);
+    }
+
+    function getTranslationTokens(item) {
+      return tokenize(item && item.translation);
+    }
+
+    function scoreItem(item, searchTokens) {
+      const titleTokens = getItemTokens(item);
+      const translationTokens = getTranslationTokens(item);
+
+      let score = 0;
+
+      searchTokens.forEach((searchToken) => {
+        const exactTitle = titleTokens.some((token) => token === searchToken);
+        const exactTranslation = translationTokens.some((token) => token === searchToken);
+        const startsTitle = titleTokens.some((token) => token.startsWith(searchToken));
+        const startsTranslation = translationTokens.some((token) => token.startsWith(searchToken));
+        const titleContains = normalize(item && item.title).includes(searchToken);
+        const translationContains = normalize(item && item.translation).includes(searchToken);
+
+        if (exactTitle) score += 10000;
+        else if (startsTitle) score += 5000;
+        else if (titleContains) score += 3000;
+        else if (exactTranslation) score += 2000;
+        else if (startsTranslation) score += 1000;
+        else if (translationContains) score += 500;
+
+        if (exactTitle && titleTokens.length === searchTokens.length) score += 5000;
+      });
+
+      return score;
+    }
+
     function query(value) {
       const tokens = tokenize(value);
       if (!tokens.length) return [];
@@ -78,8 +113,13 @@
       });
 
       return [...(candidates || [])]
-        .map((id) => itemsById.get(id))
-        .filter(Boolean);
+        .map((id, index) => ({ item: itemsById.get(id), index }))
+        .filter((result) => result.item)
+        .sort((a, b) => {
+          const scoreDifference = scoreItem(b.item, tokens) - scoreItem(a.item, tokens);
+          return scoreDifference || a.index - b.index;
+        })
+        .map((result) => result.item);
     }
 
     const api = {
