@@ -546,9 +546,13 @@
 
     exerciseTabs.querySelectorAll('[data-exercise]').forEach((button) => {
       button.addEventListener('click', () => {
+        const scrollPosition = window.scrollY;
         activeExercise = button.dataset.exercise;
         renderExerciseTabs();
         renderPracticeSubcategory(selectedItem);
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: scrollPosition, behavior: 'auto' });
+        });
       });
     });
   }
