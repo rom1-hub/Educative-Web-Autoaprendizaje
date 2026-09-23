@@ -23,7 +23,7 @@
     Object.freeze({id:'family-relations',title:'Familia y relaciones',src:'../data/vocabulary/categories/family-relations.js?v=20260919-1'}),
     Object.freeze({id:'transport',title:'Transporte y desplazamientos',src:'../data/vocabulary/categories/transport.js?v=20260919-1'}),
     Object.freeze({id:'travel-tourism',title:'Viajes y turismo',src:'../data/vocabulary/categories/travel-tourism.js?v=20260919-1'}),
-    Object.freeze({id:'nature',title:'Naturaleza',src:'../data/vocabulary/categories/nature.js?v=20260920-2'}),
+    Object.freeze({id:'nature',title:'Naturaleza',src:'../data/vocabulary/categories/nature.js?v=20260922-3'}),
     Object.freeze({id:'weather-climate',title:'Clima y tiempo',src:'../data/vocabulary/categories/weather-climate.js?v=20260920-1'}),
     Object.freeze({id:'education',title:'Educación',src:'../data/vocabulary/categories/education.js?v=20260920-1'}),
     Object.freeze({id:'work-professions',title:'Trabajo y profesiones',src:'../data/vocabulary/categories/work-professions.js?v=20260920-1'}),
@@ -45,6 +45,7 @@
     Object.freeze({id:'common-adverbs',title:'Adverbios más usados',src:'../data/vocabulary/categories/common-adverbs.js?v=20260922-1'}),
     Object.freeze({id:'connectors',title:'Conectores',src:'../data/vocabulary/categories/connectors.js?v=20260922-1'}),
     Object.freeze({id:'greetings-presentations',title:'Saludos y presentaciones',src:'../data/vocabulary/categories/greetings-presentations.js?v=20260922-2'}),
+    Object.freeze({id:'planets-space',title:'Planetas y el espacio',src:'../data/vocabulary/categories/planets-space.js?v=20260922-1'}),
   ]);
 
   const registry = new Map();
