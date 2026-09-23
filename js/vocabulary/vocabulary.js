@@ -195,7 +195,7 @@
 
   function bindVocabularyNavigation(container) {
     const rootButton = container.querySelector('[data-vocabulary-root]');
-    if (rootButton) rootButton.addEventListener('click', navigateToVocabularyRoot);
+    if (rootButton) rootButton.addEventListener('click', openAllCategories);
     const categoryButton = container.querySelector('[data-vocabulary-category]');
     if (categoryButton) categoryButton.addEventListener('click', () => selectCategoryById(categoryButton.dataset.vocabularyCategory));
     container.querySelectorAll('[data-subcategory-nav]').forEach((button) => button.addEventListener('click', () => selectSubcategoryById(button.dataset.subcategoryNav)));
