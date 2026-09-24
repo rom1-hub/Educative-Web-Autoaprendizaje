@@ -1,6 +1,8 @@
 /* COQ — Motor global de ejercicios. Extraído de V43 sin cambios de comportamiento. */
 /* Exercises: no answer is revealed until every question has been answered. */
 document.querySelectorAll(".exercise").forEach(ex=>{
+ if(ex.dataset.coqExerciseReady==="1")return;
+ ex.dataset.coqExerciseReady="1";
  const questions=[...ex.querySelectorAll(".question")];
  questions.forEach(q=>{
   q.querySelectorAll(".option").forEach(o=>o.addEventListener("click",()=>{
