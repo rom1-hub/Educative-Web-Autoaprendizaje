@@ -17,6 +17,7 @@ const SOURCES_LOCAL=[
 ];
 const SOURCE_PRONOMINAL=path.resolve(__dirname,'../data/verbs/pronominal-catalog.js');
 const OUT=path.resolve(__dirname,'../data/verbs/local-database.js');
+const SEARCH_INDEX_OUT=path.resolve(__dirname,'../data/verbs/search-index.js');
 const SIMPLE={
   "présent de l'indicatif":['indicative','present'],
   'passé simple':['indicative','simple-past'],
@@ -202,5 +203,8 @@ function sortObject(value){return Object.fromEntries(Object.keys(value).sort((a,
   const payload=`/* AUTO-GENERATED — do not edit manually. Source: conjugation-fr ${VERSION} / Verbiste + COQ local metadata + pronominal catalog. */\nwindow.COQ_VERBS=${JSON.stringify(data)};\nwindow.COQ_VERB_DATABASE_VERSION=${JSON.stringify(VERSION)};\n`;
   fs.mkdirSync(path.dirname(OUT),{recursive:true});
   fs.writeFileSync(OUT,payload,'utf8');
+  const searchIndex=`/* COQ — Índice ligero de verbos para la búsqueda global.\n * Fuente: local-database.js. Generado automáticamente por build-local-verb-database.js.\n * No contiene conjugaciones ni datos lingüísticos; solo identificadores de búsqueda.\n */\nwindow.COQ_VERB_SEARCH_INDEX=Object.freeze(${JSON.stringify(Object.keys(data).sort((a,b)=>a.localeCompare(b,'fr')))});\n`;
+  fs.writeFileSync(SEARCH_INDEX_OUT,searchIndex,'utf8');
   console.log(`Generated ${Object.keys(data).length} verbs at ${OUT}`);
+  console.log(`Generated search index at ${SEARCH_INDEX_OUT}`);
 })();
