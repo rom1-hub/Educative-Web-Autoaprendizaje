@@ -14,7 +14,7 @@ No se modifica la lógica de conjugación, datos, ejercicios, buscador, progreso
 ## Validación
 - `script.js` ya no contiene `SpeechSynthesisUtterance`.
 - `audio.js` contiene la implementación global.
-- Cada HTML carga `navigation.js`, `audio.js` y `script.js` una sola vez.
+- Cada HTML carga `navigation.js` y `audio.js`; el antiguo `script.js` fue eliminado tras completar su extracción.
 - Se conserva el conjunto completo de archivos V43, incluido CSS y logo.
 
 
@@ -22,14 +22,14 @@ No se modifica la lógica de conjugación, datos, ejercicios, buscador, progreso
 
 - Extraído el motor genérico de ejercicios de `script.js` a `js/exercises/exercise-engine.js`.
 - Se conserva la lógica y comportamiento existentes; no se rediseña el motor.
-- Las páginas HTML cargan el motor antes de `script.js`.
+- Las páginas HTML cargan el motor de ejercicios sin depender de `script.js`.
 - Protegidos: conjugación, audio, navegación, búsqueda, progreso y estilos.
 
 ## Validación FASE 2C
-- `script.js`, `js/core/audio.js`, `js/core/navigation.js` y `js/exercises/exercise-engine.js` pasan `node --check`.
+- Los servicios extraídos pasan las comprobaciones de sintaxis correspondientes; `script.js` ya no forma parte del árbol actual.
 - El bloque de ejercicios ya no existe en `script.js`.
 - El motor aparece una sola vez en `js/exercises/exercise-engine.js`.
-- Todas las páginas HTML cargan `exercise-engine.js` antes de `script.js`.
+- Las páginas con ejercicios cargan `exercise-engine.js` directamente.
 - No se modificó `styles.css` ni la lógica específica de `conjugaison.html`.
 
 
@@ -43,13 +43,13 @@ No se modifica la lógica de conjugación, datos, ejercicios, buscador, progreso
 ## Fase 2E — separar buscador global
 - Extraída la lógica del buscador global de `script.js` a `js/search/search.js`.
 - Se conserva el índice actual y el comportamiento de búsqueda; no se amplía todavía el buscador.
-- Las 10 páginas HTML cargan `js/search/search.js` antes de `script.js`.
+- Las páginas con búsqueda global cargan `js/search/search.js` directamente, precedido por el índice ligero de verbos.
 - Protegidos: conjugación, audio, navegación, ejercicios, progreso, estilos y contenido.
 
 ## Validación FASE 2E
-- `script.js` ya no contiene el bloque del buscador global.
+- El antiguo `script.js` ya no contiene el bloque del buscador global porque fue eliminado.
 - `search.js` contiene una única implementación del buscador global.
-- Todas las páginas HTML cargan `search.js` una sola vez.
+- Todas las páginas HTML con búsqueda global cargan `search.js` una sola vez.
 - El buscador mantiene el mismo índice y comportamiento de V43.
 
 
@@ -157,3 +157,11 @@ No se modifica la lógica de conjugación, datos, ejercicios, buscador, progreso
 - Cuando un tiempo todavía no está registrado y el motor no sabe generarlo (por ejemplo, una irregularidad aún no migrada), ese tiempo queda fuera de la sesión en lugar de generar una pregunta bloqueada.
 - Se añadió la formación correcta del imperativo pronominal básico (`lève-toi`, `levons-nous`, `levez-vous`) para evitar respuestas incorrectas al utilizar `Todos los tiempos`.
 
+
+
+### Estado posterior a la limpieza arquitectónica
+
+- `js/legacy/script.js` ya no forma parte del repositorio; las páginas no deben referenciarlo.
+- La navegación de lecciones (`data-guard`) vive en `js/core/lesson-navigation.js`.
+- La búsqueda global usa `data/verbs/search-index.js`, un índice ligero de nombres de verbos generado junto con la base local.
+- La búsqueda global no necesita cargar `data/verbs/local-database.js` en páginas que no usan Conjugación.
