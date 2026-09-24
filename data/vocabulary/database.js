@@ -139,7 +139,12 @@
     const category=registry.get(id); if(!category)throw new Error('Vocabulario: el módulo "'+id+'" no registró ninguna categoría.');
     refreshDatabaseIndex(); return Object.freeze(category);
   }
-  async function loadAll(){await Promise.all(MANIFEST.map((item)=>loadCategory(item.id)));validateLoadedRegistry();refreshDatabaseIndex();return database.categories;}
+  async function loadAll(){
+    await Promise.all(MANIFEST.map((item)=>loadScript(item.src)));
+    validateLoadedRegistry();
+    refreshDatabaseIndex();
+    return database.categories;
+  }
   window.COQ_VOCABULARY_DATABASE=database;
   window.COQ_VOCABULARY_DATABASE_API=Object.freeze({manifest:MANIFEST,registerCategory,loadCategory,loadAll,getLoadedCategories,refreshDatabaseIndex});
   window.COQ_VOCABULARY_DATABASE_READY=Promise.resolve(database);
