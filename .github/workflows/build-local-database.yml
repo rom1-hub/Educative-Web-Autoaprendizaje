@@ -2,7 +2,7 @@ name: Build local verb database
 
 on:
   push:
-    branches: [audit-arquitectura, test-base-datos]
+    branches: [audit-arquitectura, test-base-datos, optimizacion-limpieza]
 
 permissions:
   contents: write
@@ -43,7 +43,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/verbs/local-database.js
+          git add data/verbs/local-database.js data/verbs/search-index.js
           if git diff --cached --quiet; then
             echo "Database already up to date"
             exit 0
