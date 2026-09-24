@@ -914,18 +914,6 @@
     else renderPractice(selectedItem);
   }
 
-  function resultContextKey(item) {
-    if (!item || item.type !== 'entry') return '';
-    return normalize(item.data.word);
-  }
-
-  function shouldShowEntryContext(item, entryMatches) {
-    if (!item || item.type !== 'entry') return false;
-
-    const key = resultContextKey(item);
-    return entryMatches.filter((match) => resultContextKey(match) === key).length > 1;
-  }
-
   function renderEntryResult(item, index) {
     const entry = item.data;
     const word = formatFrenchWord(entry);
