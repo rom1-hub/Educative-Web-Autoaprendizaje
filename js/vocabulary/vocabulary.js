@@ -50,9 +50,7 @@
   }
 
   async function ensureCategoryLoaded(id) {
-    const category = await databaseApi.loadCategory(id);
-    searchService.refresh();
-    return category;
+    return databaseApi.loadCategory(id);
   }
 
   const EXERCISES = [
