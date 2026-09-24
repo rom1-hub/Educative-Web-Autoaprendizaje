@@ -119,10 +119,13 @@
       });
 
       return [...(candidates || [])]
-        .map((id, index) => ({ item: itemsById.get(id), index }))
-        .filter((result) => result.item)
+        .map((id, index) => {
+          const item = itemsById.get(id);
+          return item ? { item, index, score: scoreItem(item, tokens) } : null;
+        })
+        .filter(Boolean)
         .sort((a, b) => {
-          const scoreDifference = scoreItem(b.item, tokens) - scoreItem(a.item, tokens);
+          const scoreDifference = b.score - a.score;
           return scoreDifference || a.index - b.index;
         })
         .map((result) => result.item);
