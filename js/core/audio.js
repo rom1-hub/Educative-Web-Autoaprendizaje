@@ -2,6 +2,13 @@
  * Fuente única de verdad para la pronunciación mediante SpeechSynthesis.
  */
 (function(){
+  let cachedFrenchVoice=null;
+  let voicesReady=false;
+  function refreshFrenchVoice(){
+    cachedFrenchVoice=getFrenchVoice();
+    voicesReady=true;
+    return cachedFrenchVoice;
+  }
   function getFrenchVoice(){
     const voices=window.speechSynthesis.getVoices()||[];
     const fr=voices.filter(function(v){ return /^fr(?:-|_)/i.test(v.lang||''); });
@@ -39,7 +46,7 @@
     window.speechSynthesis.cancel();
     const utterance=new SpeechSynthesisUtterance(normalizeFrenchSpeech(text));
     utterance.lang='fr-FR';
-    const voice=getFrenchVoice();
+    const voice=voicesReady?cachedFrenchVoice:refreshFrenchVoice();
     if(voice) utterance.voice=voice;
     utterance.rate=.88;
     window.speechSynthesis.speak(utterance);
@@ -58,6 +65,10 @@
 
   window.Coqaudio={speak:speak,bind:bind};
 
+  if('speechSynthesis' in window){
+    window.speechSynthesis.addEventListener('voiceschanged',refreshFrenchVoice);
+    refreshFrenchVoice();
+  }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){bind(document);});
   else bind(document);
 })();
