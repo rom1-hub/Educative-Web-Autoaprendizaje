@@ -138,7 +138,8 @@
     const descriptor=manifestById.get(id); if(!descriptor)throw new Error('Vocabulario: categoría no registrada en el catálogo: "'+id+'".');
     if(!registry.has(id))await loadScript(descriptor.src);
     const category=registry.get(id); if(!category)throw new Error('Vocabulario: el módulo "'+id+'" no registró ninguna categoría.');
-    refreshDatabaseIndex(); return Object.freeze(category);
+    if(!database.categories.some((item)=>item.id===id))refreshDatabaseIndex();
+    return Object.freeze(category);
   }
   async function loadAll(){
     await Promise.all(MANIFEST.map((item)=>loadScript(item.src)));
