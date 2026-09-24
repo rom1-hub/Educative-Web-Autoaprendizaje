@@ -1050,17 +1050,24 @@
     });
   }
 
+  let searchDebounceTimer = null;
+
   searchInput.addEventListener('input', () => {
+    if (searchDebounceTimer) window.clearTimeout(searchDebounceTimer);
+
     if (!searchInput.value.trim()) {
       results.innerHTML = '';
       searchInput.setAttribute('aria-expanded', 'false');
       return;
     }
-    renderResults(searchInput.value).catch((error) => {
-      results.innerHTML = '<div class="vocabulary-no-results">No se pudo realizar la búsqueda.</div>';
-      searchInput.setAttribute('aria-expanded', 'true');
-      console.error(error);
-    });
+
+    searchDebounceTimer = window.setTimeout(() => {
+      renderResults(searchInput.value).catch((error) => {
+        results.innerHTML = '<div class="vocabulary-no-results">No se pudo realizar la búsqueda.</div>';
+        searchInput.setAttribute('aria-expanded', 'true');
+        console.error(error);
+      });
+    }, 180);
   });
 
   browseButton.addEventListener('click', () => {
