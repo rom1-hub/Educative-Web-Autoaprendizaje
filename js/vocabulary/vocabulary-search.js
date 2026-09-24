@@ -25,6 +25,7 @@
   function create(database) {
     const itemsById = new Map();
     const prefixIndex = new Map();
+    const searchMetadata = new Map();
 
     function addPrefix(prefix, id) {
       if (!prefixIndex.has(prefix)) prefixIndex.set(prefix, new Set());
@@ -35,6 +36,15 @@
       if (!item || !item.id) return;
 
       itemsById.set(item.id, item);
+
+      const titleTokens = tokenize(item.title);
+      const translationTokens = tokenize(item.translation);
+      searchMetadata.set(item.id, {
+        titleTokens,
+        translationTokens,
+        normalizedTitle: normalize(item.title),
+        normalizedTranslation: normalize(item.translation)
+      });
 
       const text = [item.title, item.translation, item.category]
         .filter(Boolean)
@@ -50,6 +60,7 @@
     function rebuild() {
       itemsById.clear();
       prefixIndex.clear();
+      searchMetadata.clear();
 
       const source = Array.isArray(database && database.index) ? database.index : [];
       source.forEach(indexItem);
@@ -60,17 +71,12 @@
       return api;
     }
 
-    function getItemTokens(item) {
-      return tokenize(item && item.title);
-    }
-
-    function getTranslationTokens(item) {
-      return tokenize(item && item.translation);
-    }
-
     function scoreItem(item, searchTokens) {
-      const titleTokens = getItemTokens(item);
-      const translationTokens = getTranslationTokens(item);
+      const metadata = searchMetadata.get(item && item.id);
+      const titleTokens = metadata?.titleTokens || tokenize(item && item.title);
+      const translationTokens = metadata?.translationTokens || tokenize(item && item.translation);
+      const normalizedTitle = metadata?.normalizedTitle || normalize(item && item.title);
+      const normalizedTranslation = metadata?.normalizedTranslation || normalize(item && item.translation);
 
       let score = 0;
 
@@ -79,8 +85,8 @@
         const exactTranslation = translationTokens.some((token) => token === searchToken);
         const startsTitle = titleTokens.some((token) => token.startsWith(searchToken));
         const startsTranslation = translationTokens.some((token) => token.startsWith(searchToken));
-        const titleContains = normalize(item && item.title).includes(searchToken);
-        const translationContains = normalize(item && item.translation).includes(searchToken);
+        const titleContains = normalizedTitle.includes(searchToken);
+        const translationContains = normalizedTranslation.includes(searchToken);
 
         if (exactTitle) score += 10000;
         else if (startsTitle) score += 5000;
