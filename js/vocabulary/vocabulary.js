@@ -35,9 +35,18 @@
   const databaseApi = window.COQ_VOCABULARY_DATABASE_API;
   if (!databaseApi || typeof databaseApi.loadCategory !== 'function' || typeof databaseApi.loadAll !== 'function') return;
 
+  let allLoadedPromise = null;
+
   async function ensureAllLoaded() {
-    await databaseApi.loadAll();
-    searchService.refresh();
+    if (!allLoadedPromise) {
+      allLoadedPromise = databaseApi.loadAll()
+        .then(() => searchService.refresh())
+        .catch((error) => {
+          allLoadedPromise = null;
+          throw error;
+        });
+    }
+    await allLoadedPromise;
   }
 
   async function ensureCategoryLoaded(id) {
