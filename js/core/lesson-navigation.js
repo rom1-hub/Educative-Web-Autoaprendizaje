@@ -44,11 +44,4 @@
       if(url)location.href=url;
     });
   });
-
-  const missionButton=document.querySelector('#missionButton');
-  if(missionButton){
-    missionButton.addEventListener('click',function(){
-      alert('Prototipo: aquí construiremos una Mission interactiva paso a paso, con decisiones, feedback y resultado final.');
-    });
-  }
 })();
