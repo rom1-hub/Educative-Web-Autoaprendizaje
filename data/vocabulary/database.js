@@ -52,6 +52,7 @@
 
   const registry = new Map();
   const loadCache = new Map();
+  const manifestById = new Map(MANIFEST.map(item=>[item.id,item]));
 
   function assertString(value,label,required=true){
     if(required&&(!value||typeof value!=='string'))throw new Error('Vocabulario: '+label+' inválido.');
@@ -91,7 +92,7 @@
   }
   function registerCategory(category){
     assertCategory(category);
-    const descriptor=MANIFEST.find((item)=>item.id===category.id);
+    const descriptor=manifestById.get(category.id);
     if(!descriptor)throw new Error('Vocabulario: la categoría "'+category.id+'" no existe en el manifiesto.');
     const previous=registry.get(category.id);
     if(previous&&previous!==category)throw new Error('Vocabulario: la categoría "'+category.id+'" fue registrada más de una vez.');
@@ -134,7 +135,7 @@
   const database={version:'5.3.0',schemaVersion:'1.1',categories:[],index:[],manifest:MANIFEST,loadCategory,loadAll,getLoadedCategories};
   function refreshDatabaseIndex(){const categories=getLoadedCategories();database.categories=categories;database.index=buildSearchIndex(categories);return database;}
   async function loadCategory(id){
-    const descriptor=MANIFEST.find((item)=>item.id===id); if(!descriptor)throw new Error('Vocabulario: categoría no registrada en el catálogo: "'+id+'".');
+    const descriptor=manifestById.get(id); if(!descriptor)throw new Error('Vocabulario: categoría no registrada en el catálogo: "'+id+'".');
     if(!registry.has(id))await loadScript(descriptor.src);
     const category=registry.get(id); if(!category)throw new Error('Vocabulario: el módulo "'+id+'" no registró ninguna categoría.');
     refreshDatabaseIndex(); return Object.freeze(category);
