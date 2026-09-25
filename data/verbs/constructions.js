@@ -107,7 +107,6 @@ window.COQ_PRONOMINAL_RULES=Object.freeze({
   'étendre':{fonctionDeSe:'COD',accord:'sujet'}
 });
 window.COQ_CONSTRUCTION_OPTIONS=Object.freeze([
-  {id:'',label:'Verbos pronominales y no pronominales'},
   {id:'non-pronomiale',label:'Verbos no pronomiales'},
   {id:'pronomiale',label:'Verbos pronomiales'}
 ]);
