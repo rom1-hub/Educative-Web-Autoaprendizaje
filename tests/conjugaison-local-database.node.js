@@ -64,4 +64,6 @@ const sEnPresent=sEnContrebalancer?.formes?.["présent de l'indicatif"]||[];
 assert(sEnPresent[0]==="m'en contrebalance",`s'en contrebalancer debe conservar «en» en je.; obtenido: ${JSON.stringify(sEnPresent[0])}`);
 assert(sEnPresent[2]==="s'en contrebalance","s'en contrebalancer debe conservar «en» en il/elle/on.");
 assert(sEnPresent[5]==="s'en contrebalancent","s'en contrebalancer debe conservar «en» en ils/elles.");
-console.log('Local database regression passed: '+keys.length+' verbs, '+pronominal.length+' pronominal entries');
+const translatedRecords=Object.values(verbs).filter(record=>typeof record?.traduccion==='string'&&record.traduccion.trim());
+assert(translatedRecords.length>0,'La base local debe conservar traducciones francés-español cuando están disponibles.');
+console.log('Local database regression passed: '+keys.length+' verbs, '+pronominal.length+' pronominal entries, '+translatedRecords.length+' translated entries');
