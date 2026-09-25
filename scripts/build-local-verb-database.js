@@ -123,7 +123,7 @@ function imperativePronominal(values,particle){
   return values.slice(0,3).map((value,index)=>{
     const form=bareForm(value);
     if(particle==='en'){
-      const suffix=index===0?'t'en':index===1?'nous-en':'vous-en';
+      const suffix=index===0?"t'en":index===1?'nous-en':'vous-en';
       return `${form}-${suffix}`;
     }
     return `${form}-${pronouns[index]}`;
