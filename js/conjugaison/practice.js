@@ -77,7 +77,7 @@
         const verbCount=Math.min(8,randomizedVerbs.length);
         randomizedVerbs.slice(0,verbCount).forEach(v=>add(v,allTenses));
       }else{
-        U.shuffleArray(verbs).forEach(add);
+        U.shuffleArray(verbs).forEach(v=>add(v));
       }
     }
 
