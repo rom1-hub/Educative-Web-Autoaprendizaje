@@ -10,6 +10,7 @@
     {base:'allonger',infinitif:"s'allonger"},
     {base:'fâcher',infinitif:'se fâcher'},
     {base:'voir',infinitif:'se voir'},
+    {base:'regarder',infinitif:'se regarder'},
     {base:'amuser',infinitif:"s'amuser"},
     {base:'appeler',infinitif:"s'appeler"},
     {base:'asseoir',infinitif:"s'asseoir"},
