@@ -28,6 +28,7 @@
         baseVerbId:baseCandidate&&baseCandidate!==key?baseCandidate:null,
         formePronominale:merged.formePronominale||null,
         formeNonPronominale:merged.formeNonPronominale||null,
+        traduccion:typeof merged.traduccion==='string'&&merged.traduccion.trim()?merged.traduccion.trim():null,
         pronominal:merged.pronominal===true,
         variantes:merged.variantes??merged.variante??null,
         exceptions:merged.exceptions||null,
