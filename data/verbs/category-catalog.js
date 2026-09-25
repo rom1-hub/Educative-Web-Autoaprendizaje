@@ -9,7 +9,7 @@
   ];
   const categories=[
     {id:'all',label:'Todos los grupos',section:null,groupes:null,familyIds:null,subCategories:null},
-    {id:'groupe-1-all',label:'Todos los verbos',section:'Primer grupo',groupes:[1],familyIds:null,subCategories:null},
+    {id:'groupe-1-all',label:'Todos los verbos del primer grupo',section:'Primer grupo',groupes:[1],familyIds:null,subCategories:null},
     {id:'regular-er',label:'Normales',section:'Primer grupo',groupes:[1],familyIds:['er-regular'],subCategories:['NORMAL']},
     {id:'er-ger',label:'-GER',section:'Primer grupo',groupes:[1],familyIds:['er-ger'],subCategories:['GER']},
     {id:'er-cer',label:'-CER',section:'Primer grupo',groupes:[1],familyIds:['er-cer'],subCategories:['CER']},
@@ -17,8 +17,8 @@
     {id:'er-eter',label:'-ETER',section:'Primer grupo',groupes:[1],familyIds:['er-eter-double','er-eter-accent','er-eter-orthographic'],subCategories:['ETER']},
     {id:'yer',label:'-YER',section:'Primer grupo',groupes:[1],familyIds:['yer-oyer-uyer','yer-ayer'],subCategories:['YER']},
     {id:'er-e-accent',label:'-E (È) + consonante + ER',section:'Primer grupo',groupes:[1],familyIds:['er-e-accent'],subCategories:['E_ACUTE_CONSONANT_ER']},
-    {id:'groupe-2-all',label:'Todos los verbos',section:'Segundo grupo',groupes:[2],familyIds:null,subCategories:null},
-    {id:'groupe-3-all',label:'Todos los verbos',section:'Tercer grupo',groupes:[3],familyIds:null,subCategories:null},
+    {id:'groupe-2-all',label:'Todos los verbos del segundo grupo',section:'Segundo grupo',groupes:[2],familyIds:null,subCategories:null},
+    {id:'groupe-3-all',label:'Todos los verbos del tercer grupo',section:'Tercer grupo',groupes:[3],familyIds:null,subCategories:null},
     {id:'groupe-3-dre',label:'-DRE',section:'Tercer grupo',groupes:[3],familyIds:null,subCategories:['DRE'],endings:['dre']},
     {id:'groupe-3-ir',label:'-IR',section:'Tercer grupo',groupes:[3],familyIds:null,subCategories:['IR_THIRD'],endings:['ir']},
     {id:'groupe-3-uire',label:'-UIRE',section:'Tercer grupo',groupes:[3],familyIds:['conduire-type'],subCategories:['UIRE'],endings:['uire']},
