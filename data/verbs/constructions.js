@@ -18,6 +18,7 @@ window.COQ_PRONOMINAL_RULES=Object.freeze({
   'acharner':{fonctionDeSe:'aucune',accord:'sujet'},
   'acoquiner':{fonctionDeSe:'aucune',accord:'sujet'},
   'adonner':{fonctionDeSe:'aucune',accord:'sujet'},
+  'affairer':{fonctionDeSe:'aucune',accord:'sujet'},
 
   'amuser':{fonctionDeSe:'COD',accord:'sujet'},
   'appeler':{fonctionDeSe:'COD',accord:'sujet'},
