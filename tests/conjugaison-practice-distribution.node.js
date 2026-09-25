@@ -35,6 +35,8 @@ const files=[
 
 files.forEach(file=>vm.runInContext(fs.readFileSync(file,'utf8'),context,{filename:file}));
 
+assert(context.window.COQ_CONJ_PRACTICE,'API de práctica no disponible.');
+assert.strictEqual(typeof context.window.COQ_CONJ_PRACTICE.bind,'function','La API pública de práctica debe exponer bind para conectar la interfaz.');
 assert(context.window.COQ_CONJ_PRACTICE_TESTING,'API de pruebas de práctica no disponible.');
 const {selectPracticeQuestions}=context.window.COQ_CONJ_PRACTICE_TESTING;
 
