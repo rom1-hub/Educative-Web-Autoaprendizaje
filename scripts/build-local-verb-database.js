@@ -50,8 +50,12 @@ function readPronominalCatalog(){
   return Array.isArray(window.COQ_PRONOMINAL_CATALOG)?window.COQ_PRONOMINAL_CATALOG:[];
 }
 function groupOf(template,verb){
+  const infinitif=String(verb||'').trim().toLowerCase();
+  // El grupo verbal es lingüístico, no una simple lectura del template de la fuente.
+  // Los verbos regulares en -ER pertenecen al primer grupo; aller y envoyer
+  // son excepciones tradicionales y pertenecen al tercer grupo.
   if(template==='fin:ir')return 2;
-  if(/:er$/i.test(String(template||'')) && verb!=='aller')return 1;
+  if(/er$/i.test(infinitif) && infinitif!=='aller' && infinitif!=='envoyer')return 1;
   return 3;
 }
 function category(verb,group){
