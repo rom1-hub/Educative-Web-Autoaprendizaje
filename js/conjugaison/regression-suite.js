@@ -56,6 +56,22 @@
     const normalized=lookup.normalizedRows([['je','parle'],['il/elle/on','parle'],['ils/elles','parlent']],"présent de l'indicatif");
     assert('consulta separa grupos de sujetos',normalized.length,6,results);
 
+    const category=window.COQ_CATEGORY_RESOLVER;
+    if(category){
+      const groupCases=[['groupe-1-all','parler',1],['groupe-2-all','finir',2],['groupe-3-all','prendre',3],['groupe-3-all','venir',3]];
+      groupCases.forEach(([id,verb,groupe])=>{
+        const record=window.COQ_CONJ_DATA_MODEL?.get?.(verb);
+        assert('grupo canónico · '+verb,record?.groupe,groupe,results);
+        assert('filtro de grupo · '+id+' · '+verb,category.matchesCategory(verb,id),true,results);
+      });
+      assert('grupo 1 no entra en grupo 2',category.matchesCategory('parler','groupe-2-all'),false,results);
+      assert('grupo 1 no entra en grupo 3',category.matchesCategory('parler','groupe-3-all'),false,results);
+      assert('grupo 2 no entra en grupo 1',category.matchesCategory('finir','groupe-1-all'),false,results);
+      assert('grupo 2 no entra en grupo 3',category.matchesCategory('finir','groupe-3-all'),false,results);
+      assert('grupo 3 no entra en grupo 1',category.matchesCategory('prendre','groupe-1-all'),false,results);
+      assert('grupo 3 no entra en grupo 2',category.matchesCategory('prendre','groupe-2-all'),false,results);
+    }
+
     const practice=window.COQ_CONJ_PRACTICE;
     if(practice){
       const mixed=practice.buildQuestions('', 'passé composé','Todos','', 'avec-avoir-et-etre');
