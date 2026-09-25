@@ -8,7 +8,7 @@ const rules=context.window.COQ_PRONOMINAL_RULES||{};
 const agreement=context.window.COQ_CONJ_AGREEMENT;
 const assert=(condition,message)=>{if(!condition)throw new Error(message);};
 const expect=(actual,expected,message)=>assert(actual===expected,`${message}: esperado «${expected}», obtenido «${actual}»`);
-assert(catalog.length===117,`El catálogo pronominal debe contener 116 verbos; obtenido ${catalog.length}.`);
+assert(catalog.length===201,`El catálogo pronominal debe contener 116 verbos; obtenido ${catalog.length}.`);
 assert(Object.keys(rules).length===catalog.length,`Cada pronominal debe tener una regla explícita de concordancia: ${Object.keys(rules).length}/${catalog.length}.`);
 assert(agreement&&typeof agreement.formatLookupCompoundForm==='function','La concordancia debe exponer el formateador de Consulta.');
 for(const entry of catalog){
@@ -29,6 +29,11 @@ assert(rules.acharner?.fonctionDeSe==='aucune'&&rules.acharner?.accord==='sujet'
 assert(rules.acoquiner?.fonctionDeSe==='aucune'&&rules.acoquiner?.accord==='sujet','s\'acoquiner debe concordar con el sujeto.');
 assert(rules.adonner?.fonctionDeSe==='aucune'&&rules.adonner?.accord==='sujet','s\'adonner debe concordar con el sujeto.');
 assert(rules.affairer?.fonctionDeSe==='aucune'&&rules.affairer?.accord==='sujet','s\'affairer debe concordar con el sujeto.');
+const addedPronominalBases=["amouracher","amuïr","arroger","autocensurer","autodétruire","autoproclamer","blottir","contorsionner","contrebalancer","déhancher","démener","démerder","dénuer","déprendre","désertifier","désister","dévergonder","duveter","ébattre","ébrouer","égosiller","emparer","empiffrer","encanailler","encorder","endimancher","engouer","enquérir","ensuivre","entraider","entredéchirer","entredétruire","entredévorer","entrégorger","entremettre","entretuer","époumoner","éprendre","esclaffer","escrimer","évertuer","extasier","fier","formaliser","gargariser","gausser","goinfrer","gominer","gourer","immiscer","ingénier","insurger","interpénétrer","lexicaliser","lignifier","magner","marrer","méconduire","méprendre","morfondre","mutiner","pâmer","parjurer","pavaner","prélasser","rabougrir","ramifier","raviser","rebeller","rebiffer","récrier","réfugier","réincarner","renfrogner","rengorger","repentir","revancher","scléroser","suicider","tapir","targuer","toquer","trémousser","vautrer"];
+assert(addedPronominalBases.length===84,'La cobertura de nuevos pronominales debe contener 84 verbos.');
+for(const base of addedPronominalBases){
+  assert(rules[base]?.accord==='sujet',`El nuevo pronominal ${base} debe concordar con el sujeto.`);
+}
 assert(rules.permettre?.fonctionDeSe==='COI'&&rules.permettre?.accord==='aucun','se permettre debe permanecer sin concordancia: se es COI.');
 assert(rules.lever?.accord==='sujet','se lever debe concordar con el sujeto.');
 assert(rules.inscrire?.accord==='sujet','s’inscrire debe concordar con el sujeto.');
