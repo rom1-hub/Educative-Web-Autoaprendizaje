@@ -96,8 +96,13 @@ function variants(value){
 function applyTemplate(verb,template,value){
   const parts=String(template||'').split(':');
   const suffix=parts.length>1?parts.slice(1).join(':'):'';
-  const forms=variants(value).filter(Boolean);
   const stem=suffix&&String(verb).endsWith(suffix)?String(verb).slice(0,-suffix.length):String(verb);
+  // In conjugation-fr, an empty object means an explicit empty suffix.
+  // Example: bat:tre -> present 3rd singular = bat.
+  if(value&&typeof value==='object'&&!Array.isArray(value)&&Object.keys(value).length===0){
+    return [stem];
+  }
+  const forms=variants(value).filter(Boolean);
   return forms.map(form=>stem+form);
 }
 function bareForm(value){
