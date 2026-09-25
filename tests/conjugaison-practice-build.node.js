@@ -43,15 +43,20 @@ for(const tense of tenses){
   assert(questions.every(q=>q.tense===tense),`Las preguntas de «${tense}» no deben mezclar otros tiempos.`);
 }
 
-for(const [id,label] of [
-  ['groupe-1-all','primer grupo'],
-  ['groupe-2-all','segundo grupo'],
-  ['groupe-3-all','tercer grupo']
-]){
-  const questions=api.buildQuestions('',"présent de l'indicatif",id,'','');
-  assert.strictEqual(questions.length,20,`El ${label} debe generar 20 preguntas.`);
-  const records=context.window.COQ_CONJ_DATA_MODEL.records;
-  assert(questions.every(q=>Number(records[q.verb]?.groupe)==={"groupe-1-all":1,"groupe-2-all":2,"groupe-3-all":3}[id]),`El ${label} no debe incluir verbos de otro grupo.`);
+const groupCases=[
+  ['groupe-1-all','primer grupo',1],
+  ['groupe-2-all','segundo grupo',2],
+  ['groupe-3-all','tercer grupo',3]
+];
+const records=context.window.COQ_CONJ_DATA_MODEL.records;
+
+for(const tense of tenses){
+  for(const [id,label,expectedGroup] of groupCases){
+    const questions=api.buildQuestions('',tense,id,'','');
+    assert.strictEqual(questions.length,20,'El tiempo «'+tense+'» con el '+label+' debe generar 20 preguntas; obtuvo '+questions.length+'.');
+    assert(questions.every(q=>q.tense===tense),'El tiempo «'+tense+'» con el '+label+' no debe mezclar otros tiempos.');
+    assert(questions.every(q=>Number(records[q.verb]?.groupe)===expectedGroup),'El tiempo «'+tense+'» con el '+label+' no debe incluir verbos de otro grupo.');
+  }
 }
 
-console.log('conjugaison-practice-build: OK — todos los tiempos específicos generan 20 preguntas y respetan los filtros.');
+console.log('conjugaison-practice-build: OK — cada tiempo específico genera 20 preguntas con todos los grupos y respeta los filtros.');
