@@ -16,6 +16,7 @@
     {base:'embrasser',infinitif:"s'embrasser"},
     {base:'plaire',infinitif:'se plaire'},
     {base:'rendre',infinitif:'se rendre'},
+    {base:'abstenir',infinitif:"s'abstenir"},
     {base:'amuser',infinitif:"s'amuser"},
     {base:'appeler',infinitif:"s'appeler"},
     {base:'asseoir',infinitif:"s'asseoir"},
