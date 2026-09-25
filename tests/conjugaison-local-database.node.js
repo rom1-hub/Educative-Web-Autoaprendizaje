@@ -61,7 +61,7 @@ for(const key of ['être','avoir','prendre','finir','aller','se lever']){
 const sEnContrebalancer=verbs["s'en contrebalancer"];
 assert(sEnContrebalancer&&sEnContrebalancer.pronominal===true,"s'en contrebalancer debe estar en la base local como pronominal.");
 const sEnPresent=sEnContrebalancer?.formes?.["présent de l'indicatif"]||[];
-assert(sEnPresent[0]?.[1]==="m'en contrebalance",'s'en contrebalancer debe conservar «en» en je.');
-assert(sEnPresent[2]?.[1]==="s'en contrebalance",'s'en contrebalancer debe conservar «en» en il/elle/on.');
-assert(sEnPresent[5]?.[1]==="s'en contrebalancent",'s'en contrebalancer debe conservar «en» en ils/elles.');
+assert(sEnPresent[0]?.[1]==="m'en contrebalance","s'en contrebalancer debe conservar «en» en je.");
+assert(sEnPresent[2]?.[1]==="s'en contrebalance","s'en contrebalancer debe conservar «en» en il/elle/on.");
+assert(sEnPresent[5]?.[1]==="s'en contrebalancent","s'en contrebalancer debe conservar «en» en ils/elles.");
 console.log('Local database regression passed: '+keys.length+' verbs, '+pronominal.length+' pronominal entries');
