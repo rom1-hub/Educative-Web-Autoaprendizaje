@@ -12,7 +12,7 @@ const assert=(condition,message)=>{if(!condition)throw new Error(message);};
 assert(verbs&&typeof verbs==='object','La base local debe exponer COQ_VERBS.');
 const keys=Object.keys(verbs);
 assert(keys.length>=7000,'La base local debe contener el catálogo completo.');
-assert(catalog.length===117,'El catálogo pedagógico debe contener 116 verbos pronominales.');
+assert(catalog.length===201,'El catálogo pedagógico debe contener 201 verbos pronominales.');
 const seen=new Set();
 for(const entry of catalog){
   assert(entry&&entry.infinitif&&entry.base,'Entrada pronominal incompleta.');
@@ -58,4 +58,10 @@ for(const key of ['être','avoir','prendre','finir','aller','se lever']){
   assert(record&&record.formes&&Object.keys(record.formes).length>0,'Faltan conjugaciones locales para '+key+'.');
   assert(record.formes["présent de l'indicatif"],'Falta el presente de '+key+'.');
 }
+const sEnContrebalancer=verbs["s'en contrebalancer"];
+assert(sEnContrebalancer&&sEnContrebalancer.pronominal===true,"s'en contrebalancer debe estar en la base local como pronominal.");
+const sEnPresent=sEnContrebalancer?.formes?.["présent de l'indicatif"]||[];
+assert(sEnPresent[0]?.[1]==="m'en contrebalance",'s'en contrebalancer debe conservar «en» en je.');
+assert(sEnPresent[2]?.[1]==="s'en contrebalance",'s'en contrebalancer debe conservar «en» en il/elle/on.');
+assert(sEnPresent[5]?.[1]==="s'en contrebalancent",'s'en contrebalancer debe conservar «en» en ils/elles.');
 console.log('Local database regression passed: '+keys.length+' verbs, '+pronominal.length+' pronominal entries');
