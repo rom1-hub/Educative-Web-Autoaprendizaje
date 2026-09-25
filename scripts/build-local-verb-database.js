@@ -26,10 +26,10 @@ async function getText(url){
 function normalizeTranslationKey(value){return String(value||'').replace(/[’＇]/g,"'").normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();}
 function cleanApertiumSide(value){
   return String(value||'')
-    .replace(/<b\\s*\\/>/gi,' ')
+    .replace(/<b\s*\/>/gi,' ')
     .replace(/<g>/gi,' ')
     .replace(/<\/g>/gi,' ')
-    .replace(/<s\\s+[^>]+\\/>/gi,'')
+    .replace(/<s\s+[^>]+\/>/gi,'')
     .replace(/<[^>]+>/g,'')
     .replace(/&apos;/g,"'")
     .replace(/&amp;/g,'&')
@@ -45,8 +45,8 @@ function readFrenchSpanishTranslations(xml){
   let match;
   while((match=entryPattern.exec(String(xml||'')))){
     const leftRaw=match[1],rightRaw=match[2];
-    if(!/<s\\s+n="(?:vblex|vbser)"\\s*\\/>/i.test(leftRaw))continue;
-    if(!/<s\\s+n="(?:vblex|vbser)"\\s*\\/>/i.test(rightRaw))continue;
+    if(!/<s\s+n="(?:vblex|vbser)"\s*\/>/i.test(leftRaw))continue;
+    if(!/<s\s+n="(?:vblex|vbser)"\s*\/>/i.test(rightRaw))continue;
     const left=cleanApertiumSide(leftRaw),right=cleanApertiumSide(rightRaw);
     if(!left||!right||left.includes('<g>')||right.includes('<g>'))continue;
     const key=normalizeTranslationKey(left);
