@@ -18,6 +18,7 @@
     {base:'rendre',infinitif:'se rendre'},
     {base:'abstenir',infinitif:"s'abstenir"},
     {base:'accouder',infinitif:"s'accouder"},
+    {base:'accroupir',infinitif:"s'accroupir"},
     {base:'amuser',infinitif:"s'amuser"},
     {base:'appeler',infinitif:"s'appeler"},
     {base:'asseoir',infinitif:"s'asseoir"},
