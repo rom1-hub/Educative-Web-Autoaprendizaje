@@ -11,6 +11,7 @@ const vm=require('vm');
 const VERSION='0.3.4';
 const BASE=`https://cdn.jsdelivr.net/npm/conjugation-fr@${VERSION}/`;
 const URLS={verbs:BASE+'verbs-fr.json',templates:BASE+'conjugation-fr.json'};
+const TRANSLATION_URL='https://raw.githubusercontent.com/apertium/apertium-fr-es/main/apertium-fra-spa.fra-spa.dix';
 const SOURCES_LOCAL=[
   path.resolve(__dirname,'../data/verbs/verbs.js'),
   path.resolve(__dirname,'../data/verbs/verbs-extended.js')
@@ -18,7 +19,16 @@ const SOURCES_LOCAL=[
 const SOURCE_PRONOMINAL=path.resolve(__dirname,'../data/verbs/pronominal-catalog.js');
 const OUT=path.resolve(__dirname,'../data/verbs/local-database.js');
 const SEARCH_INDEX_OUT=path.resolve(__dirname,'../data/verbs/search-index.js');
-const TRANSLATION_URL='https://raw.githubusercontent.com/apertium/apertium-fr-es/main/apertium-fra-spa.fra-spa.dix';
+const SIMPLE={
+  "présent de l'indicatif":['indicative','present'],
+  'passé simple':['indicative','simple-past'],
+  'imparfait':['indicative','imperfect'],
+  'futur simple':['indicative','future'],
+  'conditionnel présent':['conditional','present'],
+  'subjonctif présent':['subjunctive','present'],
+  'subjonctif imparfait':['subjunctive','imperfect'],
+  'impératif présent':['imperative','imperative-present']
+};
 
 async function getJson(url){
   const response=await fetch(url,{headers:{'user-agent':'COQ-local-database-builder'}});
@@ -31,21 +41,7 @@ async function getText(url){
   return response.text();
 }
 function normalizeTranslationKey(value){return String(value||'').replace(/[’＇]/g,"'").normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();}
-function cleanApertiumSide(value){
-  return String(value||'')
-    .replace(/<b\s*\/>/gi,' ')
-    .replace(/<g>/gi,' ')
-    .replace(/<\/g>/gi,' ')
-    .replace(/<s\s+[^>]+\/>/gi,'')
-    .replace(/<[^>]+>/g,'')
-    .replace(/&apos;/g,"'")
-    .replace(/&amp;/g,'&')
-    .replace(/&quot;/g,'"')
-    .replace(/&lt;/g,'<')
-    .replace(/&gt;/g,'>')
-     .replace(/\s+/g,' ')
-    .trim();
-}
+function cleanApertiumSide(value){return String(value||'').replace(/<b\s*\/>/gi,' ').replace(/<g>/gi,' ').replace(/<\/g>/gi,' ').replace(/<s\s+[^>]+\/>/gi,'').replace(/<[^>]+>/g,'').replace(/&apos;/g,"'").replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/\s+/g,' ').trim();}
 function readFrenchSpanishTranslations(xml){
   const translations=new Map();
   const entryPattern=/<e(?:\s[^>]*)?>\s*<p>\s*<l>([\s\S]*?)<\/l>\s*<r>([\s\S]*?)<\/r>\s*<\/p>\s*<\/e>/g;
@@ -55,7 +51,7 @@ function readFrenchSpanishTranslations(xml){
     if(!/<s\s+n="(?:vblex|vbser)"\s*\/>/i.test(leftRaw))continue;
     if(!/<s\s+n="(?:vblex|vbser)"\s*\/>/i.test(rightRaw))continue;
     const left=cleanApertiumSide(leftRaw),right=cleanApertiumSide(rightRaw);
-    if(!left||!right||left.includes('<g>')||right.includes('<g>'))continue;
+    if(!left||!right)continue;
     const key=normalizeTranslationKey(left);
     if(!key)continue;
     const values=translations.get(key)||[];
@@ -64,7 +60,6 @@ function readFrenchSpanishTranslations(xml){
   }
   return translations;
 }
-
 function readLocalMetadata(){
   const window={};
   const merged={};
