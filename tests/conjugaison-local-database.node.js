@@ -27,6 +27,22 @@ for(const entry of catalog){
 }
 assert(verbs['servir']&&!verbs['servir'].pronominal,'servir no debe clasificarse como pronominal.');
 assert(verbs['se servir']&&verbs['se servir'].pronominal===true,'se servir debe estar en la base local como pronominal.');
+
+// Control lingüístico de grupos: los verbos en -ER son del primer grupo,
+// salvo aller y envoyer, que pertenecen al tercero.
+const erThirdGroup=keys.filter(key=>/er$/i.test(key)&&Number(verbs[key]?.groupe)===3);
+assert(erThirdGroup.every(key=>['aller','envoyer'].includes(key)),
+  'El tercer grupo no puede contener verbos en -ER fuera de aller/envoyer: '+erThirdGroup.slice(0,20).join(', '));
+for(const key of ['acheter','appeler','aboyer','aller','envoyer','prendre','finir']){
+  assert(verbs[key]&&Number.isFinite(Number(verbs[key].groupe)),'Falta clasificación de grupo para '+key+'.');
+}
+assert(Number(verbs['acheter'].groupe)===1,'acheter debe pertenecer al primer grupo.');
+assert(Number(verbs['appeler'].groupe)===1,'appeler debe pertenecer al primer grupo.');
+assert(Number(verbs['aboyer'].groupe)===1,'aboyer debe pertenecer al primer grupo.');
+assert(Number(verbs['aller'].groupe)===3,'aller debe pertenecer al tercer grupo.');
+assert(Number(verbs['envoyer'].groupe)===3,'envoyer debe pertenecer al tercer grupo.');
+assert(Number(verbs['prendre'].groupe)===3,'prendre debe pertenecer al tercer grupo.');
+assert(Number(verbs['finir'].groupe)===2,'finir debe pertenecer al segundo grupo.');
 const pronominal=keys.filter(key=>verbs[key]?.pronominal===true);
 assert(pronominal.length>=catalog.length,'La base debe contener todos los pronominales del catálogo.');
 for(const key of pronominal){
