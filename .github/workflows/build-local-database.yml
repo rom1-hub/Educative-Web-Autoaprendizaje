@@ -39,6 +39,7 @@ jobs:
           node tests/conjugaison-regression.node.js
           node tests/conjugaison-simple-generation-coverage.node.js
           node tests/conjugaison-practice-distribution.node.js
+          node tests/conjugaison-practice-build.node.js
       - name: Commit generated database
         run: |
           git config user.name "github-actions[bot]"
