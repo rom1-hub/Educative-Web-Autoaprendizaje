@@ -69,16 +69,37 @@
       add(verb);
     }else{
       const verbs=Object.keys(dataModel?.records||{}).filter(v=>matchesCategory(v,category)&&matchesConstruction(v,construction));
-      if(tense==='Todos los tiempos'){
-        // La aleatoriedad debe comenzar por verbos, no por un pool limitado de
-        // preguntas: cada verbo genera muchas filas (sujetos × tiempos), por lo
-        // que un límite de 120 filas podía dejar el pool reducido a solo 1–2 verbos.
-        const randomizedVerbs=U.shuffleArray(verbs);
-        const verbCount=Math.min(8,randomizedVerbs.length);
-        randomizedVerbs.slice(0,verbCount).forEach(v=>add(v,allTenses));
-      }else{
-        U.shuffleArray(verbs).forEach(v=>add(v));
+      const randomizedVerbs=U.shuffleArray(verbs);
+      let selectedVerbs=randomizedVerbs.slice(0,Math.min(8,randomizedVerbs.length));
+
+      // Cuando no se ha elegido un grupo, la aleatoriedad debe representar
+      // pedagógicamente los tres grupos verbales. El primer grupo contiene
+      // muchos más verbos, por lo que una selección puramente global puede
+      // producir 20 preguntas únicamente con verbos en -ER.
+      if(category==='all'){
+        const buckets=new Map([[1,[]],[2,[]],[3,[]]]);
+        randomizedVerbs.forEach(v=>{
+          const group=Number(getRecord(v)?.groupe);
+          if(buckets.has(group))buckets.get(group).push(v);
+        });
+        const groupOrder=U.shuffleArray([1,2,3]);
+        selectedVerbs=[];
+        while(selectedVerbs.length<8){
+          let added=false;
+          groupOrder.forEach(group=>{
+            if(selectedVerbs.length>=8)return;
+            const bucket=buckets.get(group)||[];
+            if(bucket.length){
+              selectedVerbs.push(bucket.shift());
+              added=true;
+            }
+          });
+          if(!added)break;
+        }
       }
+
+      const requestedTenses=tense==='Todos los tiempos'?allTenses:[tense];
+      selectedVerbs.forEach(v=>add(v,requestedTenses));
     }
 
     if(!pool.length)return [];
