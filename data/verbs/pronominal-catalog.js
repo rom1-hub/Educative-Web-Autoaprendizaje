@@ -21,6 +21,7 @@
     {base:'accroupir',infinitif:"s'accroupir"},
     {base:'acharner',infinitif:"s'acharner"},
     {base:'acoquiner',infinitif:"s'acoquiner"},
+    {base:'adonner',infinitif:"s'adonner"},
     {base:'amuser',infinitif:"s'amuser"},
     {base:'appeler',infinitif:"s'appeler"},
     {base:'asseoir',infinitif:"s'asseoir"},
