@@ -8,7 +8,7 @@ const rules=context.window.COQ_PRONOMINAL_RULES||{};
 const agreement=context.window.COQ_CONJ_AGREEMENT;
 const assert=(condition,message)=>{if(!condition)throw new Error(message);};
 const expect=(actual,expected,message)=>assert(actual===expected,`${message}: esperado «${expected}», obtenido «${actual}»`);
-assert(catalog.length===112,`El catálogo pronominal debe contener 105 verbos; obtenido ${catalog.length}.`);
+assert(catalog.length===113,`El catálogo pronominal debe contener 105 verbos; obtenido ${catalog.length}.`);
 assert(Object.keys(rules).length===catalog.length,`Cada pronominal debe tener una regla explícita de concordancia: ${Object.keys(rules).length}/${catalog.length}.`);
 assert(agreement&&typeof agreement.formatLookupCompoundForm==='function','La concordancia debe exponer el formateador de Consulta.');
 for(const entry of catalog){
@@ -24,6 +24,7 @@ assert(rules.douter?.fonctionDeSe==='COI'&&rules.douter?.accord==='aucun','se do
 assert(rules.plaire?.fonctionDeSe==='COI'&&rules.plaire?.accord==='aucun','se plaire debe permanecer sin concordancia: se es COI.');
 assert(rules.abstenir?.fonctionDeSe==='aucune'&&rules.abstenir?.accord==='sujet','s\'abstenir debe concordar con el sujeto.');
 assert(rules.accouder?.fonctionDeSe==='aucune'&&rules.accouder?.accord==='sujet','s\'accouder debe concordar con el sujeto.');
+assert(rules.accroupir?.fonctionDeSe==='aucune'&&rules.accroupir?.accord==='sujet','s\'accroupir debe concordar con el sujeto.');
 assert(rules.permettre?.fonctionDeSe==='COI'&&rules.permettre?.accord==='aucun','se permettre debe permanecer sin concordancia: se es COI.');
 assert(rules.lever?.accord==='sujet','se lever debe concordar con el sujeto.');
 assert(rules.inscrire?.accord==='sujet','s’inscrire debe concordar con el sujeto.');
