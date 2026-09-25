@@ -39,8 +39,8 @@ assert.strictEqual(typeof api.buildQuestions,'function','buildQuestions debe est
 const tenses=context.window.COQ_CONJ_COMPOUND.displayOrder;
 for(const tense of tenses){
   const questions=api.buildQuestions('',tense,'all','', '');
-  assert.strictEqual(questions.length,20,\`El tiempo «${tense}» debe generar 20 preguntas; obtuvo ${questions.length}.\`);
-  assert(questions.every(q=>q.tense===tense),\`Las preguntas de «${tense}» no deben mezclar otros tiempos.\`);
+  assert.strictEqual(questions.length,20,`El tiempo «${tense}» debe generar 20 preguntas; obtuvo ${questions.length}.`);
+  assert(questions.every(q=>q.tense===tense),`Las preguntas de «${tense}» no deben mezclar otros tiempos.`);
 }
 
 for(const [id,label] of [
@@ -49,9 +49,9 @@ for(const [id,label] of [
   ['groupe-3-all','tercer grupo']
 ]){
   const questions=api.buildQuestions('',"présent de l'indicatif",id,'','');
-  assert.strictEqual(questions.length,20,\`El ${label} debe generar 20 preguntas.\`);
+  assert.strictEqual(questions.length,20,`El ${label} debe generar 20 preguntas.`);
   const records=context.window.COQ_CONJ_DATA_MODEL.records;
-  assert(questions.every(q=>Number(records[q.verb]?.groupe)==={"groupe-1-all":1,"groupe-2-all":2,"groupe-3-all":3}[id]),\`El ${label} no debe incluir verbos de otro grupo.\`);
+  assert(questions.every(q=>Number(records[q.verb]?.groupe)==={"groupe-1-all":1,"groupe-2-all":2,"groupe-3-all":3}[id]),`El ${label} no debe incluir verbos de otro grupo.`);
 }
 
 console.log('conjugaison-practice-build: OK — todos los tiempos específicos generan 20 preguntas y respetan los filtros.');
