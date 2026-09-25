@@ -21,6 +21,7 @@ assert(rules.parler?.fonctionDeSe==='COI'&&rules.parler?.accord==='aucun','se pa
 assert(rules.téléphoner?.fonctionDeSe==='COI'&&rules.téléphoner?.accord==='aucun','se téléphoner debe permanecer sin concordancia: se es COI.');
 assert(rules.demander?.fonctionDeSe==='COI'&&rules.demander?.accord==='aucun','se demander debe permanecer sin concordancia en su construcción pedagógica canónica.');
 assert(rules.douter?.fonctionDeSe==='COI'&&rules.douter?.accord==='aucun','se douter debe permanecer sin concordancia.');
+assert(rules.permettre?.fonctionDeSe==='COI'&&rules.permettre?.accord==='aucun','se permettre debe permanecer sin concordancia: se es COI.');
 assert(rules.lever?.accord==='sujet','se lever debe concordar con el sujeto.');
 assert(rules.inscrire?.accord==='sujet','s’inscrire debe concordar con el sujeto.');
 assert(rules.réveiller?.accord==='sujet','se réveiller debe concordar con el sujeto.');
