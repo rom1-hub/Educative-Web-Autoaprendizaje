@@ -11,24 +11,7 @@ const vm=require('vm');
 const VERSION='0.3.4';
 const BASE=`https://cdn.jsdelivr.net/npm/conjugation-fr@${VERSION}/`;
 const URLS={verbs:BASE+'verbs-fr.json',templates:BASE+'conjugation-fr.json'};
-const TRANSLATION_URL='https://raw.githubusercontent.com/open-dsl-dict/wikidict-dsl-es/master/data/fr-es_wikidict.dsl';
-const SOURCES_LOCAL=[
-  path.resolve(__dirname,'../data/verbs/verbs.js'),
-  path.resolve(__dirname,'../data/verbs/verbs-extended.js')
-];
-const SOURCE_PRONOMINAL=path.resolve(__dirname,'../data/verbs/pronominal-catalog.js');
-const OUT=path.resolve(__dirname,'../data/verbs/local-database.js');
-const SEARCH_INDEX_OUT=path.resolve(__dirname,'../data/verbs/search-index.js');
-const SIMPLE={
-  "présent de l'indicatif":['indicative','present'],
-  'passé simple':['indicative','simple-past'],
-  'imparfait':['indicative','imperfect'],
-  'futur simple':['indicative','future'],
-  'conditionnel présent':['conditional','present'],
-  'subjonctif présent':['subjunctive','present'],
-  'subjonctif imparfait':['subjunctive','imperfect'],
-  'impératif présent':['imperative','imperative-present']
-};
+const TRANSLATION_URL='https://raw.githubusercontent.com/apertium/apertium-fr-es/main/apertium-fra-spa.fra-spa.dix';
 
 async function getJson(url){
   const response=await fetch(url,{headers:{'user-agent':'COQ-local-database-builder'}});
@@ -40,26 +23,41 @@ async function getText(url){
   if(!response.ok)throw new Error(`${url} HTTP ${response.status}`);
   return response.text();
 }
-function normalizeTranslationKey(value){return String(value||'').replace(/[’＇]/g,"'").normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').trim().toLowerCase();}
-function cleanDslTranslation(value){
-  return String(value||'').replace(/^\\s+/,'').replace(/\\[[^\\]]+\\]/g,'').replace(/\\{[^}]+\\}/g,'').replace(/\\\\[a-z]+/gi,' ').replace(/\\s+/g,' ').trim();
+function normalizeTranslationKey(value){return String(value||'').replace(/[’＇]/g,"'").normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();}
+function cleanApertiumSide(value){
+  return String(value||'')
+    .replace(/<b\\s*\\/>/gi,' ')
+    .replace(/<g>/gi,' ')
+    .replace(/<\\/g>/gi,' ')
+    .replace(/<s\\s+[^>]+\\/>/gi,'')
+    .replace(/<[^>]+>/g,'')
+    .replace(/&apos;/g,"'")
+    .replace(/&amp;/g,'&')
+    .replace(/&quot;/g,'"')
+    .replace(/&lt;/g,'<')
+    .replace(/&gt;/g,'>')
+    .replace(/\\s+/g,' ')
+    .trim();
 }
-function readFrenchSpanishTranslations(text){
+function readFrenchSpanishTranslations(xml){
   const translations=new Map();
-  let headword='';
-  for(const rawLine of String(text||'').split(/\\r?\\n/)){
-    const line=rawLine.replace(/^\\uFEFF/,'');
-    if(!line.trim()||line.startsWith('#'))continue;
-    if(/^\\S/.test(line)){
-      headword=line.trim();
-      continue;
-    }
-    if(!headword||translations.has(normalizeTranslationKey(headword)))continue;
-    const translation=cleanDslTranslation(line);
-    if(translation)translations.set(normalizeTranslationKey(headword),translation);
+  const entryPattern=/<e(?:\\s[^>]*)?>\\s*<p>\\s*<l>([\\s\\S]*?)<\\/l>\\s*<r>([\\s\\S]*?)<\\/r>\\s*<\\/p>\\s*<\\/e>/g;
+  let match;
+  while((match=entryPattern.exec(String(xml||'')))){
+    const leftRaw=match[1],rightRaw=match[2];
+    if(!/<s\\s+n="(?:vblex|vbser)"\\s*\\/>/i.test(leftRaw))continue;
+    if(!/<s\\s+n="(?:vblex|vbser)"\\s*\\/>/i.test(rightRaw))continue;
+    const left=cleanApertiumSide(leftRaw),right=cleanApertiumSide(rightRaw);
+    if(!left||!right||left.includes('<g>')||right.includes('<g>'))continue;
+    const key=normalizeTranslationKey(left);
+    if(!key)continue;
+    const values=translations.get(key)||[];
+    if(!values.includes(right))values.push(right);
+    translations.set(key,values);
   }
   return translations;
 }
+
 function readLocalMetadata(){
   const window={};
   const merged={};
@@ -215,7 +213,7 @@ function normalize(verbs,templates,local,pronominalCatalog,translations){
       exceptions:old.exceptions??null,
       formePronominale:old.formePronominale||null,
       formeNonPronominale:old.formeNonPronominale||null,
-      traduccion:old.traduccion||translations.get(normalizeTranslationKey(verb))||null,
+      traduccion:old.traduccion||(translations.get(normalizeTranslationKey(verb))||[]).join(' / ')||null,
       source:{name:'conjugation-fr',version:VERSION,base:'Verbiste',localMetadata:Boolean(local[verb])}
     };
   });
@@ -240,7 +238,7 @@ function normalize(verbs,templates,local,pronominalCatalog,translations){
       ...record,
       participePasse:pp,
       formes:{...formes,...(record.formes||{})},
-      traduccion:record.traduccion||translations.get(normalizeTranslationKey(verb))||null,
+      traduccion:record.traduccion||(translations.get(normalizeTranslationKey(verb))||[]).join(' / ')||null,
       source:{name:'COQ-local',localMetadata:true}
     };
   });
@@ -249,7 +247,7 @@ function normalize(verbs,templates,local,pronominalCatalog,translations){
     const base=out[entry.base];
     if(!base){missing.push(entry.base);return;}
     out[entry.base]={...base,formePronominale:entry.infinitif,formePronominaleDisponible:true};
-    const pronominalRecord={...makePronominalRecord(base,entry),traduccion:translations.get(normalizeTranslationKey(entry.infinitif))||null};
+    const pronominalRecord={...makePronominalRecord(base,entry),traduccion:(translations.get(normalizeTranslationKey(entry.infinitif))||[]).join(' / ')||null};
     out[entry.infinitif]={
       ...pronominalRecord,
       pronominal:true,
