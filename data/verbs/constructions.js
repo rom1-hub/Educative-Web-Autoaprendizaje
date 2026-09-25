@@ -4,6 +4,8 @@
 // explícitamente; nunca se infieren por prefijos, regex o heurísticas.
 window.COQ_PRONOMINAL_RULES=Object.freeze({
   'allonger':{fonctionDeSe:'COD',accord:'sujet'},
+  'fâcher':{fonctionDeSe:'aucune',accord:'sujet'},
+
   'amuser':{fonctionDeSe:'COD',accord:'sujet'},
   'appeler':{fonctionDeSe:'COD',accord:'sujet'},
   'asseoir':{fonctionDeSe:'COD',accord:'sujet'},
