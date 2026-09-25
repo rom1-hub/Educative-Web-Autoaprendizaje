@@ -12,7 +12,7 @@ const assert=(condition,message)=>{if(!condition)throw new Error(message);};
 assert(verbs&&typeof verbs==='object','La base local debe exponer COQ_VERBS.');
 const keys=Object.keys(verbs);
 assert(keys.length>=7000,'La base local debe contener el catálogo completo.');
-assert(catalog.length===114,'El catálogo pedagógico debe contener 114 verbos pronominales.');
+assert(catalog.length===115,'El catálogo pedagógico debe contener 115 verbos pronominales.');
 const seen=new Set();
 for(const entry of catalog){
   assert(entry&&entry.infinitif&&entry.base,'Entrada pronominal incompleta.');
