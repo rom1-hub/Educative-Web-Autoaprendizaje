@@ -10,6 +10,7 @@ window.COQ_PRONOMINAL_RULES=Object.freeze({
   'hydrater':{fonctionDeSe:'COD',accord:'sujet'},
   'permettre':{fonctionDeSe:'COI',accord:'aucun'},
   'embrasser':{fonctionDeSe:'COD',accord:'sujet'},
+  'plaire':{fonctionDeSe:'COI',accord:'aucun'},
 
   'amuser':{fonctionDeSe:'COD',accord:'sujet'},
   'appeler':{fonctionDeSe:'COD',accord:'sujet'},
