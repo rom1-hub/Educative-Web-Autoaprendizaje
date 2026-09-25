@@ -19,6 +19,7 @@
     {base:'abstenir',infinitif:"s'abstenir"},
     {base:'accouder',infinitif:"s'accouder"},
     {base:'accroupir',infinitif:"s'accroupir"},
+    {base:'acharner',infinitif:"s'acharner"},
     {base:'amuser',infinitif:"s'amuser"},
     {base:'appeler',infinitif:"s'appeler"},
     {base:'asseoir',infinitif:"s'asseoir"},
