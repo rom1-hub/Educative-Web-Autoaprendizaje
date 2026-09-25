@@ -274,6 +274,8 @@ function sortObject(value){return Object.fromEntries(Object.keys(value).sort((a,
   const local=readLocalMetadata();
   const pronominalCatalog=readPronominalCatalog();
   const translations=readFrenchSpanishTranslations(translationText);
+  // Excepciones léxicas locales: una misma forma francesa puede tener varias traducciones según el uso.
+  translations.set('sortir',['salir','sacar']);
   const data=sortObject(normalize(verbs,templates,local,pronominalCatalog,translations));
   const payload=`/* AUTO-GENERATED — do not edit manually. Source: conjugation-fr ${VERSION} / Verbiste + COQ local metadata + pronominal catalog. */\nwindow.COQ_VERBS=${JSON.stringify(data)};\nwindow.COQ_VERB_DATABASE_VERSION=${JSON.stringify(VERSION)};\n`;
   fs.mkdirSync(path.dirname(OUT),{recursive:true});
