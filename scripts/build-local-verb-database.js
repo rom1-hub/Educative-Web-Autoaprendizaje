@@ -193,7 +193,28 @@ function normalize(verbs,templates,local,pronominalCatalog){
     };
   });
   Object.entries(local).forEach(([verb,record])=>{
-    if(!out[verb])out[verb]={...record,source:{name:'COQ-local',localMetadata:true}};
+    if(out[verb])return;
+    const template=record?.pattern||record?.t;
+    const data=templates?.[template];
+    const formes={};
+    if(data){
+      for(const [label,[mode,tense]] of Object.entries(SIMPLE)){
+        const rows=data?.[mode]?.[tense];
+        if(!Array.isArray(rows)||rows.length<3)continue;
+        formes[label]=rows.slice(0,6).map((row)=>applyTemplate(verb,template,row?.i??row)[0]||'');
+      }
+    }
+    const pp=record?.participePasse||(
+      data
+        ? applyTemplate(verb,template,data?.participle?.['past-participle']?.[0]?.i??data?.participle?.['past-participle']?.[0]??'')[0]||null
+        : null
+    );
+    out[verb]={
+      ...record,
+      participePasse:pp,
+      formes:{...formes,...(record.formes||{})},
+      source:{name:'COQ-local',localMetadata:true}
+    };
   });
   const missing=[];
   pronominalCatalog.forEach(entry=>{
