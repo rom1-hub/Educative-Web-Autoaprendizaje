@@ -112,7 +112,7 @@ function bareForm(value){
 function reflexivePronoun(index,form,particle){
   const pronouns=['me','te','se','nous','vous','se'];
   const p=pronouns[index]||'se';
-  if(particle==='en')return `${p[0]}'en`;
+  if(particle==='en')return `${p[0]}'en ${form}`;
   return /^[aeiouyàâäéèêëîïôöùûüÿæœh]/i.test(form)?`${p[0]}'${form}`:`${p} ${form}`;
 }
 function pronominalFormList(values,particle){
