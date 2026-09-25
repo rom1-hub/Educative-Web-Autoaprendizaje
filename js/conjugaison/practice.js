@@ -70,16 +70,12 @@
     }else{
       const verbs=Object.keys(dataModel?.records||{}).filter(v=>matchesCategory(v,category)&&matchesConstruction(v,construction));
       if(tense==='Todos los tiempos'){
-        const targetPoolSize=120;
+        // La aleatoriedad debe comenzar por verbos, no por un pool limitado de
+        // preguntas: cada verbo genera muchas filas (sujetos × tiempos), por lo
+        // que un límite de 120 filas podía dejar el pool reducido a solo 1–2 verbos.
         const randomizedVerbs=U.shuffleArray(verbs);
-        const randomizedTenses=U.shuffleArray(allTenses);
-        for(const v of randomizedVerbs){
-          for(const t of randomizedTenses){
-            add(v,[t]);
-            if(pool.length>=targetPoolSize)break;
-          }
-          if(pool.length>=targetPoolSize)break;
-        }
+        const verbCount=Math.min(8,randomizedVerbs.length);
+        randomizedVerbs.slice(0,verbCount).forEach(v=>add(v,allTenses));
       }else{
         U.shuffleArray(verbs).forEach(add);
       }
