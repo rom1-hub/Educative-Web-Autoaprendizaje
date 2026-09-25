@@ -8,7 +8,7 @@ const rules=context.window.COQ_PRONOMINAL_RULES||{};
 const agreement=context.window.COQ_CONJ_AGREEMENT;
 const assert=(condition,message)=>{if(!condition)throw new Error(message);};
 const expect=(actual,expected,message)=>assert(actual===expected,`${message}: esperado «${expected}», obtenido «${actual}»`);
-assert(catalog.length===107,`El catálogo pronominal debe contener 105 verbos; obtenido ${catalog.length}.`);
+assert(catalog.length===108,`El catálogo pronominal debe contener 105 verbos; obtenido ${catalog.length}.`);
 assert(Object.keys(rules).length===catalog.length,`Cada pronominal debe tener una regla explícita de concordancia: ${Object.keys(rules).length}/${catalog.length}.`);
 assert(agreement&&typeof agreement.formatLookupCompoundForm==='function','La concordancia debe exponer el formateador de Consulta.');
 for(const entry of catalog){
