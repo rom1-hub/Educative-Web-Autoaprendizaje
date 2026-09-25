@@ -109,24 +109,33 @@ function bareForm(value){
   const forms=variants(value);
   return String(forms[1]??forms[0]??'');
 }
-function reflexivePronoun(index,form){
+function reflexivePronoun(index,form,particle){
   const pronouns=['me','te','se','nous','vous','se'];
   const p=pronouns[index]||'se';
+  if(particle==='en')return `${p[0]}? en`.replace('?','');
   return /^[aeiouyàâäéèêëîïôöùûüÿæœh]/i.test(form)?`${p[0]}'${form}`:`${p} ${form}`;
 }
-function pronominalFormList(values){
-  return values.map((value,index)=>reflexivePronoun(index,bareForm(value)));
+function pronominalFormList(values,particle){
+  return values.map((value,index)=>reflexivePronoun(index,bareForm(value),particle));
 }
-function imperativePronominal(values){
+function imperativePronominal(values,particle){
   const pronouns=['toi','nous','vous'];
-  return values.slice(0,3).map((value,index)=>`${bareForm(value)}-${pronouns[index]}`);
+  return values.slice(0,3).map((value,index)=>{
+    const form=bareForm(value);
+    if(particle==='en'){
+      const suffix=index===0?'t'en':index===1?'nous-en':'vous-en';
+      return `${form}-${suffix}`;
+    }
+    return `${form}-${pronouns[index]}`;
+  });
 }
 function makePronominalRecord(base,entry){
   const formes={};
+  const particle=/^s'en\s+/i.test(String(entry.infinitif||''))?'en':null;
   Object.entries(base.formes||{}).forEach(([label,values])=>{
     if(!Array.isArray(values))return;
-    if(label==='impératif présent')formes[label]=imperativePronominal(values);
-    else if(values.length>=3)formes[label]=pronominalFormList(values.slice(0,6));
+    if(label==='impératif présent')formes[label]=imperativePronominal(values,particle);
+    else if(values.length>=3)formes[label]=pronominalFormList(values.slice(0,6),particle);
   });
   return {
     ...base,
