@@ -13,6 +13,7 @@ window.COQ_PRONOMINAL_RULES=Object.freeze({
   'plaire':{fonctionDeSe:'COI',accord:'aucun'},
   'rendre':{fonctionDeSe:'COD',accord:'sujet'},
   'abstenir':{fonctionDeSe:'aucune',accord:'sujet'},
+  'accouder':{fonctionDeSe:'aucune',accord:'sujet'},
 
   'amuser':{fonctionDeSe:'COD',accord:'sujet'},
   'appeler':{fonctionDeSe:'COD',accord:'sujet'},
