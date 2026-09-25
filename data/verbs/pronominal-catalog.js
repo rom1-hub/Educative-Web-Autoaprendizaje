@@ -9,6 +9,7 @@
   window.COQ_PRONOMINAL_CATALOG = Object.freeze([
     {base:'allonger',infinitif:"s'allonger"},
     {base:'fâcher',infinitif:'se fâcher'},
+    {base:'voir',infinitif:'se voir'},
     {base:'amuser',infinitif:"s'amuser"},
     {base:'appeler',infinitif:"s'appeler"},
     {base:'asseoir',infinitif:"s'asseoir"},
