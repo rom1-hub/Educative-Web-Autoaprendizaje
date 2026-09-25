@@ -4,7 +4,7 @@
  */
 (function(){
   const api={};
-  api.normalizeVerb=v=>String(v??'').trim().toLowerCase();
+  api.normalizeVerb=v=>String(v??'').replace(/[’＇]/g,"'").trim().toLowerCase();
   api.escapeHtml=v=>String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#039;'}[c]));
   api.normalizeAnswerText=v=>String(v??'').trim().toLocaleLowerCase().replace(/\s+/g,' ');
   api.expandPracticeRows=rows=>{
