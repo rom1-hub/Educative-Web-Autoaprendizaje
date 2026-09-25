@@ -43,6 +43,11 @@ for(const tense of tenses){
   assert(questions.every(q=>q.tense===tense),`Las preguntas de «${tense}» no deben mezclar otros tiempos.`);
 }
 
+const allQuestions=api.buildQuestions('',"présent de l'indicatif",'all','','');
+assert.strictEqual(allQuestions.length,20,'Todos los grupos debe generar 20 preguntas.');
+const allGroups=new Set(allQuestions.map(q=>Number(records[q.verb]?.groupe)));
+assert.deepStrictEqual([...allGroups].sort((a,b)=>a-b),[1,2,3],'Todos los grupos debe representar los tres grupos verbales.');
+
 const groupCases=[
   ['groupe-1-all','primer grupo',1],
   ['groupe-2-all','segundo grupo',2],
