@@ -11,6 +11,13 @@ const vm=require('vm');
 const VERSION='0.3.4';
 const BASE=`https://cdn.jsdelivr.net/npm/conjugation-fr@${VERSION}/`;
 const URLS={verbs:BASE+'verbs-fr.json',templates:BASE+'conjugation-fr.json'};
+const SOURCES_LOCAL=[
+  path.resolve(__dirname,'../data/verbs/verbs.js'),
+  path.resolve(__dirname,'../data/verbs/verbs-extended.js')
+];
+const SOURCE_PRONOMINAL=path.resolve(__dirname,'../data/verbs/pronominal-catalog.js');
+const OUT=path.resolve(__dirname,'../data/verbs/local-database.js');
+const SEARCH_INDEX_OUT=path.resolve(__dirname,'../data/verbs/search-index.js');
 const TRANSLATION_URL='https://raw.githubusercontent.com/apertium/apertium-fr-es/main/apertium-fra-spa.fra-spa.dix';
 
 async function getJson(url){
