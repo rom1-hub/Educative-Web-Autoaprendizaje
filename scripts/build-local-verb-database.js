@@ -77,8 +77,16 @@ function familyId(group,cat){
   return 'groupe-3';
 }
 function variants(value){
-  const raw=Array.isArray(value)?value:(value&&typeof value==='object'&&'i' in value?value.i:value);
-  return (Array.isArray(raw)?raw:[raw]).filter(v=>v!=null).map(String);
+  if(value==null)return [];
+  if(Array.isArray(value))return value.flatMap(variants);
+  if(typeof value==='object'){
+    if('i' in value)return variants(value.i);
+    if('form' in value)return variants(value.form);
+    if('forme' in value)return variants(value.forme);
+    if('value' in value)return variants(value.value);
+    return [];
+  }
+  return [String(value)];
 }
 function applyTemplate(verb,template,value){
   const parts=String(template||'').split(':');
@@ -88,9 +96,8 @@ function applyTemplate(verb,template,value){
   return forms.map(form=>stem+form);
 }
 function bareForm(value){
-  if(Array.isArray(value))return String(value[1]??value[0]??'');
-  if(value&&typeof value==='object'&&'i' in value)return bareForm(value.i);
-  return String(value??'');
+  const forms=variants(value);
+  return String(forms[1]??forms[0]??'');
 }
 function reflexivePronoun(index,form){
   const pronouns=['me','te','se','nous','vous','se'];
