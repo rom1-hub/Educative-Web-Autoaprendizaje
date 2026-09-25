@@ -49,7 +49,7 @@ Object.values(w.COQ_VERB_CATEGORY_CATALOG).forEach(category=>{
 });
 const categories=w.COQ_VERB_CATEGORY_CATALOG;
 expect(categories.find(g=>g.id==='all')?.label,'Todos los grupos','La categoría global debe conservar su etiqueta.');
-expect(categories.find(g=>g.id==='groupe-1-all')?.label,'Todos los verbos','La categoría de primer grupo debe conservar su etiqueta.');
+expect(categories.find(g=>g.id==='groupe-1-all')?.label,'Todos los verbos del primer grupo','La categoría de primer grupo debe conservar su etiqueta.');
 expect(categories.find(g=>g.id==='regular-er')?.label,'Normales','La categoría Normal debe conservar su etiqueta.');
 expect(categories.find(g=>g.id==='er-ger')?.label,'-GER','La categoría -GER debe conservar su etiqueta.');
 expect(categories.find(g=>g.id==='er-cer')?.label,'-CER','La categoría -CER debe conservar su etiqueta.');
@@ -57,8 +57,8 @@ expect(categories.find(g=>g.id==='er-eler')?.label,'-ELER','La categoría -ELER 
 expect(categories.find(g=>g.id==='er-eter')?.label,'-ETER','La categoría -ETER debe conservar su etiqueta.');
 expect(categories.find(g=>g.id==='yer')?.label,'-YER','La categoría -YER debe conservar su etiqueta.');
 expect(categories.find(g=>g.id==='er-e-accent')?.label,'-E (È) + consonante + ER','La categoría E (È) debe conservar su etiqueta.');
-expect(categories.find(g=>g.id==='groupe-2-all')?.label,'Todos los verbos','La categoría de segundo grupo debe conservar su etiqueta.');
-expect(categories.find(g=>g.id==='groupe-3-all')?.label,'Todos los verbos','La categoría de tercer grupo debe conservar su etiqueta.');
+expect(categories.find(g=>g.id==='groupe-2-all')?.label,'Todos los verbos del segundo grupo','La categoría de segundo grupo debe conservar su etiqueta.');
+expect(categories.find(g=>g.id==='groupe-3-all')?.label,'Todos los verbos del tercer grupo','La categoría de tercer grupo debe conservar su etiqueta.');
 expect(categories.find(g=>g.id==='groupe-3-dre')?.label,'-DRE','La categoría -DRE debe conservar su etiqueta.');
 expect(categories.find(g=>g.id==='groupe-3-ir')?.label,'-IR','La categoría -IR debe conservar su etiqueta.');
 expect(categories.find(g=>g.id==='groupe-3-uire')?.label,'-UIRE','La categoría -UIRE debe conservar su etiqueta.');
