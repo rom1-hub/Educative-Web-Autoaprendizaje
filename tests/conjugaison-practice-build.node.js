@@ -43,6 +43,8 @@ for(const tense of tenses){
   assert(questions.every(q=>q.tense===tense),`Las preguntas de «${tense}» no deben mezclar otros tiempos.`);
 }
 
+const records=context.window.COQ_CONJ_DATA_MODEL.records;
+
 const allQuestions=api.buildQuestions('',"présent de l'indicatif",'all','','');
 assert.strictEqual(allQuestions.length,20,'Todos los grupos debe generar 20 preguntas.');
 const allGroups=new Set(allQuestions.map(q=>Number(records[q.verb]?.groupe)));
@@ -53,7 +55,6 @@ const groupCases=[
   ['groupe-2-all','segundo grupo',2],
   ['groupe-3-all','tercer grupo',3]
 ];
-const records=context.window.COQ_CONJ_DATA_MODEL.records;
 
 for(const tense of tenses){
   for(const [id,label,expectedGroup] of groupCases){
