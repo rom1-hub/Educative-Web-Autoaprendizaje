@@ -8,7 +8,7 @@ const rules=context.window.COQ_PRONOMINAL_RULES||{};
 const agreement=context.window.COQ_CONJ_AGREEMENT;
 const assert=(condition,message)=>{if(!condition)throw new Error(message);};
 const expect=(actual,expected,message)=>assert(actual===expected,`${message}: esperado «${expected}», obtenido «${actual}»`);
-assert(catalog.length===108,`El catálogo pronominal debe contener 105 verbos; obtenido ${catalog.length}.`);
+assert(catalog.length===109,`El catálogo pronominal debe contener 105 verbos; obtenido ${catalog.length}.`);
 assert(Object.keys(rules).length===catalog.length,`Cada pronominal debe tener una regla explícita de concordancia: ${Object.keys(rules).length}/${catalog.length}.`);
 assert(agreement&&typeof agreement.formatLookupCompoundForm==='function','La concordancia debe exponer el formateador de Consulta.');
 for(const entry of catalog){
@@ -21,6 +21,7 @@ assert(rules.parler?.fonctionDeSe==='COI'&&rules.parler?.accord==='aucun','se pa
 assert(rules.téléphoner?.fonctionDeSe==='COI'&&rules.téléphoner?.accord==='aucun','se téléphoner debe permanecer sin concordancia: se es COI.');
 assert(rules.demander?.fonctionDeSe==='COI'&&rules.demander?.accord==='aucun','se demander debe permanecer sin concordancia en su construcción pedagógica canónica.');
 assert(rules.douter?.fonctionDeSe==='COI'&&rules.douter?.accord==='aucun','se douter debe permanecer sin concordancia.');
+assert(rules.plaire?.fonctionDeSe==='COI'&&rules.plaire?.accord==='aucun','se plaire debe permanecer sin concordancia: se es COI.');
 assert(rules.permettre?.fonctionDeSe==='COI'&&rules.permettre?.accord==='aucun','se permettre debe permanecer sin concordancia: se es COI.');
 assert(rules.lever?.accord==='sujet','se lever debe concordar con el sujeto.');
 assert(rules.inscrire?.accord==='sujet','s’inscrire debe concordar con el sujeto.');
