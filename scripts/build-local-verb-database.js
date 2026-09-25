@@ -11,6 +11,7 @@ const vm=require('vm');
 const VERSION='0.3.4';
 const BASE=`https://cdn.jsdelivr.net/npm/conjugation-fr@${VERSION}/`;
 const URLS={verbs:BASE+'verbs-fr.json',templates:BASE+'conjugation-fr.json'};
+const TRANSLATION_URL='https://raw.githubusercontent.com/open-dsl-dict/wikidict-dsl-es/master/data/fr-es_wikidict.dsl';
 const SOURCES_LOCAL=[
   path.resolve(__dirname,'../data/verbs/verbs.js'),
   path.resolve(__dirname,'../data/verbs/verbs-extended.js')
@@ -33,6 +34,31 @@ async function getJson(url){
   const response=await fetch(url,{headers:{'user-agent':'COQ-local-database-builder'}});
   if(!response.ok)throw new Error(`${url} HTTP ${response.status}`);
   return response.json();
+}
+async function getText(url){
+  const response=await fetch(url,{headers:{'user-agent':'COQ-local-database-builder'}});
+  if(!response.ok)throw new Error(`${url} HTTP ${response.status}`);
+  return response.text();
+}
+function normalizeTranslationKey(value){return String(value||'').replace(/[’＇]/g,"'").normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').trim().toLowerCase();}
+function cleanDslTranslation(value){
+  return String(value||'').replace(/^\\s+/,'').replace(/\\[[^\\]]+\\]/g,'').replace(/\\{[^}]+\\}/g,'').replace(/\\\\[a-z]+/gi,' ').replace(/\\s+/g,' ').trim();
+}
+function readFrenchSpanishTranslations(text){
+  const translations=new Map();
+  let headword='';
+  for(const rawLine of String(text||'').split(/\\r?\\n/)){
+    const line=rawLine.replace(/^\\uFEFF/,'');
+    if(!line.trim()||line.startsWith('#'))continue;
+    if(/^\\S/.test(line)){
+      headword=line.trim();
+      continue;
+    }
+    if(!headword||translations.has(normalizeTranslationKey(headword)))continue;
+    const translation=cleanDslTranslation(line);
+    if(translation)translations.set(normalizeTranslationKey(headword),translation);
+  }
+  return translations;
 }
 function readLocalMetadata(){
   const window={};
@@ -153,7 +179,7 @@ function makePronominalRecord(base,entry){
     source:{name:'COQ-pronominal-catalog',base:'COQ local + conjugation-fr',catalog:true}
   };
 }
-function normalize(verbs,templates,local,pronominalCatalog){
+function normalize(verbs,templates,local,pronominalCatalog,translations){
   const out={};
   Object.entries(verbs||{}).forEach(([verb,meta])=>{
     const template=meta?.t;
@@ -189,6 +215,7 @@ function normalize(verbs,templates,local,pronominalCatalog){
       exceptions:old.exceptions??null,
       formePronominale:old.formePronominale||null,
       formeNonPronominale:old.formeNonPronominale||null,
+      traduccion:old.traduccion||translations.get(normalizeTranslationKey(verb))||null,
       source:{name:'conjugation-fr',version:VERSION,base:'Verbiste',localMetadata:Boolean(local[verb])}
     };
   });
@@ -213,6 +240,7 @@ function normalize(verbs,templates,local,pronominalCatalog){
       ...record,
       participePasse:pp,
       formes:{...formes,...(record.formes||{})},
+      traduccion:record.traduccion||translations.get(normalizeTranslationKey(verb))||null,
       source:{name:'COQ-local',localMetadata:true}
     };
   });
@@ -242,15 +270,18 @@ function normalize(verbs,templates,local,pronominalCatalog){
 }
 function sortObject(value){return Object.fromEntries(Object.keys(value).sort((a,b)=>a.localeCompare(b,'fr')).map(key=>[key,value[key]]));}
 (async()=>{
-  const [verbs,templates]=await Promise.all([getJson(URLS.verbs),getJson(URLS.templates)]);
+  const [verbs,templates,translationText]=await Promise.all([getJson(URLS.verbs),getJson(URLS.templates),getText(TRANSLATION_URL)]);
   const local=readLocalMetadata();
   const pronominalCatalog=readPronominalCatalog();
-  const data=sortObject(normalize(verbs,templates,local,pronominalCatalog));
+  const translations=readFrenchSpanishTranslations(translationText);
+  const data=sortObject(normalize(verbs,templates,local,pronominalCatalog,translations));
   const payload=`/* AUTO-GENERATED — do not edit manually. Source: conjugation-fr ${VERSION} / Verbiste + COQ local metadata + pronominal catalog. */\nwindow.COQ_VERBS=${JSON.stringify(data)};\nwindow.COQ_VERB_DATABASE_VERSION=${JSON.stringify(VERSION)};\n`;
   fs.mkdirSync(path.dirname(OUT),{recursive:true});
   fs.writeFileSync(OUT,payload,'utf8');
   const searchIndex=`/* COQ — Índice ligero de verbos para la búsqueda global.\n * Fuente: local-database.js. Generado automáticamente por build-local-verb-database.js.\n * No contiene conjugaciones ni datos lingüísticos; solo identificadores de búsqueda.\n */\nwindow.COQ_VERB_SEARCH_INDEX=Object.freeze(${JSON.stringify(Object.keys(data).sort((a,b)=>a.localeCompare(b,'fr')))});\n`;
   fs.writeFileSync(SEARCH_INDEX_OUT,searchIndex,'utf8');
+  const translated=Object.values(data).filter(record=>record?.traduccion).length;
   console.log(`Generated ${Object.keys(data).length} verbs at ${OUT}`);
+  console.log(`Attached ${translated} French-Spanish verb translations`);
   console.log(`Generated search index at ${SEARCH_INDEX_OUT}`);
 })();
