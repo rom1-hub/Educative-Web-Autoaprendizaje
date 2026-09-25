@@ -249,7 +249,7 @@ function normalize(verbs,templates,local,pronominalCatalog,translations){
     const base=out[entry.base];
     if(!base){missing.push(entry.base);return;}
     out[entry.base]={...base,formePronominale:entry.infinitif,formePronominaleDisponible:true};
-    const pronominalRecord=makePronominalRecord(base,entry);
+    const pronominalRecord={...makePronominalRecord(base,entry),traduccion:translations.get(normalizeTranslationKey(entry.infinitif))||null};
     out[entry.infinitif]={
       ...pronominalRecord,
       pronominal:true,
