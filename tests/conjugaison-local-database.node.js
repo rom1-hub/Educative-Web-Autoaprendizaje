@@ -31,8 +31,10 @@ assert(verbs['se servir']&&verbs['se servir'].pronominal===true,'se servir debe 
 // Control lingüístico de grupos: los verbos en -ER son del primer grupo,
 // salvo aller y envoyer, que pertenecen al tercero.
 const erThirdGroup=keys.filter(key=>/er$/i.test(key)&&Number(verbs[key]?.groupe)===3);
-assert(erThirdGroup.every(key=>['aller','envoyer'].includes(key)),
-  'El tercer grupo no puede contener verbos en -ER fuera de aller/envoyer: '+erThirdGroup.slice(0,20).join(', '));
+assert(erThirdGroup.every(key=>{
+  const base=String(verbs[key]?.infinitif_base||key).trim().toLowerCase();
+  return ['aller','envoyer'].includes(base);
+}), 'El tercer grupo no puede contener verbos en -ER fuera de aller/envoyer y sus formas pronominales: '+erThirdGroup.slice(0,20).join(', '));
 for(const key of ['acheter','appeler','aboyer','aller','envoyer','prendre','finir']){
   assert(verbs[key]&&Number.isFinite(Number(verbs[key].groupe)),'Falta clasificación de grupo para '+key+'.');
 }
