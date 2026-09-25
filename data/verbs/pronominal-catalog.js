@@ -12,6 +12,7 @@
     {base:'voir',infinitif:'se voir'},
     {base:'regarder',infinitif:'se regarder'},
     {base:'hydrater',infinitif:"s'hydrater"},
+    {base:'permettre',infinitif:'se permettre'},
     {base:'amuser',infinitif:"s'amuser"},
     {base:'appeler',infinitif:"s'appeler"},
     {base:'asseoir',infinitif:"s'asseoir"},
