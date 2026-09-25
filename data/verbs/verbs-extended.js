@@ -107,7 +107,13 @@
     'fileter':{id:'fileter',infinitif:'fileter',infinitif_base:'fileter',groupe:1,pattern:'er-eter',auxiliaire:'avoir',pronominal:false,participePasse:'fileté',construction:'non-pronominale',verbeBase:'fileter',variante:'accent'},
     'fureter':{id:'fureter',infinitif:'fureter',infinitif_base:'fureter',groupe:1,pattern:'er-eter',auxiliaire:'avoir',pronominal:false,participePasse:'fureté',construction:'non-pronominale',verbeBase:'fureter',variante:'accent'},
     'haleter':{id:'haleter',infinitif:'haleter',infinitif_base:'haleter',groupe:1,pattern:'er-eter',auxiliaire:'avoir',pronominal:false,participePasse:'haleté',construction:'non-pronominale',verbeBase:'haleter',variante:'accent'},
-    'feuilleter':{id:'feuilleter',infinitif:'feuilleter',infinitif_base:'feuilleter',groupe:1,pattern:'er-eter',auxiliaire:'avoir',pronominal:false,participePasse:'feuilleté',construction:'non-pronominale',verbeBase:'feuilleter',variante:'double'}
+    'feuilleter':{id:'feuilleter',infinitif:'feuilleter',infinitif_base:'feuilleter',groupe:1,pattern:'er-eter',auxiliaire:'avoir',pronominal:false,participePasse:'feuilleté',construction:'non-pronominale',verbeBase:'feuilleter',variante:'double'},
+    'désertifier':{id:'désertifier',infinitif:'désertifier',infinitif_base:'désertifier',groupe:1,pattern:'regular-er',auxiliaire:'avoir',pronominal:false,participePasse:'désertifié',construction:'non-pronominale',verbeBase:'désertifier'},
+    'entredéchirer':{id:'entredéchirer',infinitif:'entredéchirer',infinitif_base:'entredéchirer',groupe:1,pattern:'regular-er',auxiliaire:'avoir',pronominal:false,participePasse:'entredéchiré',construction:'non-pronominale',verbeBase:'entredéchirer'},
+    'entredétruire':{id:'entredétruire',infinitif:'entredétruire',infinitif_base:'entredétruire',groupe:3,pattern:'conduire-type',auxiliaire:'avoir',pronominal:false,participePasse:'entredétruit',construction:'non-pronominale',verbeBase:'entredétruire'},
+    'entredévorer':{id:'entredévorer',infinitif:'entredévorer',infinitif_base:'entredévorer',groupe:1,pattern:'regular-er',auxiliaire:'avoir',pronominal:false,participePasse:'entredévoré',construction:'non-pronominale',verbeBase:'entredévorer'},
+    'entrégorger':{id:'entrégorger',infinitif:'entrégorger',infinitif_base:'entrégorger',groupe:1,pattern:'regular-er',auxiliaire:'avoir',pronominal:false,participePasse:'entrégorgé',construction:'non-pronominale',verbeBase:'entrégorger'},
+    'méconduire':{id:'méconduire',infinitif:'méconduire',infinitif_base:'méconduire',groupe:3,pattern:'conduire-type',auxiliaire:'avoir',pronominal:false,participePasse:'méconduit',construction:'non-pronominale',verbeBase:'méconduire'},
   };
   const target=window.COQ_VERBS||{};
   Object.entries(verbs).forEach(([key,record])=>{if(!target[key])target[key]=record;});
