@@ -11,7 +11,7 @@
   const families={
     'être':{id:'être',patternId:'être',groupe:3,verbs:['être']},
     'avoir':{id:'avoir',patternId:'avoir',groupe:3,verbs:['avoir']},
-    'er-regular':{id:'er-regular',patternId:'regular-er',groupe:1,verbs:['parler','se parler']},
+    'er-regular':{id:'er-regular',patternId:'regular-er',groupe:1,verbs:['parler','se parler','désertifier','entredéchirer','entredévorer','entrégorger']},
     'er-ger':{id:'er-ger',patternId:'er-ger',groupe:1,verbs:['manger']},
     'er-cer':{id:'er-cer',patternId:'er-cer',groupe:1,verbs:['commencer']},
     'er-e-accent':{id:'er-e-accent',patternId:'er-e-accent',groupe:1,verbs:['lever','promener','se lever','se promener']},
@@ -35,7 +35,7 @@
     'lire-type':{id:'lire-type',patternId:'lire-type',groupe:3,verbs:['lire','relire']},
     'rire-type':{id:'rire-type',patternId:'rire-type',groupe:3,verbs:['rire','sourire']},
     'vivre-type':{id:'vivre-type',patternId:'vivre-type',groupe:3,verbs:['vivre','revivre','survivre']},
-    'conduire-type':{id:'conduire-type',patternId:'conduire-type',groupe:3,verbs:['conduire','traduire','produire','construire','détruire','réduire','cuire']},
+    'conduire-type':{id:'conduire-type',patternId:'conduire-type',groupe:3,verbs:['conduire','traduire','produire','construire','détruire','réduire','cuire','entredétruire','méconduire']},
     'courir-type':{id:'courir-type',patternId:'courir-type',groupe:3,verbs:['courir','accourir','recourir']},
     'mourir-type':{id:'mourir-type',patternId:'mourir-type',groupe:3,verbs:['mourir']},
     'croire-type':{id:'croire-type',patternId:'croire-type',groupe:3,verbs:['croire']},
