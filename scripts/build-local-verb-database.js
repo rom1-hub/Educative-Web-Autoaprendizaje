@@ -28,7 +28,7 @@ function cleanApertiumSide(value){
   return String(value||'')
     .replace(/<b\\s*\\/>/gi,' ')
     .replace(/<g>/gi,' ')
-    .replace(/<\\/g>/gi,' ')
+    .replace(/<\/g>/gi,' ')
     .replace(/<s\\s+[^>]+\\/>/gi,'')
     .replace(/<[^>]+>/g,'')
     .replace(/&apos;/g,"'")
@@ -36,12 +36,12 @@ function cleanApertiumSide(value){
     .replace(/&quot;/g,'"')
     .replace(/&lt;/g,'<')
     .replace(/&gt;/g,'>')
-    .replace(/\\s+/g,' ')
+     .replace(/\s+/g,' ')
     .trim();
 }
 function readFrenchSpanishTranslations(xml){
   const translations=new Map();
-  const entryPattern=/<e(?:\\s[^>]*)?>\\s*<p>\\s*<l>([\\s\\S]*?)<\\/l>\\s*<r>([\\s\\S]*?)<\\/r>\\s*<\\/p>\\s*<\\/e>/g;
+  const entryPattern=/<e(?:\s[^>]*)?>\s*<p>\s*<l>([\s\S]*?)<\/l>\s*<r>([\s\S]*?)<\/r>\s*<\/p>\s*<\/e>/g;
   let match;
   while((match=entryPattern.exec(String(xml||'')))){
     const leftRaw=match[1],rightRaw=match[2];
