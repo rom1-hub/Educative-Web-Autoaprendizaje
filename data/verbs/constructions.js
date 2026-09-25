@@ -7,6 +7,7 @@ window.COQ_PRONOMINAL_RULES=Object.freeze({
   'fâcher':{fonctionDeSe:'aucune',accord:'sujet'},
   'voir':{fonctionDeSe:'COD',accord:'sujet'},
   'regarder':{fonctionDeSe:'COD',accord:'sujet'},
+  'hydrater':{fonctionDeSe:'COD',accord:'sujet'},
 
   'amuser':{fonctionDeSe:'COD',accord:'sujet'},
   'appeler':{fonctionDeSe:'COD',accord:'sujet'},
