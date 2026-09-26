@@ -40,12 +40,11 @@
         let rows=[];
         if(isCompound&&effectiveAuxiliary==='être'){
           rows=Object.keys(subjectVariants).map(subject=>[subject,'']);
-        }else if(engine&&engine.rowsFor){
-          rows=engine.rowsFor(v,t);
-        }
-        if(engine&&engine.rowsForConstruction&&construction&&!(isCompound&&effectiveAuxiliary==='être')){
+        }else if(engine&&engine.rowsForConstruction&&construction){
           rows=engine.rowsForConstruction(v,t,construction);
           if(!rows.length)return;
+        }else if(engine&&engine.rowsFor){
+          rows=engine.rowsFor(v,t);
         }
         U.expandPracticeRows(rows).forEach(r=>{
           const baseSubject=P.baseSubject(String(r.subject||'').split(' (')[0].trim());
