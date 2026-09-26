@@ -31,11 +31,13 @@
   }
   function buildQuestions(verb,tense,category,construction,auxiliary){
     let pool=[];
-    const add=(v,requestedTenses=null)=>{
+    const add=(v,requestedTenses=null,filtersAlreadyMatched=false)=>{
       const meta=getRecord(v);
       if(!meta)return;
-      if(!verb&&!matchesCategory(v,category))return;
-      if(!matchesConstruction(meta,construction))return;
+      if(!filtersAlreadyMatched){
+        if(!verb&&!matchesCategory(v,category))return;
+        if(!matchesConstruction(meta,construction))return;
+      }
       const isPronominal=!!(constructionResolver?.isPronominal?.(meta));
       const ts=requestedTenses|| (tense==='Todos los tiempos'?allTenses:[tense]);
       ts.forEach(t=>{
@@ -89,7 +91,7 @@
       }
 
       const requestedTenses=tense==='Todos los tiempos'?allTenses:[tense];
-      selectedVerbs.forEach(v=>add(v,requestedTenses));
+      selectedVerbs.forEach(v=>add(v,requestedTenses,true));
     }
 
     if(!pool.length)return [];
