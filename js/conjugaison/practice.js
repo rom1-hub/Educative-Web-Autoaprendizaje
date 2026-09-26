@@ -24,6 +24,9 @@
   function practiceQuestionKey(q){return [q.verb,q.tense,practiceVariantKey(q.subject),q.displayAnswer||q.answer].join('|');}
   function selectPracticeQuestions(pool,limit){const unique=[],seen=new Set();U.shuffleArray(pool).forEach(q=>{const key=practiceQuestionKey(q);if(seen.has(key))return;seen.add(key);unique.push(q);});const target=Math.max(0,Number(limit)||0);if(!target||!unique.length)return [];const selected=[];const counts={subject:new Map(),variant:new Map(),tense:new Map(),verb:new Map()};const count=(map,key)=>map.get(key)||0;const increment=(map,key)=>map.set(key,count(map,key)+1);let available=new Set(unique.map((_,index)=>index));let previousKey='';while(selected.length<target){if(!available.size){available=new Set(unique.map((_,index)=>index));if(available.size>1){const previousIndex=unique.findIndex(q=>practiceQuestionKey(q)===previousKey);if(previousIndex>=0)available.delete(previousIndex);}}let bestScore=Infinity,best=[];available.forEach(index=>{const q=unique[index],key=practiceQuestionKey(q);const subject=practiceSubjectKey(q.subject),variant=practiceVariantKey(q.subject),tense=q.tense,verb=q.verb;let score=count(counts.subject,subject)*6+count(counts.variant,variant)*2+count(counts.tense,tense)*4+count(counts.verb,verb);if(key===previousKey)score+=1000;if(selected.length){const last=selected[selected.length-1];if(practiceSubjectKey(last.subject)===subject)score+=100;if(last.tense===tense)score+=12;if(last.verb===verb)score+=4;}if(score<bestScore){bestScore=score;best=[index];}else if(score===bestScore)best.push(index);});const pickIndex=best[Math.floor(Math.random()*best.length)];const pick={...unique[pickIndex]};available.delete(pickIndex);selected.push(pick);previousKey=practiceQuestionKey(pick);increment(counts.subject,practiceSubjectKey(pick.subject));increment(counts.variant,practiceVariantKey(pick.subject));increment(counts.tense,pick.tense);increment(counts.verb,practiceVariantKey(pick.verb));}return selected;}
   function sampleMatchingVerbs(target,predicate){const wanted=Math.max(0,Number(target)||0);if(!wanted)return [];const selected=[];let seen=0;for(const v of Object.keys(dataModel?.records||{})){if(!predicate(v))continue;seen+=1;if(selected.length<wanted){selected.push(v);continue;}const index=Math.floor(Math.random()*seen);if(index<wanted)selected[index]=v;}return selected;}
+  function sampleMatchingVerbsByGroup(targets,predicate){const groups=new Map(Object.entries(targets||{}).map(([group,target])=>[Number(group),{target:Math.max(0,Number(target)||0),selected:[],seen:0}]));if(!groups.size)return [];for(const v of Object.keys(dataModel?.records||{})){if(!predicate(v))continue;const group=Number(getRecord(v)?.groupe);const bucket=groups.get(group);if(!bucket||!bucket.target)continue;bucket.seen+=1;if(bucket.selected.length<bucket.target){bucket.selected.push(v);continue;}const index=Math.floor(Math.random()*bucket.seen);if(index<bucket.target)bucket.selected[index]=v;}
+    return [...groups.values()].flatMap(bucket=>bucket.selected);
+  }
   function buildQuestions(verb,tense,category,construction,auxiliary){
     let pool=[];
     const add=(v,requestedTenses=null)=>{
@@ -77,11 +80,7 @@
         // Conserva la cobertura pedagógica actual: 3/3/2 entre los grupos.
         const groupOrder=U.shuffleArray([1,2,3]);
         const targets=new Map([[groupOrder[0],3],[groupOrder[1],3],[groupOrder[2],2]]);
-        selectedVerbs=[];
-        groupOrder.forEach(group=>{
-          const sampled=sampleMatchingVerbs(targets.get(group),v=>predicate(v)&&Number(getRecord(v)?.groupe)===group);
-          selectedVerbs.push(...sampled);
-        });
+        selectedVerbs=sampleMatchingVerbsByGroup(Object.fromEntries(targets),predicate);
       }else{
         selectedVerbs=sampleMatchingVerbs(8,predicate);
       }
