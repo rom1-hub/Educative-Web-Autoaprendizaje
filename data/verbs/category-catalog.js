@@ -38,15 +38,14 @@
     const records=window.COQ_CONJ_DATA_MODEL?.records||{};
     return records[String(verb||'').trim().toLowerCase()]||null;
   };
-  function categoryOptions(){
-    return frozen.map(category=>Object.freeze({...category,
-      groupes:category.groupes?Object.freeze([...category.groupes]):null,
-      familyIds:category.familyIds?Object.freeze([...category.familyIds]):null,
-      subCategories:category.subCategories?Object.freeze([...category.subCategories]):null,
-      endings:category.endings?Object.freeze([...category.endings]):null,
-      verbIds:category.verbIds?Object.freeze([...category.verbIds]):null
-    }));
-  }
+  const optionCopies=Object.freeze(frozen.map(category=>Object.freeze({...category,
+    groupes:category.groupes?Object.freeze([...category.groupes]):null,
+    familyIds:category.familyIds?Object.freeze([...category.familyIds]):null,
+    subCategories:category.subCategories?Object.freeze([...category.subCategories]):null,
+    endings:category.endings?Object.freeze([...category.endings]):null,
+    verbIds:category.verbIds?Object.freeze([...category.verbIds]):null
+  })));
+  function categoryOptions(){return optionCopies;}
   function matchesCategory(verb,categoryId){
     if(!categoryId||categoryId==='all')return true;
     const category=categoryById.get(categoryId);if(!category)return false;
