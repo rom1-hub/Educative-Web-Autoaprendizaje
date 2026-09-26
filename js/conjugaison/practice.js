@@ -36,12 +36,12 @@
       if(!meta)return;
       if(!verb&&!matchesCategory(v,category))return;
       if(!matchesConstruction(v,construction))return;
-      const effectiveAuxiliary=auxiliaryResolver?.resolve?.(meta,constructionResolver);
       const ts=requestedTenses|| (tense==='Todos los tiempos'?allTenses:[tense]);
       ts.forEach(t=>{
         const isSimple=simpleTenseSet.has(t),isCompound=compoundTenseSet.has(t);
         if(!isSimple&&!isCompound)return;
         if(!matchesAuxiliary(v,t,auxiliary))return;
+        const effectiveAuxiliary=isCompound?auxiliaryResolver?.resolve?.(meta,constructionResolver):null;
         let rows=[];
         if(isCompound&&effectiveAuxiliary==='être'){
           rows=Object.keys(subjectVariants).map(subject=>[subject,'']);
