@@ -64,20 +64,20 @@
           rows=engine.rowsForConstruction(v,t,construction,meta);
           if(!rows.length)return;
         }else if(engine&&engine.rowsFor){
-          rows=engine.rowsFor(v,t);
+          rows=engine.rowsFor(v,t,meta);
         }
         U.expandPracticeRows(rows).forEach(r=>{
           const baseSubject=P.baseSubject(String(r.subject||'').split(' (')[0].trim());
           if(isCompound&&compoundAuxiliary==='être'&&subjectVariants[baseSubject]&&engine&&engine.conjugate){
             subjectVariants[baseSubject].forEach(subject=>{
-              const answer=engine.conjugate(v,t,subject,construction||(isPronominal?'pronomiale':'non-pronomiale'));
+              const answer=engine.conjugate(v,t,subject,construction||(isPronominal?'pronomiale':'non-pronomiale'),meta);
               if(answer!=null)pushQuestion(pool,v,t,P.subjectForMode(subject,(t==='subjonctif présent'||t==='subjonctif passé')?'subjonctif':'normal',answer),answer);
             });
           }else{
             const rowAnswer=r.answer;
             const answer=rowAnswer!=null&&String(rowAnswer).trim()!==''
               ?rowAnswer
-              :(engine&&engine.conjugate?engine.conjugate(v,t,r.subject,construction||(isPronominal?'pronomiale':'non-pronomiale')):null);
+              :(engine&&engine.conjugate?engine.conjugate(v,t,r.subject,construction||(isPronominal?'pronomiale':'non-pronomiale'),meta):null);
             if(answer!=null&&String(answer).trim()!==''){
               const displaySubject=isCompound&&compoundAuxiliary==='avoir'?P.subjectForMode(baseSubject,(t==='subjonctif présent'||t==='subjonctif passé')?'subjonctif':'normal',answer):formatPracticeSubject(r.subject,t,isCompound,answer);
               pushQuestion(pool,v,t,displaySubject,answer);
