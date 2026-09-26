@@ -54,11 +54,13 @@
               if(answer!=null)pushQuestion(pool,v,t,P.subjectForMode(subject,(t==='subjonctif présent'||t==='subjonctif passé')?'subjonctif':'normal',answer),answer);
             });
           }else{
-            const answer=(engine&&engine.conjugate)?engine.conjugate(v,t,r.subject,construction||((constructionResolver?.isPronominal(meta))?'pronomiale':'non-pronomiale')):r.answer;
-            const finalAnswer=answer==null?r.answer:answer;
-            if(finalAnswer!=null&&String(finalAnswer).trim()!==''){
-              const displaySubject=isCompound&&effectiveAuxiliary==='avoir'?P.subjectForMode(baseSubject,(t==='subjonctif présent'||t==='subjonctif passé')?'subjonctif':'normal',finalAnswer):formatPracticeSubject(r.subject,t,isCompound,finalAnswer);
-              pushQuestion(pool,v,t,displaySubject,finalAnswer);
+            const rowAnswer=r.answer;
+            const answer=rowAnswer!=null&&String(rowAnswer).trim()!==''
+              ?rowAnswer
+              :(engine&&engine.conjugate?engine.conjugate(v,t,r.subject,construction||((constructionResolver?.isPronominal(meta))?'pronomiale':'non-pronomiale')):null);
+            if(answer!=null&&String(answer).trim()!==''){
+              const displaySubject=isCompound&&effectiveAuxiliary==='avoir'?P.subjectForMode(baseSubject,(t==='subjonctif présent'||t==='subjonctif passé')?'subjonctif':'normal',answer):formatPracticeSubject(r.subject,t,isCompound,answer);
+              pushQuestion(pool,v,t,displaySubject,answer);
             }
           }
         });
