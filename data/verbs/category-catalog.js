@@ -33,6 +33,7 @@
     endings:category.endings?Object.freeze([...category.endings]):null,
     verbIds:category.verbIds?Object.freeze([...category.verbIds]):null
   })));
+  const categoryById=new Map(frozen.map(category=>[category.id,category]));
   const canonicalRecord=verb=>{
     const records=window.COQ_CONJ_DATA_MODEL?.records||{};
     return records[String(verb||'').trim().toLowerCase()]||null;
@@ -48,7 +49,7 @@
   }
   function matchesCategory(verb,categoryId){
     if(!categoryId||categoryId==='all')return true;
-    const category=frozen.find(item=>item.id===categoryId);if(!category)return false;
+    const category=categoryById.get(categoryId);if(!category)return false;
     const record=canonicalRecord(verb);if(!record)return false;
     const groupeMatches=!category.groupes?.length||category.groupes.includes(Number(record.groupe));
     if(!groupeMatches)return false;
