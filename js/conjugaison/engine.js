@@ -4,7 +4,9 @@
 (function(){
   const P=window.COQ_CONJ_PRONOUNS,C=window.COQ_CONJ_COMPOUND,A=window.COQ_CONJ_AGREEMENT,R=window.COQ_PATTERN_REGISTRY,dataModel=window.COQ_CONJ_DATA_MODEL,constructionResolver=window.COQ_CONSTRUCTION_RESOLVER,auxiliaryResolver=window.COQ_AUXILIARY_RESOLVER,S=P.subjectSets;
   const CONJUGATION_CACHE_LIMIT=4096;
+  const SIMPLE_FORM_CACHE_LIMIT=2048;
   const conjugationCache=new Map();
+  const simpleFormCache=new Map();
   const imperativeIndex=Object.freeze({tu:0,nous:1,vous:2});
   const groupedSubjects=Object.freeze({il:['il/elle/on','il'],elle:['il/elle/on','elle'],on:['il/elle/on','on'],ils:['ils/elles','ils'],elles:['ils/elles','elles']});
   const simpleSubjectIndex=Object.freeze({je:0,tu:1,il:2,elle:2,on:2,nous:3,vous:4,ils:5,elles:5});
@@ -32,9 +34,16 @@
   }
   function generatedSimple(verb,tense,subject,knownRecord){const r=knownRecord||record(verb);if(!r||!R||typeof R.generate!=='function')return null;return R.generate(r.patternId,r.infinitifBase,P.baseSubject(subject),tense,r);}
   function simpleForm(verb,tense,subject,knownRecord){
+    const key=[String(verb||''),String(tense||''),String(subject||'')].join('|');
+    if(simpleFormCache.has(key))return simpleFormCache.get(key);
     const external=externalSimple(verb,tense,subject,knownRecord);
-    if(external!=null)return external;
-    return generatedSimple(verb,tense,subject,knownRecord);
+    const result=external!=null?external:generatedSimple(verb,tense,subject,knownRecord);
+    simpleFormCache.set(key,result);
+    if(simpleFormCache.size>SIMPLE_FORM_CACHE_LIMIT){
+      const oldest=simpleFormCache.keys().next().value;
+      if(oldest!==undefined)simpleFormCache.delete(oldest);
+    }
+    return result;
   }
   function isPronominalRecord(r,construction){
     return r?.pronominal===true||r?.construction==='pronomiale'||r?.construction==='pronominale'||construction==='pronomiale'||construction==='pronominale';
