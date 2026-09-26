@@ -31,7 +31,7 @@
       const form=String(row?.[1]??'').trim();if(!form)return;
       const rawSubject=String(row?.[0]||'').trim();
       expandSubjects(rawSubject,form,tense).forEach(subject=>{
-        const resolvedForm=isCompound(tense)&&engine?.conjugate?.(verb,tense,subject,construction)||form;
+        const resolvedForm=form;
         output.push([subject,isCompound(tense)?A.formatLookupCompoundForm(resolvedForm,subject,recordMeta,verb):resolvedForm]);
       });
     });
