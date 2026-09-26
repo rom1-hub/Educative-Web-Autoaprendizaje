@@ -5,6 +5,9 @@
   const P=window.COQ_CONJ_PRONOUNS,C=window.COQ_CONJ_COMPOUND,A=window.COQ_CONJ_AGREEMENT,R=window.COQ_PATTERN_REGISTRY,dataModel=window.COQ_CONJ_DATA_MODEL,constructionResolver=window.COQ_CONSTRUCTION_RESOLVER,auxiliaryResolver=window.COQ_AUXILIARY_RESOLVER,S=P.subjectSets;
   const CONJUGATION_CACHE_LIMIT=4096;
   const conjugationCache=new Map();
+  const imperativeIndex=Object.freeze({tu:0,nous:1,vous:2});
+  const groupedSubjects=Object.freeze({il:['il/elle/on','il'],elle:['il/elle/on','elle'],on:['il/elle/on','on'],ils:['ils/elles','ils'],elles:['ils/elles','elles']});
+  const simpleSubjectIndex=Object.freeze({je:0,tu:1,il:2,elle:2,on:2,nous:3,vous:4,ils:5,elles:5});
   function canonicalRecord(verb){return dataModel&&typeof dataModel.get==='function'?dataModel.get(verb):null;}
   function baseKey(verb,canonical){const r=canonical||canonicalRecord(verb);if(r&&r.baseVerbId)return r.baseVerbId;return verb;}
   function conjugationCacheKey(verb,tense,subject,construction){return [String(verb||''),String(tense||''),String(subject||''),String(construction||'')].join('|');}
@@ -17,19 +20,14 @@
     if(!Array.isArray(forms)||!forms.length)return null;
     const base=P.baseSubject(subject);
     if(tense==='impératif présent'){
-      const imperativeIndex={tu:0,nous:1,vous:2};
       const index=imperativeIndex[base];
       return Number.isInteger(index)&&forms[index]?formValue(forms[index]):null;
     }
     const exact=forms.find(row=>Array.isArray(row)&&String(row?.[0]||'').trim()===base);
     if(exact)return formValue(exact);
-    const grouped={
-      il:['il/elle/on','il'],elle:['il/elle/on','elle'],on:['il/elle/on','on'],
-      ils:['ils/elles','ils'],elles:['ils/elles','elles']
-    };
-    const candidates=grouped[base];
+    const candidates=groupedSubjects[base];
     if(candidates){const row=forms.find(item=>Array.isArray(item)&&candidates.includes(String(item?.[0]||'').trim()));if(row)return formValue(row);}
-    const index={je:0,tu:1,il:2,elle:2,on:2,nous:3,vous:4,ils:5,elles:5}[base];
+    const index=simpleSubjectIndex[base];
     return Number.isInteger(index)&&forms[index]?formValue(forms[index]):null;
   }
   function generatedSimple(verb,tense,subject,knownRecord){const r=knownRecord||record(verb);if(!r||!R||typeof R.generate!=='function')return null;return R.generate(r.patternId,r.infinitifBase,P.baseSubject(subject),tense,r);}
