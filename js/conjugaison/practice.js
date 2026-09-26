@@ -61,7 +61,7 @@
         if(isCompound&&compoundAuxiliary==='être'){
           rows=Object.keys(subjectVariants).map(subject=>[subject,'']);
         }else if(engine&&engine.rowsForConstruction&&construction){
-          rows=engine.rowsForConstruction(v,t,construction);
+          rows=engine.rowsForConstruction(v,t,construction,meta);
           if(!rows.length)return;
         }else if(engine&&engine.rowsFor){
           rows=engine.rowsFor(v,t);
