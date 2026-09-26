@@ -39,14 +39,15 @@
         if(!matchesConstruction(meta,construction))return;
       }
       const isPronominal=!!(constructionResolver?.isPronominal?.(meta));
+      const effectiveAuxiliary=auxiliaryResolver?.resolve?.(meta,constructionResolver);
       const ts=requestedTenses|| (tense==='Todos los tiempos'?allTenses:[tense]);
       ts.forEach(t=>{
         const isSimple=simpleTenseSet.has(t),isCompound=compoundTenseSet.has(t);
         if(!isSimple&&!isCompound)return;
         if(!matchesAuxiliary(meta,t,auxiliary))return;
-        const effectiveAuxiliary=isCompound?auxiliaryResolver?.resolve?.(meta,constructionResolver):null;
+        const compoundAuxiliary=isCompound?effectiveAuxiliary:null;
         let rows=[];
-        if(isCompound&&effectiveAuxiliary==='être'){
+        if(isCompound&&compoundAuxiliary==='être'){
           rows=Object.keys(subjectVariants).map(subject=>[subject,'']);
         }else if(engine&&engine.rowsForConstruction&&construction){
           rows=engine.rowsForConstruction(v,t,construction);
@@ -56,7 +57,7 @@
         }
         U.expandPracticeRows(rows).forEach(r=>{
           const baseSubject=P.baseSubject(String(r.subject||'').split(' (')[0].trim());
-          if(isCompound&&effectiveAuxiliary==='être'&&subjectVariants[baseSubject]&&engine&&engine.conjugate){
+          if(isCompound&&compoundAuxiliary==='être'&&subjectVariants[baseSubject]&&engine&&engine.conjugate){
             subjectVariants[baseSubject].forEach(subject=>{
               const answer=engine.conjugate(v,t,subject,construction||(isPronominal?'pronomiale':'non-pronomiale'));
               if(answer!=null)pushQuestion(pool,v,t,P.subjectForMode(subject,(t==='subjonctif présent'||t==='subjonctif passé')?'subjonctif':'normal',answer),answer);
@@ -67,7 +68,7 @@
               ?rowAnswer
               :(engine&&engine.conjugate?engine.conjugate(v,t,r.subject,construction||(isPronominal?'pronomiale':'non-pronomiale')):null);
             if(answer!=null&&String(answer).trim()!==''){
-              const displaySubject=isCompound&&effectiveAuxiliary==='avoir'?P.subjectForMode(baseSubject,(t==='subjonctif présent'||t==='subjonctif passé')?'subjonctif':'normal',answer):formatPracticeSubject(r.subject,t,isCompound,answer);
+              const displaySubject=isCompound&&compoundAuxiliary==='avoir'?P.subjectForMode(baseSubject,(t==='subjonctif présent'||t==='subjonctif passé')?'subjonctif':'normal',answer):formatPracticeSubject(r.subject,t,isCompound,answer);
               pushQuestion(pool,v,t,displaySubject,answer);
             }
           }
