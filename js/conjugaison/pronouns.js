@@ -41,6 +41,8 @@
   });
   const VOWELS=/^[aeiouàâäéèêëîïôöùûüÿœæ]/i;
   const VOWELS_OR_MUTE_H=/^[aeiouàâäéèêëîïôöùûüÿœæh]/i;
+  const SUBJECT_INFO_CACHE_LIMIT=64;
+  const subjectInfoCache=new Map();
   function baseSubject(label){
     const s=String(label||'').trim();
     const withoutGender=s.replace(/\s*\([^)]*\)\s*$/,'').trim();
@@ -58,6 +60,7 @@
   }
   function subjectInfo(subject){
     const label=String(subject||'').trim();
+    if(subjectInfoCache.has(label))return subjectInfoCache.get(label);
     const base=baseSubject(label);
     const match=label.match(/\(([^)]+)\)/);
     let gender='masculin',number='singulier';
@@ -69,7 +72,10 @@
     else if(base==='ils'){gender='masculin';number='pluriel';}
     else if(base==='elles'){gender='féminin';number='pluriel';}
     else if(base==='nous'||base==='vous'){number='pluriel';}
-    return Object.freeze({label,base,gender,number});
+    const result=Object.freeze({label,base,gender,number});
+    subjectInfoCache.set(label,result);
+    if(subjectInfoCache.size>SUBJECT_INFO_CACHE_LIMIT){const oldest=subjectInfoCache.keys().next().value;if(oldest!==undefined)subjectInfoCache.delete(oldest);}
+    return result;
   }
   function pronounFor(label){return subjectPronouns[baseSubject(label)]||null;}
   function imperativePronounFor(label){return imperativePronouns[baseSubject(label)]||null;}
