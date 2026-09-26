@@ -39,8 +39,10 @@
         if(!matchesConstruction(meta,construction))return;
       }
       const isPronominal=!!(constructionResolver?.isPronominal?.(meta));
-      const effectiveAuxiliary=auxiliaryResolver?.resolve?.(meta,constructionResolver);
       const ts=requestedTenses|| (tense==='Todos los tiempos'?allTenses:[tense]);
+      const effectiveAuxiliary=ts.some(t=>compoundTenseSet.has(t))
+        ?auxiliaryResolver?.resolve?.(meta,constructionResolver)
+        :null;
       ts.forEach(t=>{
         const isSimple=simpleTenseSet.has(t),isCompound=compoundTenseSet.has(t);
         if(!isSimple&&!isCompound)return;
