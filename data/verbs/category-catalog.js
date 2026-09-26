@@ -46,10 +46,10 @@
     verbIds:category.verbIds?Object.freeze([...category.verbIds]):null
   })));
   function categoryOptions(){return optionCopies;}
-  function matchesCategory(verb,categoryId){
+  function matchesCategory(verb,categoryId,knownRecord){
     if(!categoryId||categoryId==='all')return true;
     const category=categoryById.get(categoryId);if(!category)return false;
-    const record=canonicalRecord(verb);if(!record)return false;
+    const record=knownRecord||canonicalRecord(verb);if(!record)return false;
     const groupeMatches=!category.groupes?.length||category.groupes.includes(Number(record.groupe));
     if(!groupeMatches)return false;
     if(category.verbIds?.length){
