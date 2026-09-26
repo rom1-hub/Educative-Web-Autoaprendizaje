@@ -6,7 +6,8 @@ window.COQ_COMPOUND_AUXILIARY_FILTERS={
   'avec-avoir-et-etre':{id:'avec-avoir-et-etre',label:'Con los auxiliares AVOIR y ÊTRE',auxiliaires:['avoir','être']},
   'verbes-pronominaux':{id:'verbes-pronominaux',label:'Verbos pronominales',auxiliaires:['être'],pronominal:true}
 };
-const COQ_AUXILIARY_COMPOUND_TENSES=new Set();
+const COQ_AUXILIARY_COMPOUND_TENSE_CACHE=new WeakMap();
+function compoundTenseSet(compoundTenses){if(!Array.isArray(compoundTenses))return null;let set=COQ_AUXILIARY_COMPOUND_TENSE_CACHE.get(compoundTenses);if(!set){set=new Set(compoundTenses);COQ_AUXILIARY_COMPOUND_TENSE_CACHE.set(compoundTenses,set);}return set;}
 window.COQ_AUXILIARY_OPTIONS=Object.freeze([
   {id:'avec-avoir',label:'Con el auxiliar AVOIR'},
   {id:'avec-etre',label:'Con el auxiliar ÊTRE'},
@@ -19,7 +20,7 @@ const COQ_AUXILIARY_RESOLVER=Object.freeze({
   },
   matches(record,tense,auxiliary,compoundTenses,constructionResolver){
     if(!auxiliary||tense==='Todos los tiempos')return true;
-    if(!COQ_AUXILIARY_COMPOUND_TENSES.has(tense))return true;
+    const compoundTenseSetValue=compoundTenseSet(compoundTenses);if(!compoundTenseSetValue?.has(tense))return true;
     const filter=window.COQ_COMPOUND_AUXILIARY_FILTERS?.[auxiliary];
     if(!filter)return true;
     const resolved=this.resolve(record,constructionResolver);
