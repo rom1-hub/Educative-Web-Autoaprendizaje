@@ -4,14 +4,14 @@
 (function(){
   const U=window.COQ_CONJ_UTILS,P=window.COQ_CONJ_PRONOUNS,dataModel=window.COQ_CONJ_DATA_MODEL,engine=window.COQ_CONJ_ENGINE,C=window.COQ_CONJ_COMPOUND,A=window.COQ_CONJ_AGREEMENT;
   const record=v=>dataModel?.get?.(v)||null;
+  const pronominalByBase=new Map((Array.isArray(window.COQ_PRONOMINAL_CATALOG)?window.COQ_PRONOMINAL_CATALOG:[]).map(item=>[String(item?.base||'').trim(),item]));
   const meta=v=>record(v)||{},verbExists=verb=>!!record(verb),isCompound=tense=>!!C?.isCompound?.(tense);
   function counterpart(verb,knownMeta){
     const m=knownMeta||meta(verb);
     if(m.pronominal&&m.baseVerbId&&record(m.baseVerbId))return m.baseVerbId;
     if(!m.pronominal&&m.formePronominale?.infinitif&&record(m.formePronominale.infinitif))return m.formePronominale.infinitif;
     if(!m.pronominal){
-      const catalogByBase=window.COQ_PRONOMINAL_BY_BASE;
-      const entry=catalogByBase?.get?.(String(verb||'').trim())||null;
+      const entry=pronominalByBase.get(String(verb||'').trim())||null;
       if(entry?.infinitif&&record(entry.infinitif))return entry.infinitif;
     }
     return null;
