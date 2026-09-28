@@ -10,8 +10,8 @@
     if(m.pronominal&&m.baseVerbId&&record(m.baseVerbId))return m.baseVerbId;
     if(!m.pronominal&&m.formePronominale?.infinitif&&record(m.formePronominale.infinitif))return m.formePronominale.infinitif;
     if(!m.pronominal){
-      const catalog=Array.isArray(window.COQ_PRONOMINAL_CATALOG)?window.COQ_PRONOMINAL_CATALOG:[];
-      const entry=catalog.find(item=>String(item?.base||'').trim()===String(verb||'').trim());
+      const catalogByBase=window.COQ_PRONOMINAL_BY_BASE;
+      const entry=catalogByBase?.get?.(String(verb||'').trim())||null;
       if(entry?.infinitif&&record(entry.infinitif))return entry.infinitif;
     }
     return null;
