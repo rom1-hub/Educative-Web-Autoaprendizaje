@@ -43,6 +43,7 @@ class ExerciseService:
         tense_ids: list[str],
         verb_id: str | None = None,
         pronominal: bool | None = None,
+        auxiliary: str | None = None,
         limit: int = 10,
     ) -> list[dict[str, Any]]:
         self._validate_inputs(
@@ -61,6 +62,7 @@ class ExerciseService:
             family_id=family_id,
             verb_id=verb_id,
             pronominal=pronominal,
+            auxiliary=auxiliary,
         )
 
         if verb_id is not None:
@@ -171,6 +173,7 @@ class ExerciseService:
         family_id: str | None,
         verb_id: str | None,
         pronominal: bool | None,
+        auxiliary: str | None,
     ) -> list[Verb]:
         if verb_id is not None:
             verb = self.repository.get_verb(verb_id)
@@ -179,6 +182,7 @@ class ExerciseService:
                 groups=groups,
                 family_id=family_id,
                 pronominal=pronominal,
+                auxiliary=auxiliary,
             )
             return [verb]
 
@@ -188,6 +192,11 @@ class ExerciseService:
             if verb.groupe in groups
             and (family_id is None or verb.familyId == family_id)
             and (pronominal is None or verb.pronominal is pronominal)
+            and (
+                auxiliary is None
+                or verb.auxiliaire == auxiliary
+                or auxiliary in verb.auxiliaires
+            )
         ]
 
         if not candidates:
@@ -200,6 +209,8 @@ class ExerciseService:
                     if pronominal
                     else "verbos no pronominales"
                 )
+            if auxiliary is not None:
+                filters.append(f"auxiliar '{auxiliary}'")
             raise ValueError(
                 "No hay verbos disponibles para " + " y ".join(filters) + "."
             )
@@ -213,6 +224,7 @@ class ExerciseService:
         groups: list[int],
         family_id: str | None,
         pronominal: bool | None,
+        auxiliary: str | None,
     ) -> None:
         if verb.groupe not in groups:
             raise ValueError(
@@ -230,6 +242,15 @@ class ExerciseService:
             expected = "pronominal" if pronominal else "no pronominal"
             raise ValueError(
                 f"El verbo '{verb.id}' no cumple el filtro '{expected}'."
+            )
+
+        if (
+            auxiliary is not None
+            and verb.auxiliaire != auxiliary
+            and auxiliary not in verb.auxiliaires
+        ):
+            raise ValueError(
+                f"El verbo '{verb.id}' no coincide con el auxiliar '{auxiliary}'."
             )
 
     @staticmethod
