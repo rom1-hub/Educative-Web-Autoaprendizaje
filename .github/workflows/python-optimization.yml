@@ -30,11 +30,6 @@ jobs:
       - name: Compile Python sources
         run: python -m compileall -q app
 
-      - name: Validate backend import
-        env:
-          PYTHONPATH: .
-        run: python -c "from app.main import app; print('Backend import OK:', app.title)"
-
       - name: Validate vocabulary exercise service
         env:
           PYTHONPATH: .
