@@ -54,7 +54,8 @@
     verbId,
     tenseIds,
     group,
-    construction
+    construction,
+    auxiliary
   }){
     const groups=convertirGrupoFrontend(group);
     const normalizedTenses=Array.isArray(tenseIds)?tenseIds:[tenseIds];
@@ -64,7 +65,8 @@
       limite:20,
       familyId:null,
       verbId:verbId||null,
-      pronominal:convertirPronominalFrontend(construction)
+      pronominal:convertirPronominalFrontend(construction),
+      auxiliary:auxiliary||null
     });
     const questions=adaptarPreguntasBackend(data.questions);
     if(questions.length!==20)
@@ -82,6 +84,7 @@
       tense=document.querySelector('#practiceTense')?.value,
       group=document.querySelector('#practiceGroup')?.value,
       construction=document.querySelector('#practiceConstruction')?.value,
+      auxiliary=document.querySelector('#practiceAuxiliary')?.value,
       msg=document.querySelector('#practiceMessage');
 
     if(!msg)return;
@@ -106,7 +109,8 @@
         verbId:verb||null,
         tenseIds:[tense],
         group,
-        construction
+        construction,
+        auxiliary
       });
 
       session={
