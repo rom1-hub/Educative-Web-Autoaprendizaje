@@ -56,6 +56,26 @@
   let mode = 'learn';
   let activeExercise = 'match';
 
+  const session = {
+    questions: []
+  };
+
+  function getVocabularyAdapter() {
+    const adapter = window.COQ_VOCABULARY_ADAPTER;
+    if (!adapter || typeof adapter.adaptarPreguntaVocabulario !== 'function') {
+      throw new Error('El adaptador de vocabulario no está disponible.');
+    }
+    return adapter;
+  }
+
+  function getVocabularyApi() {
+    const api = window.COQ_API;
+    if (!api || typeof api.generarEjercicioVocabularioDesdeBackend !== 'function') {
+      throw new Error('El cliente API de vocabulario no está disponible.');
+    }
+    return api;
+  }
+
   function escapeHtml(value) {
     return String(value == null ? '' : value).replace(/[&<>'"]/g, (char) => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
@@ -379,6 +399,7 @@
   }
 
   function resetVocabulary() {
+    session.questions = [];
     selectedItem = null;
     mode = 'learn';
     activeExercise = 'match';
@@ -578,8 +599,46 @@
       : `<div class="vocabulary-exercise-feedback wrong" role="status">Incorrecto. Respuesta: <strong>${escapeHtml(answer)}</strong></div>`;
   }
 
-  function renderMatchExercise(entries) {
-    const selected = sampleEntries(entries);
+  async function iniciarSesionPracticaVocabulario(item) {
+    const entries = getEntries(item);
+    if (!item || item.type !== 'subcategory' || !entries.length) {
+      session.questions = [];
+      return [];
+    }
+
+    const limite = Math.min(15, entries.length);
+    const api = getVocabularyApi();
+    const adapter = getVocabularyAdapter();
+
+    try {
+      const questions = await api.generarEjercicioVocabularioDesdeBackend({
+        categoryId: item.parent.id,
+        subcategoryId: item.id,
+        type: 'multiple_choice',
+        limite
+      });
+
+      session.questions = questions.map((question) =>
+        adapter.adaptarPreguntaVocabulario(question)
+      );
+
+      return session.questions;
+    } catch (error) {
+      session.questions = [];
+      practiceContent.innerHTML = `
+        <div class="vocabulary-practice-card">
+          <strong>No se pudo generar el ejercicio.</strong>
+          <p>${escapeHtml(error.message || 'Error desconocido.')}</p>
+        </div>`;
+      console.error('[COQ VOCABULARIO]', error);
+      return [];
+    }
+  }
+
+  function renderMatchExercise(questions) {
+    const selected = Array.isArray(questions) ? questions.slice() : [];
+    if (!selected.length) return;
+
     let index = 0;
     let matched = 0;
 
@@ -590,12 +649,12 @@
       </div>
       <div class="vocabulary-match-single" data-match-board>
         <div class="vocabulary-match-current">
-          <span class="vocabulary-match-label">Français</span>
+          <span class="vocabulary-match-label">Español</span>
           <button type="button" class="vocabulary-match-card vocabulary-match-source" data-current-source disabled></button>
-          <p class="vocabulary-match-instruction">Selecciona su traducción en español.</p>
+          <p class="vocabulary-match-instruction">Selecciona su palabra en francés.</p>
         </div>
         <div class="vocabulary-match-target-panel">
-          <span class="vocabulary-match-label">Español</span>
+          <span class="vocabulary-match-label">Français</span>
           <div class="vocabulary-match-list" data-match-options></div>
         </div>
       </div>`;
@@ -604,25 +663,21 @@
     const options = practiceContent.querySelector('[data-match-options]');
     const progress = practiceContent.querySelector('.vocabulary-match-progress');
 
-    function buildOptions(entry) {
-      const distractors = shuffle(selected.filter((item) => item.id !== entry.id)).slice(0, Math.min(3, selected.length - 1));
-      return shuffle([entry, ...distractors]);
-    }
-
     function showQuestion() {
-      const entry = selected[index];
-      source.innerHTML = displayWord(entry);
-      source.dataset.matchId = entry.id;
-      options.innerHTML = buildOptions(entry).map((option) => `
-        <button type="button" class="vocabulary-match-card vocabulary-match-target" data-match-id="${escapeHtml(option.id)}">
-          ${escapeHtml(option.articleEs || '')} ${escapeHtml(option.translation || '')}
+      const question = selected[index];
+      source.textContent = question.prompt;
+      source.dataset.matchId = question.id;
+
+      options.innerHTML = shuffle(question.options).map((option) => `
+        <button type="button" class="vocabulary-match-card vocabulary-match-target" data-answer="${escapeHtml(option)}">
+          ${escapeHtml(option)}
         </button>`).join('');
 
       options.querySelectorAll('.vocabulary-match-target').forEach((target) => {
         target.addEventListener('click', () => {
           if (target.disabled) return;
 
-          const correct = target.dataset.matchId === entry.id;
+          const correct = normalize(target.dataset.answer) === normalize(question.correctAnswer);
 
           if (correct) {
             target.disabled = true;
@@ -648,6 +703,7 @@
     }
 
     function finish() {
+      session.questions = [];
       practiceContent.querySelector('[data-match-board]').innerHTML = `
         <div class="vocabulary-exercise-final">
           <strong>Ejercicio terminado</strong>
@@ -835,11 +891,12 @@
     bindExerciseNavigation();
   }
 
-  function renderPracticeSubcategory(item) {
+  async function renderPracticeSubcategory(item) {
     if (!item || item.type !== 'subcategory') return;
 
     const entries = getEntries(item);
     if (!entries.length) {
+      session.questions = [];
       exerciseTabs.classList.add('hidden');
       practiceContent.innerHTML = '<div class="vocabulary-practice-card"><strong>Sin vocabulario</strong><p>Esta subcategoría todavía no tiene palabras cargadas.</p></div>';
       return;
@@ -847,10 +904,18 @@
 
     renderExerciseTabs();
 
-    if (activeExercise === 'match') renderMatchExercise(entries);
-    else if (activeExercise === 'write') renderWriteExercise(entries);
+    if (activeExercise === 'match') {
+      practiceContent.innerHTML = '<div class="vocabulary-practice-card"><p>Generando ejercicio…</p></div>';
+      const questions = await iniciarSesionPracticaVocabulario(item);
+      if (questions.length) renderMatchExercise(session.questions);
+      return;
+    }
+
+    session.questions = [];
+
+    if (activeExercise === 'write') renderWriteExercise(entries);
     else if (activeExercise === 'audio') renderAudioExercise(entries);
-    else renderMatchExercise(entries);
+    else renderPracticeSubcategory(item);
   }
 
   function renderPractice(item) {
