@@ -82,7 +82,7 @@ class TenseRule(BaseModel):
 
     id: str
     type: Literal["simple", "composé"]
-    mode: str
+    mode: str | None = None
     auxiliaireTemps: str | None = None
     participe: str | None = None
     order: int = Field(..., ge=0)
