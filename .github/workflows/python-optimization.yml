@@ -35,6 +35,12 @@ jobs:
       - name: Generate canonical verb catalogs
         run: node ../scripts/migrate-verb-data-to-json.js
 
+      - name: Upload generated canonical verb catalogs
+        uses: actions/upload-artifact@v4
+        with:
+          name: canonical-verb-catalogs
+          path: backend/data/verbs/*.json
+
       - name: Compile Python sources
         run: python -m compileall -q app
 
