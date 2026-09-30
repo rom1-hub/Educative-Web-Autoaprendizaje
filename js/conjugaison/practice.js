@@ -1,45 +1,151 @@
 /* COQ — Práctica de conjugación */
 (function(){
   const U=window.COQ_CONJ_UTILS;
-  const P=window.COQ_CONJ_PRONOUNS;
   const dataModel=window.COQ_CONJ_DATA_MODEL;
   const categoryResolver=window.COQ_CATEGORY_RESOLVER;
   const constructionResolver=window.COQ_CONSTRUCTION_RESOLVER;
-  const auxiliaryResolver=window.COQ_AUXILIARY_RESOLVER;
-  const engine=window.COQ_CONJ_ENGINE;
   const C=window.COQ_CONJ_COMPOUND;
   const constructionOptions=window.COQ_CONSTRUCTION_OPTIONS||[];
   const auxiliaryOptions=window.COQ_AUXILIARY_OPTIONS||[];
   const getRecord=v=>dataModel?.get?.(v)||null;
   const compoundTenses=C?.compoundTenses||[];
-  const simpleTenses=C?.simpleTenses||[];
-  const allTenses=C?.allTenses||[];
-  const subjectVariants=P?.subjectVariants||{};
   let session={questions:[],index:0,correct:0,results:[],locked:false};
-  function matchesCategory(v,category){if(!category || category==='all')return true;return !!(categoryResolver&&typeof categoryResolver.matchesCategory==='function'&&categoryResolver.matchesCategory(v,category));}
-  function answerModel(answer){const normalize=U.normalizeAnswerText||function(v){return String(v||'').trim().toLowerCase().replace(/\s+/g,' ');};const accepted=String(answer??'').split(/\s+\/\s+/).map(normalize).filter(Boolean);const unique=[...new Set(accepted)];return {displayAnswer:unique[0]||'',acceptedAnswers:unique};}
-  function pushQuestion(pool,verb,tense,subject,answer){const model=answerModel(answer);if(!model.displayAnswer)return;pool.push({verb,tense,subject,answer:model.displayAnswer,displayAnswer:model.displayAnswer,acceptedAnswers:model.acceptedAnswers});}
-  function practiceSubjectKey(subject){return P.baseSubject(subject)||String(subject||'').trim().toLowerCase();}
-  function practiceVariantKey(subject){return String(subject||'').trim().toLowerCase();}
-  function practiceQuestionKey(q){return [q.verb,q.tense,practiceVariantKey(q.subject),q.displayAnswer||q.answer].join('|');}
-  function selectPracticeQuestions(pool,limit){const unique=[],seen=new Set();U.shuffleArray(pool).forEach(q=>{const key=practiceQuestionKey(q);if(seen.has(key))return;seen.add(key);unique.push(q);});const target=Math.max(0,Number(limit)||0);if(!target||!unique.length)return [];const selected=[];const counts={subject:new Map(),variant:new Map(),tense:new Map(),verb:new Map()};const count=(map,key)=>map.get(key)||0;const increment=(map,key)=>map.set(key,count(map,key)+1);let available=new Set(unique.map((_,index)=>index));let previousKey='';while(selected.length<target){if(!available.size){available=new Set(unique.map((_,index)=>index));if(available.size>1){const previousIndex=unique.findIndex(q=>practiceQuestionKey(q)===previousKey);if(previousIndex>=0)available.delete(previousIndex);}}let bestScore=Infinity,best=[];available.forEach(index=>{const q=unique[index],key=practiceQuestionKey(q);const subject=practiceSubjectKey(q.subject),variant=practiceVariantKey(q.subject),tense=q.tense,verb=q.verb;let score=count(counts.subject,subject)*6+count(counts.variant,variant)*2+count(counts.tense,tense)*4+count(counts.verb,verb);if(key===previousKey)score+=1000;if(selected.length){const last=selected[selected.length-1];if(practiceSubjectKey(last.subject)===subject)score+=100;if(last.tense===tense)score+=12;if(last.verb===verb)score+=4;}if(score<bestScore){bestScore=score;best=[index];}else if(score===bestScore)best.push(index);});const pickIndex=best[Math.floor(Math.random()*best.length)];const pick={...unique[pickIndex]};available.delete(pickIndex);selected.push(pick);previousKey=practiceQuestionKey(pick);increment(counts.subject,practiceSubjectKey(pick.subject));increment(counts.variant,practiceVariantKey(pick.subject));increment(counts.tense,pick.tense);increment(counts.verb,practiceVariantKey(pick.verb));}return selected;}
-  function buildQuestions(verb,tense,category,construction,auxiliary){let pool=[];const add=v=>{const meta=getRecord(v);if(!meta)return;if(!verb&&!matchesCategory(v,category))return;if(!matchesConstruction(v,construction))return;const effectiveAuxiliary=auxiliaryResolver?.resolve?.(meta,constructionResolver);const ts=tense==='Todos los tiempos'?allTenses:[tense];ts.forEach(t=>{const isSimple=simpleTenses.includes(t),isCompound=compoundTenses.includes(t);if(!isSimple&&!isCompound)return;if(!matchesAuxiliary(v,t,auxiliary))return;let rows=(engine&&engine.rowsFor)?engine.rowsFor(v,t):[];if(engine&&engine.rowsForConstruction&&construction){rows=engine.rowsForConstruction(v,t,construction);if(!rows.length)return;}U.expandPracticeRows(rows).forEach(r=>{const baseSubject=P.baseSubject(String(r.subject||'').split(' (')[0].trim());if(isCompound&&effectiveAuxiliary==='être'&&subjectVariants[baseSubject]&&engine&&engine.conjugate){subjectVariants[baseSubject].forEach(subject=>{const answer=engine.conjugate(v,t,subject,construction||((constructionResolver?.isPronominal(meta))?'pronomiale':'non-pronomiale'));if(answer!=null)pushQuestion(pool,v,t,P.subjectForMode(subject,(t==='subjonctif présent'||t==='subjonctif passé')?'subjonctif':'normal',answer),answer);});}else{const answer=(engine&&engine.conjugate)?engine.conjugate(v,t,r.subject,construction||((constructionResolver?.isPronominal(meta))?'pronomiale':'non-pronomiale')):r.answer;const finalAnswer=answer==null?r.answer:answer;if(finalAnswer!=null&&String(finalAnswer).trim()!==''){const displaySubject=isCompound&&effectiveAuxiliary==='avoir'?P.subjectForMode(baseSubject,(t==='subjonctif présent'||t==='subjonctif passé')?'subjonctif':'normal',finalAnswer):formatPracticeSubject(r.subject,t,isCompound,finalAnswer);pushQuestion(pool,v,t,displaySubject,finalAnswer);}}});});};if(verb)add(verb);else Object.keys(dataModel?.records||{}).forEach(add);if(!pool.length)return [];return selectPracticeQuestions(pool,20);}
-  function formatPracticeSubject(subject,tense,isCompound,form){const raw=String(subject||'').trim(),base=P.baseSubject(raw),compound=!!isCompound,isSubjonctif=tense==='subjonctif présent'||tense==='subjonctif passé';const variants=compound?subjectVariants:{};const normalized=P.subjectForMode(raw,isSubjonctif?'subjonctif':'normal',compound?'':form||'');if(isSubjonctif)return normalized;return variants[base]?.includes(raw)?raw:(variants[base]?.[0]&&compound?variants[base][0]:normalized);}
-  function matchesConstruction(v,construction){if(!construction)return true;const meta=getRecord(v)||{};return !!(constructionResolver&&typeof constructionResolver.matchesConstruction==='function'&&constructionResolver.matchesConstruction(meta,construction));}
-  function matchesAuxiliary(v,tense,auxiliary){if(!auxiliary||!compoundTenses.includes(tense))return true;return !!(auxiliaryResolver&&typeof auxiliaryResolver.matches==='function'&&auxiliaryResolver.matches(getRecord(v)||{},tense,auxiliary,compoundTenses,constructionResolver));}
-  function samePracticeAnswer(value,q){const normalize=U.normalizeAnswerText||function(s){return String(s??'').trim().toLocaleLowerCase().replace(/\s+/g,' ');};const input=normalize(value);if(!input)return false;const accepted=Array.isArray(q?.acceptedAnswers)&&q.acceptedAnswers.length?q.acceptedAnswers:[q?.answer];return accepted.map(normalize).filter(Boolean).includes(input);}
-  function adaptarPreguntaBackend(question){const answer=String(question?.correct_answer??'').trim();if(!question?.verb_id||!question?.tense_id||!question?.pronoun||!answer)throw new Error('El servidor devolvió una pregunta incompleta.');return{verb:question.verb_id,infinitif:question.infinitif??question.verb_id,translation:question.translation??null,tense:question.tense_id,group:question.group,auxiliary:question.auxiliary??null,subject:question.pronoun,pronounIndex:question.pronoun_index,answer,displayAnswer:answer,acceptedAnswers:[answer]};}
-  function adaptarPreguntasBackend(questions){if(!Array.isArray(questions))throw new TypeError('El servidor no devolvió una lista de preguntas.');return questions.map(adaptarPreguntaBackend);}
-  function convertirGrupoFrontend(group){if(!group||group==='all')return[1,2,3];if(group==='groupe-1-all')return[1];if(group==='groupe-2-all')return[2];if(group==='groupe-3-all')return[3];const numericGroup=Number(group);if([1,2,3].includes(numericGroup))return[numericGroup];throw new Error('No se pudo interpretar el grupo verbal seleccionado.');}
-  function isBackendSupported(verb,tense,group,construction,auxiliary){return !verb&&!!tense&&tense!=='Todos los tiempos'&&!construction&&!auxiliary&&!!window.COQ_API&&typeof window.COQ_API.generarEjercicioDesdeBackend==='function'&&(()=>{try{convertirGrupoFrontend(group);return true;}catch{return false;}})();}
-  async function generarPreguntasDesdeBackend(tense,group){const groups=convertirGrupoFrontend(group);const data=await window.COQ_API.generarEjercicioDesdeBackend(groups,tense,20,null);const questions=adaptarPreguntasBackend(data.questions);if(questions.length!==20)throw new Error('El servidor no generó las 20 preguntas solicitadas.');return questions;}
+  function convertirGrupoFrontend(group){
+    if(!group||group==='all')return[1,2,3];
+    if(group==='groupe-1-all')return[1];
+    if(group==='groupe-2-all')return[2];
+    if(group==='groupe-3-all')return[3];
+    const numericGroup=Number(group);
+    if([1,2,3].includes(numericGroup))return[numericGroup];
+    throw new Error('No se pudo interpretar el grupo verbal seleccionado.');
+  }
+  function convertirPronominalFrontend(construction){
+    if(construction==='pronomiale')return true;
+    if(construction==='non-pronomiale'||construction==='non-pronomial')return false;
+    return null;
+  }
+  function adaptarPreguntaBackend(question){
+    const answer=String(question?.correct_answer??'').trim();
+    if(!question?.verb_id||!question?.tense_id||!question?.pronoun||!answer)
+      throw new Error('El servidor devolvió una pregunta incompleta.');
+    return{
+      verb:question.verb_id,
+      infinitif:question.infinitif??question.verb_id,
+      translation:question.translation??null,
+      tense:question.tense_id,
+      group:question.group,
+      familyId:question.family_id??null,
+      patternId:question.pattern_id??null,
+      pronominal:question.pronominal===true,
+      auxiliary:question.auxiliary??null,
+      subject:question.pronoun,
+      pronounIndex:question.pronoun_index,
+      answer,
+      displayAnswer:answer,
+      acceptedAnswers:[answer]
+    };
+  }
+  function adaptarPreguntasBackend(questions){
+    if(!Array.isArray(questions))
+      throw new TypeError('El servidor no devolvió una lista de preguntas.');
+    return questions.map(adaptarPreguntaBackend);
+  }
+  async function generarPreguntasDesdeBackend({
+    verbId,
+    tenseIds,
+    group,
+    construction
+  }){
+    const groups=convertirGrupoFrontend(group);
+    const normalizedTenses=Array.isArray(tenseIds)?tenseIds:[tenseIds];
+    const data=await window.COQ_API.generarEjercicioDesdeBackend({
+      grupos:groups,
+      tenseIds:normalizedTenses,
+      limite:20,
+      familyId:null,
+      verbId:verbId||null,
+      pronominal:convertirPronominalFrontend(construction)
+    });
+    const questions=adaptarPreguntasBackend(data.questions);
+    if(questions.length!==20)
+      throw new Error('El servidor no generó las 20 preguntas solicitadas.');
+    return questions;
+  }
   function updatePracticeAuxiliaryOptions(){const tense=document.querySelector('#practiceTense')?.value,verb=U.normalizeVerb(document.querySelector('#practiceVerb')?.value),construction=document.querySelector('#practiceConstruction')?.value,aux=document.querySelector('#practiceAuxiliary'),help=document.querySelector('#practiceAuxiliaryHelp');if(!aux)return;aux.innerHTML='';let disabledReason='';if(verb)disabledReason='Determinado por el verbo seleccionado';else if(construction==='pronomiale')disabledReason='No disponible para los verbos pronominales';else if(!tense||!compoundTenses.includes(tense))disabledReason=tense==='Todos los tiempos'?'Disponible únicamente cuando se selecciona un tiempo compuesto.':'No disponible para un tiempo simple';if(disabledReason){aux.disabled=true;const o=document.createElement('option');o.value='';o.selected=true;o.textContent=disabledReason;aux.appendChild(o);if(help){if(verb)help.textContent='El verbo seleccionado ya determina el verbo auxiliar en Conjugación.';else if(construction==='pronomiale')help.textContent='La construcción pronominal determina el verbo auxiliar en Conjugación.';else help.textContent=tense==='Todos los tiempos'?'Disponible únicamente cuando se selecciona un tiempo compuesto.':'Disponible únicamente con un tiempo compuesto.';}return;}aux.disabled=false;const placeholder=document.createElement('option');placeholder.value='';placeholder.selected=true;placeholder.textContent='- seleccionar -';aux.appendChild(placeholder);auxiliaryOptions.forEach(item=>{const o=document.createElement('option');o.value=U.escapeHtml(item.id);o.textContent=U.escapeHtml(item.label);aux.appendChild(o);});if(help)help.textContent='Este filtro se aplica a todos los tiempos compuestos.';}
   function updatePracticeConstructionOptions(){const construction=document.querySelector('#practiceConstruction'),help=document.querySelector('#practiceConstructionHelp'),verb=U.normalizeVerb(document.querySelector('#practiceVerb')?.value);if(!construction)return;if(verb){const meta=getRecord(verb)||{};const isPronominal=!!(constructionResolver&&typeof constructionResolver.isPronominal==='function'&&constructionResolver.isPronominal(meta));const selectedId=isPronominal?'pronomiale':'non-pronomiale';const selected=constructionOptions.find(item=>item.id===selectedId);const selectedLabel=isPronominal?'Verbos pronominales':'Verbos no pronominales';construction.disabled=true;construction.innerHTML='';const o=document.createElement('option');o.value=selectedId;o.selected=true;o.textContent=selectedLabel;construction.appendChild(o);if(help)help.textContent='Determinada por el verbo seleccionado.';return;}construction.disabled=false;construction.innerHTML='<option value="" selected>-seleccionar-</option>'+constructionOptions.map(item=>'<option value="'+U.escapeHtml(item.id)+'">'+U.escapeHtml(item.label)+'</option>').join('');if(help)help.textContent='Puedes elegir una construcción para afinar el ejercicio.';}
   function updatePracticeGroupState(){const verb=U.normalizeVerb(document.querySelector('#practiceVerb')?.value),group=document.querySelector('#practiceGroup'),help=document.querySelector('#practiceGroupHelp');if(!group)return;if(verb){group.disabled=true;group.innerHTML='<option value="" selected>No necesario: verbo concreto</option>';if(help)help.textContent='';return;}group.disabled=false;const options=categoryResolver&&typeof categoryResolver.categoryOptions==='function'?categoryResolver.categoryOptions():[];const first=options.find(item=>!item.section&&item.id==='all');const sections=[...new Set(options.map(item=>item.section).filter(Boolean))];const optionHtml=item=>'<option value="'+U.escapeHtml(item.id)+'">'+U.escapeHtml(item.label)+'</option>';group.innerHTML=(first?optionHtml(first):'<option value="all">Todos los grupos</option>')+sections.map(section=>'<optgroup label="'+U.escapeHtml(section)+'">'+options.filter(item=>item.section===section).map(optionHtml).join('')+'</optgroup>').join('');const placeholder=document.createElement('option');placeholder.value='';placeholder.selected=true;placeholder.textContent='-seleccionar-';group.insertBefore(placeholder,group.firstChild);if(help)help.textContent='Selecciona una categoría verbal para afinar el ejercicio.';}
   function resetPracticeSession(){session={questions:[],index:0,correct:0,results:[],locked:false};document.querySelector('#practiceSession')?.classList.add('hidden');const input=document.querySelector('#answerInput');if(input){input.value='';input.className='';input.disabled=false;}const feedback=document.querySelector('#practiceFeedback');if(feedback){feedback.className='feedback-box';feedback.textContent='';}const progressText=document.querySelector('#practiceProgressText');if(progressText)progressText.textContent='Pregunta 1 / 20';const progressBar=document.querySelector('#practiceProgressBar');if(progressBar)progressBar.style.width='0%';const criteria=document.querySelector('#practiceCriteria');if(criteria)criteria.textContent='—';}
   function clearPracticeForm(){const verbInput=document.querySelector('#practiceVerb');if(verbInput)verbInput.value='';const tense=document.querySelector('#practiceTense');if(tense){tense.value='';if(tense.options.length)tense.selectedIndex=0;}const group=document.querySelector('#practiceGroup');if(group)group.value='';const construction=document.querySelector('#practiceConstruction');if(construction)construction.value='';const auxiliary=document.querySelector('#practiceAuxiliary');if(auxiliary)auxiliary.value='';const message=document.querySelector('#practiceMessage');if(message){message.className='form-message';message.textContent='';}resetPracticeSession();updatePracticeGroupState();updatePracticeConstructionOptions();updatePracticeAuxiliaryOptions();verbInput?.focus();verbInput?.scrollIntoView({behavior:'smooth',block:'center'});}
   function constructionLabel(id){const option=constructionOptions.find(item=>item.id===id);if(option?.label)return option.label;if(id==='pronomiale')return 'Verbos pronominales';if(id==='non-pronomiale'||id==='non-pronominale')return 'Verbos no pronomiales';return id;}
-  async function startSession(){const verb=U.normalizeVerb(document.querySelector('#practiceVerb')?.value),tense=document.querySelector('#practiceTense')?.value,group=document.querySelector('#practiceGroup')?.value,construction=document.querySelector('#practiceConstruction')?.value,auxiliary=document.querySelector('#practiceAuxiliary')?.value,msg=document.querySelector('#practiceMessage');if(!msg)return;if(!tense){msg.className='form-message error';msg.textContent='Debes seleccionar un tiempo verbal para comenzar la práctica.';return;}if(verb&&!getRecord(verb)){msg.className='form-message error';msg.textContent='Ese verbo no puede resolverse todavía con los patrones disponibles.';return;}let questions;const useBackend=isBackendSupported(verb,tense,group,construction,auxiliary);try{if(useBackend){msg.className='form-message';msg.textContent='Generando el ejercicio…';questions=await generarPreguntasDesdeBackend(tense,group);}else{questions=buildQuestions(verb,tense,group,construction,auxiliary);}}catch(error){console.error('[COQ] Error al generar la sesión:',error);msg.className='form-message error';msg.textContent=error?.message||'No se pudo generar el ejercicio.';return;}if(!Array.isArray(questions)||questions.length<20){msg.className='form-message error';msg.textContent='No hay suficientes preguntas disponibles para crear una sesión de 20 preguntas con esta configuración.';return;}session={questions,index:0,correct:0,results:[],locked:false};msg.className='form-message';msg.textContent='';document.querySelector('#practiceSession')?.classList.remove('hidden');const summaryGroup=({'all':'Todos los verbos','groupe-1-all':'Todos los verbos del primer grupo','groupe-2-all':'Todos los verbos del segundo grupo','groupe-3-all':'Todos los verbos del tercer grupo'}[group]||group||'');const summaryConstruction=constructionLabel(construction);document.querySelector('#practiceCriteria').textContent=[tense,summaryGroup,summaryConstruction,auxiliary||''].filter(Boolean).join(' · ');showQuestion();document.querySelector('#practiceSession')?.scrollIntoView({behavior:'smooth',block:'start'});}
+  async function startSession(){
+    const verb=U.normalizeVerb(document.querySelector('#practiceVerb')?.value),
+      tense=document.querySelector('#practiceTense')?.value,
+      group=document.querySelector('#practiceGroup')?.value,
+      construction=document.querySelector('#practiceConstruction')?.value,
+      msg=document.querySelector('#practiceMessage');
+
+    if(!msg)return;
+
+    if(!tense){
+      msg.className='form-message error';
+      msg.textContent='Debes seleccionar un tiempo verbal para comenzar la práctica.';
+      return;
+    }
+
+    if(verb&&!getRecord(verb)){
+      msg.className='form-message error';
+      msg.textContent='Ese verbo no puede resolverse todavía con los datos disponibles.';
+      return;
+    }
+
+    try{
+      msg.className='form-message';
+      msg.textContent='Generando el ejercicio…';
+
+      const questions=await generarPreguntasDesdeBackend({
+        verbId:verb||null,
+        tenseIds:[tense],
+        group,
+        construction
+      });
+
+      session={
+        questions,
+        index:0,
+        correct:0,
+        results:[],
+        locked:false
+      };
+
+      msg.className='form-message';
+      msg.textContent='';
+      document.querySelector('#practiceSession')?.classList.remove('hidden');
+
+      const summaryGroup=({
+        'all':'Todos los verbos',
+        'groupe-1-all':'Todos los verbos del primer grupo',
+        'groupe-2-all':'Todos los verbos del tercer grupo',
+        'groupe-3-all':'Todos los verbos del tercer grupo'
+      }[group]||group||'');
+      const summaryConstruction=constructionLabel(construction);
+
+      document.querySelector('#practiceCriteria').textContent=[
+        tense,
+        summaryGroup,
+        summaryConstruction
+      ].filter(Boolean).join(' · ');
+
+      showQuestion();
+      document.querySelector('#practiceSession')?.scrollIntoView({
+        behavior:'smooth',
+        block:'start'
+      });
+    }catch(error){
+      console.error('[COQ] Error al generar la sesión:',error);
+      msg.className='form-message error';
+      msg.textContent=error?.message||'No se pudo generar el ejercicio.';
+    }
+  }
   function renderizarPregunta(question){const questionVerb=document.querySelector('#questionVerb'),questionSubject=document.querySelector('#questionSubject');if(questionVerb)questionVerb.textContent=`${question.verb} · ${question.tense}`;if(questionSubject)questionSubject.textContent=question.subject;}
   function showQuestion(){const q=session.questions[session.index];session.locked=false;q.attempts=0;q.firstError='';q.secondError='';q.mustTypeCorrect=false;renderizarPregunta(q);const input=document.querySelector('#answerInput');input.value='';input.className='';input.disabled=false;const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box';fb.textContent='';document.querySelector('#practiceProgressText').textContent=`Pregunta ${session.index+1} / 20`;document.querySelector('#practiceProgressBar').style.width=`${(session.index/20)*100}%`;setTimeout(()=>input.focus(),80);}
   function renderSecondErrorFeedback(q){const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box warn';fb.innerHTML='Respuesta incorrecta.<br>Respuesta correcta: <strong>'+U.escapeHtml(q.displayAnswer||q.answer)+'</strong><br>Escribe la respuesta correcta para continuar.';}
