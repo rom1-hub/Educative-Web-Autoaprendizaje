@@ -112,6 +112,10 @@ class ConjugationRepository:
         except KeyError as exc:
             raise KeyError(f"Verbo no encontrado: {verb_id}") from exc
 
+    def list_verbs(self) -> list[Verb]:
+        """Return all loaded verbs without exposing the backing dictionary."""
+        return list(self.verbs.values())
+
     def get_family(self, family_id: str) -> Family:
         try:
             return self.families[family_id]
