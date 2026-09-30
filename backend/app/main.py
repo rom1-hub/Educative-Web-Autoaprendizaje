@@ -8,10 +8,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.conjugation_engine import ConjugationEngine
 from app.modules.conjugation.exercise_service import ExerciseService
 from app.modules.conjugation.repository import ConjugationRepository
+from app.modules.vocabulary.exercise_service import VocabularyExerciseService
+from app.modules.vocabulary.repository import VocabularyRepository
 
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 VERB_DATA_DIR = BASE_DIR / "data" / "verbs"
+VOCABULARY_DATA_FILE = BASE_DIR / "data" / "vocabulary" / "vocabulary.json"
 
 
 def create_app() -> FastAPI:
@@ -32,6 +35,12 @@ def create_app() -> FastAPI:
     repository.load()
     engine = ConjugationEngine(repository)
     exercise_service = ExerciseService(repository)
+
+    vocabulary_repository = VocabularyRepository(VOCABULARY_DATA_FILE)
+    vocabulary_repository.load()
+    vocabulary_exercise_service = VocabularyExerciseService(
+        vocabulary_repository
+    )
 
     @app.get("/api/verbs/test/{verb_id}")
     def test_verb(verb_id: str, tense_id: str):
@@ -124,6 +133,44 @@ def create_app() -> FastAPI:
             "tense_ids": parsed_tenses,
             "pronominal": pronominal,
             "auxiliary": auxiliary,
+            "limit": limit,
+        }
+
+    @app.get("/api/vocabulary/exercises")
+    def generate_vocabulary_exercises(
+        category_id: str = Query(..., description="ID de la categoría."),
+        subcategory_id: str = Query(..., description="ID de la subcategoría."),
+        type: str = Query(..., description="Tipo de ejercicio."),
+        limit: int = Query(
+            default=10,
+            ge=1,
+            description="Número de preguntas sin repetir ítems.",
+        ),
+    ):
+        try:
+            questions = vocabulary_exercise_service.generate_vocabulary_exercise(
+                category_id=category_id,
+                subcategory_id=subcategory_id,
+                type=type,
+                limit=limit,
+            )
+        except KeyError as exc:
+            raise HTTPException(
+                status_code=404,
+                detail=str(exc),
+            ) from exc
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=400,
+                detail=str(exc),
+            ) from exc
+
+        return {
+            "questions": questions,
+            "count": len(questions),
+            "category_id": category_id,
+            "subcategory_id": subcategory_id,
+            "type": type,
             "limit": limit,
         }
 
