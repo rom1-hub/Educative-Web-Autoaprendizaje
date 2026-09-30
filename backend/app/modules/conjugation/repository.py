@@ -6,18 +6,17 @@ from typing import TypeVar
 
 from pydantic import BaseModel
 
-from app.core.models import Family, Pattern, TenseRule, Verb
+from app.database.models import Family, Pattern, TenseRule, Verb
 
 
 ModelT = TypeVar("ModelT", bound=BaseModel)
 
 
 class ConjugationRepository:
-    """Loads canonical conjugation catalogs and validates their relationships."""
+    """Loads the four canonical conjugation catalogs."""
 
     def __init__(self, data_dir: Path):
         self.data_dir = data_dir
-
         self.verbs: dict[str, Verb] = {}
         self.families: dict[str, Family] = {}
         self.patterns: dict[str, Pattern] = {}
@@ -31,7 +30,6 @@ class ConjugationRepository:
             "tense-rules.json",
             TenseRule,
         )
-
         self._validate_relationships()
 
     def _load_collection(
@@ -40,7 +38,6 @@ class ConjugationRepository:
         model: type[ModelT],
     ) -> dict[str, ModelT]:
         path = self.data_dir / filename
-
         if not path.is_file():
             raise FileNotFoundError(
                 f"No existe el catálogo requerido: {path}"
@@ -62,7 +59,6 @@ class ConjugationRepository:
     def _validate_relationships(self) -> None:
         for verb in self.verbs.values():
             family = self.families.get(verb.familyId)
-
             if family is None:
                 raise ValueError(
                     f"El verbo '{verb.id}' referencia la familia "
@@ -78,7 +74,6 @@ class ConjugationRepository:
                 )
 
             pattern = self.patterns.get(verb.patternId)
-
             if pattern is None:
                 raise ValueError(
                     f"El verbo '{verb.id}' referencia el patrón "
@@ -98,6 +93,19 @@ class ConjugationRepository:
                     f"inexistente '{family.patternId}'."
                 )
 
+        for tense in self.tense_rules.values():
+            if tense.type == "composé":
+                if not tense.auxiliaireTemps:
+                    raise ValueError(
+                        f"El tiempo compuesto '{tense.id}' no declara "
+                        "auxiliaireTemps."
+                    )
+                if not tense.participe:
+                    raise ValueError(
+                        f"El tiempo compuesto '{tense.id}' no declara "
+                        "participe."
+                    )
+
     def get_verb(self, verb_id: str) -> Verb:
         try:
             return self.verbs[verb_id]
@@ -108,22 +116,16 @@ class ConjugationRepository:
         try:
             return self.families[family_id]
         except KeyError as exc:
-            raise KeyError(
-                f"Familia no encontrada: {family_id}"
-            ) from exc
+            raise KeyError(f"Familia no encontrada: {family_id}") from exc
 
     def get_pattern(self, pattern_id: str) -> Pattern:
         try:
             return self.patterns[pattern_id]
         except KeyError as exc:
-            raise KeyError(
-                f"Patrón no encontrado: {pattern_id}"
-            ) from exc
+            raise KeyError(f"Patrón no encontrado: {pattern_id}") from exc
 
     def get_tense_rule(self, tense_id: str) -> TenseRule:
         try:
             return self.tense_rules[tense_id]
         except KeyError as exc:
-            raise KeyError(
-                f"Tiempo no encontrado: {tense_id}"
-            ) from exc
+            raise KeyError(f"Tiempo no encontrado: {tense_id}") from exc
