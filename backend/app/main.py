@@ -12,9 +12,9 @@ from app.modules.vocabulary.exercise_service import VocabularyExerciseService
 from app.modules.vocabulary.repository import VocabularyRepository
 
 
-BASE_DIR = Path(__file__).resolve().parents[2]
-VERB_DATA_DIR = BASE_DIR / "data" / "verbs"
-VOCABULARY_DATA_FILE = BASE_DIR / "data" / "vocabulary" / "vocabulary.json"
+BACKEND_DIR = Path(__file__).resolve().parents[2]
+VERB_DATA_DIR = BACKEND_DIR / "data" / "verbs"
+VOCABULARY_DATA_FILE = BACKEND_DIR / "data" / "vocabulary" / "vocabulary.json"
 
 
 def create_app() -> FastAPI:
