@@ -11,7 +11,8 @@
     limite = 10,
     familyId = null,
     verbId = null,
-    pronominal = null
+    pronominal = null,
+    auxiliary = null
   } = {}) {
     const normalizedGroups = Array.isArray(grupos) ? grupos : [grupos];
     const normalizedTenses = Array.isArray(tenseIds)
@@ -41,6 +42,10 @@
 
     if (typeof pronominal === 'boolean') {
       params.set('pronominal', String(pronominal));
+    }
+
+    if (auxiliary) {
+      params.set('auxiliary', auxiliary);
     }
 
     let response;
