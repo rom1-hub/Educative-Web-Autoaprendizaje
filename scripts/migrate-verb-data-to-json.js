@@ -122,15 +122,6 @@ for (const [key, source] of Object.entries(sourceVerbs)) {
   }
 
   if (
-    source.patternId &&
-    source.patternId !== relation.patternId
-  ) {
-    throw new Error(
-      `Conflicto de patrón en '${infinitif}': verbo='${source.patternId}', familia='${relation.patternId}'.`
-    );
-  }
-
-  if (
     Number.isInteger(source.groupe) &&
     Number.isInteger(sourcePatterns[relation.patternId].groupe) &&
     source.groupe !== sourcePatterns[relation.patternId].groupe
