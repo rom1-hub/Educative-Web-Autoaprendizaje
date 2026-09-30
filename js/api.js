@@ -95,7 +95,73 @@
     return data;
   }
 
+  async function generarEjercicioVocabularioDesdeBackend({
+    categoryId,
+    subcategoryId,
+    type,
+    limite = 10
+  } = {}) {
+    if (!categoryId || !subcategoryId || !type) {
+      throw new Error(
+        'Debes indicar categoría, subcategoría y tipo de ejercicio.'
+      );
+    }
+
+    const params = new URLSearchParams();
+    params.set('category_id', String(categoryId));
+    params.set('subcategory_id', String(subcategoryId));
+    params.set('type', String(type));
+    params.set('limit', String(limite));
+
+    let response;
+
+    try {
+      response = await fetch(
+        `${API_BASE_URL}/api/vocabulary/exercises?${params.toString()}`,
+        {
+          method: 'GET',
+          headers: { Accept: 'application/json' }
+        }
+      );
+    } catch (error) {
+      console.error('[COQ API] Backend de vocabulario no disponible:', error);
+      throw new Error(
+        'No se puede conectar con el servidor de vocabulario. ' +
+        'Comprueba que el backend de COQ esté iniciado.'
+      );
+    }
+
+    let data;
+
+    try {
+      data = await response.json();
+    } catch (error) {
+      console.error('[COQ API] Respuesta de vocabulario inválida:', error);
+      throw new Error(
+        'El servidor de vocabulario devolvió una respuesta no válida.'
+      );
+    }
+
+    if (!response.ok) {
+      const message =
+        data?.detail ||
+        `El servidor rechazó la solicitud de vocabulario (${response.status}).`;
+      console.error('[COQ API]', response.status, message);
+      throw new Error(message);
+    }
+
+    if (!Array.isArray(data?.questions)) {
+      console.error('[COQ API] Contrato de vocabulario inesperado:', data);
+      throw new Error(
+        'El servidor no devolvió un conjunto de preguntas de vocabulario válido.'
+      );
+    }
+
+    return data.questions;
+  }
+
   window.COQ_API = Object.freeze({
-    generarEjercicioDesdeBackend
+    generarEjercicioDesdeBackend,
+    generarEjercicioVocabularioDesdeBackend
   });
 })();
