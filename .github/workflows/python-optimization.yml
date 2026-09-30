@@ -1,0 +1,70 @@
+name: Python optimization validation
+
+on:
+  push:
+    branches:
+      - python-optimizacion
+  pull_request:
+    branches:
+      - python-optimizacion
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install backend dependencies
+        run: python -m pip install --upgrade pip && python -m pip install fastapi pydantic
+
+      - name: Compile Python sources
+        run: python -m compileall -q app
+
+      - name: Validate backend import
+        env:
+          PYTHONPATH: .
+        run: python -c "from app.main import app; print('Backend import OK:', app.title)"
+
+      - name: Validate vocabulary exercise service
+        env:
+          PYTHONPATH: .
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          from app.modules.vocabulary.exercise_service import VocabularyExerciseService
+          from app.modules.vocabulary.repository import VocabularyRepository
+
+          repository = VocabularyRepository(
+              Path("data/vocabulary/vocabulary.json")
+          )
+          repository.load()
+
+          service = VocabularyExerciseService(repository)
+          questions = service.generate_vocabulary_exercise(
+              category_id="animales",
+              subcategory_id="animales-domesticos",
+              type="multiple_choice",
+              limit=5,
+          )
+
+          assert len(questions) == 5
+          assert all(len(question["options"]) == 4 for question in questions)
+          assert all(
+              question["correct_answer"] in question["options"]
+              for question in questions
+          )
+          assert len({question["item_id"] for question in questions}) == 5
+
+          print("Vocabulary exercise validation OK")
+          PY
