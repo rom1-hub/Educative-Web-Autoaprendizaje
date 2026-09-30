@@ -915,7 +915,7 @@
 
     if (activeExercise === 'write') renderWriteExercise(entries);
     else if (activeExercise === 'audio') renderAudioExercise(entries);
-    else renderPracticeSubcategory(item);
+    else renderMatchExercise(session.questions);
   }
 
   function renderPractice(item) {
