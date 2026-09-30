@@ -12,7 +12,7 @@ from app.modules.vocabulary.exercise_service import VocabularyExerciseService
 from app.modules.vocabulary.repository import VocabularyRepository
 
 
-BACKEND_DIR = Path(__file__).resolve().parents[2]
+BACKEND_DIR = Path(__file__).resolve().parents[1]
 VERB_DATA_DIR = BACKEND_DIR / "data" / "verbs"
 VOCABULARY_DATA_FILE = BACKEND_DIR / "data" / "vocabulary" / "vocabulary.json"
 
