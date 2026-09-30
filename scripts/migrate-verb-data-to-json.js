@@ -105,6 +105,7 @@ for (const [familyId, family] of Object.entries(sourceFamilies)) {
 
 const verbs = {};
 const missingFamily = [];
+const groupMismatches = [];
 
 for (const [key, source] of Object.entries(sourceVerbs)) {
   const infinitif = source.infinitif || key;
@@ -121,21 +122,25 @@ for (const [key, source] of Object.entries(sourceVerbs)) {
     );
   }
 
+  const canonicalGroup = sourcePatterns[relation.patternId].groupe;
+
   if (
     Number.isInteger(source.groupe) &&
-    Number.isInteger(sourcePatterns[relation.patternId].groupe) &&
-    source.groupe !== sourcePatterns[relation.patternId].groupe
+    Number.isInteger(canonicalGroup) &&
+    source.groupe !== canonicalGroup
   ) {
-    throw new Error(
-      `Conflicto de grupo en '${infinitif}': verbo=${source.groupe}, patrón=${sourcePatterns[relation.patternId].groupe}.`
-    );
+    groupMismatches.push({
+      infinitif,
+      source: source.groupe,
+      canonical: canonicalGroup,
+    });
   }
 
   verbs[source.id || key] = {
     id: source.id || key,
     infinitif,
     infinitif_base: source.infinitif_base || source.verbeBase || infinitif,
-    groupe: source.groupe,
+    groupe: canonicalGroup,
     familyId: relation.familyId,
     patternId: relation.patternId,
     sub_category: source.sub_category ?? null,
@@ -215,6 +220,7 @@ console.log(
       families: Object.keys(families).length,
       patterns: Object.keys(patterns).length,
       tenseRules: Object.keys(tenseRules).length,
+      groupMismatches: groupMismatches.length,
       outputDir: OUTPUT_DIR,
     },
     null,
