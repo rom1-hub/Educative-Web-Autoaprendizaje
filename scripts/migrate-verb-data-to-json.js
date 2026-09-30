@@ -167,14 +167,8 @@ for (const [key, source] of Object.entries(sourceVerbs)) {
 }
 
 if (missingFamily.length) {
-  throw new Error(
-    [
-      `Hay ${missingFamily.length} verbos sin familia explícita en family-catalog.js.`,
-      ...missingFamily.slice(0, 50).map((verb) => `- ${verb}`),
-      missingFamily.length > 50
-        ? `- ... y ${missingFamily.length - 50} más`
-        : '',
-    ].filter(Boolean).join('\n')
+  console.warn(
+    `[COQ] ${missingFamily.length} verbos de la fuente todavía no tienen familia canónica explícita; se mantienen fuera del catálogo backend hasta que exista esa relación.`
   );
 }
 
@@ -221,6 +215,7 @@ console.log(
       patterns: Object.keys(patterns).length,
       tenseRules: Object.keys(tenseRules).length,
       groupMismatches: groupMismatches.length,
+      unmappedSourceVerbs: missingFamily.length,
       outputDir: OUTPUT_DIR,
     },
     null,
