@@ -84,6 +84,10 @@ def create_app() -> FastAPI:
             default=None,
             description="Filtra verbos pronominales (true) o no pronominales (false).",
         ),
+        auxiliary: str | None = Query(
+            default=None,
+            description="Filtra por verbo auxiliar.",
+        ),
         limit: int = Query(
             default=10,
             ge=1,
@@ -102,6 +106,7 @@ def create_app() -> FastAPI:
                 tense_ids=parsed_tenses,
                 verb_id=verb_id,
                 pronominal=pronominal,
+                auxiliary=auxiliary,
                 limit=limit,
             )
         except (KeyError, ValueError) as exc:
@@ -118,6 +123,7 @@ def create_app() -> FastAPI:
             "verb_id": verb_id,
             "tense_ids": parsed_tenses,
             "pronominal": pronominal,
+            "auxiliary": auxiliary,
             "limit": limit,
         }
 
