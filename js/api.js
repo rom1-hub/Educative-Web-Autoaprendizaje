@@ -4,21 +4,43 @@
 
   const API_BASE_URL = 'http://localhost:8000';
 
-  async function generarEjercicioDesdeBackend(
+  async function generarEjercicioDesdeBackend({
     grupos,
-    tenseId,
+    tenseIds,
+    tenseId = null,
     limite = 10,
-    familyId = null
-  ) {
+    familyId = null,
+    verbId = null,
+    pronominal = null
+  } = {}) {
     const normalizedGroups = Array.isArray(grupos) ? grupos : [grupos];
-    const params = new URLSearchParams();
+    const normalizedTenses = Array.isArray(tenseIds)
+      ? tenseIds
+      : (tenseIds ? [tenseIds] : (tenseId ? [tenseId] : []));
 
+    if (!normalizedGroups.length) {
+      throw new Error('Debes indicar al menos un grupo verbal.');
+    }
+
+    if (!normalizedTenses.length) {
+      throw new Error('Debes indicar al menos un tiempo verbal.');
+    }
+
+    const params = new URLSearchParams();
     params.set('groups', normalizedGroups.join(','));
-    params.set('tense_id', tenseId);
+    params.set('tense_ids', normalizedTenses.join(','));
     params.set('limit', String(limite));
 
     if (familyId) {
       params.set('family_id', familyId);
+    }
+
+    if (verbId) {
+      params.set('verb_id', verbId);
+    }
+
+    if (typeof pronominal === 'boolean') {
+      params.set('pronominal', String(pronominal));
     }
 
     let response;
