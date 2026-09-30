@@ -17,9 +17,20 @@ PRONOUNS: tuple[str, ...] = (
     "ils/elles",
 )
 
+REFLEXIVE_PRONOUNS: dict[str, str] = {
+    "je": "me",
+    "tu": "te",
+    "il/elle": "se",
+    "nous": "nous",
+    "vous": "vous",
+    "ils/elles": "se",
+}
+
+ELISION_VOWELS = frozenset("aeiouyàâäéèêëîïôöùûüÿœæ")
+
 
 class ExerciseService:
-    """Generates balanced random conjugation exercise sets."""
+    """Generates random conjugation exercise sets from the canonical backend data."""
 
     def __init__(self, repository: ConjugationRepository):
         self.repository = repository
@@ -29,129 +40,245 @@ class ExerciseService:
         self,
         groups: list[int],
         family_id: str | None,
-        tense_id: str,
+        tense_ids: list[str],
+        verb_id: str | None = None,
+        pronominal: bool | None = None,
         limit: int = 10,
     ) -> list[dict[str, Any]]:
-        self._validate_inputs(groups=groups, limit=limit)
+        self._validate_inputs(
+            groups=groups,
+            tense_ids=tense_ids,
+            limit=limit,
+        )
 
         normalized_groups = list(dict.fromkeys(groups))
-        candidates_by_group = self._get_candidates_by_group(
+        normalized_tenses = list(dict.fromkeys(tense_ids))
+        for tense_id in normalized_tenses:
+            self.repository.get_tense_rule(tense_id)
+
+        candidates = self._get_candidates(
             groups=normalized_groups,
             family_id=family_id,
+            verb_id=verb_id,
+            pronominal=pronominal,
         )
 
-        total_available = sum(
-            len(candidates)
-            for candidates in candidates_by_group.values()
-        )
-        if total_available < limit:
-            raise ValueError(
-                f"No hay suficientes verbos disponibles para generar "
-                f"{limit} preguntas. Disponibles: {total_available}."
+        if verb_id is not None:
+            return self._generate_for_specific_verb(
+                verb=candidates[0],
+                tense_ids=normalized_tenses,
+                limit=limit,
             )
 
-        selected_verbs = self._select_balanced(
-            candidates_by_group=candidates_by_group,
+        if len(candidates) < limit:
+            raise ValueError(
+                f"No hay suficientes verbos disponibles para generar "
+                f"{limit} preguntas. Disponibles: {len(candidates)}."
+            )
+
+        selected_verbs = candidates[:]
+        random.shuffle(selected_verbs)
+        selected_verbs = selected_verbs[:limit]
+
+        assigned_tenses = self._distribute_tenses(
+            tense_ids=normalized_tenses,
+            limit=limit,
+        )
+
+        questions = [
+            self._build_question(
+                verb=verb,
+                tense_id=tense_id,
+            )
+            for verb, tense_id in zip(selected_verbs, assigned_tenses)
+        ]
+
+        random.shuffle(questions)
+        return questions
+
+    def _generate_for_specific_verb(
+        self,
+        *,
+        verb: Verb,
+        tense_ids: list[str],
+        limit: int,
+    ) -> list[dict[str, Any]]:
+        assigned_tenses = self._distribute_tenses(
+            tense_ids=tense_ids,
             limit=limit,
         )
 
         questions: list[dict[str, Any]] = []
-        for verb in selected_verbs:
-            pronoun_index = random.randrange(len(PRONOUNS))
-            pronoun = PRONOUNS[pronoun_index]
-
-            result = self.engine.conjugate_verb(
-                verb_id=verb.id,
-                tense_id=tense_id,
+        for index, tense_id in enumerate(assigned_tenses):
+            pronoun_index = index % len(PRONOUNS)
+            questions.append(
+                self._build_question(
+                    verb=verb,
+                    tense_id=tense_id,
+                    pronoun_index=pronoun_index,
+                )
             )
-            correct_answer = self._resolve_answer(
-                legacy_forms=result["legacy_forms"],
-                pronoun_index=pronoun_index,
+
+        random.shuffle(questions)
+        return questions
+
+    def _build_question(
+        self,
+        *,
+        verb: Verb,
+        tense_id: str,
+        pronoun_index: int | None = None,
+    ) -> dict[str, Any]:
+        if pronoun_index is None:
+            pronoun_index = random.randrange(len(PRONOUNS))
+
+        pronoun = PRONOUNS[pronoun_index]
+        result = self.engine.conjugate_verb(
+            verb_id=verb.id,
+            tense_id=tense_id,
+        )
+        correct_answer = self._resolve_answer(
+            legacy_forms=result["legacy_forms"],
+            pronoun_index=pronoun_index,
+            pronoun=pronoun,
+        )
+
+        if verb.pronominal:
+            correct_answer = self._add_reflexive_pronoun(
+                conjugated_form=correct_answer,
                 pronoun=pronoun,
             )
 
-            questions.append(
-                {
-                    "verb_id": verb.id,
-                    "infinitif": verb.infinitif,
-                    "translation": self._get_translation(verb),
-                    "group": verb.groupe,
-                    "auxiliary": verb.auxiliaire,
-                    "tense_id": result["tense_rule"].id,
-                    "pronoun_index": pronoun_index,
-                    "pronoun": pronoun,
-                    "correct_answer": correct_answer,
-                }
-            )
+        return {
+            "verb_id": verb.id,
+            "infinitif": verb.infinitif,
+            "translation": self._get_translation(verb),
+            "group": verb.groupe,
+            "family_id": verb.familyId,
+            "pattern_id": verb.patternId,
+            "pronominal": verb.pronominal,
+            "auxiliary": verb.auxiliaire,
+            "tense_id": result["tense_rule"].id,
+            "pronoun_index": pronoun_index,
+            "pronoun": pronoun,
+            "correct_answer": correct_answer,
+        }
 
-        return questions
-
-    def _get_candidates_by_group(
+    def _get_candidates(
         self,
         *,
         groups: list[int],
         family_id: str | None,
-    ) -> dict[int, list[Verb]]:
+        verb_id: str | None,
+        pronominal: bool | None,
+    ) -> list[Verb]:
+        if verb_id is not None:
+            verb = self.repository.get_verb(verb_id)
+            self._validate_verb_filters(
+                verb=verb,
+                groups=groups,
+                family_id=family_id,
+                pronominal=pronominal,
+            )
+            return [verb]
+
         candidates = [
             verb
             for verb in self.repository.list_verbs()
             if verb.groupe in groups
             and (family_id is None or verb.familyId == family_id)
+            and (pronominal is None or verb.pronominal is pronominal)
         ]
 
-        grouped = {group: [] for group in groups}
-        for verb in candidates:
-            grouped[verb.groupe].append(verb)
-
         if not candidates:
-            family_detail = (
-                f" y familia '{family_id}'"
-                if family_id is not None
-                else ""
-            )
+            filters = [f"grupos {groups}"]
+            if family_id is not None:
+                filters.append(f"familia '{family_id}'")
+            if pronominal is not None:
+                filters.append(
+                    "verbos pronominales"
+                    if pronominal
+                    else "verbos no pronominales"
+                )
             raise ValueError(
-                f"No hay verbos disponibles para los grupos "
-                f"{groups}{family_detail}."
+                "No hay verbos disponibles para " + " y ".join(filters) + "."
             )
 
-        return grouped
+        return candidates
 
     @staticmethod
-    def _select_balanced(
+    def _validate_verb_filters(
         *,
-        candidates_by_group: dict[int, list[Verb]],
+        verb: Verb,
+        groups: list[int],
+        family_id: str | None,
+        pronominal: bool | None,
+    ) -> None:
+        if verb.groupe not in groups:
+            raise ValueError(
+                f"El verbo '{verb.id}' pertenece al grupo {verb.groupe} "
+                f"y no coincide con los grupos solicitados {groups}."
+            )
+
+        if family_id is not None and verb.familyId != family_id:
+            raise ValueError(
+                f"El verbo '{verb.id}' pertenece a la familia "
+                f"'{verb.familyId}', no a '{family_id}'."
+            )
+
+        if pronominal is not None and verb.pronominal is not pronominal:
+            expected = "pronominal" if pronominal else "no pronominal"
+            raise ValueError(
+                f"El verbo '{verb.id}' no cumple el filtro '{expected}'."
+            )
+
+    @staticmethod
+    def _distribute_tenses(
+        *,
+        tense_ids: list[str],
         limit: int,
-    ) -> list[Verb]:
-        groups = list(candidates_by_group)
-        for candidates in candidates_by_group.values():
-            random.shuffle(candidates)
+    ) -> list[str]:
+        if not tense_ids:
+            raise ValueError("Debe indicarse al menos un tiempo verbal.")
 
-        base_quota, remainder = divmod(limit, len(groups))
-        quotas = {
-            group: base_quota + (index < remainder)
-            for index, group in enumerate(groups)
-        }
+        base_quota, remainder = divmod(limit, len(tense_ids))
+        assigned: list[str] = []
 
-        selected: list[Verb] = []
-        remaining_slots = 0
+        order = tense_ids[:]
+        random.shuffle(order)
 
-        for group in groups:
-            available = len(candidates_by_group[group])
-            take = min(quotas[group], available)
-            selected.extend(candidates_by_group[group][:take])
-            remaining_slots += quotas[group] - take
+        for index, tense_id in enumerate(order):
+            quota = base_quota + (1 if index < remainder else 0)
+            assigned.extend([tense_id] * quota)
 
-        if remaining_slots:
-            remaining_candidates = [
-                verb
-                for group in groups
-                for verb in candidates_by_group[group][quotas[group]:]
-            ]
-            random.shuffle(remaining_candidates)
-            selected.extend(remaining_candidates[:remaining_slots])
+        random.shuffle(assigned)
+        return assigned
 
-        random.shuffle(selected)
-        return selected
+    @staticmethod
+    def _add_reflexive_pronoun(
+        *,
+        conjugated_form: str,
+        pronoun: str,
+    ) -> str:
+        form = conjugated_form.strip()
+        if not form:
+            raise ValueError("La forma conjugada no puede estar vacía.")
+
+        reflexive = REFLEXIVE_PRONOUNS.get(pronoun)
+        if reflexive is None:
+            raise ValueError(
+                f"No existe pronombre reflexivo para '{pronoun}'."
+            )
+
+        if pronoun == "je" and ExerciseService._starts_with_elision_sound(form):
+            return f"m'{form}"
+
+        return f"{reflexive} {form}"
+
+    @staticmethod
+    def _starts_with_elision_sound(form: str) -> bool:
+        first = form.lstrip().lower()[:1]
+        return bool(first and first in ELISION_VOWELS)
 
     @staticmethod
     def _resolve_answer(
@@ -213,7 +340,12 @@ class ExerciseService:
         return translation if isinstance(translation, str) else None
 
     @staticmethod
-    def _validate_inputs(*, groups: list[int], limit: int) -> None:
+    def _validate_inputs(
+        *,
+        groups: list[int],
+        tense_ids: list[str],
+        limit: int,
+    ) -> None:
         if not groups:
             raise ValueError("Debe indicarse al menos un grupo verbal.")
 
@@ -222,6 +354,9 @@ class ExerciseService:
             raise ValueError(
                 f"Grupos inválidos: {invalid_groups}. Use 1, 2 o 3."
             )
+
+        if not tense_ids:
+            raise ValueError("Debe indicarse al menos un tiempo verbal.")
 
         if limit < 1:
             raise ValueError("El límite debe ser mayor o igual que 1.")
