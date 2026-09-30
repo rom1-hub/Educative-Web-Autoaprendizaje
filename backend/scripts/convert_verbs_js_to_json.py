@@ -194,7 +194,6 @@ def normalize_families(raw: dict[str, Any]) -> dict[str, Any]:
             "id": family["id"],
             "patternId": family["patternId"],
             "groupe": family["groupe"],
-            "verbs": sorted(set(family.get("verbs", []))),
         }
 
     return dict(sorted(result.items(), key=lambda item: item[0].casefold()))
@@ -247,10 +246,6 @@ def validate(verbs, families, patterns, tenses) -> None:
                     f"verb {verb_id}: patternId no coincide con su familia"
                 )
 
-            if verb_id not in family["verbs"]:
-                errors.append(
-                    f"verb {verb_id}: no figura en la familia {verb['familyId']}"
-                )
 
         pattern = patterns.get(verb["patternId"])
 
@@ -311,10 +306,11 @@ def main() -> None:
         extract_assignment_object(tenses_text, "window.COQ_TENSE_RULES")
     )
 
-    families = normalize_families(families)
+    source_families = families
+    families = normalize_families(source_families)
     patterns = normalize_patterns(patterns)
     tenses = normalize_tenses(tenses)
-    verbs = build_verbs(raw_verbs, families)
+    verbs = build_verbs(raw_verbs, source_families)
 
     validate(verbs, families, patterns, tenses)
 
