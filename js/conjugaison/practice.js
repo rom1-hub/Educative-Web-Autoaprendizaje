@@ -136,7 +136,8 @@
       document.querySelector('#practiceCriteria').textContent=[
         tense,
         summaryGroup,
-        summaryConstruction
+        summaryConstruction,
+        auxiliary||''
       ].filter(Boolean).join(' · ');
 
       showQuestion();
