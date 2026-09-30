@@ -68,9 +68,21 @@ def create_app() -> FastAPI:
             default=None,
             description="ID de familia verbal opcional.",
         ),
-        tense_id: str = Query(
-            ...,
-            description="ID del tiempo verbal.",
+        tense_id: str | None = Query(
+            default=None,
+            description="ID de un tiempo verbal. Se mantiene por compatibilidad.",
+        ),
+        tense_ids: str | None = Query(
+            default=None,
+            description="IDs de varios tiempos verbales separados por comas.",
+        ),
+        verb_id: str | None = Query(
+            default=None,
+            description="ID de un verbo concreto.",
+        ),
+        pronominal: bool | None = Query(
+            default=None,
+            description="Filtra verbos pronominales (true) o no pronominales (false).",
         ),
         limit: int = Query(
             default=10,
@@ -80,10 +92,16 @@ def create_app() -> FastAPI:
     ):
         try:
             parsed_groups = _parse_groups(groups)
+            parsed_tenses = _parse_tense_ids(
+                tense_id=tense_id,
+                tense_ids=tense_ids,
+            )
             questions = exercise_service.generate_exercise_set(
                 groups=parsed_groups,
                 family_id=family_id,
-                tense_id=tense_id,
+                tense_ids=parsed_tenses,
+                verb_id=verb_id,
+                pronominal=pronominal,
                 limit=limit,
             )
         except (KeyError, ValueError) as exc:
@@ -97,7 +115,9 @@ def create_app() -> FastAPI:
             "count": len(questions),
             "groups": parsed_groups,
             "family_id": family_id,
-            "tense_id": tense_id,
+            "verb_id": verb_id,
+            "tense_ids": parsed_tenses,
+            "pronominal": pronominal,
             "limit": limit,
         }
 
@@ -125,6 +145,31 @@ def _parse_groups(value: str) -> list[int]:
         raise ValueError("Debe indicarse al menos un grupo verbal.")
 
     return groups
+
+
+def _parse_tense_ids(
+    *,
+    tense_id: str | None,
+    tense_ids: str | None,
+) -> list[str]:
+    values: list[str] = []
+
+    for raw_value in (tense_ids, tense_id):
+        if not raw_value:
+            continue
+        values.extend(
+            item.strip()
+            for item in raw_value.split(",")
+            if item.strip()
+        )
+
+    parsed = list(dict.fromkeys(values))
+    if not parsed:
+        raise ValueError(
+            'Debe indicarse "tense_id" o "tense_ids" con al menos un tiempo verbal.'
+        )
+
+    return parsed
 
 
 app = create_app()
