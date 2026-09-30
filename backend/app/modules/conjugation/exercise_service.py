@@ -26,7 +26,7 @@ REFLEXIVE_PRONOUNS: dict[str, str] = {
     "ils/elles": "se",
 }
 
-ELISION_VOWELS = frozenset("aeiouyàâäéèêëîïôöùûüÿœæ")
+ELISION_INITIALS = frozenset("aeiouyhàâäéèêëîïôöùûüÿœæ")
 
 
 class ExerciseService:
@@ -270,15 +270,16 @@ class ExerciseService:
                 f"No existe pronombre reflexivo para '{pronoun}'."
             )
 
-        if pronoun == "je" and ExerciseService._starts_with_elision_sound(form):
-            return f"m'{form}"
+        if reflexive in {"me", "te", "se"} and ExerciseService._starts_with_elision_sound(form):
+            elided = {"me": "m'", "te": "t'", "se": "s'"}[reflexive]
+            return f"{elided}{form}"
 
         return f"{reflexive} {form}"
 
     @staticmethod
     def _starts_with_elision_sound(form: str) -> bool:
         first = form.lstrip().lower()[:1]
-        return bool(first and first in ELISION_VOWELS)
+        return bool(first and first in ELISION_INITIALS)
 
     @staticmethod
     def _resolve_answer(
