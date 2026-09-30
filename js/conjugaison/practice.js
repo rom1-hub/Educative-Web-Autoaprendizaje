@@ -124,7 +124,7 @@
       const summaryGroup=({
         'all':'Todos los verbos',
         'groupe-1-all':'Todos los verbos del primer grupo',
-        'groupe-2-all':'Todos los verbos del tercer grupo',
+        'groupe-2-all':'Todos los verbos del segundo grupo',
         'groupe-3-all':'Todos los verbos del tercer grupo'
       }[group]||group||'');
       const summaryConstruction=constructionLabel(construction);
