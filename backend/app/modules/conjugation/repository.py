@@ -58,6 +58,16 @@ class ConjugationRepository:
 
     def _validate_relationships(self) -> None:
         for verb in self.verbs.values():
+            # Legacy-regression path: a verb without canonical family/pattern
+            # ownership is valid only when its legacy conjugation block exists.
+            if verb.familyId is None or verb.patternId is None:
+                if not verb.legacy_formes:
+                    raise ValueError(
+                        f"El verbo '{verb.id}' no tiene familia/patrón canónicos "
+                        "y tampoco contiene '_legacy_formes'."
+                    )
+                continue
+
             family = self.families.get(verb.familyId)
             if family is None:
                 raise ValueError(
