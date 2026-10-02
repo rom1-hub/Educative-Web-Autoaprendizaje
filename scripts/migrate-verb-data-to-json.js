@@ -110,39 +110,65 @@ const groupMismatches = [];
 for (const [key, source] of Object.entries(sourceVerbs)) {
   const infinitif = source.infinitif || key;
   const relation = familyByVerb[infinitif];
+  const id = source.id || key;
 
-  if (!relation) {
-    missingFamily.push(infinitif);
-    continue;
-  }
-
-  if (!sourcePatterns[relation.patternId]) {
+  if (!source.formes || typeof source.formes !== 'object') {
     throw new Error(
-      `El verbo '${infinitif}' referencia el patrón inexistente '${relation.patternId}'.`
+      `El verbo '${infinitif}' no contiene un bloque 'formes' válido para la regresión legacy.`
     );
   }
 
-  const canonicalGroup = sourcePatterns[relation.patternId].groupe;
-
-  if (
-    Number.isInteger(source.groupe) &&
-    Number.isInteger(canonicalGroup) &&
-    source.groupe !== canonicalGroup
-  ) {
-    groupMismatches.push({
-      infinitif,
-      source: source.groupe,
-      canonical: canonicalGroup,
-    });
+  if (!Number.isInteger(source.groupe) || ![1, 2, 3].includes(source.groupe)) {
+    throw new Error(
+      `El verbo '${infinitif}' tiene un grupo nativo inválido: '${source.groupe}'.`
+    );
   }
 
-  verbs[source.id || key] = {
-    id: source.id || key,
+  let groupe = source.groupe;
+  let familyId = null;
+  let patternId = null;
+
+  if (relation) {
+    if (!sourcePatterns[relation.patternId]) {
+      throw new Error(
+        `El verbo '${infinitif}' referencia el patrón inexistente '${relation.patternId}'.`
+      );
+    }
+
+    const canonicalGroup = sourcePatterns[relation.patternId].groupe;
+
+    if (
+      Number.isInteger(source.groupe) &&
+      Number.isInteger(canonicalGroup) &&
+      source.groupe !== canonicalGroup
+    ) {
+      groupMismatches.push({
+        infinitif,
+        source: source.groupe,
+        canonical: canonicalGroup,
+      });
+    }
+
+    groupe = canonicalGroup;
+    familyId = relation.familyId;
+    patternId = relation.patternId;
+  } else {
+    missingFamily.push(infinitif);
+  }
+
+  if (verbs[id]) {
+    throw new Error(
+      `ID de verbo duplicado durante la migración: '${id}'.`
+    );
+  }
+
+  verbs[id] = {
+    id,
     infinitif,
     infinitif_base: source.infinitif_base || source.verbeBase || infinitif,
-    groupe: canonicalGroup,
-    familyId: relation.familyId,
-    patternId: relation.patternId,
+    groupe,
+    familyId,
+    patternId,
     sub_category: source.sub_category ?? null,
     auxiliaire: source.auxiliaire ?? null,
     auxiliaires: Array.isArray(source.auxiliaires)
@@ -162,13 +188,13 @@ for (const [key, source] of Object.entries(sourceVerbs)) {
 
     // Transitional regression source. The final Python engine will
     // eventually replace these stored forms.
-    _legacy_formes: source.formes ?? null,
+    _legacy_formes: source.formes,
   };
 }
 
 if (missingFamily.length) {
   console.warn(
-    `[COQ] ${missingFamily.length} verbos de la fuente todavía no tienen familia canónica explícita; se mantienen fuera del catálogo backend hasta que exista esa relación.`
+    `[COQ] ${missingFamily.length} verbos no tienen familia canónica explícita; se incluyen con familyId/patternId=null y sus formas legacy.`
   );
 }
 
