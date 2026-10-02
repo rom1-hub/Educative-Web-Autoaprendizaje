@@ -61,7 +61,7 @@ class ConjugationRepository:
             # Legacy-regression path: a verb without canonical family/pattern
             # ownership is valid only when its legacy conjugation block exists.
             if verb.familyId is None or verb.patternId is None:
-                if not verb.legacy_formes:
+                if verb.legacy_formes is None:
                     raise ValueError(
                         f"El verbo '{verb.id}' no tiene familia/patrón canónicos "
                         "y tampoco contiene '_legacy_formes'."
