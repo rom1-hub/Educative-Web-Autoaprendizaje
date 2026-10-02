@@ -108,6 +108,19 @@ jobs:
           print("7,116-verb legacy fallback validation OK")
           PY
 
+      - name: Audit exercise API contract
+        env:
+          PYTHONPATH: .
+        run: python tests/test_contract_integrity.py
+
+      - name: Upload contract integrity report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-integrity-report
+          path: backend/tests/contract-integrity-report.md
+          if-no-files-found: warn
+
       - name: Validate vocabulary exercise service
         env:
           PYTHONPATH: .
