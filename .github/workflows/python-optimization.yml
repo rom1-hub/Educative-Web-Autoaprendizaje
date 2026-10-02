@@ -69,7 +69,17 @@ jobs:
           assert len(verbs) == 7116, len(verbs)
           assert len(legacy_only) == 7003, len(legacy_only)
           assert all(verb.patternId is None for verb in legacy_only)
-          assert all(verb.legacy_formes for verb in legacy_only)
+          legacy_with_forms = [
+              verb for verb in legacy_only
+              if verb.legacy_formes
+          ]
+          legacy_without_forms = [
+              verb for verb in legacy_only
+              if not verb.legacy_formes
+          ]
+
+          assert len(legacy_with_forms) == 6986
+          assert len(legacy_without_forms) == 17
 
           engine = ConjugationEngine(repository)
           result = engine.conjugate_verb(
