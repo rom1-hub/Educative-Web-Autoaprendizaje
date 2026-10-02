@@ -63,6 +63,7 @@ class ExerciseService:
             verb_id=verb_id,
             pronominal=pronominal,
             auxiliary=auxiliary,
+            tense_ids=normalized_tenses,
         )
 
         if verb_id is not None:
@@ -176,6 +177,7 @@ class ExerciseService:
         verb_id: str | None,
         pronominal: bool | None,
         auxiliary: str | None,
+        tense_ids: list[str],
     ) -> list[Verb]:
         if verb_id is not None:
             verb = self.repository.get_verb(verb_id)
@@ -199,6 +201,7 @@ class ExerciseService:
                 or verb.auxiliaire == auxiliary
                 or auxiliary in verb.auxiliaires
             )
+            and self._supports_tenses(verb=verb, tense_ids=tense_ids)
         ]
 
         if not candidates:
@@ -259,6 +262,18 @@ class ExerciseService:
                 break
 
         return selected
+
+    @staticmethod
+    def _supports_tenses(
+        *,
+        verb: Verb,
+        tense_ids: list[str],
+    ) -> bool:
+        """Keep exercise candidates that the current regression engine can answer."""
+        if verb.legacy_formes is None:
+            return False
+
+        return all(tense_id in verb.legacy_formes for tense_id in tense_ids)
 
     @staticmethod
     def _validate_verb_filters(
