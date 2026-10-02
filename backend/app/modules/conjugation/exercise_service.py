@@ -78,9 +78,11 @@ class ExerciseService:
                 f"{limit} preguntas. Disponibles: {len(candidates)}."
             )
 
-        selected_verbs = candidates[:]
-        random.shuffle(selected_verbs)
-        selected_verbs = selected_verbs[:limit]
+        selected_verbs = self._select_verbs_balanced_by_group(
+            candidates=candidates,
+            groups=normalized_groups,
+            limit=limit,
+        )
 
         assigned_tenses = self._distribute_tenses(
             tense_ids=normalized_tenses,
@@ -216,6 +218,47 @@ class ExerciseService:
             )
 
         return candidates
+
+    @staticmethod
+    def _select_verbs_balanced_by_group(
+        *,
+        candidates: list[Verb],
+        groups: list[int],
+        limit: int,
+    ) -> list[Verb]:
+        """Select a randomized pool while balancing the requested groups.
+
+        The group comes directly from Verb.groupe. No family/pattern inference
+        is used, so legacy-only verbs participate in the same pool as
+        canonical verbs.
+        """
+        pools: dict[int, list[Verb]] = {group: [] for group in groups}
+        for verb in candidates:
+            pools.setdefault(verb.groupe, []).append(verb)
+
+        active_groups = [group for group in groups if pools.get(group)]
+        if not active_groups:
+            return []
+
+        for pool in pools.values():
+            random.shuffle(pool)
+        random.shuffle(active_groups)
+
+        selected: list[Verb] = []
+        while len(selected) < limit:
+            progressed = False
+            for group in active_groups:
+                pool = pools[group]
+                if pool:
+                    selected.append(pool.pop())
+                    progressed = True
+                    if len(selected) == limit:
+                        break
+
+            if not progressed:
+                break
+
+        return selected
 
     @staticmethod
     def _validate_verb_filters(
