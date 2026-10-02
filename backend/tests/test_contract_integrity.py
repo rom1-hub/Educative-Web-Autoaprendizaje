@@ -14,6 +14,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from app.core.conjugation_engine import ConjugationEngine
 from app.modules.conjugation.exercise_service import (
     ELISION_INITIALS,
     PRONOUNS,
@@ -180,6 +181,7 @@ def _find_elision_cases(
     repository: ConjugationRepository,
     service: ExerciseService,
 ) -> list[dict[str, str]]:
+    engine = ConjugationEngine(repository)
     cases: list[dict[str, str]] = []
 
     for verb in repository.list_verbs():
@@ -199,32 +201,52 @@ def _find_elision_cases(
                 limit=6,
             )
 
+            raw = engine.conjugate_verb(
+                verb_id=verb.id,
+                tense_id=tense_id,
+            )
+
             for question in result:
                 pronoun = question["pronoun"]
                 reflexive = REFLEXIVE_PRONOUNS.get(pronoun)
                 if reflexive not in ("me", "te", "se"):
                     continue
 
-                answer = question["correct_answer"]
-                prefix = {"me": "m'", "te": "t'", "se": "s'"}[reflexive]
-                if answer.startswith(prefix):
-                    cases.append(
-                        {
-                            "verb_id": verb.id,
-                            "tense_id": tense_id,
-                            "pronoun": pronoun,
-                            "answer": answer,
-                            "expected_prefix": prefix,
-                        }
-                    )
+                raw_form = service._resolve_answer(
+                    legacy_forms=raw["legacy_forms"],
+                    pronoun_index=question["pronoun_index"],
+                    pronoun=pronoun,
+                )
+                if not raw_form or raw_form[0].lower() not in ELISION_INITIALS:
+                    continue
+
+                expected_prefix = {
+                    "me": "m'",
+                    "te": "t'",
+                    "se": "s'",
+                }[reflexive]
+                expected = f"{expected_prefix}{raw_form}"
+
+                assert question["correct_answer"] == expected, (
+                    f"{verb.id}/{tense_id}/{pronoun}: "
+                    f"esperado={expected!r}, "
+                    f"obtenido={question['correct_answer']!r}"
+                )
+
+                cases.append(
+                    {
+                        "verb_id": verb.id,
+                        "tense_id": tense_id,
+                        "pronoun": pronoun,
+                        "answer": question["correct_answer"],
+                        "expected_prefix": expected_prefix,
+                    }
+                )
 
     if not cases:
         raise AssertionError(
             "No se encontró ningún caso pronominal con elisión para validar."
         )
-
-    for case in cases:
-        assert case["answer"].startswith(case["expected_prefix"]), case
 
     return cases
 
