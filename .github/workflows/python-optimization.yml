@@ -49,6 +49,52 @@ jobs:
           PYTHONPATH: .
         run: python -c "from app.main import app; print('Backend import OK:', app.title)"
 
+      - name: Validate 7,116-verb legacy fallback
+        env:
+          PYTHONPATH: .
+        run: |
+          python - <<'PY'
+          from app.core.conjugation_engine import ConjugationEngine
+          from app.modules.conjugation.exercise_service import ExerciseService
+          from app.modules.conjugation.repository import ConjugationRepository
+
+          repository = ConjugationRepository("data/verbs")
+          repository.load()
+
+          verbs = repository.list_verbs()
+          legacy_only = [verb for verb in verbs if verb.familyId is None]
+
+          assert len(verbs) == 7116, len(verbs)
+          assert len(legacy_only) == 7003, len(legacy_only)
+          assert all(verb.patternId is None for verb in legacy_only)
+          assert all(verb.legacy_formes for verb in legacy_only)
+
+          engine = ConjugationEngine(repository)
+          result = engine.conjugate_verb(
+              verb_id="abaisser",
+              tense_id="présent de l'indicatif",
+          )
+          assert result["source"] == "legacy"
+          assert result["family"] is None
+          assert result["pattern"] is None
+          assert result["legacy_forms"] is not None
+
+          service = ExerciseService(repository)
+          questions = service.generate_exercise_set(
+              groups=[1, 2, 3],
+              family_id=None,
+              tense_ids=["présent de l'indicatif"],
+              limit=30,
+          )
+          assert len(questions) == 30
+          counts = {group: 0 for group in (1, 2, 3)}
+          for question in questions:
+              counts[question["group"]] += 1
+          assert counts == {1: 10, 2: 10, 3: 10}, counts
+
+          print("7,116-verb legacy fallback validation OK")
+          PY
+
       - name: Validate vocabulary exercise service
         env:
           PYTHONPATH: .
