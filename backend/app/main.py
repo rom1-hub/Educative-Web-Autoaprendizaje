@@ -60,8 +60,16 @@ def create_app() -> FastAPI:
                 by_alias=True,
                 exclude={"legacy_formes"},
             ),
-            "family": result["family"].model_dump(),
-            "pattern": result["pattern"].model_dump(),
+            "family": (
+                result["family"].model_dump()
+                if result["family"] is not None
+                else None
+            ),
+            "pattern": (
+                result["pattern"].model_dump()
+                if result["pattern"] is not None
+                else None
+            ),
             "tense_rule": result["tense_rule"].model_dump(),
             "legacy_forms": result["legacy_forms"],
             "source": result["source"],
