@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - python-optimizacion
+      - python-optimización
   pull_request:
     branches:
       - python-optimizacion
