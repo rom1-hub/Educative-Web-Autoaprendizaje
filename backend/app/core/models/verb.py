@@ -21,8 +21,9 @@ class Verb(BaseModel):
     infinitif_base: str
     groupe: int = Field(..., ge=1, le=3)
 
-    familyId: str
-    patternId: str
+    # Optional during the legacy-regression migration path.
+    familyId: str | None = None
+    patternId: str | None = None
 
     sub_category: str | None = None
 
