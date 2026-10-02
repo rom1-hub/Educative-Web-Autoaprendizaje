@@ -54,11 +54,13 @@ jobs:
           PYTHONPATH: .
         run: |
           python - <<'PY'
+          from pathlib import Path
+
           from app.core.conjugation_engine import ConjugationEngine
           from app.modules.conjugation.exercise_service import ExerciseService
           from app.modules.conjugation.repository import ConjugationRepository
 
-          repository = ConjugationRepository("data/verbs")
+          repository = ConjugationRepository(Path("data/verbs"))
           repository.load()
 
           verbs = repository.list_verbs()
