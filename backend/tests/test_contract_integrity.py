@@ -215,6 +215,9 @@ def _find_elision_cases(
             )
 
             for question in result:
+                if tense_id == "impératif présent":
+                    continue
+
                 pronoun = question["pronoun"]
                 reflexive = REFLEXIVE_PRONOUNS.get(pronoun)
                 if reflexive not in ("me", "te", "se"):
