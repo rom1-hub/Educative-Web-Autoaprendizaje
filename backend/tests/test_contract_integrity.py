@@ -197,7 +197,7 @@ def _find_elision_cases(
             continue
 
         for tense_id in TENSES:
-            if not _supports(verb, tense_id):
+            if not _supports(service, verb, tense_id):
                 continue
 
             result = service.generate_exercise_set(
