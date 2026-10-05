@@ -7,17 +7,21 @@
   async function generarEjercicioDesdeBackend({
     grupos,
     tenseIds,
+    tense_ids = null,
     tenseId = null,
     limite = 10,
     familyId = null,
     verbId = null,
+    verb_id = null,
     pronominal = null,
     auxiliary = null
   } = {}) {
     const normalizedGroups = Array.isArray(grupos) ? grupos : [grupos];
-    const normalizedTenses = Array.isArray(tenseIds)
-      ? tenseIds
-      : (tenseIds ? [tenseIds] : (tenseId ? [tenseId] : []));
+    const requestedTenses = tenseIds ?? tense_ids;
+    const normalizedTenses = Array.isArray(requestedTenses)
+      ? requestedTenses
+      : (requestedTenses ? [requestedTenses] : (tenseId ? [tenseId] : []));
+    const normalizedVerbId = verbId ?? verb_id;
 
     if (!normalizedGroups.length) {
       throw new Error('Debes indicar al menos un grupo verbal.');
@@ -36,8 +40,8 @@
       params.set('family_id', familyId);
     }
 
-    if (verbId) {
-      params.set('verb_id', verbId);
+    if (normalizedVerbId) {
+      params.set('verb_id', normalizedVerbId);
     }
 
     if (typeof pronominal === 'boolean') {
