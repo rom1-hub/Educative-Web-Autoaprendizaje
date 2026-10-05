@@ -4,7 +4,11 @@ import random
 from typing import Any
 
 from app.core.conjugation_engine import ConjugationEngine
-from app.core.morphology import ELISION_INITIALS, starts_with_elision_sound
+from app.core.morphology import (
+    ELISION_INITIALS,
+    add_reflexive_pronoun,
+    starts_with_elision_sound,
+)
 from app.database.models import TenseRule, Verb
 from app.modules.conjugation.repository import ConjugationRepository
 
@@ -162,9 +166,10 @@ class ExerciseService:
         )
 
         if verb.pronominal:
-            correct_answer = self._add_reflexive_pronoun(
+            correct_answer = add_reflexive_pronoun(
                 conjugated_form=correct_answer,
                 pronoun=pronoun,
+                tense_id=tense_id,
             )
 
         return {
