@@ -34,7 +34,7 @@
     const groups=convertirGrupoFrontend(group);
     const selectedTenses=Array.isArray(tenseIds)?tenseIds:[tenseIds];
     const normalizedTenses=selectedTenses.flatMap((tenseId)=>
-      tenseId==='Todos los tiempos' ? compoundTenses.slice() : [tenseId]
+      tenseId==='Todos los tiempos' ? (C?.displayOrder||[]).slice() : [tenseId]
     ).filter(Boolean);
     if(!normalizedTenses.length)
       throw new Error('Debes indicar al menos un tiempo verbal.');
