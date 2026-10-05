@@ -32,7 +32,12 @@
     auxiliary
   }){
     const groups=convertirGrupoFrontend(group);
-    const normalizedTenses=Array.isArray(tenseIds)?tenseIds:[tenseIds];
+    const selectedTenses=Array.isArray(tenseIds)?tenseIds:[tenseIds];
+    const normalizedTenses=selectedTenses.flatMap((tenseId)=>
+      tenseId==='Todos los tiempos' ? compoundTenses.slice() : [tenseId]
+    ).filter(Boolean);
+    if(!normalizedTenses.length)
+      throw new Error('Debes indicar al menos un tiempo verbal.');
     const data=await window.COQ_API.generarEjercicioDesdeBackend({
       grupos:groups,
       tenseIds:normalizedTenses,
