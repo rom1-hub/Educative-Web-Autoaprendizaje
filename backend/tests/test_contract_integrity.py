@@ -86,8 +86,16 @@ def _assert_contract(question: dict[str, Any]) -> None:
     assert question["correct_answer"].strip()
 
 
-def _supports(verb: Any, tense_id: str) -> bool:
-    return bool(verb.legacy_formes and tense_id in verb.legacy_formes)
+def _supports(
+    service: ExerciseService,
+    verb: Any,
+    tense_id: str,
+) -> bool:
+    return service._supports_tenses(
+        verb=verb,
+        tense_ids=[tense_id],
+        auxiliary=None,
+    )
 
 
 def _audit_all_tenses(
@@ -142,7 +150,7 @@ def _audit_massive_catalog(
 
     for verb in repository.list_verbs():
         for tense_id in TENSES:
-            if not _supports(verb, tense_id):
+            if not _supports(service, verb, tense_id):
                 skipped += 1
                 continue
 
