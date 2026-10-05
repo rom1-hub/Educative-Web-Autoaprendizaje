@@ -24,32 +24,6 @@
     if(construction==='non-pronomiale'||construction==='non-pronomial')return false;
     return null;
   }
-  function adaptarPreguntaBackend(question){
-    const answer=String(question?.correct_answer??'').trim();
-    if(!question?.verb_id||!question?.tense_id||!question?.pronoun||!answer)
-      throw new Error('El servidor devolvió una pregunta incompleta.');
-    return{
-      verb:question.verb_id,
-      infinitif:question.infinitif??question.verb_id,
-      translation:question.translation??null,
-      tense:question.tense_id,
-      group:question.group,
-      familyId:question.family_id??null,
-      patternId:question.pattern_id??null,
-      pronominal:question.pronominal===true,
-      auxiliary:question.auxiliary??null,
-      subject:question.pronoun,
-      pronounIndex:question.pronoun_index,
-      answer,
-      displayAnswer:answer,
-      acceptedAnswers:[answer]
-    };
-  }
-  function adaptarPreguntasBackend(questions){
-    if(!Array.isArray(questions))
-      throw new TypeError('El servidor no devolvió una lista de preguntas.');
-    return questions.map(adaptarPreguntaBackend);
-  }
   async function generarPreguntasDesdeBackend({
     verbId,
     tenseIds,
@@ -68,7 +42,10 @@
       pronominal:convertirPronominalFrontend(construction),
       auxiliary:auxiliary||null
     });
-    const questions=adaptarPreguntasBackend(data.questions);
+    const adapter=window.COQ_CONJUGATION_ADAPTER;
+    if(!adapter||typeof adapter.adaptarPreguntasConjugation!=='function')
+      throw new Error('El adaptador de conjugación no está disponible.');
+    const questions=adapter.adaptarPreguntasConjugation(data.questions);
     if(questions.length!==20)
       throw new Error('El servidor no generó las 20 preguntas solicitadas.');
     return questions;
@@ -92,12 +69,6 @@
     if(!tense){
       msg.className='form-message error';
       msg.textContent='Debes seleccionar un tiempo verbal para comenzar la práctica.';
-      return;
-    }
-
-    if(verb&&!getRecord(verb)){
-      msg.className='form-message error';
-      msg.textContent='Ese verbo no puede resolverse todavía con los datos disponibles.';
       return;
     }
 
