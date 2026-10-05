@@ -155,6 +155,10 @@ class ExerciseService:
             legacy_forms=result["legacy_forms"],
             pronoun_index=pronoun_index,
             pronoun=pronoun,
+            form_index=self._legacy_form_index(
+                tense_id=tense_id,
+                pronoun_index=pronoun_index,
+            ),
         )
 
         if verb.pronominal:
@@ -422,11 +426,30 @@ class ExerciseService:
         return starts_with_elision_sound(form)
 
     @staticmethod
+    def _legacy_form_index(
+        *,
+        tense_id: str,
+        pronoun_index: int,
+    ) -> int:
+        if tense_id == "impératif présent":
+            mapping = {1: 0, 3: 1, 4: 2}
+            try:
+                return mapping[pronoun_index]
+            except KeyError as exc:
+                raise ValueError(
+                    f"El pronombre '{PRONOUNS[pronoun_index]}' no tiene "
+                    "forma propia en impératif présent."
+                ) from exc
+
+        return pronoun_index
+
+    @staticmethod
     def _resolve_answer(
         *,
         legacy_forms: dict[str, Any] | list[Any] | None,
         pronoun_index: int,
         pronoun: str,
+        form_index: int | None = None,
     ) -> str:
         if legacy_forms is None:
             raise ValueError(
@@ -436,12 +459,13 @@ class ExerciseService:
 
         value: Any
         if isinstance(legacy_forms, list):
-            if pronoun_index >= len(legacy_forms):
+            index = pronoun_index if form_index is None else form_index
+            if index >= len(legacy_forms):
                 raise ValueError(
                     f"No existe la forma para el pronombre '{pronoun}' "
                     "en _legacy_formes."
                 )
-            value = legacy_forms[pronoun_index]
+            value = legacy_forms[index]
         else:
             keys = (
                 pronoun,
