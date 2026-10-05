@@ -4,7 +4,12 @@ import random
 from typing import Any
 
 from app.core.conjugation_engine import ConjugationEngine
-from app.database.models import Verb
+from app.core.morphology import (
+    ELISION_INITIALS,
+    add_reflexive_pronoun,
+    starts_with_elision_sound,
+)
+from app.database.models import TenseRule, Verb
 from app.modules.conjugation.repository import ConjugationRepository
 
 
@@ -26,11 +31,11 @@ REFLEXIVE_PRONOUNS: dict[str, str] = {
     "ils/elles": "se",
 }
 
-ELISION_INITIALS = frozenset("aeiouyhàâäéèêëîïôöùûüÿœæ")
+IMPERATIVE_PRONOUN_INDICES: tuple[int, ...] = (1, 3, 4)
 
 
 class ExerciseService:
-    """Generates random conjugation exercise sets from the canonical backend data."""
+    """Generates exercise sets from canonical data and legacy regression forms."""
 
     def __init__(self, repository: ConjugationRepository):
         self.repository = repository
@@ -70,6 +75,7 @@ class ExerciseService:
             return self._generate_for_specific_verb(
                 verb=candidates[0],
                 tense_ids=normalized_tenses,
+                auxiliary=auxiliary,
                 limit=limit,
             )
 
@@ -94,6 +100,7 @@ class ExerciseService:
             self._build_question(
                 verb=verb,
                 tense_id=tense_id,
+                auxiliary=auxiliary,
             )
             for verb, tense_id in zip(selected_verbs, assigned_tenses)
         ]
@@ -106,21 +113,24 @@ class ExerciseService:
         *,
         verb: Verb,
         tense_ids: list[str],
+        auxiliary: str | None,
         limit: int,
     ) -> list[dict[str, Any]]:
         assigned_tenses = self._distribute_tenses(
             tense_ids=tense_ids,
             limit=limit,
         )
-
         questions: list[dict[str, Any]] = []
+
         for index, tense_id in enumerate(assigned_tenses):
-            pronoun_index = index % len(PRONOUNS)
+            valid_indices = self._valid_pronoun_indices(tense_id)
+            pronoun_index = valid_indices[index % len(valid_indices)]
             questions.append(
                 self._build_question(
                     verb=verb,
                     tense_id=tense_id,
                     pronoun_index=pronoun_index,
+                    auxiliary=auxiliary,
                 )
             )
 
@@ -133,25 +143,33 @@ class ExerciseService:
         verb: Verb,
         tense_id: str,
         pronoun_index: int | None = None,
+        auxiliary: str | None = None,
     ) -> dict[str, Any]:
         if pronoun_index is None:
-            pronoun_index = random.randrange(len(PRONOUNS))
+            valid_indices = self._valid_pronoun_indices(tense_id)
+            pronoun_index = random.choice(valid_indices)
 
         pronoun = PRONOUNS[pronoun_index]
         result = self.engine.conjugate_verb(
             verb_id=verb.id,
             tense_id=tense_id,
+            auxiliary=auxiliary,
         )
         correct_answer = self._resolve_answer(
             legacy_forms=result["legacy_forms"],
             pronoun_index=pronoun_index,
             pronoun=pronoun,
+            form_index=self._legacy_form_index(
+                tense_id=tense_id,
+                pronoun_index=pronoun_index,
+            ),
         )
 
         if verb.pronominal:
-            correct_answer = self._add_reflexive_pronoun(
+            correct_answer = add_reflexive_pronoun(
                 conjugated_form=correct_answer,
                 pronoun=pronoun,
+                tense_id=tense_id,
             )
 
         return {
@@ -162,7 +180,7 @@ class ExerciseService:
             "family_id": verb.familyId,
             "pattern_id": verb.patternId,
             "pronominal": verb.pronominal,
-            "auxiliary": verb.auxiliaire,
+            "auxiliary": auxiliary or verb.auxiliaire,
             "tense_id": result["tense_rule"].id,
             "pronoun_index": pronoun_index,
             "pronoun": pronoun,
@@ -188,6 +206,10 @@ class ExerciseService:
                 pronominal=pronominal,
                 auxiliary=auxiliary,
             )
+            if not self._supports_tenses(verb=verb, tense_ids=tense_ids, auxiliary=auxiliary):
+                raise ValueError(
+                    f"El verbo '{verb.id}' no puede resolver los tiempos solicitados."
+                )
             return [verb]
 
         candidates = [
@@ -201,7 +223,11 @@ class ExerciseService:
                 or verb.auxiliaire == auxiliary
                 or auxiliary in verb.auxiliaires
             )
-            and self._supports_tenses(verb=verb, tense_ids=tense_ids)
+            and self._supports_tenses(
+                verb=verb,
+                tense_ids=tense_ids,
+                auxiliary=auxiliary,
+            )
         ]
 
         if not candidates:
@@ -222,6 +248,64 @@ class ExerciseService:
 
         return candidates
 
+    def _supports_tenses(
+        self,
+        *,
+        verb: Verb,
+        tense_ids: list[str],
+        auxiliary: str | None = None,
+    ) -> bool:
+        if not verb.legacy_formes:
+            return False
+
+        for tense_id in tense_ids:
+            tense_rule = self.repository.get_tense_rule(tense_id)
+
+            if tense_rule.type == "composé":
+                if not isinstance(verb.participePasse, str) or not verb.participePasse.strip():
+                    return False
+
+                auxiliaries = verb.auxiliaires or (
+                    [verb.auxiliaire] if verb.auxiliaire else []
+                )
+                selected = auxiliary or verb.auxiliaire
+                if selected not in auxiliaries:
+                    return False
+
+                auxiliary_verb = self.repository.get_verb(selected)
+                auxiliary_forms = auxiliary_verb.legacy_formes or {}
+                if tense_rule.auxiliaireTemps not in auxiliary_forms:
+                    return False
+
+                if not self._has_usable_forms(auxiliary_forms[tense_rule.auxiliaireTemps]):
+                    return False
+                continue
+
+            if not self._has_usable_forms(verb.legacy_formes.get(tense_id)):
+                return False
+
+        return True
+
+    @staticmethod
+    def _has_usable_forms(forms: Any) -> bool:
+        if isinstance(forms, list):
+            usable = 0
+            for value in forms:
+                try:
+                    ConjugationEngine.extract_answer_form(value)
+                    usable += 1
+                except ValueError:
+                    continue
+            return usable > 0
+
+        if isinstance(forms, dict):
+            return any(
+                isinstance(value, str) and value.strip()
+                for value in forms.values()
+            )
+
+        return False
+
     @staticmethod
     def _select_verbs_balanced_by_group(
         *,
@@ -229,12 +313,6 @@ class ExerciseService:
         groups: list[int],
         limit: int,
     ) -> list[Verb]:
-        """Select a randomized pool while balancing the requested groups.
-
-        The group comes directly from Verb.groupe. No family/pattern inference
-        is used, so legacy-only verbs participate in the same pool as
-        canonical verbs.
-        """
         pools: dict[int, list[Verb]] = {group: [] for group in groups}
         for verb in candidates:
             pools.setdefault(verb.groupe, []).append(verb)
@@ -262,18 +340,6 @@ class ExerciseService:
                 break
 
         return selected
-
-    @staticmethod
-    def _supports_tenses(
-        *,
-        verb: Verb,
-        tense_ids: list[str],
-    ) -> bool:
-        """Keep exercise candidates that the current regression engine can answer."""
-        if verb.legacy_formes is None:
-            return False
-
-        return all(tense_id in verb.legacy_formes for tense_id in tense_ids)
 
     @staticmethod
     def _validate_verb_filters(
@@ -312,6 +378,12 @@ class ExerciseService:
             )
 
     @staticmethod
+    def _valid_pronoun_indices(tense_id: str) -> tuple[int, ...]:
+        if tense_id == "impératif présent":
+            return IMPERATIVE_PRONOUN_INDICES
+        return tuple(range(len(PRONOUNS)))
+
+    @staticmethod
     def _distribute_tenses(
         *,
         tense_ids: list[str],
@@ -322,7 +394,6 @@ class ExerciseService:
 
         base_quota, remainder = divmod(limit, len(tense_ids))
         assigned: list[str] = []
-
         order = tense_ids[:]
         random.shuffle(order)
 
@@ -349,7 +420,7 @@ class ExerciseService:
                 f"No existe pronombre reflexivo para '{pronoun}'."
             )
 
-        if reflexive in {"me", "te", "se"} and ExerciseService._starts_with_elision_sound(form):
+        if reflexive in {"me", "te", "se"} and starts_with_elision_sound(form):
             elided = {"me": "m'", "te": "t'", "se": "s'"}[reflexive]
             return f"{elided}{form}"
 
@@ -357,8 +428,25 @@ class ExerciseService:
 
     @staticmethod
     def _starts_with_elision_sound(form: str) -> bool:
-        first = form.lstrip().lower()[:1]
-        return bool(first and first in ELISION_INITIALS)
+        return starts_with_elision_sound(form)
+
+    @staticmethod
+    def _legacy_form_index(
+        *,
+        tense_id: str,
+        pronoun_index: int,
+    ) -> int:
+        if tense_id == "impératif présent":
+            mapping = {1: 0, 3: 1, 4: 2}
+            try:
+                return mapping[pronoun_index]
+            except KeyError as exc:
+                raise ValueError(
+                    f"El pronombre '{PRONOUNS[pronoun_index]}' no tiene "
+                    "forma propia en impératif présent."
+                ) from exc
+
+        return pronoun_index
 
     @staticmethod
     def _resolve_answer(
@@ -366,6 +454,7 @@ class ExerciseService:
         legacy_forms: dict[str, Any] | list[Any] | None,
         pronoun_index: int,
         pronoun: str,
+        form_index: int | None = None,
     ) -> str:
         if legacy_forms is None:
             raise ValueError(
@@ -375,12 +464,13 @@ class ExerciseService:
 
         value: Any
         if isinstance(legacy_forms, list):
-            if pronoun_index >= len(legacy_forms):
+            index = pronoun_index if form_index is None else form_index
+            if index >= len(legacy_forms):
                 raise ValueError(
                     f"No existe la forma para el pronombre '{pronoun}' "
                     "en _legacy_formes."
                 )
-            value = legacy_forms[pronoun_index]
+            value = legacy_forms[index]
         else:
             keys = (
                 pronoun,
@@ -398,18 +488,12 @@ class ExerciseService:
                     "en _legacy_formes."
                 )
 
-        if isinstance(value, str):
-            return value
-
-        if isinstance(value, dict):
-            for key in ("forme", "form", "value", "conjugaison", "conjugation"):
-                nested = value.get(key)
-                if isinstance(nested, str):
-                    return nested
-
-        raise ValueError(
-            f"Formato de conjugación no soportado para '{pronoun}'."
-        )
+        try:
+            return ConjugationEngine.extract_answer_form(value)
+        except ValueError as exc:
+            raise ValueError(
+                f"Formato de conjugación no soportado para '{pronoun}'."
+            ) from exc
 
     @staticmethod
     def _get_translation(verb: Verb) -> str | None:
