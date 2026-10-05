@@ -77,3 +77,47 @@ def compose_compound_entry(
     subject = extract_subject(auxiliary_entry, default_subject)
     subject = elide_subject(subject, auxiliary_form)
     return [subject, f"{auxiliary_form} {participle.strip()}"]
+
+
+REFLEXIVE_PRONOUNS = {
+    "je": "me",
+    "tu": "te",
+    "il/elle": "se",
+    "nous": "nous",
+    "vous": "vous",
+    "ils/elles": "se",
+}
+
+
+def add_reflexive_pronoun(
+    *,
+    conjugated_form: str,
+    pronoun: str,
+    tense_id: str | None = None,
+) -> str:
+    """Build a pronominal form using French proclitic/elision rules."""
+    form = conjugated_form.strip()
+    if not form:
+        raise ValueError("La forma conjugada no puede estar vacía.")
+
+    reflexive = REFLEXIVE_PRONOUNS.get(pronoun)
+    if reflexive is None:
+        raise ValueError(f"No existe pronombre reflexivo para '{pronoun}'.")
+
+    if tense_id == "impératif présent":
+        suffix = {
+            "tu": "toi",
+            "nous": "nous",
+            "vous": "vous",
+        }.get(pronoun)
+        if suffix is None:
+            raise ValueError(
+                f"El pronombre '{pronoun}' no tiene forma propia en impératif présent."
+            )
+        return f"{form}-{suffix}"
+
+    if reflexive in {"me", "te", "se"} and starts_with_elision_sound(form):
+        elided = {"me": "m'", "te": "t'", "se": "s'"}[reflexive]
+        return f"{elided}{form}"
+
+    return f"{reflexive} {form}"
