@@ -67,6 +67,10 @@ LEGACY_INDEX_BY_PRONOUN: dict[str, int] = {
     "ils/elles": 5,
 }
 
+ALL_SUBJECT_PRONOUNS: frozenset[str] = frozenset(
+    subject.pronoun for subject in (*SIMPLE_SUBJECTS, *COMPOUND_SUBJECTS)
+)
+
 IMPERATIVE_SUBJECTS: tuple[Subject, ...] = tuple(
     subject for subject in SIMPLE_SUBJECTS if subject.pronoun in {"tu", "nous", "vous"}
 )
