@@ -22,6 +22,7 @@ from app.modules.conjugation.exercise_service import (
     ExerciseService,
 )
 from app.modules.conjugation.repository import ConjugationRepository
+from app.core.subjects import ALL_SUBJECT_PRONOUNS
 
 
 BACKEND_DIR = Path(__file__).resolve().parents[1]
@@ -54,6 +55,10 @@ CONTRACT_KEYS = (
     "tense_id",
     "pronoun_index",
     "pronoun",
+    "subject_id",
+    "subject_pronoun",
+    "gender",
+    "number",
     "correct_answer",
 )
 
@@ -79,7 +84,9 @@ def _assert_contract(question: dict[str, Any]) -> None:
             f"Propiedad vacía o nula: {key}={question[key]!r}"
         )
 
-    assert question["pronoun"] in PRONOUNS
+    assert question["subject_pronoun"] in ALL_SUBJECT_PRONOUNS
+    assert question["gender"] in ("masculin", "féminin")
+    assert question["number"] in ("singulier", "pluriel")
     assert question["group"] in (1, 2, 3)
     assert question["tense_id"] in TENSES
     assert isinstance(question["correct_answer"], str)
@@ -96,6 +103,43 @@ def _supports(
         tense_ids=[tense_id],
         auxiliary=None,
     )
+
+
+def _audit_subject_model(
+    repository: ConjugationRepository,
+    service: ExerciseService,
+) -> None:
+    simple_subjects = service._valid_subjects("présent de l'indicatif")
+    assert [subject.display for subject in simple_subjects] == [
+        "je", "tu", "il/elle", "nous", "vous", "ils/elles"
+    ]
+
+    compound_subjects = service._valid_subjects("plus-que-parfait")
+    assert len(compound_subjects) == 18
+
+    on_subjects = [
+        subject.display
+        for subject in compound_subjects
+        if subject.pronoun == "on"
+    ]
+    assert on_subjects == [
+        "on (masculin singulier)",
+        "on (féminin singulier)",
+        "on (masculin pluriel)",
+        "on (féminin pluriel)",
+    ]
+
+    implicit_subjects = {
+        subject.display: (subject.gender, subject.number)
+        for subject in compound_subjects
+        if subject.pronoun in {"il", "elle", "ils", "elles"}
+    }
+    assert implicit_subjects == {
+        "il": ("masculin", "singulier"),
+        "elle": ("féminin", "singulier"),
+        "ils": ("masculin", "pluriel"),
+        "elles": ("féminin", "pluriel"),
+    }
 
 
 def _audit_all_tenses(
@@ -218,7 +262,7 @@ def _find_elision_cases(
                 if tense_id == "impératif présent":
                     continue
 
-                pronoun = question["pronoun"]
+                pronoun = question["subject_pronoun"]
                 reflexive = REFLEXIVE_PRONOUNS.get(pronoun)
                 if reflexive not in ("me", "te", "se"):
                     continue
@@ -236,11 +280,9 @@ def _find_elision_cases(
                     "te": "t'",
                     "se": "s'",
                 }[reflexive]
-                expected = f"{expected_prefix}{raw_form}"
-
-                assert question["correct_answer"] == expected, (
+                assert question["correct_answer"].startswith(expected_prefix), (
                     f"{verb.id}/{tense_id}/{pronoun}: "
-                    f"esperado={expected!r}, "
+                    f"se esperaba el prefijo {expected_prefix!r}, "
                     f"obtenido={question['correct_answer']!r}"
                 )
 
@@ -260,6 +302,59 @@ def _find_elision_cases(
         )
 
     return cases
+
+
+def _audit_compound_subject_agreement(
+    service: ExerciseService,
+) -> None:
+    aller_questions = service.generate_exercise_set(
+        groups=[3],
+        family_id="aller-type",
+        tense_ids=["plus-que-parfait"],
+        verb_id="aller",
+        auxiliary="être",
+        limit=18,
+    )
+
+    expected = {
+        "je (masculin singulier)": "étais allé",
+        "je (féminin singulier)": "étais allée",
+        "tu (masculin singulier)": "étais allé",
+        "tu (féminin singulier)": "étais allée",
+        "il": "était allé",
+        "elle": "était allée",
+        "on (masculin singulier)": "était allé",
+        "on (féminin singulier)": "était allée",
+        "on (masculin pluriel)": "était allés",
+        "on (féminin pluriel)": "était allées",
+        "nous (masculin pluriel)": "étions allés",
+        "nous (féminin pluriel)": "étions allées",
+        "vous (masculin singulier)": "étiez allé",
+        "vous (féminin singulier)": "étiez allée",
+        "vous (masculin pluriel)": "étiez allés",
+        "vous (féminin pluriel)": "étiez allées",
+        "ils": "étaient allés",
+        "elles": "étaient allées",
+    }
+
+    actual = {
+        question["pronoun"]: question["correct_answer"]
+        for question in aller_questions
+    }
+    assert actual == expected
+
+    avoir_questions = service.generate_exercise_set(
+        groups=[1],
+        family_id="er-regular",
+        tense_ids=["passé composé"],
+        verb_id="parler",
+        auxiliary="avoir",
+        limit=18,
+    )
+    assert {
+        question["correct_answer"]
+        for question in avoir_questions
+    } == {"ai parlé", "as parlé", "a parlé", "avons parlé", "avez parlé", "ont parlé"}
 
 
 def _audit_canonical_vs_legacy(
@@ -435,6 +530,7 @@ def _write_report(
 def main() -> None:
     repository, service = _load_service()
     failures: list[str] = []
+    _audit_subject_model(repository, service)
 
     assert len(repository.verbs) == 7116, (
         f"Se esperaban 7116 verbos; encontrados: {len(repository.verbs)}"

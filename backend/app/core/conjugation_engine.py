@@ -3,10 +3,12 @@ from __future__ import annotations
 from typing import Any
 
 from app.core.morphology import (
+    agree_past_participle,
     compose_compound_entry,
     extract_conjugated_form,
 )
 from app.database.models import Family, Pattern, TenseRule, Verb
+from app.core.subjects import Subject
 from app.modules.conjugation.repository import ConjugationRepository
 
 
@@ -171,6 +173,78 @@ class ConjugationEngine:
             )
 
         return result
+
+    def conjugate_subject(
+        self,
+        *,
+        verb_id: str,
+        tense_id: str,
+        subject: Subject,
+        auxiliary: str | None = None,
+    ) -> str:
+        """Resolve one exercise subject without changing the verb data contract."""
+        result = self.conjugate_verb(
+            verb_id=verb_id,
+            tense_id=tense_id,
+            auxiliary=auxiliary,
+        )
+        tense_rule = result["tense_rule"]
+        verb = result["verb"]
+        forms = result["legacy_forms"]
+
+        form_index = self._form_index_for_subject(
+            tense_id=tense_id,
+            subject=subject,
+        )
+
+        if tense_rule.type != "composé":
+            value = forms[form_index]
+            return self.extract_answer_form(value)
+
+        selected_auxiliary = auxiliary or verb.auxiliaire
+        value = forms[form_index]
+        compound_form = self.extract_answer_form(value)
+
+        if selected_auxiliary != "être":
+            return compound_form
+
+        if not isinstance(verb.participePasse, str) or not verb.participePasse.strip():
+            raise ValueError(
+                f"El verbo '{verb.id}' no tiene 'participePasse' válido."
+            )
+
+        auxiliary_verb = self.repository.get_verb(selected_auxiliary)
+        auxiliary_forms = auxiliary_verb.legacy_formes or {}
+        simple_forms = auxiliary_forms.get(tense_rule.auxiliaireTemps or "")
+        if not isinstance(simple_forms, list) or form_index >= len(simple_forms):
+            raise ValueError(
+                f"No existe la forma del auxiliar '{selected_auxiliary}' "
+                f"para el sujeto '{subject.pronoun}'."
+            )
+
+        auxiliary_form = self.extract_answer_form(
+            simple_forms[form_index]
+        )
+        participle = agree_past_participle(
+            verb.participePasse,
+            gender=subject.gender,
+            number=subject.number,
+        )
+        return f"{auxiliary_form} {participle}"
+
+    @staticmethod
+    def _form_index_for_subject(*, tense_id: str, subject: Subject) -> int:
+        """Map pedagogical subjects to the legacy form index for a tense."""
+        if tense_id == "impératif présent":
+            mapping = {"tu": 0, "nous": 1, "vous": 2}
+            try:
+                return mapping[subject.pronoun]
+            except KeyError as exc:
+                raise ValueError(
+                    f"El pronombre '{subject.pronoun}' no tiene forma propia "
+                    "en impératif présent."
+                ) from exc
+        return subject.legacy_index
 
     @staticmethod
     def extract_answer_form(value: Any) -> str:

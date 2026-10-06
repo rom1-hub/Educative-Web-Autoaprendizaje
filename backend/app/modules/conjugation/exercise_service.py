@@ -11,27 +11,29 @@ from app.core.morphology import (
 )
 from app.database.models import TenseRule, Verb
 from app.modules.conjugation.repository import ConjugationRepository
+from app.core.subjects import (
+    SIMPLE_SUBJECTS,
+    Subject,
+    subjects_for_tense,
+)
 
 
-PRONOUNS: tuple[str, ...] = (
-    "je",
-    "tu",
-    "il/elle",
-    "nous",
-    "vous",
-    "ils/elles",
+PRONOUNS: tuple[str, ...] = tuple(
+    subject.pronoun for subject in SIMPLE_SUBJECTS
 )
 
 REFLEXIVE_PRONOUNS: dict[str, str] = {
     "je": "me",
     "tu": "te",
-    "il/elle": "se",
+    "il": "se",
+    "elle": "se",
+    "on": "se",
     "nous": "nous",
     "vous": "vous",
-    "ils/elles": "se",
+    "ils": "se",
+    "elles": "se",
 }
 
-IMPERATIVE_PRONOUN_INDICES: tuple[int, ...] = (1, 3, 4)
 
 
 class ExerciseService:
@@ -123,13 +125,13 @@ class ExerciseService:
         questions: list[dict[str, Any]] = []
 
         for index, tense_id in enumerate(assigned_tenses):
-            valid_indices = self._valid_pronoun_indices(tense_id)
-            pronoun_index = valid_indices[index % len(valid_indices)]
+            subjects = self._valid_subjects(tense_id)
+            subject = subjects[index % len(subjects)]
             questions.append(
                 self._build_question(
                     verb=verb,
                     tense_id=tense_id,
-                    pronoun_index=pronoun_index,
+                    subject=subject,
                     auxiliary=auxiliary,
                 )
             )
@@ -142,35 +144,31 @@ class ExerciseService:
         *,
         verb: Verb,
         tense_id: str,
-        pronoun_index: int | None = None,
+        subject: Subject | None = None,
         auxiliary: str | None = None,
     ) -> dict[str, Any]:
-        if pronoun_index is None:
-            valid_indices = self._valid_pronoun_indices(tense_id)
-            pronoun_index = random.choice(valid_indices)
+        if subject is None:
+            subject = random.choice(self._valid_subjects(tense_id))
 
-        pronoun = PRONOUNS[pronoun_index]
-        result = self.engine.conjugate_verb(
+        correct_answer = self.engine.conjugate_subject(
             verb_id=verb.id,
             tense_id=tense_id,
+            subject=subject,
             auxiliary=auxiliary,
-        )
-        correct_answer = self._resolve_answer(
-            legacy_forms=result["legacy_forms"],
-            pronoun_index=pronoun_index,
-            pronoun=pronoun,
-            form_index=self._legacy_form_index(
-                tense_id=tense_id,
-                pronoun_index=pronoun_index,
-            ),
         )
 
         if verb.pronominal:
             correct_answer = add_reflexive_pronoun(
                 conjugated_form=correct_answer,
-                pronoun=pronoun,
+                pronoun=subject.pronoun,
                 tense_id=tense_id,
             )
+
+        result = self.engine.conjugate_verb(
+            verb_id=verb.id,
+            tense_id=tense_id,
+            auxiliary=auxiliary,
+        )
 
         return {
             "verb_id": verb.id,
@@ -182,8 +180,12 @@ class ExerciseService:
             "pronominal": verb.pronominal,
             "auxiliary": auxiliary or verb.auxiliaire,
             "tense_id": result["tense_rule"].id,
-            "pronoun_index": pronoun_index,
-            "pronoun": pronoun,
+            "pronoun_index": subject.legacy_index,
+            "pronoun": subject.display,
+            "subject_id": subject.id,
+            "subject_pronoun": subject.pronoun,
+            "gender": subject.gender,
+            "number": subject.number,
             "correct_answer": correct_answer,
         }
 
@@ -377,11 +379,9 @@ class ExerciseService:
                 f"El verbo '{verb.id}' no coincide con el auxiliar '{auxiliary}'."
             )
 
-    @staticmethod
-    def _valid_pronoun_indices(tense_id: str) -> tuple[int, ...]:
-        if tense_id == "impératif présent":
-            return IMPERATIVE_PRONOUN_INDICES
-        return tuple(range(len(PRONOUNS)))
+    def _valid_subjects(self, tense_id: str) -> tuple[Subject, ...]:
+        tense_rule = self.repository.get_tense_rule(tense_id)
+        return subjects_for_tense(tense_rule.type, tense_id)
 
     @staticmethod
     def _distribute_tenses(
