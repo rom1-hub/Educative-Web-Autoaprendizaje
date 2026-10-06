@@ -110,11 +110,11 @@ def _audit_subject_model(
 ) -> None:
     simple_subjects = service._valid_subjects("présent de l'indicatif")
     assert [subject.display for subject in simple_subjects] == [
-        "je", "tu", "il", "elle", "on", "nous", "vous", "ils", "elles"
+        "je", "tu", "il/elle", "nous", "vous", "ils/elles"
     ]
 
     compound_subjects = service._valid_subjects("plus-que-parfait")
-    assert len(compound_subjects) == 17
+    assert len(compound_subjects) == 18
 
     on_subjects = [
         subject.display
@@ -123,6 +123,7 @@ def _audit_subject_model(
     ]
     assert on_subjects == [
         "on (masculin singulier)",
+        "on (féminin singulier)",
         "on (masculin pluriel)",
         "on (féminin pluriel)",
     ]
@@ -311,7 +312,7 @@ def _audit_compound_subject_agreement(
         tense_ids=["plus-que-parfait"],
         verb_id="aller",
         auxiliary="être",
-        limit=17,
+        limit=18,
     )
 
     expected = {
@@ -322,6 +323,7 @@ def _audit_compound_subject_agreement(
         "il": "était allé",
         "elle": "était allée",
         "on (masculin singulier)": "était allé",
+        "on (féminin singulier)": "était allée",
         "on (masculin pluriel)": "était allés",
         "on (féminin pluriel)": "était allées",
         "nous (masculin pluriel)": "étions allés",
@@ -346,7 +348,7 @@ def _audit_compound_subject_agreement(
         tense_ids=["passé composé"],
         verb_id="parler",
         auxiliary="avoir",
-        limit=17,
+        limit=18,
     )
     assert {
         question["correct_answer"]
