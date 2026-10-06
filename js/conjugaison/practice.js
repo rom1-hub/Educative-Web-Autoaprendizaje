@@ -131,6 +131,43 @@
   function showQuestion(){const q=session.questions[session.index];session.locked=false;q.attempts=0;q.firstError='';q.secondError='';q.mustTypeCorrect=false;renderizarPregunta(q);const input=document.querySelector('#answerInput');input.value='';input.className='';input.disabled=false;const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box';fb.textContent='';document.querySelector('#practiceProgressText').textContent=`Pregunta ${session.index+1} / 20`;document.querySelector('#practiceProgressBar').style.width=`${(session.index/20)*100}%`;setTimeout(()=>input.focus(),80);}
   function renderSecondErrorFeedback(q){const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box warn';fb.innerHTML='Respuesta incorrecta.<br>Respuesta correcta: <strong>'+U.escapeHtml(q.displayAnswer||q.answer)+'</strong><br>Escribe la respuesta correcta para continuar.';}
   function validateAnswer(){if(session.locked)return;const q=session.questions[session.index],input=document.querySelector('#answerInput'),value=input.value.trim();if(!value)return;if(q.mustTypeCorrect){if(samePracticeAnswer(value,q)){input.className='success';const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box ok';fb.textContent='✓ Correcto. Pasamos a la siguiente pregunta.';session.locked=true;setTimeout(()=>{session.index++;session.index>=20?finishSession():showQuestion()},650);}else{input.className='error-second';renderSecondErrorFeedback(q);input.focus();}return;}q.attempts++;if(samePracticeAnswer(value,q)){input.className='success';if(q.attempts===1)session.correct+=1;else if(q.attempts===2)session.correct+=0.5;let outcome;if(q.attempts===1)outcome='correct-first';else if(q.attempts===2)outcome='correct-after-first-error';else outcome='correct-after-help';session.results.push({question:q,finalAnswer:value,outcome});session.locked=true;const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box ok';fb.textContent=q.attempts===1?'✓ Correcto.':'✓ Correcto en el segundo intento.';setTimeout(()=>{session.index++;session.index>=20?finishSession():showQuestion()},650);return;}input.className='error-first';if(q.attempts===1){q.firstError=value;const fb=document.querySelector('#practiceFeedback');fb.className='feedback-box warn';fb.textContent='Respuesta incorrecta. Corrige tu respuesta e inténtalo de nuevo.';input.focus();return;}q.secondError=value;q.mustTypeCorrect=true;session.results.push({question:q,finalAnswer:'',outcome:'incorrect-twice',firstError:q.firstError,secondError:q.secondError});renderSecondErrorFeedback(q);input.focus();}
+  function selectPracticeQuestions(pool, limit=20){
+    if(!Array.isArray(pool)) throw new TypeError('El pool de práctica debe ser una lista.');
+    const target=Math.max(0,Math.min(Number(limit)||0,pool.length));
+    const unique=[];
+    const seen=new Set();
+    pool.forEach(question=>{
+      if(!question||typeof question!=='object') return;
+      const key=[question.verb,question.tense,question.subject,question.answer].map(value=>String(value??'')).join('|');
+      if(seen.has(key)) return;
+      seen.add(key);
+      unique.push(question);
+    });
+    if(target===0) return [];
+    const remaining=unique.slice();
+    const selected=[];
+    const subjectCounts=new Map();
+    let previousSubject=null;
+    while(selected.length<target&&remaining.length){
+      const minCount=Math.min(...new Set(remaining.map(q=>subjectCounts.get(String(q.subject??''))||0)));
+      let candidates=remaining.filter(q=>{
+        const subject=String(q.subject??'');
+        return (subjectCounts.get(subject)||0)===minCount && subject.toLowerCase()!==String(previousSubject??'').toLowerCase();
+      });
+      if(!candidates.length){
+        candidates=remaining.filter(q=>(subjectCounts.get(String(q.subject??''))||0)===minCount);
+      }
+      const question=candidates[0];
+      const index=remaining.indexOf(question);
+      remaining.splice(index,1);
+      selected.push(question);
+      const subject=String(question.subject??'');
+      subjectCounts.set(subject,(subjectCounts.get(subject)||0)+1);
+      previousSubject=subject;
+    }
+    return selected;
+  }
+
   function finishSession(){document.querySelector('#practiceProgressBar').style.width='100%';const errors=session.results.filter(r=>r.outcome!=='correct-first').length;document.dispatchEvent(new CustomEvent('coq:practice-finished',{detail:{...session,results:session.results,correct:session.results.filter(r=>r.outcome==='correct-first').length,score:session.correct,errors}}));}
   function bind(){document.querySelector('#practiceVerb')?.addEventListener('input',()=>{updatePracticeGroupState();updatePracticeConstructionOptions();updatePracticeAuxiliaryOptions();});document.querySelector('#practiceTense')?.addEventListener('change',updatePracticeAuxiliaryOptions);document.querySelector('#practiceGroup')?.addEventListener('change',updatePracticeAuxiliaryOptions);document.querySelector('#practiceConstruction')?.addEventListener('change',updatePracticeAuxiliaryOptions);document.querySelector('#startPractice')?.addEventListener('click',startSession);document.querySelector('#validateAnswer')?.addEventListener('click',validateAnswer);document.querySelector('#answerInput')?.addEventListener('keydown',e=>{if(e.key==='Enter')validateAnswer();});document.querySelector('#clearVerb')?.addEventListener('click',clearPracticeForm);document.querySelector('#reviewDone')?.addEventListener('click',clearPracticeForm);updatePracticeGroupState();updatePracticeConstructionOptions();updatePracticeAuxiliaryOptions();}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
