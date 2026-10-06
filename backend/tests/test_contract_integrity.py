@@ -54,6 +54,10 @@ CONTRACT_KEYS = (
     "tense_id",
     "pronoun_index",
     "pronoun",
+    "subject_id",
+    "subject_pronoun",
+    "gender",
+    "number",
     "correct_answer",
 )
 
@@ -79,7 +83,9 @@ def _assert_contract(question: dict[str, Any]) -> None:
             f"Propiedad vacía o nula: {key}={question[key]!r}"
         )
 
-    assert question["pronoun"] in PRONOUNS
+    assert question["subject_pronoun"] in PRONOUNS
+    assert question["gender"] in ("masculin", "féminin")
+    assert question["number"] in ("singulier", "pluriel")
     assert question["group"] in (1, 2, 3)
     assert question["tense_id"] in TENSES
     assert isinstance(question["correct_answer"], str)
@@ -96,6 +102,42 @@ def _supports(
         tense_ids=[tense_id],
         auxiliary=None,
     )
+
+
+def _audit_subject_model(
+    repository: ConjugationRepository,
+    service: ExerciseService,
+) -> None:
+    simple_subjects = service._valid_subjects("présent de l'indicatif")
+    assert [subject.display for subject in simple_subjects] == [
+        "je", "tu", "il", "elle", "on", "nous", "vous", "ils", "elles"
+    ]
+
+    compound_subjects = service._valid_subjects("plus-que-parfait")
+    assert len(compound_subjects) == 17
+
+    on_subjects = [
+        subject.display
+        for subject in compound_subjects
+        if subject.pronoun == "on"
+    ]
+    assert on_subjects == [
+        "on (masculin singulier)",
+        "on (masculin pluriel)",
+        "on (féminin pluriel)",
+    ]
+
+    implicit_subjects = {
+        subject.display: (subject.gender, subject.number)
+        for subject in compound_subjects
+        if subject.pronoun in {"il", "elle", "ils", "elles"}
+    }
+    assert implicit_subjects == {
+        "il": ("masculin", "singulier"),
+        "elle": ("féminin", "singulier"),
+        "ils": ("masculin", "pluriel"),
+        "elles": ("féminin", "pluriel"),
+    }
 
 
 def _audit_all_tenses(
@@ -218,7 +260,7 @@ def _find_elision_cases(
                 if tense_id == "impératif présent":
                     continue
 
-                pronoun = question["pronoun"]
+                pronoun = question["subject_pronoun"]
                 reflexive = REFLEXIVE_PRONOUNS.get(pronoun)
                 if reflexive not in ("me", "te", "se"):
                     continue
@@ -435,6 +477,7 @@ def _write_report(
 def main() -> None:
     repository, service = _load_service()
     failures: list[str] = []
+    _audit_subject_model(repository, service)
 
     assert len(repository.verbs) == 7116, (
         f"Se esperaban 7116 verbos; encontrados: {len(repository.verbs)}"
