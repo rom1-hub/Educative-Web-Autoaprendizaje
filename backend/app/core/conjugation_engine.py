@@ -192,12 +192,17 @@ class ConjugationEngine:
         verb = result["verb"]
         forms = result["legacy_forms"]
 
+        form_index = self._form_index_for_subject(
+            tense_id=tense_id,
+            subject=subject,
+        )
+
         if tense_rule.type != "composé":
-            value = forms[subject.legacy_index]
+            value = forms[form_index]
             return self.extract_answer_form(value)
 
         selected_auxiliary = auxiliary or verb.auxiliaire
-        value = forms[subject.legacy_index]
+        value = forms[form_index]
         compound_form = self.extract_answer_form(value)
 
         if selected_auxiliary != "être":
@@ -211,14 +216,14 @@ class ConjugationEngine:
         auxiliary_verb = self.repository.get_verb(selected_auxiliary)
         auxiliary_forms = auxiliary_verb.legacy_formes or {}
         simple_forms = auxiliary_forms.get(tense_rule.auxiliaireTemps or "")
-        if not isinstance(simple_forms, list) or subject.legacy_index >= len(simple_forms):
+        if not isinstance(simple_forms, list) or form_index >= len(simple_forms):
             raise ValueError(
                 f"No existe la forma del auxiliar '{selected_auxiliary}' "
                 f"para el sujeto '{subject.pronoun}'."
             )
 
         auxiliary_form = self.extract_answer_form(
-            simple_forms[subject.legacy_index]
+            simple_forms[form_index]
         )
         participle = agree_past_participle(
             verb.participePasse,
@@ -226,6 +231,20 @@ class ConjugationEngine:
             number=subject.number,
         )
         return f"{auxiliary_form} {participle}"
+
+    @staticmethod
+    def _form_index_for_subject(*, tense_id: str, subject: Subject) -> int:
+        """Map pedagogical subjects to the legacy form index for a tense."""
+        if tense_id == "impératif présent":
+            mapping = {"tu": 0, "nous": 1, "vous": 2}
+            try:
+                return mapping[subject.pronoun]
+            except KeyError as exc:
+                raise ValueError(
+                    f"El pronombre '{subject.pronoun}' no tiene forma propia "
+                    "en impératif présent."
+                ) from exc
+        return subject.legacy_index
 
     @staticmethod
     def extract_answer_form(value: Any) -> str:
