@@ -36,6 +36,23 @@ def elide_subject(subject: str, following_form: str) -> str:
     return replacements.get(normalized_subject.lower(), normalized_subject)
 
 
+def agree_past_participle(
+    participle: str,
+    *,
+    gender: str,
+    number: str,
+) -> str:
+    """Agree a masculine-singular past participle with the exercise subject."""
+    result = participle.strip()
+    if not result:
+        raise ValueError("Le participe passé ne peut pas être vide.")
+    if gender == "féminin" and not result.endswith("e"):
+        result += "e"
+    if number == "pluriel" and not result.endswith("s"):
+        result += "s"
+    return result
+
+
 def extract_conjugated_form(value: Any) -> str:
     """Normalize legacy entries to their conjugated predicate."""
     if isinstance(value, str):
