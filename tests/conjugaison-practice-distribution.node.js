@@ -1,6 +1,7 @@
 const fs=require('fs');
 const vm=require('vm');
 const assert=require('assert');
+// Validation-only run for python-optimizacion.
 
 const context={
   window:{},
