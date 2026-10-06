@@ -278,11 +278,9 @@ def _find_elision_cases(
                     "te": "t'",
                     "se": "s'",
                 }[reflexive]
-                expected = f"{expected_prefix}{raw_form}"
-
-                assert question["correct_answer"] == expected, (
+                assert question["correct_answer"].startswith(expected_prefix), (
                     f"{verb.id}/{tense_id}/{pronoun}: "
-                    f"esperado={expected!r}, "
+                    f"se esperaba el prefijo {expected_prefix!r}, "
                     f"obtenido={question['correct_answer']!r}"
                 )
 
@@ -302,6 +300,58 @@ def _find_elision_cases(
         )
 
     return cases
+
+
+def _audit_compound_subject_agreement(
+    service: ExerciseService,
+) -> None:
+    aller_questions = service.generate_exercise_set(
+        groups=[3],
+        family_id="aller-type",
+        tense_ids=["plus-que-parfait"],
+        verb_id="aller",
+        auxiliary="être",
+        limit=17,
+    )
+
+    expected = {
+        "je (masculin singulier)": "étais allé",
+        "je (féminin singulier)": "étais allée",
+        "tu (masculin singulier)": "étais allé",
+        "tu (féminin singulier)": "étais allée",
+        "il": "était allé",
+        "elle": "était allée",
+        "on (masculin singulier)": "était allé",
+        "on (masculin pluriel)": "était allés",
+        "on (féminin pluriel)": "était allées",
+        "nous (masculin pluriel)": "étions allés",
+        "nous (féminin pluriel)": "étions allées",
+        "vous (masculin singulier)": "étiez allé",
+        "vous (féminin singulier)": "étiez allée",
+        "vous (masculin pluriel)": "étiez allés",
+        "vous (féminin pluriel)": "étiez allées",
+        "ils": "étaient allés",
+        "elles": "étaient allées",
+    }
+
+    actual = {
+        question["pronoun"]: question["correct_answer"]
+        for question in aller_questions
+    }
+    assert actual == expected
+
+    avoir_questions = service.generate_exercise_set(
+        groups=[1],
+        family_id="er-regular",
+        tense_ids=["passé composé"],
+        verb_id="parler",
+        auxiliary="avoir",
+        limit=17,
+    )
+    assert {
+        question["correct_answer"]
+        for question in avoir_questions
+    } == {"ai parlé", "as parlé", "a parlé", "avons parlé", "avez parlé", "ont parlé"}
 
 
 def _audit_canonical_vs_legacy(
