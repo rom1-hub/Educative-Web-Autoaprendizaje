@@ -26,13 +26,10 @@ class Subject:
 SIMPLE_SUBJECTS: tuple[Subject, ...] = (
     Subject("je", "je", "masculin", "singulier", "je"),
     Subject("tu", "tu", "masculin", "singulier", "tu"),
-    Subject("il", "il", "masculin", "singulier", "il"),
-    Subject("elle", "elle", "féminin", "singulier", "elle"),
-    Subject("on", "on", "masculin", "singulier", "on"),
+    Subject("il-elle", "il/elle", "masculin", "singulier", "il/elle"),
     Subject("nous", "nous", "masculin", "pluriel", "nous"),
     Subject("vous", "vous", "masculin", "pluriel", "vous"),
-    Subject("ils", "ils", "masculin", "pluriel", "ils"),
-    Subject("elles", "elles", "féminin", "pluriel", "elles"),
+    Subject("ils-elles", "ils/elles", "masculin", "pluriel", "ils/elles"),
 )
 
 COMPOUND_SUBJECTS: tuple[Subject, ...] = (
@@ -43,6 +40,7 @@ COMPOUND_SUBJECTS: tuple[Subject, ...] = (
     Subject("il", "il", "masculin", "singulier", "il"),
     Subject("elle", "elle", "féminin", "singulier", "elle"),
     Subject("on-masculin-singulier", "on", "masculin", "singulier", "on (masculin singulier)"),
+    Subject("on-feminin-singulier", "on", "féminin", "singulier", "on (féminin singulier)"),
     Subject("on-masculin-pluriel", "on", "masculin", "pluriel", "on (masculin pluriel)"),
     Subject("on-feminin-pluriel", "on", "féminin", "pluriel", "on (féminin pluriel)"),
     Subject("nous-masculin-pluriel", "nous", "masculin", "pluriel", "nous (masculin pluriel)"),
@@ -60,11 +58,13 @@ LEGACY_INDEX_BY_PRONOUN: dict[str, int] = {
     "tu": 1,
     "il": 2,
     "elle": 2,
+    "il/elle": 2,
     "on": 2,
     "nous": 3,
     "vous": 4,
     "ils": 5,
     "elles": 5,
+    "ils/elles": 5,
 }
 
 IMPERATIVE_SUBJECTS: tuple[Subject, ...] = tuple(
