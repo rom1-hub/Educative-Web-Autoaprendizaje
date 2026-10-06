@@ -99,9 +99,14 @@ def compose_compound_entry(
 REFLEXIVE_PRONOUNS = {
     "je": "me",
     "tu": "te",
+    "il": "se",
+    "elle": "se",
+    "on": "se",
     "il/elle": "se",
     "nous": "nous",
     "vous": "vous",
+    "ils": "se",
+    "elles": "se",
     "ils/elles": "se",
 }
 
