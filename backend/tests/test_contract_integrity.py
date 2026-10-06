@@ -22,6 +22,7 @@ from app.modules.conjugation.exercise_service import (
     ExerciseService,
 )
 from app.modules.conjugation.repository import ConjugationRepository
+from app.core.subjects import ALL_SUBJECT_PRONOUNS
 
 
 BACKEND_DIR = Path(__file__).resolve().parents[1]
@@ -83,7 +84,7 @@ def _assert_contract(question: dict[str, Any]) -> None:
             f"Propiedad vacía o nula: {key}={question[key]!r}"
         )
 
-    assert question["subject_pronoun"] in PRONOUNS
+    assert question["subject_pronoun"] in ALL_SUBJECT_PRONOUNS
     assert question["gender"] in ("masculin", "féminin")
     assert question["number"] in ("singulier", "pluriel")
     assert question["group"] in (1, 2, 3)
