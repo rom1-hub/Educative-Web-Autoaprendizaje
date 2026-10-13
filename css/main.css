@@ -1,0 +1,11 @@
+/* ==========================================================
+   COQ — PUNTO DE ENTRADA CSS
+   Orden: tokens → base → layout → componentes → navegación → páginas → utilidades
+   ========================================================== */
+@import url("./tokens.css");
+@import url("./base.css");
+@import url("./layout.css");
+@import url("./components.css");
+@import url("./navigation.css");
+@import url("./pages.css");
+@import url("./utilities.css");

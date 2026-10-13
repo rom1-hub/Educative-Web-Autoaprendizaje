@@ -1,16 +1,77 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Coq — una web interactiva para aprender francés."><title>Coq · Apprendre le français</title><link rel="stylesheet" href="css/styles.css"></head><body>
-<header class="header"><nav class="nav" aria-label="Navegación principal"><a class="logo" href="index.html" aria-label="Coq"><img src="assets/images/coq-logo.jpg" alt="Coq"></a><div class="navlinks"><a class="active" aria-current="page" href="index.html">Inicio</a><div class="nav-item"><button class="nav-button" type="button" aria-haspopup="true" aria-expanded="false">Niveles ▾</button><div class="dropdown"><a href="pages/a1.html">A1</a><a href="#">A2</a><a href="#">B1</a><a href="#">B2</a></div></div><a href="pages/conjugaison.html">Conjugación</a><a href="pages/grammar-possessifs.html">Gramática</a><a href="pages/stage-vocabulario.html">Vocabulario</a><a href="pages/blog.html">Blog</a></div><div class="search-wrap"><label class="search"><span class="search-icon" aria-hidden="true"></span><input id="searchInput" type="search" placeholder="Buscar en Coq…" aria-label="Buscar en Coq"></label><div id="searchResults" class="search-results"></div></div><button class="menu" type="button" aria-label="Abrir menú">☰</button></nav></header>
-<main>
-<section class="hero-home"><div class="container home-grid"><div class="copy"><span class="eyebrow">Une nouvelle façon d'apprendre</span><h1>El francés,<br><span style="color:var(--blue)">a tu manera.</span></h1><p class="lead">Coq es una plataforma web interactiva para aprender francés paso a paso, practicar lo que necesitas y volver directamente a cualquier contenido.</p><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:24px"><a class="btn blue" href="pages/a1.html">Empezar A1 →</a><a class="btn secondary" href="pages/conjugaison.html">Practicar conjugación</a></div></div><div class="home-visual"><span class="hero-orb orb1"></span><span class="hero-orb orb2"></span><span class="hero-orb orb3"></span><img class="logo-hero" src="assets/images/coq-logo.webp" alt="Logotipo de Coq"></div></div></section>
-<section class="section"><div class="container"><div class="section-head"><div><span class="tag">Le parcours</span><h2>Aprende con una ruta. Explora con libertad.</h2></div><p>Los niveles tienen una progresión y unos objetivos claros. Fuera de ellos, puedes buscar directamente gramática, vocabulario, verbos o ejercicios.</p></div><div class="grid4"><a class="card level-card stage-card" href="pages/a1.html"><span class="stage-number">NIVEAU 01</span><h3>A1</h3><p>Primeras competencias y situaciones cotidianas.</p></a><article class="card level-card"><span class="stage-number">NIVEAU 02</span><h3>A2</h3><p>Próximamente.</p></article><article class="card level-card"><span class="stage-number">NIVEAU 03</span><h3>B1</h3><p>Próximamente.</p></article><article class="card level-card"><span class="stage-number">NIVEAU 04</span><h3>B2</h3><p>Próximamente.</p></article></div></div></section>
-<section class="section"><div class="container"><div class="section-head"><div><span class="tag">Explora</span><h2>Contenidos «sueltos»</h2></div><p>No todo tiene que pasar por una unidad. Encuentra y practica un concepto concreto.</p></div><div class="free-tools"><a class="tool-chip" href="pages/grammar-possessifs.html">📖 Gramática</a><a class="tool-chip" href="pages/stage-vocabulario.html">🥖 Vocabulario</a><a class="tool-chip" href="pages/conjugaison.html">🔤 Conjugación</a><a class="tool-chip" href="pages/stage-partitifs.html">✍️ Ejercicios</a><a class="tool-chip" href="pages/stage-vocabulario.html">🔊 Comprensión oral</a></div></div></section>
-<section class="section"><div class="container"><div class="stats"><div class="stat"><strong>A1 → B2</strong><span class="muted">niveles previstos</span></div><div class="stat"><strong>Libre</strong><span class="muted">acceso al contenido</span></div><div class="stat"><strong>20</strong><span class="muted">preguntas por sesión de conjugación</span></div></div></div></section>
-<section class="section"><div class="container"><div class="academy"><span class="eyebrow" style="background:rgba(255,255,255,.12);color:#fff">Créé par École FLE et ELE</span><h2 style="color:#fff;margin-top:15px">¿Quieres aprender francés con un profesor?</h2><p>Coq está creado por École FLE et ELE. Si buscas clases de francés online personalizadas, preparación de exámenes o acompañamiento individual, puedes conocer la academia.</p><a class="btn" href="https://www.ecole-fle-ele.com/" target="_blank" rel="noopener">Conocer École FLE et ELE →</a></div></div></section>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071a3d">
+  <meta name="description" content="Coq: aprende francés a tu ritmo con explicaciones claras, conjugación, gramática, vocabulario y práctica.">
+  <title>Coq — Aprende francés a tu ritmo</title>
+  <link rel="stylesheet" href="css/main.css">
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+<header class="site-header">
+  <div class="container nav">
+    <a class="brand" href="index.html" aria-label="Coq, inicio"><span class="brand-mark" aria-hidden="true"></span><span>Coq</span></a>
+    <button class="menu-toggle" type="button" data-menu-toggle aria-controls="nav-links" aria-expanded="false" aria-label="Abrir menú">☰</button>
+    <nav class="nav-links" id="nav-links" data-nav-links aria-label="Navegación principal">
+      <a href="index.html" aria-current="page">Inicio</a>
+      <a href="conjugacion.html">Conjugación</a>
+      <a href="gramatica.html">Gramática</a>
+      <a href="vocabulario.html">Vocabulario</a>
+    </nav>
+    <div class="nav-actions"><a class="button button-primary" href="conjugacion.html">Empezar a aprender <span aria-hidden="true">↗</span></a></div>
+  </div>
+</header>
+<main id="contenido">
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <span class="eyebrow">Tu plataforma de autoaprendizaje</span>
+        <h1>Aprende francés<br><span class="text-gradient">a tu ritmo.</span></h1>
+        <p class="hero-lead">Conjuga, comprende y amplía tu vocabulario con explicaciones claras y herramientas para practicar de forma autónoma.</p>
+        <div class="hero-actions"><a class="button button-primary" href="conjugacion.html">Comenzar ahora <span aria-hidden="true">→</span></a><a class="button button-secondary" href="#contenidos">Explorar contenidos</a></div>
+        <div class="hero-benefits"><span>Gratis</span><span>Sin presión</span><span>A tu ritmo</span></div>
+      </div>
+      <div class="hero-art" aria-label="Emblema abstracto inspirado en las plumas del gallo de Coq">
+        <div class="hero-orbit" aria-hidden="true"></div><div class="hero-emblem" aria-hidden="true"><strong>Coq</strong><span></span></div>
+      </div>
+    </div>
+  </section>
+  <section class="section" id="contenidos">
+    <div class="container">
+      <div class="section-heading"><div><span class="eyebrow">Explora y aprende</span><h2>Tu francés empieza aquí.</h2></div><p>Ve directamente al tema que necesitas o explora nuevas áreas cuando quieras.</p></div>
+      <div class="grid grid-4">
+        <article class="card learning-card"><div class="card-icon">Aa</div><h3>Conjugación</h3><p>Comprende los tiempos verbales y practica las formas de los verbos franceses.</p><a class="card-link" href="conjugacion.html">Ir a conjugación <span aria-hidden="true">→</span></a></article>
+        <article class="card learning-card"><div class="card-icon red">文</div><h3>Gramática</h3><p>Descubre las reglas del francés con explicaciones estructuradas y ejemplos.</p><a class="card-link" href="gramatica.html">Ir a gramática <span aria-hidden="true">→</span></a></article>
+        <article class="card learning-card"><div class="card-icon orange">Ab</div><h3>Vocabulario</h3><p>Aprende palabras y expresiones organizadas por temas y situaciones reales.</p><a class="card-link" href="vocabulario.html">Ir a vocabulario <span aria-hidden="true">→</span></a></article>
+        <article class="card learning-card"><div class="card-icon violet">✓</div><h3>Práctica</h3><p>Consolida lo aprendido con sesiones breves y objetivos concretos.</p><a class="card-link" href="conjugacion.html">Empezar a practicar <span aria-hidden="true">→</span></a></article>
+      </div>
+    </div>
+  </section>
+  <section class="section method" id="metodo">
+    <div class="container">
+      <span class="eyebrow">Un método sencillo</span><h2>Aprender, paso a paso.</h2><p>Organiza tu estudio como mejor te convenga: elige, comprende, practica y vuelve a repasar.</p>
+      <div class="method-steps">
+        <article class="method-step"><span>01</span><h3>Explora</h3><p>Elige el tema que quieres aprender.</p></article>
+        <article class="method-step"><span>02</span><h3>Comprende</h3><p>Lee explicaciones y ejemplos claros.</p></article>
+        <article class="method-step"><span>03</span><h3>Practica</h3><p>Comprueba cómo aplicas lo aprendido.</p></article>
+        <article class="method-step"><span>04</span><h3>Progresa</h3><p>Refuerza tus conocimientos a tu ritmo.</p></article>
+      </div>
+    </div>
+  </section>
+  <section class="section"><div class="container section-heading"><div><span class="eyebrow">Siempre a tu alcance</span><h2>Elige tu próximo paso.</h2></div><a class="button button-blue" href="conjugacion.html">Explorar la conjugación →</a></div></section>
 </main>
-<footer class="footer" id="footer"><div class="footer-grid"><div><div class="logo"><img src="assets/images/coq-logo.jpg" alt="Coq"></div><p>Apprendre le français · A1 → B2</p><p>Un proyecto creado por École FLE et ELE.</p></div><div><div class="footer-title">Apprendre</div><div class="footer-links"><a href="pages/a1.html">A1</a><a href="#">A2</a><a href="#">B1</a><a href="#">B2</a></div></div><div><div class="footer-title">Pratiquer</div><div class="footer-links"><a href="pages/conjugaison.html">Conjugación</a><a href="pages/grammar-possessifs.html">Gramática</a><a href="pages/stage-vocabulario.html">Vocabulario</a></div></div><div><div class="footer-title">Información</div><div class="footer-links"><a href="#">Aviso legal</a><a href="#">Política de privacidad</a><a href="#">Política de cookies</a><a href="https://www.ecole-fle-ele.com/" target="_blank" rel="noopener">Clases de francés online · École FLE et ELE</a></div></div></div></footer>
-<script src="js/core/navigation.js"></script>
-<script src="js/core/audio.js"></script>
-<script src="js/progress/progress.js"></script>
-<script src="js/exercises/exercise-engine.js"></script>
-<script src="data/verbs/search-index.js"></script>\n<script src="js/search/search.js"></script>
-</body></html>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"></span><span>Coq</span></a><p style="margin-top:1rem;max-width:22rem">Aprender francés a tu ritmo. Comprende, practica y avanza con autonomía.</p></div>
+      <div class="footer-links"><h3>Aprende</h3><a href="conjugacion.html">Conjugación</a><a href="gramatica.html">Gramática</a><a href="vocabulario.html">Vocabulario</a></div>
+      <div class="footer-links"><h3>La plataforma</h3><a href="index.html#metodo">Cómo funciona</a><a href="404.html">Página 404</a></div>
+    </div>
+    <div class="footer-bottom"><span>© Coq · Plataforma de autoaprendizaje de francés</span><span>Aprende. Practica. Progresa.</span></div>
+  </div>
+</footer>
+</body>
+</html>

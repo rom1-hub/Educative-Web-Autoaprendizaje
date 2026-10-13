@@ -1,0 +1,41 @@
+/* ==========================================================
+   COMPONENTES REUTILIZABLES
+   ========================================================== */
+/* -------- BOTONES -------- */
+.button {
+  display: inline-flex; align-items: center; justify-content: center; gap: .65rem;
+  min-height: 3rem; padding: .78rem 1.2rem; border: 1px solid transparent;
+  border-radius: var(--radius-pill); cursor: pointer; font-size: .92rem;
+  font-weight: 750; transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast), background var(--duration-fast);
+}
+.button:hover { transform: translateY(-2px); }
+.button-primary { color: white; background: var(--gradient-brand); box-shadow: 0 10px 24px rgba(245, 31, 53, .2); }
+.button-primary:hover { box-shadow: 0 14px 30px rgba(245, 31, 53, .28); }
+.button-secondary { color: var(--color-ink); background: rgba(255,255,255,.7); border-color: var(--color-line); }
+.button-secondary:hover { background: white; box-shadow: var(--shadow-soft); }
+.button-blue { color: white; background: var(--gradient-blue); }
+/* -------- TARJETAS -------- */
+.card {
+  position: relative; overflow: hidden; padding: 1.5rem; border: 1px solid rgba(7,26,61,.08);
+  border-radius: var(--radius-md); background: var(--color-surface);
+  box-shadow: 0 8px 28px rgba(7,26,61,.045);
+  transition: transform var(--duration-normal) var(--ease-out), box-shadow var(--duration-normal), border-color var(--duration-normal);
+}
+.card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); border-color: rgba(7,91,232,.22); }
+.card p { margin: .6rem 0 1.2rem; }
+.card-icon {
+  display: grid; place-items: center; width: 3rem; height: 3rem; margin-bottom: 1.2rem;
+  border-radius: 15px; color: white; background: var(--gradient-blue); font-size: 1.25rem; font-weight: 850;
+  box-shadow: 0 8px 18px rgba(7,91,232,.22);
+}
+.card-icon.red { background: linear-gradient(135deg, var(--color-red), #ff6a73); }
+.card-icon.orange { background: linear-gradient(135deg, #ff8a00, var(--color-orange)); }
+.card-icon.violet { background: linear-gradient(135deg, #8757f5, #b18aff); }
+.card-link { display: inline-flex; align-items: center; gap: .5rem; color: var(--color-blue); font-size: .9rem; font-weight: 800; }
+/* -------- ETIQUETAS Y LISTAS -------- */
+.pill { display: inline-flex; align-items: center; padding: .4rem .75rem; border: 1px solid var(--color-line); border-radius: var(--radius-pill); background: white; color: var(--color-ink-soft); font-size: .78rem; font-weight: 750; }
+.topic-list { display: grid; gap: .75rem; margin: 1.5rem 0 0; padding: 0; list-style: none; }
+.topic-list a { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.1rem; border: 1px solid var(--color-line); border-radius: var(--radius-sm); background: white; font-weight: 700; transition: border-color var(--duration-fast), transform var(--duration-fast); }
+.topic-list a:hover { transform: translateX(3px); border-color: rgba(7,91,232,.4); }
+.topic-list small { display: block; color: var(--color-muted); font-weight: 500; }
+/* -------- FIN COMPONENTES -------- */

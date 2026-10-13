@@ -1,0 +1,38 @@
+/* ==========================================================
+   NAVEGACIÓN GLOBAL
+   ========================================================== */
+/* -------- CABECERA Y MENÚ PRINCIPAL -------- */
+.site-header { position: sticky; z-index: 100; top: 0; border-bottom: 1px solid rgba(255,255,255,.1); background: rgba(5,20,46,.94); color: white; backdrop-filter: blur(18px); }
+.nav { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; min-height: 4.8rem; }
+.brand { display: inline-flex; align-items: center; gap: .65rem; flex-shrink: 0; color: white; font-size: 1.65rem; font-weight: 850; letter-spacing: -.06em; }
+.brand-mark { position: relative; display: inline-block; width: 2rem; height: 2rem; border-radius: 50% 50% 45% 45%; background: conic-gradient(from 220deg, var(--color-blue), var(--color-blue-bright), var(--color-red), var(--color-orange), var(--color-blue)); box-shadow: 0 0 24px rgba(17,168,245,.2); }
+.brand-mark::after { content: ""; position: absolute; inset: .35rem; border: 2px solid rgba(5,20,46,.85); border-radius: 50%; }
+.nav-links { display: flex; align-items: center; gap: .25rem; }
+.nav-links a { position: relative; padding: .7rem .85rem; border-radius: var(--radius-pill); color: rgba(255,255,255,.76); font-size: .88rem; font-weight: 700; transition: color var(--duration-fast), background var(--duration-fast); }
+.nav-links a:hover, .nav-links a[aria-current="page"] { color: white; background: rgba(255,255,255,.09); }
+.nav-links a[aria-current="page"]::after { content: ""; position: absolute; right: 35%; bottom: .2rem; left: 35%; height: 2px; border-radius: 2px; background: var(--gradient-brand); }
+.nav-actions { display: flex; align-items: center; gap: .6rem; }
+.menu-toggle { display: none; width: 2.75rem; height: 2.75rem; border: 1px solid rgba(255,255,255,.2); border-radius: 50%; background: rgba(255,255,255,.08); color: white; cursor: pointer; }
+/* -------- PIE DE PÁGINA -------- */
+.site-footer { margin-top: 3rem; padding: 3.5rem 0 1.5rem; background: #06152f; color: white; }
+.footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 2rem; padding-bottom: 2.5rem; }
+.site-footer p, .site-footer a { color: rgba(255,255,255,.68); }
+.site-footer h2, .site-footer h3 { color: white; }
+.footer-links { display: grid; align-content: start; gap: .5rem; }
+.footer-links a:hover { color: white; }
+.footer-bottom { display: flex; justify-content: space-between; gap: 1rem; padding-top: 1.25rem; border-top: 1px solid rgba(255,255,255,.14); color: rgba(255,255,255,.55); font-size: .82rem; }
+/* -------- RESPONSIVE: NAVEGACIÓN MÓVIL -------- */
+@media (max-width: 820px) {
+  .nav { min-height: 4.25rem; }
+  .menu-toggle { display: inline-grid; place-items: center; }
+  .nav-links { position: absolute; top: calc(100% + .35rem); right: 1rem; left: 1rem; display: none; align-items: stretch; padding: .75rem; border: 1px solid rgba(255,255,255,.12); border-radius: 1.25rem; background: #071a3d; box-shadow: 0 20px 45px rgba(0,0,0,.25); }
+  .nav-links.is-open { display: grid; }
+  .nav-links a { padding: .9rem 1rem; }
+  .nav-actions .button { display: none; }
+  .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  .footer-grid { grid-template-columns: 1fr; }
+  .footer-bottom { flex-direction: column; }
+}
+/* -------- FIN NAVEGACIÓN GLOBAL -------- */
