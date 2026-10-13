@@ -17,6 +17,7 @@
 .site-footer { margin-top: 3rem; padding: 3.5rem 0 1.5rem; background: #06152f; color: white; }
 .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 2rem; padding-bottom: 2.5rem; }
 .site-footer p, .site-footer a { color: rgba(255,255,255,.68); }
+.footer-brand-copy { margin-top: 1rem; max-width: 22rem; }
 .site-footer h2, .site-footer h3 { color: white; }
 .footer-links { display: grid; align-content: start; gap: .5rem; }
 .footer-links a:hover { color: white; }
