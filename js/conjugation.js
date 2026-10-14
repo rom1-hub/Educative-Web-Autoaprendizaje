@@ -114,8 +114,8 @@
         let displayedForm = String(typeof form === "object" ? (form.form || form.value || JSON.stringify(form)) : form);
         // La columna izquierda ya contiene el sujeto. Quitar cualquier sujeto inicial
         // de la celda derecha, independientemente del tipo de verbo o del tiempo.
-        displayedForm = displayedForm.replace(/[\\u00A0\\u202F]/g, " ").trim();
-        displayedForm = displayedForm.replace(/^(?:(?:que|qu')\\s*)?(?:je|j'|tu|il|elle|on|nous|vous|ils|elles)(?:\\s+|(?=['’]))/i, "");
+        displayedForm = displayedForm.replace(/[\u00A0\u202F]/g, " ").trim();
+        displayedForm = displayedForm.replace(/^(?:(?:que|qu')\s*)?(?:je|j'|tu|il|elle|on|nous|vous|ils|elles)(?:\s+|(?=['’]))/i, "");
         // Mantener los pronombres reflexivos (me, m', te, t', se, s', nous, vous).
         displayedForm = displayedForm.trim();
         output += '<tr><td>' + esc(person) + '</td><td>' + esc(displayedForm) + '</td></tr>';
