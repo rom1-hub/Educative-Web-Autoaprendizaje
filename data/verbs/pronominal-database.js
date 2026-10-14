@@ -146,6 +146,15 @@ window.COQ_PRONOMINAL_VERBS = {
     "accordParticipePasse": "sujet",
     "actif": true
   },
+  "se-écrire": {
+    "infinitif": "s'écrire",
+    "infinitifBase": "écrire",
+    "formeNonPronominale": "écrire",
+    "participePasse": "écrit",
+    "auxiliaire": "être",
+    "accordParticipePasse": "aucun",
+    "actif": true
+  },
   "se-écrouler": {
     "infinitif": "s'écrouler",
     "infinitifBase": "écrouler",
