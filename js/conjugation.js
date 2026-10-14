@@ -47,6 +47,10 @@
   }
 
   function getForms(verb, tense) {
+    const lookupEngine = window.COQ_LOOKUP_ENGINE;
+    if (lookupEngine && typeof lookupEngine.conjugate === "function") {
+      return lookupEngine.conjugate(verb, tense);
+    }
     const engine = getEngine();
     if (engine) {
       const fn = engine.conjugate || engine.getConjugation || engine.conjugateVerb;
@@ -74,10 +78,29 @@
     let entries;
     if (tense === "all" && !Array.isArray(forms) && typeof forms === "object") entries = Object.entries(forms);
     else entries = [[tense, forms]];
-    const tenseLabels = {"present":"Présent de l’indicatif","imparfait":"Imparfait","passe-compose":"Passé composé","futur-simple":"Futur simple","conditionnel-present":"Conditionnel présent","imperatif-present":"Impératif présent"};
+    const tenseLabels = {
+      "present":"Présent de l’indicatif",
+      "imparfait":"Imparfait",
+      "passe-simple":"Passé simple",
+      "futur-simple":"Futur simple",
+      "conditionnel-present":"Conditionnel présent",
+      "subjonctif-present":"Subjonctif présent",
+      "subjonctif-imparfait":"Subjonctif imparfait",
+      "passe-compose":"Passé composé",
+      "plus-que-parfait":"Plus-que-parfait",
+      "passe-anterieur":"Passé antérieur",
+      "futur-anterieur":"Futur antérieur",
+      "conditionnel-passe":"Conditionnel passé",
+      "subjonctif-passe":"Subjonctif passé",
+      "subjonctif-plus-que-parfait":"Subjonctif plus-que-parfait"
+    };
     let output = '<div class="results-title"><div><span class="eyebrow">Resultado de búsqueda</span><h2>' + esc(lemma) + '</h2></div><span class="pill">' + esc(tense === "all" ? "Todos los tiempos disponibles" : (tenseLabels[tense] || tense)) + '</span></div>';
     for (const [name, data] of entries) {
-      const rows = Array.isArray(data) ? data.map((value, i) => [String(i + 1), value]) : Object.entries(data || {});
+      const rows = Array.isArray(data)
+        ? data.map((value, i) => value && typeof value === "object" && "person" in value
+          ? [value.person, value.form ?? value.value ?? ""]
+          : [String(i + 1), value])
+        : Object.entries(data || {});
       output += '<div class="conjugation-table-wrap"><table class="conjugation-table"><caption>' + esc(tenseLabels[name] || name) + '</caption><thead><tr><th scope="col">Persona</th><th scope="col">Conjugación</th></tr></thead><tbody>';
       for (const [person, form] of rows) output += '<tr><td>' + esc(person) + '</td><td>' + esc(typeof form === "object" ? (form.form || form.value || JSON.stringify(form)) : form) + '</td></tr>';
       output += '</tbody></table></div>';
