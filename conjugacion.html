@@ -10,8 +10,8 @@
   <link rel="stylesheet" href="css/conjugation.css">
   <script src="js/main.js" defer></script>
   <script src="data/verbs/local-database.js" defer></script>
-  <script src="js/conjugation-lookup.js?v=contract1" defer></script>
-  <script src="js/conjugation.js?v=contract1" defer></script>
+  <script src="js/conjugation-lookup.js?v=submitfix1" defer></script>
+  <script src="js/conjugation.js?v=submitfix1" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#contenido">Saltar al contenido</a>
@@ -45,7 +45,7 @@
 
     <section class="conjugation-panel" id="panel-lookup" role="tabpanel" aria-labelledby="tab-lookup" data-panel="lookup">
       <div class="panel-heading"><div><span class="eyebrow">Consulta rápida</span><h2>Encuentra una conjugación</h2></div><p>Escribe el infinitivo en francés y elige el tiempo que quieres consultar.</p></div>
-      <form id="lookup-form" class="conjugation-form">
+      <form id="lookup-form" class="conjugation-form" onsubmit="event.preventDefault()">
         <div class="form-field form-field-verb">
           <label for="lookup-verb">Verbo francés</label>
           <input id="lookup-verb" name="verb" type="search" placeholder="Ej. parler, être, aller…" autocomplete="off" spellcheck="false" aria-describedby="lookup-help">
