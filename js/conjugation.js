@@ -39,7 +39,7 @@
       .trim()
       .toLocaleLowerCase("fr")
       .replace(/[’]/g, "'")
-      .replace(/\\s+/g, " ");
+      .replace(/\s+/g, " ");
   }
 
   function findVerb(raw) {
@@ -47,7 +47,7 @@
     if (!database) return null;
 
     const input = normalizeInfinitive(raw);
-    const pronominal = /^(?:se\\s+|s')/.test(input);
+    const pronominal = /^(?:se\s+|s')/.test(input);
     const pronominalDatabase = window.COQ_PRONOMINAL_VERBS;
     const pronominalRecords = pronominalDatabase && typeof pronominalDatabase === "object"
       ? Object.values(pronominalDatabase)
@@ -60,8 +60,8 @@
     // Esto también cubre formas como "s'en aller", cuyo verbo base es "aller".
     const baseKey = pronominalRecord
       ? normalizeInfinitive(pronominalRecord.formeNonPronominale || pronominalRecord.infinitifBase)
-      : input.replace(/^se\\s+/, "").replace(/^s'/, "");
-    const fallbackKey = input.replace(/^se\\s+/, "").replace(/^s'/, "");
+      : input.replace(/^se\s+/, "").replace(/^s'/, "");
+    const fallbackKey = input.replace(/^se\s+/, "").replace(/^s'/, "");
 
     let verb = null;
     if (Array.isArray(database)) {
