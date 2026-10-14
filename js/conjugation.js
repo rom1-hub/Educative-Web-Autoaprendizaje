@@ -112,12 +112,8 @@
       output += '<div class="conjugation-table-wrap"><table class="conjugation-table"><caption>' + esc(tenseLabels[name] || name) + '</caption><thead><tr><th scope="col">Persona</th><th scope="col">Conjugación</th></tr></thead><tbody>';
       for (const [person, form] of rows) {
         let displayedForm = String(typeof form === "object" ? (form.form || form.value || JSON.stringify(form)) : form);
-        // La columna izquierda ya contiene el sujeto. Quitar cualquier sujeto inicial
-        // de la celda derecha, independientemente del tipo de verbo o del tiempo.
-        displayedForm = displayedForm.replace(/[\u00A0\u202F]/g, " ").trim();
-        displayedForm = displayedForm.replace(/^(?:(?:que|qu')\s*)?(?:je|j'|tu|il|elle|on|nous|vous|ils|elles)(?:\s+|(?=['’]))/i, "");
-        // Mantener los pronombres reflexivos (me, m', te, t', se, s', nous, vous).
-        displayedForm = displayedForm.trim();
+        // El contrato del adaptador ya separa sujeto y predicado.
+        const displayedForm = String(typeof form === "object" ? (form.form || form.value || JSON.stringify(form)) : form);
         output += '<tr><td>' + esc(person) + '</td><td>' + esc(displayedForm) + '</td></tr>';
       }
       output += '</tbody></table></div>';
