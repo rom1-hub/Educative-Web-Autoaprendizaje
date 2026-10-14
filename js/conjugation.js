@@ -114,8 +114,8 @@
         let displayedForm = String(typeof form === "object" ? (form.form || form.value || JSON.stringify(form)) : form);
         // La persona ya aparece en la primera columna; no repetirla en la conjugación.
         displayedForm = displayedForm
-          .replace(/^(?:que\\s+|qu')?(?:je|tu|il|elle|on|nous|vous|ils|elles)\\s+/i, "")
-          .replace(/^(?:que\\s+|qu')?(?:j'|m'|t'|s')/i, "");
+          .replace(/^(?:que\s+|qu')?(?:je|tu|il|elle|on|nous|vous|ils|elles)\s+/i, "")
+          .replace(/^(?:que\s+|qu')?(?:j'|m'|t'|s')/i, "");
         output += '<tr><td>' + esc(person) + '</td><td>' + esc(displayedForm) + '</td></tr>';
       }
       output += '</tbody></table></div>';
