@@ -134,7 +134,9 @@
       ils: /^(?:qu['’]\s*|que\s+)ils\s+/i,
       elles: /^(?:qu['’]\s*|que\s+)elles\s+/i
     };
-    return (normalized.replace(subjectPatterns[subject.key], "")).trim();
+    const key = typeof subject === "string" ? subject : subject?.key;
+    const pattern = subjectPatterns[key];
+    return (pattern ? normalized.replace(pattern, "") : normalized).trim();
   }
 
   function simpleRows(verb, tense) {
@@ -153,7 +155,7 @@
       } else {
         text = elide(subject.key, form) + form;
       }
-      return { person: subject.key, form: predicateOnly(subject.key, text) };
+      return { person: subject.key, form: predicateOnly(subject, text) };
     }).filter(Boolean);
   }
 
@@ -187,7 +189,7 @@
           else text = prefix + " " + auxForm + " " + participle;
         } else text = elide(pronoun, auxForm) + auxForm + " " + participle;
       }
-      return { person: subject.key, form: text };
+      return { person: subject.key, form: predicateOnly(subject, text) };
     }).filter(Boolean);
   }
 
