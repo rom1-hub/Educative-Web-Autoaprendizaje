@@ -593,7 +593,7 @@ window.COQ_PRONOMINAL_VERBS = {
     "formeNonPronominale": "demander",
     "participePasse": "demandé",
     "auxiliaire": "être",
-    "accordParticipePasse": "sujet",
+    "accordParticipePasse": "aucun",
     "actif": true
   },
   "se-dépêcher": {
