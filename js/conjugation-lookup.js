@@ -101,6 +101,11 @@
     const pp = getParticiple(verb);
     if (!pp) return "";
     if (aux === "avoir" && !verb.pronominal) return pp;
+
+    // La base pronominale define explícitamente las excepciones de concordancia.
+    // "aucun" significa que el participio permanece invariable (p. ej. se parler).
+    if (verb.pronominal && verb.accordParticipePasse === "aucun") return pp;
+
     return agreement(pp, subject);
   }
 
