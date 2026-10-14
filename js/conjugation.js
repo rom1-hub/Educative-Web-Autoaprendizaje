@@ -204,7 +204,9 @@
       "futur-anterieur":"Futur antérieur",
       "conditionnel-passe":"Conditionnel passé",
       "subjonctif-passe":"Subjonctif passé",
-      "subjonctif-plus-que-parfait":"Subjonctif plus-que-parfait"
+      "subjonctif-plus-que-parfait":"Subjonctif plus-que-parfait",
+      "imperatif-present":"Impératif présent",
+      "imperatif-passe":"Impératif passé"
     };
     const displayLemma = lemma.charAt(0).toLocaleUpperCase("fr") + lemma.slice(1);
     const group = getVerbGroup(verb);
