@@ -120,7 +120,7 @@
     return normalizeInfinitive(
       verb?.infinitifBase || verb?.infinitif_base || verb?.verbeBase ||
       verb?.lemma || verb?.infinitive || verb?.infinitif || verb?.verb || ""
-    ).replace(/^se\\s+/, "").replace(/^s'/, "");
+    ).replace(/^se\s+/, "").replace(/^s'/, "");
   }
 
   function getPresentPluralForm(verb) {
@@ -131,7 +131,7 @@
     );
     const raw = nousEntry ? nousEntry[1] : present[3];
     if (Array.isArray(raw)) return String(raw[1] ?? raw[raw.length - 1] ?? "").trim();
-    return String(raw ?? "").trim().replace(/^nous\\s+/i, "");
+    return String(raw ?? "").trim().replace(/^nous\s+/i, "");
   }
 
   function getPresentParticiple(verb) {
