@@ -207,7 +207,6 @@
       "subjonctif-plus-que-parfait":"Subjonctif plus-que-parfait"
     };
     const displayLemma = lemma.charAt(0).toLocaleUpperCase("fr") + lemma.slice(1);
-    const baseInfinitive = getBaseInfinitive(verb);
     const group = getVerbGroup(verb);
     const groupLabel = group === 1 ? "1er groupe" : group === 2 ? "2e groupe" : "3e groupe";
     const pastParticiple = String(verb.participePasse || verb.participe_passe || "").trim() || "—";
