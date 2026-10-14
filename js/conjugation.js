@@ -116,6 +116,49 @@
     return null;
   }
 
+  function getBaseInfinitive(verb) {
+    return normalizeInfinitive(
+      verb?.infinitifBase || verb?.infinitif_base || verb?.verbeBase ||
+      verb?.lemma || verb?.infinitive || verb?.infinitif || verb?.verb || ""
+    ).replace(/^se\\s+/, "").replace(/^s'/, "");
+  }
+
+  function getPresentPluralForm(verb) {
+    const present = verb?.formes?.["présent de l'indicatif"];
+    if (!Array.isArray(present)) return "";
+    const nousEntry = present.find(entry =>
+      Array.isArray(entry) && normalizeInfinitive(entry[0]) === "nous"
+    );
+    const raw = nousEntry ? nousEntry[1] : present[3];
+    if (Array.isArray(raw)) return String(raw[1] ?? raw[raw.length - 1] ?? "").trim();
+    return String(raw ?? "").trim().replace(/^nous\\s+/i, "");
+  }
+
+  function getPresentParticiple(verb) {
+    const explicit = verb?.participePresent || verb?.participePrésent || verb?.participe_present;
+    if (explicit) return String(explicit).trim();
+    const base = getBaseInfinitive(verb);
+    const irregular = { "être": "étant", "avoir": "ayant", "savoir": "sachant" };
+    if (irregular[base]) return irregular[base];
+    const nousForm = getPresentPluralForm(verb);
+    return /ons$/i.test(nousForm) ? nousForm.slice(0, -3) + "ant" : "";
+  }
+
+  function getVerbGroup(verb) {
+    const base = getBaseInfinitive(verb);
+    if (base === "aller") return 3;
+    if (/er$/.test(base)) return 1;
+    const nousForm = getPresentPluralForm(verb);
+    if (/ir$/.test(base) && /issons$/.test(nousForm)) return 2;
+    const declared = Number(verb?.groupe || verb?.group);
+    return [1, 2, 3].includes(declared) ? declared : 3;
+  }
+
+  function getPronominalForm(verb) {
+    if (verb?.pronominal || verb?.formePronominaleDisponible !== true) return "";
+    return String(verb?.formePronominale || "").trim();
+  }
+
   function renderConjugations(verb, tense, forms) {
     if (!forms) {
       showMessage("El verbo existe, pero el motor de conjugación aún no está conectado a esta página. La interfaz está preparada; falta integrar el catálogo y el motor canónicos.", true);
@@ -163,7 +206,25 @@
       "subjonctif-passe":"Subjonctif passé",
       "subjonctif-plus-que-parfait":"Subjonctif plus-que-parfait"
     };
-    let output = '<div class="results-title"><div><span class="eyebrow">Resultado de búsqueda</span><h2>' + esc(lemma) + '</h2></div><span class="pill">' + esc(tense === "all" ? "Todos los tiempos disponibles" : (tenseLabels[tense] || tense)) + '</span></div>';
+    const displayLemma = lemma.charAt(0).toLocaleUpperCase("fr") + lemma.slice(1);
+    const baseInfinitive = getBaseInfinitive(verb);
+    const group = getVerbGroup(verb);
+    const groupLabel = group === 1 ? "1er groupe" : group === 2 ? "2e groupe" : "3e groupe";
+    const pastParticiple = String(verb.participePasse || verb.participe_passe || "").trim() || "—";
+    const presentParticiple = getPresentParticiple(verb) || "—";
+    const gerund = presentParticiple === "—" ? "—" : "en " + presentParticiple;
+    const pronominalForm = getPronominalForm(verb);
+    let output = '<section class="verb-summary-card" aria-label="Resumen del verbo">' +
+      '<div class="verb-summary-header"><div><span class="eyebrow">Ficha del verbo</span><h2>' + esc(displayLemma) + '</h2></div>' +
+      '<span class="pill">' + esc(groupLabel) + '</span></div>' +
+      '<div class="verb-summary-details">' +
+      '<div class="verb-summary-item"><span class="verb-summary-label">Participe passé</span><strong>' + esc(pastParticiple) + '</strong></div>' +
+      '<div class="verb-summary-item"><span class="verb-summary-label">Participe présent</span><strong>' + esc(presentParticiple) + '</strong></div>' +
+      '<div class="verb-summary-item"><span class="verb-summary-label">Gérondif</span><strong>' + esc(gerund) + '</strong></div>' +
+      '</div><div class="verb-summary-actions">' +
+      (pronominalForm ? '<button class="button button-secondary" type="button" data-show-pronominal>Ver su forma pronominal</button>' : '') +
+      '<button class="button button-primary" type="button" data-practice-this>Practicar este verbo →</button>' +
+      '</div></section>';
     for (const [name, data] of entries) {
       const rows = Array.isArray(data)
         ? data.map((value, i) => value && typeof value === "object" && "person" in value
@@ -180,13 +241,12 @@
       }
       output += '</tbody></table></div>';
     }
-    output += '<div class="results-actions"><button class="button button-primary" type="button" data-practice-this>Practicar este verbo →</button></div>';
     results.innerHTML = output;
     results.querySelector("[data-practice-this]")?.addEventListener("click", () => {
       const profile = verb.profile || verb.metadata || verb;
       lockedVerbProfile = {
         lemma,
-        group: profile.group || profile.groupe || "",
+        group,
         family: profile.family || profile.pattern || "",
         construction: profile.pronominal ? "pronominal" : "non-pronominal",
         auxiliary: profile.auxiliary || profile.auxiliaire || ""
@@ -195,6 +255,21 @@
       setTab("practice");
       applyLockedProfile();
       document.getElementById("practice-form").scrollIntoView({behavior:"smooth",block:"center"});
+    });
+    results.querySelector("[data-show-pronominal]")?.addEventListener("click", async () => {
+      const input = document.getElementById("lookup-verb");
+      input.value = pronominalForm;
+      try {
+        const pronominalVerb = findVerb(pronominalForm);
+        if (!pronominalVerb) {
+          showMessage("No se ha encontrado la forma pronominal «" + pronominalForm + "» en el catálogo cargado.", true);
+          return;
+        }
+        const pronominalForms = await getForms(pronominalVerb, tense);
+        renderConjugations(pronominalVerb, tense, pronominalForms);
+      } catch (error) {
+        showMessage("No se pudo obtener la conjugación de la forma pronominal.", true);
+      }
     });
   }
 
