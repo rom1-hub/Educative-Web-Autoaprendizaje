@@ -34,20 +34,59 @@
     results.innerHTML = '<p class="results-message' + (isError ? ' is-error' : '') + '" role="status">' + esc(message) + '</p>';
   }
 
+  function normalizeInfinitive(value) {
+    return String(value ?? "")
+      .trim()
+      .toLocaleLowerCase("fr")
+      .replace(/[’]/g, "'")
+      .replace(/\\s+/g, " ");
+  }
+
   function findVerb(raw) {
     const database = window.COQ_VERBS;
     if (!database) return null;
-    const input = raw.trim().toLocaleLowerCase("fr").replace(/[’]/g, "'");
-    const pronominal = /^(?:se\s+|s')/.test(input);
-    const key = input.replace(/^se\s+/, "").replace(/^s'/, "");
+
+    const input = normalizeInfinitive(raw);
+    const pronominal = /^(?:se\\s+|s')/.test(input);
+    const pronominalDatabase = window.COQ_PRONOMINAL_VERBS;
+    const pronominalRecords = pronominalDatabase && typeof pronominalDatabase === "object"
+      ? Object.values(pronominalDatabase)
+      : [];
+    const pronominalRecord = pronominal
+      ? pronominalRecords.find(record => normalizeInfinitive(record?.infinitif) === input)
+      : null;
+
+    // Para los pronominales, buscar el verbo base usando el registro específico.
+    // Esto también cubre formas como "s'en aller", cuyo verbo base es "aller".
+    const baseKey = pronominalRecord
+      ? normalizeInfinitive(pronominalRecord.formeNonPronominale || pronominalRecord.infinitifBase)
+      : input.replace(/^se\\s+/, "").replace(/^s'/, "");
+    const fallbackKey = input.replace(/^se\\s+/, "").replace(/^s'/, "");
+
     let verb = null;
     if (Array.isArray(database)) {
-      verb = database.find(v => [v.lemma, v.infinitive, v.infinitif, v.verb].some(x => String(x || "").toLocaleLowerCase("fr") === key)) || null;
+      verb = database.find(v =>
+        [v.lemma, v.infinitive, v.infinitif, v.verb]
+          .some(value => [baseKey, fallbackKey].includes(normalizeInfinitive(value)))
+      ) || null;
     } else {
-      verb = database[key] || Object.values(database).find(v => [v?.lemma, v?.infinitive, v?.infinitif, v?.verb].some(x => String(x || "").toLocaleLowerCase("fr") === key)) || null;
+      verb = database[baseKey] || database[fallbackKey] ||
+        Object.values(database).find(v =>
+          [v?.lemma, v?.infinitive, v?.infinitif, v?.verb]
+            .some(value => [baseKey, fallbackKey].includes(normalizeInfinitive(value)))
+        ) || null;
     }
+
     if (!verb || !pronominal) return verb;
-    return { ...verb, pronominal: true, infinitif: input.replace(/^se\s+/, "se ").replace(/^s'/, "s'") };
+
+    // La base pronominale aporta los metadatos gramaticales específicos;
+    // las formas conjugadas continúan procediendo de la base general.
+    return {
+      ...verb,
+      ...(pronominalRecord || {}),
+      pronominal: true,
+      infinitif: pronominalRecord?.infinitif || input
+    };
   }
 
   function getEngine() {
