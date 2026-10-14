@@ -605,6 +605,15 @@ window.COQ_PRONOMINAL_VERBS = {
     "accordParticipePasse": "aucun",
     "actif": true
   },
+  "se-donner": {
+    "infinitif": "se donner",
+    "infinitifBase": "donner",
+    "formeNonPronominale": "donner",
+    "participePasse": "donné",
+    "auxiliaire": "être",
+    "accordParticipePasse": "aucun",
+    "actif": true
+  },
   "se-dépêcher": {
     "infinitif": "se dépêcher",
     "infinitifBase": "dépêcher",
