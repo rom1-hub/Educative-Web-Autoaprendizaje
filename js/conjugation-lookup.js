@@ -122,17 +122,17 @@
   // Contrato de filas: person contiene el sujeto; form contiene solo el predicado.
   // Se elimina el sujeto aquí, en la capa de datos, nunca en el renderizador HTML.
   function predicateOnly(subject, text) {
-    const normalized = String(text || "").replace(/[\\u00A0\\u202F]/g, " ").trim();
+    const normalized = String(text || "").replace(/[\u00A0\u202F]/g, " ").trim();
     const subjectPatterns = {
-      je: /^(?:que\\s+)?(?:je\\s+|j['’])/i,
-      tu: /^(?:que\\s+)?tu\\s+/i,
-      il: /^(?:qu['’]\\s*|que\\s+)il\\s+/i,
-      elle: /^(?:qu['’]\\s*|que\\s+)elle\\s+/i,
-      on: /^(?:qu['’]\\s*|que\\s+)on\\s+/i,
-      nous: /^(?:que\\s+)?nous\\s+/i,
-      vous: /^(?:que\\s+)?vous\\s+/i,
-      ils: /^(?:qu['’]\\s*|que\\s+)ils\\s+/i,
-      elles: /^(?:qu['’]\\s*|que\\s+)elles\\s+/i
+      je: /^(?:que\s+)?(?:je\s+|j['’])/i,
+      tu: /^(?:que\s+)?tu\s+/i,
+      il: /^(?:qu['’]\s*|que\s+)il\s+/i,
+      elle: /^(?:qu['’]\s*|que\s+)elle\s+/i,
+      on: /^(?:qu['’]\s*|que\s+)on\s+/i,
+      nous: /^(?:que\s+)?nous\s+/i,
+      vous: /^(?:que\s+)?vous\s+/i,
+      ils: /^(?:qu['’]\s*|que\s+)ils\s+/i,
+      elles: /^(?:qu['’]\s*|que\s+)elles\s+/i
     };
     return (normalized.replace(subjectPatterns[subject.key], "")).trim();
   }
