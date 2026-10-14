@@ -136,7 +136,16 @@
     };
     const key = typeof subject === "string" ? subject : subject?.key;
     const pattern = subjectPatterns[key];
-    return (pattern ? normalized.replace(pattern, "") : normalized).trim();
+    if (!pattern) return normalized;
+    // Algunas entradas del catálogo ya incluyen el sujeto; el generador también lo añade.
+    // Eliminar todas las repeticiones iniciales evita que la vista muestre «je je parle».
+    let predicate = normalized;
+    while (pattern.test(predicate)) {
+      const next = predicate.replace(pattern, "").trim();
+      if (next === predicate) break;
+      predicate = next;
+    }
+    return predicate;
   }
 
   function simpleRows(verb, tense) {
