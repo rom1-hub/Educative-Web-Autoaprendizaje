@@ -123,8 +123,30 @@
     }
     const lemma = verb.lemma || verb.infinitive || verb.infinitif || verb.verb || document.getElementById("lookup-verb").value.trim();
     let entries;
-    if (tense === "all" && !Array.isArray(forms) && typeof forms === "object") entries = Object.entries(forms);
-    else entries = [[tense, forms]];
+    if (tense === "all" && !Array.isArray(forms) && typeof forms === "object") {
+      entries = Object.entries(forms);
+      // Orden de presentación: priorizar los seis tiempos solicitados sin alterar
+      // las formas devueltas por el motor ni el orden de los demás tiempos.
+      const preferredTenseOrder = [
+        "present",
+        "passe-compose",
+        "futur-simple",
+        "imparfait",
+        "plus-que-parfait",
+        "conditionnel-present"
+      ];
+      const preferredTenseRank = new Map(preferredTenseOrder.map((key, index) => [key, index]));
+      entries = entries
+        .map((entry, originalIndex) => ({ entry, originalIndex }))
+        .sort((a, b) => {
+          const rankA = preferredTenseRank.has(a.entry[0]) ? preferredTenseRank.get(a.entry[0]) : preferredTenseOrder.length + a.originalIndex;
+          const rankB = preferredTenseRank.has(b.entry[0]) ? preferredTenseRank.get(b.entry[0]) : preferredTenseOrder.length + b.originalIndex;
+          return rankA - rankB;
+        })
+        .map(item => item.entry);
+    } else {
+      entries = [[tense, forms]];
+    }
     const tenseLabels = {
       "present":"Présent de l’indicatif",
       "imparfait":"Imparfait",
