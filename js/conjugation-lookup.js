@@ -17,6 +17,12 @@
     { key: "elles", index: 5, gender: "f", number: "p" }
   ];
 
+  const IMPERATIVE_SUBJECTS = [
+    { key: "tu", index: 0, gender: "m", number: "s" },
+    { key: "nous", index: 1, gender: "m", number: "p" },
+    { key: "vous", index: 2, gender: "m", number: "p", inclusive: true }
+  ];
+
   const TENSES = {
     "present": "présent de l'indicatif",
     "imparfait": "imparfait",
@@ -46,6 +52,11 @@
       "subjonctif présent": ["sois", "sois", "soit", "soyons", "soyez", "soient"],
       "subjonctif imparfait": ["fusse", "fusses", "fût", "fussions", "fussiez", "fussent"]
     }
+  };
+
+  const IMPERATIVE_AUX_FORMS = {
+    avoir: ["aie", "ayons", "ayez"],
+    être: ["sois", "soyons", "soyez"]
   };
 
   const COMPOUNDS = [
@@ -171,6 +182,65 @@
       return { person: subject.key, form: normalizedForm };
     }).filter(Boolean);
   }
+  function readFormEntry(entry) {
+    if (Array.isArray(entry)) return String(entry.length >= 2 ? entry[entry.length - 1] : (entry[0] ?? "")).trim();
+    if (entry && typeof entry === "object") return String(entry.form ?? entry.value ?? entry.conjugation ?? "").trim();
+    return String(entry ?? "").trim();
+  }
+
+  function imperativePresentRows(verb) {
+    const forms = verb.formes && verb.formes["impératif présent"];
+    if (!Array.isArray(forms)) return [];
+
+    const infinitive = String(verb.infinitif || verb.infinitive || verb.lemma || "")
+      .toLocaleLowerCase("fr")
+      .replace(/[’]/g, "'")
+      .trim();
+    const containsEn = /^s'en\s/.test(infinitive);
+
+    return IMPERATIVE_SUBJECTS.map((subject, index) => {
+      let form = readFormEntry(forms[index]);
+      if (!form) return null;
+
+      if (verb.pronominal && !/-(?:toi|nous|vous|t'en|nous-en|vous-en|y|en)$/i.test(form)) {
+        const suffix = containsEn
+          ? ({ tu: "t'en", nous: "nous-en", vous: "vous-en" }[subject.key])
+          : ({ tu: "toi", nous: "nous", vous: "vous" }[subject.key]);
+        form += "-" + suffix;
+      }
+
+      return { person: subject.key, form };
+    }).filter(Boolean);
+  }
+
+  function imperativePastRows(verb) {
+    const auxiliary = selectAuxiliary(verb);
+    const auxiliaryForms = IMPERATIVE_AUX_FORMS[auxiliary];
+    if (!auxiliaryForms || !getParticiple(verb)) return [];
+
+    const infinitive = String(verb.infinitif || verb.infinitive || verb.lemma || "")
+      .toLocaleLowerCase("fr")
+      .replace(/[’]/g, "'")
+      .trim();
+    const containsEn = /^s'en\s/.test(infinitive);
+
+    return IMPERATIVE_SUBJECTS.map((subject, index) => {
+      const auxiliaryForm = auxiliaryForms[index];
+      const participle = compoundParticiple(verb, auxiliary, subject);
+      if (!auxiliaryForm || !participle) return null;
+
+      let form = auxiliaryForm;
+      if (verb.pronominal) {
+        const suffix = containsEn
+          ? ({ tu: "t'en", nous: "nous-en", vous: "vous-en" }[subject.key])
+          : ({ tu: "toi", nous: "nous", vous: "vous" }[subject.key]);
+        form += "-" + suffix;
+      }
+      form += " " + participle;
+      return { person: subject.key, form };
+    }).filter(Boolean);
+  }
+
   function compoundRows(verb, spec) {
     const aux = selectAuxiliary(verb);
     const auxiliaryForms = AUX_FORMS[aux] && AUX_FORMS[aux][spec.aux];
@@ -209,7 +279,19 @@
         const rows = compoundRows(verb, spec);
         if (rows.length) result[spec.key] = rows;
       }
+      const imperativePresent = imperativePresentRows(verb);
+      if (imperativePresent.length) result["imperatif-present"] = imperativePresent;
+      const imperativePast = imperativePastRows(verb);
+      if (imperativePast.length) result["imperatif-passe"] = imperativePast;
       return Object.keys(result).length ? result : null;
+    }
+    if (key === "imperatif-present") {
+      const rows = imperativePresentRows(verb);
+      return rows.length ? rows : null;
+    }
+    if (key === "imperatif-passe") {
+      const rows = imperativePastRows(verb);
+      return rows.length ? rows : null;
     }
     const tense = TENSES[key];
     if (tense) {
