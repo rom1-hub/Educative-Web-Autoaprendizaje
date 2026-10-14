@@ -78,18 +78,18 @@
   }
 
   function stripLeadingSubject(person, value) {
-    let text = String(value ?? "").replace(/[\\u00A0\\u202F]/g, " ").trim();
+    let text = String(value ?? "").replace(/[\u00A0\u202F]/g, " ").trim();
     const key = String(person ?? "").trim().toLocaleLowerCase("fr");
     const patterns = {
-      je: /^(?:que\\s+)?(?:je\\s+|j['’]\\s*)/i,
-      tu: /^(?:que\\s+)?tu\\s+/i,
-      il: /^(?:que\\s+|qu['’])?il\\s+/i,
-      elle: /^(?:que\\s+|qu['’])?elle\\s+/i,
-      on: /^(?:que\\s+|qu['’])?on\\s+/i,
-      nous: /^(?:que\\s+)?nous\\s+/i,
-      vous: /^(?:que\\s+)?vous\\s+/i,
-      ils: /^(?:que\\s+|qu['’])?ils\\s+/i,
-      elles: /^(?:que\\s+|qu['’])?elles\\s+/i
+      je: /^(?:que\s+)?(?:je\s+|j['’]\s*)/i,
+      tu: /^(?:que\s+)?tu\s+/i,
+      il: /^(?:que\s+|qu['’])?il\s+/i,
+      elle: /^(?:que\s+|qu['’])?elle\s+/i,
+      on: /^(?:que\s+|qu['’])?on\s+/i,
+      nous: /^(?:que\s+)?nous\s+/i,
+      vous: /^(?:que\s+)?vous\s+/i,
+      ils: /^(?:que\s+|qu['’])?ils\s+/i,
+      elles: /^(?:que\s+|qu['’])?elles\s+/i
     };
     const pattern = patterns[key];
     if (!pattern) return text;
