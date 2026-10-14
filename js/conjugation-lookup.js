@@ -152,12 +152,25 @@
     const forms = verb.formes && verb.formes[tense];
     if (!Array.isArray(forms)) return [];
 
-    // El catálogo canónico contiene únicamente la forma conjugada (p. ej. "parle"),
-    // no la frase con sujeto. No reconstruir la frase para volver a quitar el sujeto.
+    // El catálogo mezcla cadenas simples ("parle") y pares [sujeto, forma]
+    // (["je", "parle"]). Normalizamos ambos formatos antes de renderizar.
     return SUBJECTS.map(subject => {
-      const form = forms[subject.index];
-      if (form == null || String(form).trim() === "") return null;
-      return { person: subject.key, form: String(form).trim() };
+      const entry = forms[subject.index];
+      if (entry == null) return null;
+
+      let form;
+      if (Array.isArray(entry)) {
+        // En las entradas del catálogo, el último elemento es la forma conjugada.
+        form = entry.length >= 2 ? entry[entry.length - 1] : "";
+      } else if (typeof entry === "object") {
+        form = entry.form ?? entry.value ?? entry.conjugation ?? "";
+      } else {
+        form = entry;
+      }
+
+      const normalizedForm = String(form ?? "").trim();
+      if (!normalizedForm) return null;
+      return { person: subject.key, form: normalizedForm };
     }).filter(Boolean);
   }
 
