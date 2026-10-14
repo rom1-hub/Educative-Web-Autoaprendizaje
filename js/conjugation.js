@@ -77,6 +77,33 @@
     return null;
   }
 
+  function stripLeadingSubject(person, value) {
+    let text = String(value ?? "").replace(/[\\u00A0\\u202F]/g, " ").trim();
+    const key = String(person ?? "").trim().toLocaleLowerCase("fr");
+    const patterns = {
+      je: /^(?:que\\s+)?(?:je\\s+|j['’]\\s*)/i,
+      tu: /^(?:que\\s+)?tu\\s+/i,
+      il: /^(?:que\\s+|qu['’])?il\\s+/i,
+      elle: /^(?:que\\s+|qu['’])?elle\\s+/i,
+      on: /^(?:que\\s+|qu['’])?on\\s+/i,
+      nous: /^(?:que\\s+)?nous\\s+/i,
+      vous: /^(?:que\\s+)?vous\\s+/i,
+      ils: /^(?:que\\s+|qu['’])?ils\\s+/i,
+      elles: /^(?:que\\s+|qu['’])?elles\\s+/i
+    };
+    const pattern = patterns[key];
+    if (!pattern) return text;
+
+    // Compatibilidad con cualquier motor que todavía devuelva «sujeto + forma».
+    // Se quita el sujeto solo al inicio y solo si coincide con la columna Persona.
+    while (pattern.test(text)) {
+      const next = text.replace(pattern, "").trim();
+      if (next === text) break;
+      text = next;
+    }
+    return text;
+  }
+
   function renderConjugations(verb, tense, forms) {
     if (!forms) {
       showMessage("El verbo existe, pero el motor de conjugación aún no está conectado a esta página. La interfaz está preparada; falta integrar el catálogo y el motor canónicos.", true);
@@ -112,7 +139,8 @@
       output += '<div class="conjugation-table-wrap"><table class="conjugation-table"><caption>' + esc(tenseLabels[name] || name) + '</caption><thead><tr><th scope="col">Persona</th><th scope="col">Conjugación</th></tr></thead><tbody>';
       for (const [person, form] of rows) {
         // El adaptador separa el sujeto del predicado antes del renderizado.
-        const displayedForm = String(typeof form === "object" ? (form.form || form.value || JSON.stringify(form)) : form);
+        const rawForm = String(typeof form === "object" ? (form.form || form.value || JSON.stringify(form)) : form);
+        const displayedForm = stripLeadingSubject(person, rawForm);
         output += '<tr><td>' + esc(person) + '</td><td>' + esc(displayedForm) + '</td></tr>';
       }
       output += '</tbody></table></div>';
