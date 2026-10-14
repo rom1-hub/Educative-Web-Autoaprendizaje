@@ -85,12 +85,10 @@
   function agreement(participle, subject) {
     if (!participle) return "";
     if (subject.inclusive) {
-      if (subject.key === "on") return participle + "(e)(s)";
-      return participle + "(e)(s)";
+      return subject.key === "on" ? participle + "(e)(s)" : participle + "(e)s";
     }
     if (subject.gender === "f" && subject.number === "p") {
-      const stem = participle.endsWith("s") ? participle.slice(0, -1) : participle;
-      return stem + "es";
+      return participle.endsWith("e") ? participle + "s" : participle + "es";
     }
     if (subject.gender === "f") return participle.endsWith("e") ? participle : participle + "e";
     if (subject.number === "p") return participle.endsWith("s") ? participle : participle + "s";
