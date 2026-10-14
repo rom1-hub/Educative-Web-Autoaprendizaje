@@ -88,7 +88,10 @@
       if (subject.key === "on") return participle + "(e)(s)";
       return participle + "(e)(s)";
     }
-    if (subject.gender === "f" && subject.number === "p") return /e?s$/u.test(participle) ? (participle.endsWith("s") ? participle : participle + "s") : participle + "es";
+    if (subject.gender === "f" && subject.number === "p") {
+      const stem = participle.endsWith("s") ? participle.slice(0, -1) : participle;
+      return stem + "es";
+    }
     if (subject.gender === "f") return participle.endsWith("e") ? participle : participle + "e";
     if (subject.number === "p") return participle.endsWith("s") ? participle : participle + "s";
     return participle;
@@ -150,8 +153,11 @@
       let text;
       if (verb.pronominal) {
         const reflexive = {je:"me", tu:"te", il:"se", elle:"se", on:"se", nous:"nous", vous:"vous", ils:"se", elles:"se"}[subject.key];
-        const beforeAux = subject.key === "je" && /^[aeiouyàâäéèêëîïôöùûüÿœh]/i.test(reflexive) ? "m'" : reflexive + " ";
-        const auxPhrase = subject.key === "je" ? "je " + beforeAux + auxForm : subject.key + " " + beforeAux + auxForm;
+        const startsWithVowel = /^[aeiouyàâäéèêëîïôöùûüÿœh]/i.test(auxForm);
+        const reflexiveForm = startsWithVowel
+          ? ({me:"m'",te:"t'",se:"s'"}[reflexive] || reflexive + " ")
+          : reflexive + " ";
+        const auxPhrase = subject.key + " " + reflexiveForm + auxForm;
         text = auxPhrase + " " + participle;
       } else {
         const pronoun = subject.key;
