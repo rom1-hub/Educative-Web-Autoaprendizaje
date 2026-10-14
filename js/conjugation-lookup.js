@@ -86,9 +86,13 @@
 
   function agreement(participle, subject) {
     if (!participle) return "";
-    if (subject.inclusive) {
-      return subject.key === "on" ? participle + "(e)(s)" : participle + "(e)s";
-    }
+
+    // Notation pédagogique pour les sujets dont le genre et/ou le nombre
+    // ne sont pas fixés dans la personne grammaticale.
+    if (subject.key === "je" || subject.key === "tu") return participle + "(e)";
+    if (subject.key === "nous") return participle + "(e)s";
+    if (subject.key === "on" || subject.key === "vous") return participle + "(e)(s)";
+
     if (subject.gender === "f" && subject.number === "p") {
       return participle.endsWith("e") ? participle + "s" : participle + "es";
     }
