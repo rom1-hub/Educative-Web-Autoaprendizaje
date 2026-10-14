@@ -158,7 +158,11 @@
           ? ({me:"m'",te:"t'",se:"s'"}[reflexive] || reflexive + " ")
           : reflexive + " ";
         const auxPhrase = subject.key + " " + reflexiveForm + auxForm;
-        text = auxPhrase + " " + participle;
+        text = spec.mood === "subjonctif"
+          ? (subject.key === "je" && /^[aeiouyàâäéèêëîïôöùûüÿœh]/i.test(reflexiveForm)
+            ? "que j'" + reflexiveForm.slice(0, -1) + " " + auxForm + " " + participle
+            : (["il","elle","on","ils","elles"].includes(subject.key) ? "qu'" + subject.key + " " : "que " + subject.key + " ") + reflexiveForm + auxForm + " " + participle)
+          : auxPhrase + " " + participle;
       } else {
         const pronoun = subject.key;
         const prefix = spec.mood === "subjonctif" ? (["il","elle","on","ils","elles"].includes(pronoun) ? "qu'" + pronoun : "que " + pronoun) : pronoun;
