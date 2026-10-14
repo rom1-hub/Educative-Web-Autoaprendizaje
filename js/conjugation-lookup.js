@@ -72,8 +72,10 @@
   }
 
   function selectAuxiliary(verb) {
+    // Los verbos pronominales forman sus tiempos compuestos con être.
+    if (verb?.pronominal) return "être";
     const declared = Array.isArray(verb.auxiliaires) ? verb.auxiliaires : [verb.auxiliaire || "avoir"];
-    // Provisional COQ display rule: when both are declared, prefer être.
+    // Para los verbos no pronominales, se respeta el auxiliar del catálogo.
     if (declared.includes("être")) return "être";
     return "avoir";
   }
@@ -119,95 +121,73 @@
     return elide(pronoun, form) + form;
   }
 
-  // Contrato de filas: person contiene el sujeto; form contiene solo el predicado.
-  // Se elimina el sujeto aquí, en la capa de datos, nunca en el renderizador HTML.
-  function predicateOnly(subject, text) {
-    const normalized = String(text || "").replace(/[\u00A0\u202F]/g, " ").trim();
-    const subjectPatterns = {
-      je: /^(?:que\s+)?(?:je\s+|j['’])/i,
-      tu: /^(?:que\s+)?tu\s+/i,
-      il: /^(?:qu['’]\s*|que\s+)il\s+/i,
-      elle: /^(?:qu['’]\s*|que\s+)elle\s+/i,
-      on: /^(?:qu['’]\s*|que\s+)on\s+/i,
-      nous: /^(?:que\s+)?nous\s+/i,
-      vous: /^(?:que\s+)?vous\s+/i,
-      ils: /^(?:qu['’]\s*|que\s+)ils\s+/i,
-      elles: /^(?:qu['’]\s*|que\s+)elles\s+/i
+  function reflexivePredicate(subject, form) {
+    const pronouns = {
+      je: "me", tu: "te", il: "se", elle: "se", on: "se",
+      nous: "nous", vous: "vous", ils: "se", elles: "se"
     };
-    const key = typeof subject === "string" ? subject : subject?.key;
-    const pattern = subjectPatterns[key];
-    if (!pattern) return normalized;
-    // Algunas entradas del catálogo ya incluyen el sujeto; el generador también lo añade.
-    // Eliminar todas las repeticiones iniciales evita que la vista muestre «je je parle».
-    let predicate = normalized;
-    while (pattern.test(predicate)) {
-      const next = predicate.replace(pattern, "").trim();
-      if (next === predicate) break;
-      predicate = next;
+    const pronoun = pronouns[subject.key];
+    if (!pronoun) return form;
+
+    // Evita duplicar el pronombre si una entrada ya lo incluye.
+    const alreadyReflexive = /^(?:me|te|se|nous|vous)\s+|^(?:m|t|s)['’]/i;
+    if (alreadyReflexive.test(form)) return form;
+
+    // me/te/se se eliden delante de vocal o h muda en la forma siguiente.
+    if (["me", "te", "se"].includes(pronoun) &&
+        /^[aeiouyàâäéèêëîïôöùûüÿœh]/i.test(form)) {
+      return pronoun[0] + "'" + form;
     }
-    return predicate;
+    return pronoun + " " + form;
   }
 
   function simpleRows(verb, tense) {
     const forms = verb.formes && verb.formes[tense];
     if (!Array.isArray(forms)) return [];
 
-    // El catálogo mezcla cadenas simples ("parle") y pares [sujeto, forma]
-    // (["je", "parle"]). Normalizamos ambos formatos antes de renderizar.
     return SUBJECTS.map(subject => {
       const entry = forms[subject.index];
       if (entry == null) return null;
-
       let form;
       if (Array.isArray(entry)) {
-        // En las entradas del catálogo, el último elemento es la forma conjugada.
         form = entry.length >= 2 ? entry[entry.length - 1] : "";
       } else if (typeof entry === "object") {
         form = entry.form ?? entry.value ?? entry.conjugation ?? "";
       } else {
         form = entry;
       }
-
-      const normalizedForm = String(form ?? "").trim();
+      let normalizedForm = String(form ?? "").trim();
       if (!normalizedForm) return null;
+      if (verb.pronominal) normalizedForm = reflexivePredicate(subject, normalizedForm);
       return { person: subject.key, form: normalizedForm };
     }).filter(Boolean);
   }
-
   function compoundRows(verb, spec) {
     const aux = selectAuxiliary(verb);
     const auxiliaryForms = AUX_FORMS[aux] && AUX_FORMS[aux][spec.aux];
     const pp = getParticiple(verb);
     if (!auxiliaryForms || !pp) return [];
+
     return SUBJECTS.map(subject => {
       const auxForm = auxiliaryForms[subject.index];
       const participle = compoundParticiple(verb, aux, subject);
       if (!auxForm || !participle) return null;
-      let text;
+
+      // La columna «Persona» ya contiene el sujeto: aquí solo se genera
+      // el predicado. No eliminar nous/vous cuando son reflexivos.
+      let form;
       if (verb.pronominal) {
         const reflexive = {je:"me", tu:"te", il:"se", elle:"se", on:"se", nous:"nous", vous:"vous", ils:"se", elles:"se"}[subject.key];
-        const startsWithVowel = /^[aeiouyàâäéèêëîïôöùûüÿœh]/i.test(auxForm);
-        const reflexiveForm = startsWithVowel
-          ? ({me:"m'",te:"t'",se:"s'"}[reflexive] || reflexive + " ")
-          : reflexive + " ";
-        const auxPhrase = subject.key + " " + reflexiveForm + auxForm;
-        text = spec.mood === "subjonctif"
-          ? (subject.key === "je" && /^[aeiouyàâäéèêëîïôöùûüÿœh]/i.test(reflexiveForm)
-            ? "que j'" + reflexiveForm.slice(0, -1) + " " + auxForm + " " + participle
-            : (["il","elle","on","ils","elles"].includes(subject.key) ? "qu'" + subject.key + " " : "que " + subject.key + " ") + reflexiveForm + auxForm + " " + participle)
-          : auxPhrase + " " + participle;
+        const elideReflexive = ["me", "te", "se"].includes(reflexive) &&
+          /^[aeiouyàâäéèêëîïôöùûüÿœh]/i.test(auxForm);
+        const reflexiveForm = elideReflexive ? reflexive[0] + "'" : reflexive + " ";
+        form = reflexiveForm + auxForm + " " + participle;
       } else {
-        const pronoun = subject.key;
-        const prefix = spec.mood === "subjonctif" ? (["il","elle","on","ils","elles"].includes(pronoun) ? "qu'" + pronoun : "que " + pronoun) : pronoun;
-        if (spec.mood === "subjonctif") {
-          if (pronoun === "je") text = /^[aeiouyàâäéèêëîïôöùûüÿœh]/i.test(auxForm) ? "que j'" + auxForm + " " + participle : "que je " + auxForm + " " + participle;
-          else text = prefix + " " + auxForm + " " + participle;
-        } else text = elide(pronoun, auxForm) + auxForm + " " + participle;
+        form = auxForm + " " + participle;
       }
-      return { person: subject.key, form: predicateOnly(subject, text) };
+      return { person: subject.key, form };
     }).filter(Boolean);
   }
-
   function conjugate(verb, key) {
     if (!verb || !verb.formes) return null;
     if (key === "all") {
