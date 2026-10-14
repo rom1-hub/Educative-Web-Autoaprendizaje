@@ -110,7 +110,14 @@
           : [String(i + 1), value])
         : Object.entries(data || {});
       output += '<div class="conjugation-table-wrap"><table class="conjugation-table"><caption>' + esc(tenseLabels[name] || name) + '</caption><thead><tr><th scope="col">Persona</th><th scope="col">Conjugación</th></tr></thead><tbody>';
-      for (const [person, form] of rows) output += '<tr><td>' + esc(person) + '</td><td>' + esc(typeof form === "object" ? (form.form || form.value || JSON.stringify(form)) : form) + '</td></tr>';
+      for (const [person, form] of rows) {
+        let displayedForm = String(typeof form === "object" ? (form.form || form.value || JSON.stringify(form)) : form);
+        // La persona ya aparece en la primera columna; no repetirla en la conjugación.
+        displayedForm = displayedForm
+          .replace(/^(?:que\\s+|qu')?(?:je|tu|il|elle|on|nous|vous|ils|elles)\\s+/i, "")
+          .replace(/^(?:que\\s+|qu')?(?:j'|m'|t'|s')/i, "");
+        output += '<tr><td>' + esc(person) + '</td><td>' + esc(displayedForm) + '</td></tr>';
+      }
       output += '</tbody></table></div>';
     }
     output += '<div class="results-actions"><button class="button button-primary" type="button" data-practice-this>Practicar este verbo →</button></div>';
