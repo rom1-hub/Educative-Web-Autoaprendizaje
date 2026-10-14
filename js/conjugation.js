@@ -114,18 +114,18 @@
         let displayedForm = String(typeof form === "object" ? (form.form || form.value || JSON.stringify(form)) : form);
         // La persona ya aparece en la primera columna; no repetirla en la conjugación.
         // Normalizar espacios (incluidos NBSP) y quitar el sujeto según la primera columna.
-        displayedForm = displayedForm.replace(/[\\u00A0\\u202F]/g, " ").trim();
+        displayedForm = displayedForm.replace(/[\u00A0\u202F]/g, " ").trim();
         const subject = String(person).trim().toLocaleLowerCase("fr");
         const subjectPatterns = {
-          je: /^(?:que\\s+)?je\\s+|^(?:que\\s+)?j['’]/i,
-          tu: /^(?:que\\s+)?tu\\s+/i,
-          il: /^(?:qu['’]|que\\s+)il\\s+/i,
-          elle: /^(?:qu['’]|que\\s+)elle\\s+/i,
-          on: /^(?:qu['’]|que\\s+)on\\s+/i,
-          nous: /^(?:que\\s+)?nous\\s+/i,
-          vous: /^(?:que\\s+)?vous\\s+/i,
-          ils: /^(?:qu['’]|que\\s+)ils\\s+/i,
-          elles: /^(?:qu['’]|que\\s+)elles\\s+/i
+          je: /^(?:que\s+)?je\s+|^(?:que\s+)?j['’]/i,
+          tu: /^(?:que\s+)?tu\s+/i,
+          il: /^(?:qu['’]|que\s+)il\s+/i,
+          elle: /^(?:qu['’]|que\s+)elle\s+/i,
+          on: /^(?:qu['’]|que\s+)on\s+/i,
+          nous: /^(?:que\s+)?nous\s+/i,
+          vous: /^(?:que\s+)?vous\s+/i,
+          ils: /^(?:qu['’]|que\s+)ils\s+/i,
+          elles: /^(?:qu['’]|que\s+)elles\s+/i
         };
         if (subjectPatterns[subject]) displayedForm = displayedForm.replace(subjectPatterns[subject], "");
         // En construcciones pronominales, conservar el pronombre reflexivo.
