@@ -37,9 +37,17 @@
   function findVerb(raw) {
     const database = window.COQ_VERBS;
     if (!database) return null;
-    const key = raw.trim().toLocaleLowerCase("fr").replace(/^s['’]/, "");
-    if (Array.isArray(database)) return database.find(v => [v.lemma, v.infinitive, v.infinitif, v.verb].some(x => String(x || "").toLocaleLowerCase("fr") === key)) || null;
-    return database[key] || Object.values(database).find(v => [v?.lemma, v?.infinitive, v?.infinitif, v?.verb].some(x => String(x || "").toLocaleLowerCase("fr") === key)) || null;
+    const input = raw.trim().toLocaleLowerCase("fr").replace(/[’]/g, "'");
+    const pronominal = /^(?:se\s+|s')/.test(input);
+    const key = input.replace(/^se\s+/, "").replace(/^s'/, "");
+    let verb = null;
+    if (Array.isArray(database)) {
+      verb = database.find(v => [v.lemma, v.infinitive, v.infinitif, v.verb].some(x => String(x || "").toLocaleLowerCase("fr") === key)) || null;
+    } else {
+      verb = database[key] || Object.values(database).find(v => [v?.lemma, v?.infinitive, v?.infinitif, v?.verb].some(x => String(x || "").toLocaleLowerCase("fr") === key)) || null;
+    }
+    if (!verb || !pronominal) return verb;
+    return { ...verb, pronominal: true, infinitif: input.replace(/^se\s+/, "se ").replace(/^s'/, "s'") };
   }
 
   function getEngine() {
