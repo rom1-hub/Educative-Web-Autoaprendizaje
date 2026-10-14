@@ -36,10 +36,19 @@
 .results-message.is-error { border-color: rgba(245,31,53,.25); background: #fff4f5; color: #a31528; }
 .results-title { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; }
 .results-title h2 { font-size: clamp(1.6rem, 3vw, 2.25rem); }
+.verb-summary-card { grid-column: 1 / -1; margin-bottom: .25rem; padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid var(--color-line); border-radius: var(--radius-lg); background: linear-gradient(135deg, #fff 0%, #f5f8ff 100%); box-shadow: 0 10px 28px rgba(7,26,61,.05); }
+.verb-summary-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
+.verb-summary-header h2 { margin-top: .35rem; font-size: clamp(1.6rem, 3vw, 2.25rem); }
+.verb-summary-details { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin-block: 1.35rem; }
+.verb-summary-item { display: grid; align-content: start; gap: .45rem; min-width: 0; padding: 1rem 1.1rem; border: 1px solid rgba(7,26,61,.08); border-radius: var(--radius-md); background: rgba(255,255,255,.86); }
+.verb-summary-label { color: var(--color-muted); font-size: .8rem; font-weight: 750; }
+.verb-summary-item strong { overflow-wrap: anywhere; color: var(--color-ink); font-size: 1.15rem; }
+.verb-summary-actions { display: flex; flex-wrap: wrap; gap: .75rem; padding-top: .25rem; }
 .conjugation-table-wrap { margin-bottom: 1.5rem; overflow-x: auto; border: 1px solid var(--color-line); border-radius: var(--radius-md); background: white; }
 #conjugation-results:has(> .conjugation-table-wrap) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; align-items: start; }
 #conjugation-results:has(> .conjugation-table-wrap) > .results-title,
-#conjugation-results:has(> .conjugation-table-wrap) > .results-actions { grid-column: 1 / -1; }
+#conjugation-results:has(> .conjugation-table-wrap) > .results-actions,
+#conjugation-results:has(> .conjugation-table-wrap) > .verb-summary-card { grid-column: 1 / -1; }
 #conjugation-results:has(> .conjugation-table-wrap) > .conjugation-table-wrap { min-width: 0; margin-bottom: 0; }
 .conjugation-table { width: 100%; border-collapse: collapse; text-align: left; }
 .conjugation-table caption { padding: 1rem 1.1rem; background: #f2f6fc; color: var(--color-ink); font-weight: 850; text-align: left; }
@@ -64,6 +73,8 @@
 }
 @media (max-width: 560px) {
   #conjugation-results:has(> .conjugation-table-wrap) { grid-template-columns: minmax(0, 1fr); }
+  .verb-summary-details { grid-template-columns: minmax(0, 1fr); }
+  .verb-summary-actions .button { flex: 1 1 100%; }
 }
 @media (max-width: 520px) {
   .conjugation-tabs { display: grid; grid-template-columns: 1fr 1fr; }
