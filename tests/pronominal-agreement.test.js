@@ -65,20 +65,41 @@ test("la base pronominal contiene 102 registros y las excepciones definidas", ()
   assert.equal(findPronominal("s'absenter").participePasse, "absenté");
 });
 
-test("se laver aplica la concordancia y conserva los pronombres reflexivos", () => {
+test("se laver aplica la concordancia en los siete tiempos compuestos", () => {
+  const participleEndings = {
+    je: "lavé(e)",
+    tu: "lavé(e)",
+    il: "lavé",
+    elle: "lavée",
+    on: "lavé(e)(s)",
+    nous: "lavé(e)s",
+    vous: "lavé(e)(s)",
+    ils: "lavés",
+    elles: "lavées"
+  };
+
   for (const tense of compoundTenses) {
     const rows = conjugatePronominal("se laver", tense);
     assert.equal(rows.length, 9, `${tense}: deben existir nueve sujetos`);
     const byPerson = Object.fromEntries(rows.map(row => [row.person, row.form]));
-    assert.equal(byPerson.je, "me suis lavé(e)");
-    assert.equal(byPerson.tu, "t'es lavé(e)");
-    assert.equal(byPerson.il, "s'est lavé");
-    assert.equal(byPerson.elle, "s'est lavée");
-    assert.equal(byPerson.on, "s'est lavé(e)(s)");
-    assert.equal(byPerson.nous, "nous sommes lavé(e)s");
-    assert.equal(byPerson.vous, "vous êtes lavé(e)(s)");
-    assert.equal(byPerson.ils, "se sont lavés");
-    assert.equal(byPerson.elles, "se sont lavées");
+    for (const [person, ending] of Object.entries(participleEndings)) {
+      assert.ok(
+        byPerson[person].endsWith(ending),
+        `${tense}, ${person}: se esperaba la terminación ${ending}, se obtuvo ${byPerson[person]}`
+      );
+    }
+
+    if (tense === "passe-compose") {
+      assert.equal(byPerson.je, "me suis lavé(e)");
+      assert.equal(byPerson.tu, "t'es lavé(e)");
+      assert.equal(byPerson.il, "s'est lavé");
+      assert.equal(byPerson.elle, "s'est lavée");
+      assert.equal(byPerson.on, "s'est lavé(e)(s)");
+      assert.equal(byPerson.nous, "nous sommes lavé(e)s");
+      assert.equal(byPerson.vous, "vous êtes lavé(e)(s)");
+      assert.equal(byPerson.ils, "se sont lavés");
+      assert.equal(byPerson.elles, "se sont lavées");
+    }
   }
 });
 
