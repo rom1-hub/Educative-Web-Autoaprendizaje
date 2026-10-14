@@ -151,20 +151,13 @@
   function simpleRows(verb, tense) {
     const forms = verb.formes && verb.formes[tense];
     if (!Array.isArray(forms)) return [];
-    const prefix = isSubjunctive(tense) ? "que" : "";
+
+    // El catálogo canónico contiene únicamente la forma conjugada (p. ej. "parle"),
+    // no la frase con sujeto. No reconstruir la frase para volver a quitar el sujeto.
     return SUBJECTS.map(subject => {
       const form = forms[subject.index];
-      if (!form) return null;
-      let text;
-      if (prefix) {
-        const p = subject.key;
-        if (p === "je") text = /^[aeiouyàâäéèêëîïôöùûüÿœh]/i.test(form) ? "que j'" + form : "que je " + form;
-        else if (["il", "elle", "on", "ils", "elles"].includes(p)) text = "qu'" + p + " " + form;
-        else text = "que " + p + " " + form;
-      } else {
-        text = elide(subject.key, form) + form;
-      }
-      return { person: subject.key, form: predicateOnly(subject, text) };
+      if (form == null || String(form).trim() === "") return null;
+      return { person: subject.key, form: String(form).trim() };
     }).filter(Boolean);
   }
 
