@@ -154,19 +154,19 @@ test("pleuvoir solo muestra il e ils y no ofrece formas de imperativo", () => {
   };
 
   const present = engine.conjugate(pleuvoir, "present");
-  assert.deepEqual(present.map(row => [row.person, row.form]), [
+  assert.deepEqual(Array.from(present, row => [row.person, row.form]), [
     ["il", "pleut"],
     ["ils", "pleuvent"]
   ]);
 
   const passeCompose = engine.conjugate(pleuvoir, "passe-compose");
-  assert.deepEqual(passeCompose.map(row => [row.person, row.form]), [
+  assert.deepEqual(Array.from(passeCompose, row => [row.person, row.form]), [
     ["il", "a plu"],
     ["ils", "ont plu"]
   ]);
 
   const subjonctifPasse = engine.conjugate(pleuvoir, "subjonctif-passe");
-  assert.deepEqual(subjonctifPasse.map(row => [row.person, row.form]), [
+  assert.deepEqual(Array.from(subjonctifPasse, row => [row.person, row.form]), [
     ["il", "ait plu"],
     ["ils", "aient plu"]
   ]);
