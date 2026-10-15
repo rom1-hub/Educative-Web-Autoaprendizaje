@@ -42,6 +42,28 @@
         "subjonctif imparfait": ["", "", "fallût", "", "", ""]
       }
     },
+    bruiner: {
+      infinitif: "bruiner",
+      infinitive: "bruiner",
+      lemma: "bruiner",
+      impersonal: true,
+      typeLabel: "Verbo impersonal",
+      sujetsAutorises: ["il"],
+      groupe: 1,
+      auxiliaire: "avoir",
+      participePasse: "bruiné",
+      participePresent: "bruinant",
+      gerondifDisponible: false,
+      formes: {
+        "présent de l'indicatif": ["", "", "bruine", "", "", ""],
+        "imparfait": ["", "", "bruinait", "", "", ""],
+        "passé simple": ["", "", "bruina", "", "", ""],
+        "futur simple": ["", "", "bruinera", "", "", ""],
+        "conditionnel présent": ["", "", "bruinerait", "", "", ""],
+        "subjonctif présent": ["", "", "bruine", "", "", ""],
+        "subjonctif imparfait": ["", "", "bruinât", "", "", ""]
+      }
+    },
     brouillasser: {
       infinitif: "brouillasser",
       infinitive: "brouillasser",
