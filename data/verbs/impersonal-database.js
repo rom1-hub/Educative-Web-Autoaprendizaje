@@ -41,6 +41,27 @@
         "subjonctif présent": ["", "", "faille", "", "", ""],
         "subjonctif imparfait": ["", "", "fallût", "", "", ""]
       }
+    },
+    advenir: {
+      infinitif: "advenir",
+      infinitive: "advenir",
+      lemma: "advenir",
+      defective: true,
+      typeLabel: "Verbo defectivo",
+      groupe: 3,
+      auxiliaire: "être",
+      participePasse: "advenu",
+      participePresent: "advenant",
+      gerondifDisponible: false,
+      formes: {
+        "présent de l'indicatif": ["", "", "advient", "", "", "adviennent"],
+        "imparfait": ["", "", "advenait", "", "", "advenaient"],
+        "passé simple": ["", "", "advint", "", "", "advinrent"],
+        "futur simple": ["", "", "adviendra", "", "", "adviendront"],
+        "conditionnel présent": ["", "", "adviendrait", "", "", "adviendraient"],
+        "subjonctif présent": ["", "", "advienne", "", "", "adviennent"],
+        "subjonctif imparfait": ["", "", "advînt", "", "", "advinssent"]
+      }
     }
   });
 })();
