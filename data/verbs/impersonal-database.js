@@ -42,6 +42,29 @@
         "subjonctif imparfait": ["", "", "fallût", "", "", ""]
       }
     },
+    brumer: {
+      infinitif: "brumer",
+      infinitive: "brumer",
+      lemma: "brumer",
+      impersonal: true,
+      typeLabel: "Verbo impersonal",
+      sujetsAutorises: ["il"],
+      groupe: 1,
+      auxiliaire: "avoir",
+      participePasse: "brumé",
+      participePresent: "brumant",
+      accordParticipePasse: "aucun",
+      gerondifDisponible: false,
+      formes: {
+        "présent de l'indicatif": ["", "", "brume", "", "", ""],
+        "imparfait": ["", "", "brumait", "", "", ""],
+        "passé simple": ["", "", "bruma", "", "", ""],
+        "futur simple": ["", "", "brumera", "", "", ""],
+        "conditionnel présent": ["", "", "brumerait", "", "", ""],
+        "subjonctif présent": ["", "", "brume", "", "", ""],
+        "subjonctif imparfait": ["", "", "brumât", "", "", ""]
+      }
+    },
     bruiner: {
       infinitif: "bruiner",
       infinitive: "bruiner",
