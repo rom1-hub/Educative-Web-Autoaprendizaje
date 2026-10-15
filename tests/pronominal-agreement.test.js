@@ -173,7 +173,7 @@ test("advenir solo muestra il e ils, usa être y no presenta gerundio", () => {
     "futur-anterieur": [["il", "sera advenu"], ["ils", "seront advenus"]],
     "conditionnel-passe": [["il", "serait advenu"], ["ils", "seraient advenus"]],
     "subjonctif-passe": [["il", "soit advenu"], ["ils", "soient advenus"]],
-    "subjonctif-plus-que-parfait": [["il", "fût advenu"], ["ils", "eussent advenus"]]
+    "subjonctif-plus-que-parfait": [["il", "fût advenu"], ["ils", "fussent advenus"]]
   };
 
   for (const [tense, expected] of Object.entries(expectedCompounds)) {
