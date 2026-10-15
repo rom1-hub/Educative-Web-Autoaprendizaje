@@ -138,6 +138,62 @@ test("los verbos no pronominales con être también mantienen la concordancia", 
 });
 
 
+test("advenir solo muestra il e ils, usa être y no presenta gerundio", () => {
+  const advenir = context.window.COQ_IMPERSONAL_VERBS.advenir;
+  assert.ok(advenir, "El registro complementario de advenir debe cargarse.");
+  assert.equal(advenir.defective, true);
+  assert.equal(advenir.typeLabel, "Verbo defectivo");
+  assert.equal(advenir.auxiliaire, "être");
+  assert.equal(advenir.participePasse, "advenu");
+  assert.equal(advenir.participePresent, "advenant");
+  assert.equal(advenir.gerondifDisponible, false);
+
+  const expectedSimple = {
+    present: [["il", "advient"], ["ils", "adviennent"]],
+    imparfait: [["il", "advenait"], ["ils", "advenaient"]],
+    "passe-simple": [["il", "advint"], ["ils", "advinrent"]],
+    "futur-simple": [["il", "adviendra"], ["ils", "adviendront"]],
+    "conditionnel-present": [["il", "adviendrait"], ["ils", "adviendraient"]],
+    "subjonctif-present": [["il", "advienne"], ["ils", "adviennent"]],
+    "subjonctif-imparfait": [["il", "advînt"], ["ils", "advinssent"]]
+  };
+
+  for (const [tense, expected] of Object.entries(expectedSimple)) {
+    assert.deepEqual(
+      Array.from(engine.conjugate(advenir, tense), row => [row.person, row.form]),
+      expected,
+      `${tense}: advenir debe mostrar las formas de il e ils`
+    );
+  }
+
+  const expectedCompounds = {
+    "passe-compose": [["il", "est advenu"], ["ils", "sont advenus"]],
+    "plus-que-parfait": [["il", "était advenu"], ["ils", "étaient advenus"]],
+    "passe-anterieur": [["il", "fut advenu"], ["ils", "furent advenus"]],
+    "futur-anterieur": [["il", "sera advenu"], ["ils", "seront advenus"]],
+    "conditionnel-passe": [["il", "serait advenu"], ["ils", "seraient advenus"]],
+    "subjonctif-passe": [["il", "soit advenu"], ["ils", "soient advenus"]],
+    "subjonctif-plus-que-parfait": [["il", "fût advenu"], ["ils", "eussent advenus"]]
+  };
+
+  for (const [tense, expected] of Object.entries(expectedCompounds)) {
+    assert.deepEqual(
+      Array.from(engine.conjugate(advenir, tense), row => [row.person, row.form]),
+      expected,
+      `${tense}: advenir debe usar être y concordar el participio`
+    );
+  }
+
+  assert.equal(engine.conjugate(advenir, "imperatif-present"), null);
+  assert.equal(engine.conjugate(advenir, "imperatif-passe"), null);
+  const all = engine.conjugate(advenir, "all");
+  for (const [tense, rows] of Object.entries(all)) {
+    assert.deepEqual(Array.from(rows, row => row.person), ["il", "ils"], `${tense}: sujetos permitidos`);
+  }
+  assert.equal("imperatif-present" in all, false);
+  assert.equal("imperatif-passe" in all, false);
+});
+
 test("falloir muestra solo il, genera los tiempos compuestos y no ofrece imperativo", () => {
   const falloir = context.window.COQ_IMPERSONAL_VERBS.falloir;
   assert.ok(falloir, "El registro complementario de falloir debe cargarse.");
