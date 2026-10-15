@@ -23,6 +23,31 @@
     { key: "vous", index: 2, gender: "m", number: "p", inclusive: true }
   ];
 
+  // Verbos impersonales: en esta primera etapa se adapta pleuvoir.
+  // Se conservan il e ils porque así están documentados en la referencia
+  // pedagógica elegida para COQ.
+  const IMPERSONAL_VERBS = new Set(["pleuvoir"]);
+
+  function subjectsFor(verb) {
+    const infinitive = String(verb?.infinitif || verb?.infinitive || verb?.lemma || verb?.verb || "")
+      .toLocaleLowerCase("fr")
+      .replace(/[’]/g, "'")
+      .trim()
+      .replace(/^(?:se\s+|s')/, "");
+    return IMPERSONAL_VERBS.has(infinitive)
+      ? SUBJECTS.filter(subject => subject.key === "il" || subject.key === "ils")
+      : SUBJECTS;
+  }
+
+  function isImpersonal(verb) {
+    const infinitive = String(verb?.infinitif || verb?.infinitive || verb?.lemma || verb?.verb || "")
+      .toLocaleLowerCase("fr")
+      .replace(/[’]/g, "'")
+      .trim()
+      .replace(/^(?:se\s+|s')/, "");
+    return IMPERSONAL_VERBS.has(infinitive);
+  }
+
   const TENSES = {
     "present": "présent de l'indicatif",
     "imparfait": "imparfait",
@@ -165,7 +190,7 @@
     const forms = verb.formes && verb.formes[tense];
     if (!Array.isArray(forms)) return [];
 
-    return SUBJECTS.map(subject => {
+    return subjectsFor(verb).map(subject => {
       const entry = forms[subject.index];
       if (entry == null) return null;
       let form;
@@ -189,6 +214,7 @@
   }
 
   function imperativePresentRows(verb) {
+    if (isImpersonal(verb)) return [];
     const forms = verb.formes && verb.formes["impératif présent"];
     if (!Array.isArray(forms)) return [];
 
@@ -214,6 +240,7 @@
   }
 
   function imperativePastRows(verb) {
+    if (isImpersonal(verb)) return [];
     const auxiliary = selectAuxiliary(verb);
     const auxiliaryForms = IMPERATIVE_AUX_FORMS[auxiliary];
     if (!auxiliaryForms || !getParticiple(verb)) return [];
@@ -247,7 +274,7 @@
     const pp = getParticiple(verb);
     if (!auxiliaryForms || !pp) return [];
 
-    return SUBJECTS.map(subject => {
+    return subjectsFor(verb).map(subject => {
       const auxForm = auxiliaryForms[subject.index];
       const participle = compoundParticiple(verb, aux, subject);
       if (!auxForm || !participle) return null;
