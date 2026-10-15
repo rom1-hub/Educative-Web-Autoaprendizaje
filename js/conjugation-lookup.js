@@ -23,29 +23,30 @@
     { key: "vous", index: 2, gender: "m", number: "p", inclusive: true }
   ];
 
-  // Verbos impersonales: en esta primera etapa se adapta pleuvoir.
-  // Se conservan il e ils porque así están documentados en la referencia
-  // pedagógica elegida para COQ.
-  const IMPERSONAL_VERBS = new Set(["pleuvoir"]);
+  // Sujetos admitidos por cada verbo impersonal según su paradigma.
+  // Pleuvoir conserva il/ils; falloir solo admite il.
+  const IMPERSONAL_SUBJECTS = {
+    pleuvoir: ["il", "ils"],
+    falloir: ["il"]
+  };
 
-  function subjectsFor(verb) {
-    const infinitive = String(verb?.infinitif || verb?.infinitive || verb?.lemma || verb?.verb || "")
+  function getInfinitive(verb) {
+    return String(verb?.infinitif || verb?.infinitive || verb?.lemma || verb?.verb || "")
       .toLocaleLowerCase("fr")
       .replace(/[’]/g, "'")
       .trim()
       .replace(/^(?:se\s+|s')/, "");
-    return IMPERSONAL_VERBS.has(infinitive)
-      ? SUBJECTS.filter(subject => subject.key === "il" || subject.key === "ils")
+  }
+
+  function subjectsFor(verb) {
+    const allowedSubjects = IMPERSONAL_SUBJECTS[getInfinitive(verb)];
+    return allowedSubjects
+      ? SUBJECTS.filter(subject => allowedSubjects.includes(subject.key))
       : SUBJECTS;
   }
 
   function isImpersonal(verb) {
-    const infinitive = String(verb?.infinitif || verb?.infinitive || verb?.lemma || verb?.verb || "")
-      .toLocaleLowerCase("fr")
-      .replace(/[’]/g, "'")
-      .trim()
-      .replace(/^(?:se\s+|s')/, "");
-    return IMPERSONAL_VERBS.has(infinitive);
+    return Boolean(verb?.impersonal) || Object.hasOwn(IMPERSONAL_SUBJECTS, getInfinitive(verb));
   }
 
   const TENSES = {
