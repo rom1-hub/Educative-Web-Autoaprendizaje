@@ -42,6 +42,28 @@
         "subjonctif imparfait": ["", "", "fallût", "", "", ""]
       }
     },
+    brouillasser: {
+      infinitif: "brouillasser",
+      infinitive: "brouillasser",
+      lemma: "brouillasser",
+      impersonal: true,
+      typeLabel: "Verbo impersonal",
+      sujetsAutorises: ["il"],
+      groupe: 1,
+      auxiliaire: "avoir",
+      participePasse: "brouillassé",
+      participePresent: "brouillassant",
+      gerondifDisponible: false,
+      formes: {
+        "présent de l'indicatif": ["", "", "brouillasse", "", "", ""],
+        "imparfait": ["", "", "brouillassait", "", "", ""],
+        "passé simple": ["", "", "brouillassa", "", "", ""],
+        "futur simple": ["", "", "brouillassera", "", "", ""],
+        "conditionnel présent": ["", "", "brouillasserait", "", "", ""],
+        "subjonctif présent": ["", "", "brouillasse", "", "", ""],
+        "subjonctif imparfait": ["", "", "brouillassât", "", "", ""]
+      }
+    },
     advenir: {
       infinitif: "advenir",
       infinitive: "advenir",
