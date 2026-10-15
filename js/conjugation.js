@@ -162,7 +162,12 @@
   }
 
   function getPronominalForm(verb) {
-    if (verb?.pronominal || verb?.formePronominaleDisponible !== true) return "";
+    if (verb?.pronominal) return "";
+
+    // « agir » tiene la forma pronominal impersonal « s'agir ».
+    if (getBaseInfinitive(verb) === "agir") return "s'agir";
+
+    if (verb?.formePronominaleDisponible !== true) return "";
     return String(verb?.formePronominale || "").trim();
   }
 
