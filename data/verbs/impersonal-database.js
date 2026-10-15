@@ -42,6 +42,29 @@
         "subjonctif imparfait": ["", "", "fallût", "", "", ""]
       }
     },
+    crachiner: {
+      infinitif: "crachiner",
+      infinitive: "crachiner",
+      lemma: "crachiner",
+      impersonal: true,
+      typeLabel: "Verbo impersonal",
+      sujetsAutorises: ["il"],
+      groupe: 1,
+      auxiliaire: "avoir",
+      participePasse: "crachiné",
+      participePresent: "crachinant",
+      accordParticipePasse: "aucun",
+      gerondifDisponible: false,
+      formes: {
+        "présent de l'indicatif": ["", "", "crachine", "", "", ""],
+        "imparfait": ["", "", "crachinait", "", "", ""],
+        "passé simple": ["", "", "crachina", "", "", ""],
+        "futur simple": ["", "", "crachinera", "", "", ""],
+        "conditionnel présent": ["", "", "crachinerait", "", "", ""],
+        "subjonctif présent": ["", "", "crachine", "", "", ""],
+        "subjonctif imparfait": ["", "", "crachinât", "", "", ""]
+      }
+    },
     brumasser: {
       infinitif: "brumasser",
       infinitive: "brumasser",
