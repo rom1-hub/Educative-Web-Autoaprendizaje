@@ -44,7 +44,6 @@
 
   function findVerb(raw) {
     const database = window.COQ_VERBS;
-    if (!database) return null;
 
     const input = normalizeInfinitive(raw);
     const pronominal = /^(?:se\s+|s')/.test(input);
@@ -62,6 +61,7 @@
       ? normalizeInfinitive(pronominalRecord.formeNonPronominale || pronominalRecord.infinitifBase)
       : input.replace(/^se\s+/, "").replace(/^s'/, "");
     const fallbackKey = input.replace(/^se\s+/, "").replace(/^s'/, "");
+    if (!database && !window.COQ_IMPERSONAL_VERBS) return null;
 
     // Los registros complementarios tienen prioridad para los verbos
     // impersonales incorporados fuera del catálogo general.
@@ -77,8 +77,8 @@
           .some(value => [baseKey, fallbackKey].includes(normalizeInfinitive(value)))
       ) || null;
     } else {
-      verb = database[baseKey] || database[fallbackKey] ||
-        Object.values(database).find(v =>
+      verb = database?.[baseKey] || database?.[fallbackKey] ||
+        Object.values(database || {}).find(v =>
           [v?.lemma, v?.infinitive, v?.infinitif, v?.verb]
             .some(value => [baseKey, fallbackKey].includes(normalizeInfinitive(value)))
         ) || null;
