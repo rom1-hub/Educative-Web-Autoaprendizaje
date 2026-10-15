@@ -25,7 +25,7 @@
 
   // Sujetos admitidos por cada verbo de uso restringido.
   // Advenir y pleuvoir admiten il/ils; falloir solo admite il.
-  const IMPERSONAL_SUBJECTS = {
+  const RESTRICTED_SUBJECTS = {
     pleuvoir: ["il", "ils"],
     falloir: ["il"],
     advenir: ["il", "ils"]
@@ -46,7 +46,7 @@
       : SUBJECTS;
   }
 
-  function isImpersonal(verb) {
+  function hasRestrictedUsage(verb) {
     return Boolean(verb?.impersonal) || Object.hasOwn(IMPERSONAL_SUBJECTS, getInfinitive(verb));
   }
 
@@ -216,7 +216,7 @@
   }
 
   function imperativePresentRows(verb) {
-    if (isImpersonal(verb)) return [];
+    if (hasRestrictedUsage(verb)) return [];
     const forms = verb.formes && verb.formes["impératif présent"];
     if (!Array.isArray(forms)) return [];
 
