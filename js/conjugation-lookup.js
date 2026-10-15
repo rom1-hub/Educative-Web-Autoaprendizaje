@@ -40,7 +40,10 @@
   }
 
   function subjectsFor(verb) {
-    const allowedSubjects = RESTRICTED_SUBJECTS[getInfinitive(verb)];
+    const explicitSubjects = Array.isArray(verb?.sujetsAutorises)
+      ? verb.sujetsAutorises
+      : null;
+    const allowedSubjects = explicitSubjects || RESTRICTED_SUBJECTS[getInfinitive(verb)];
     return allowedSubjects
       ? SUBJECTS.filter(subject => allowedSubjects.includes(subject.key))
       : SUBJECTS;
