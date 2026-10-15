@@ -239,9 +239,17 @@
         // pueden ser pronombres reflexivos válidos, especialmente nous/vous.
         const rawForm = String(typeof form === "object" ? (form.form || form.value || JSON.stringify(form)) : form);
         const displayedForm = rawForm.replace(/[\u00A0\u202F]/g, " ").trim();
+        // En la tabla, el sujeto y el predicado ocupan celdas separadas.
+        // Mostrar «j'» cuando una forma no pronominal comienza por vocal:
+        // «j'écoute», «j'ai parlé», «j'avais parlé». Las formas pronominales
+        // empiezan por «me/m'», por lo que conservan «je».
+        const startsWithVowel = /^[aeiouyàâäéèêëîïôöùûüÿœ]/i.test(displayedForm);
+        const elidedPerson = String(person).toLocaleLowerCase("fr") === "je" && startsWithVowel
+          ? "j'"
+          : person;
         const displayedPerson = isImperative && ["tu", "nous", "vous"].includes(person)
           ? person + "*"
-          : person;
+          : elidedPerson;
         output += '<tr><td>' + esc(displayedPerson) + '</td><td>' + esc(displayedForm) + '</td></tr>';
       }
       output += '</tbody></table>';
