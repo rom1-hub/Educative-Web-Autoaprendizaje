@@ -248,7 +248,7 @@
       '<div class="verb-summary-item"><span class="verb-summary-label">Participe passé</span><strong>' + esc(pastParticiple) + '</strong></div>' +
       '<div class="verb-summary-item"><span class="verb-summary-label">Participe présent</span><strong>' + esc(presentParticiple) + '</strong></div>' +
       (verb.gerondifDisponible === false ? '' : '<div class="verb-summary-item"><span class="verb-summary-label">Gérondif</span><strong>' + esc(gerund) + '</strong></div>') +
-      '</div><div class="verb-summary-actions">'
+      '</div><div class="verb-summary-actions">' +
       (pronominalForm ? '<button class="button button-secondary" type="button" data-show-pronominal>Ver su forma pronominal</button>' : '') +
       (nonPronominalForm ? '<button class="button button-secondary" type="button" data-show-non-pronominal>Ver su forma no pronominal</button>' : '') +
       '<button class="button button-primary" type="button" data-practice-this>Practicar este verbo →</button>' +
