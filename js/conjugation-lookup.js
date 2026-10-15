@@ -40,14 +40,14 @@
   }
 
   function subjectsFor(verb) {
-    const allowedSubjects = IMPERSONAL_SUBJECTS[getInfinitive(verb)];
+    const allowedSubjects = RESTRICTED_SUBJECTS[getInfinitive(verb)];
     return allowedSubjects
       ? SUBJECTS.filter(subject => allowedSubjects.includes(subject.key))
       : SUBJECTS;
   }
 
   function hasRestrictedUsage(verb) {
-    return Boolean(verb?.impersonal) || Object.hasOwn(IMPERSONAL_SUBJECTS, getInfinitive(verb));
+    return Boolean(verb?.impersonal) || Object.hasOwn(RESTRICTED_SUBJECTS, getInfinitive(verb));
   }
 
   const TENSES = {
