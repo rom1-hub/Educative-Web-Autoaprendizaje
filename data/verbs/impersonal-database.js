@@ -42,6 +42,29 @@
         "subjonctif imparfait": ["", "", "fallût", "", "", ""]
       }
     },
+    brumasser: {
+      infinitif: "brumasser",
+      infinitive: "brumasser",
+      lemma: "brumasser",
+      impersonal: true,
+      typeLabel: "Verbo impersonal",
+      sujetsAutorises: ["il"],
+      groupe: 1,
+      auxiliaire: "avoir",
+      participePasse: "brumassé",
+      participePresent: "brumassant",
+      accordParticipePasse: "aucun",
+      gerondifDisponible: false,
+      formes: {
+        "présent de l'indicatif": ["", "", "brumasse", "", "", ""],
+        "imparfait": ["", "", "brumassait", "", "", ""],
+        "passé simple": ["", "", "brumassa", "", "", ""],
+        "futur simple": ["", "", "brumassera", "", "", ""],
+        "conditionnel présent": ["", "", "brumasserait", "", "", ""],
+        "subjonctif présent": ["", "", "brumasse", "", "", ""],
+        "subjonctif imparfait": ["", "", "brumassât", "", "", ""]
+      }
+    },
     brumer: {
       infinitif: "brumer",
       infinitive: "brumer",
