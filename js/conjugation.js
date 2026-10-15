@@ -225,6 +225,10 @@
       "imperatif-passe":"Impératif passé"
     };
     const displayLemma = lemma.charAt(0).toLocaleUpperCase("fr") + lemma.slice(1);
+    const impersonalRecords = window.COQ_IMPERSONAL_VERBS || {};
+    const normalizedLemma = normalizeInfinitive(getBaseInfinitive(verb));
+    const isImpersonal = verb.impersonal === true ||
+      Object.keys(impersonalRecords).some(key => normalizeInfinitive(key) === normalizedLemma);
     const group = getVerbGroup(verb);
     const groupLabel = group === 1 ? "1er groupe" : group === 2 ? "2e groupe" : "3e groupe";
     const pastParticiple = String(verb.participePasse || verb.participe_passe || "").trim() || "—";
@@ -233,7 +237,8 @@
     const pronominalForm = getPronominalForm(verb);
     const nonPronominalForm = getNonPronominalForm(verb);
     let output = '<section class="verb-summary-card" aria-label="Resumen del verbo">' +
-      '<div class="verb-summary-header"><div><span class="eyebrow">Ficha del verbo</span><h2>' + esc(displayLemma) + '</h2></div>' +
+      '<div class="verb-summary-header"><div><span class="eyebrow">Ficha del verbo</span><div class="verb-summary-title"><h2>' + esc(displayLemma) + '</h2>' +
+      (isImpersonal ? '<span class="verb-type-badge">Verbo impersonal</span>' : '') + '</div></div>' +
       '<span class="pill">' + esc(groupLabel) + '</span></div>' +
       '<div class="verb-summary-details">' +
       '<div class="verb-summary-item"><span class="verb-summary-label">Participe passé</span><strong>' + esc(pastParticiple) + '</strong></div>' +
