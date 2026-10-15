@@ -42,6 +42,29 @@
         "subjonctif imparfait": ["", "", "fallût", "", "", ""]
       }
     },
+    dracher: {
+      infinitif: "dracher",
+      infinitive: "dracher",
+      lemma: "dracher",
+      impersonal: true,
+      typeLabel: "Verbo impersonal",
+      sujetsAutorises: ["il"],
+      groupe: 1,
+      auxiliaire: "avoir",
+      participePasse: "draché",
+      participePresent: "drachant",
+      accordParticipePasse: "aucun",
+      gerondifDisponible: false,
+      formes: {
+        "présent de l'indicatif": ["", "", "drache", "", "", ""],
+        "imparfait": ["", "", "drachait", "", "", ""],
+        "passé simple": ["", "", "dracha", "", "", ""],
+        "futur simple": ["", "", "drachera", "", "", ""],
+        "conditionnel présent": ["", "", "dracherait", "", "", ""],
+        "subjonctif présent": ["", "", "drache", "", "", ""],
+        "subjonctif imparfait": ["", "", "drachât", "", "", ""]
+      }
+    },
     crachiner: {
       infinitif: "crachiner",
       infinitive: "crachiner",
