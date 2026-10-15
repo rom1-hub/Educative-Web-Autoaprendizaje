@@ -159,6 +159,15 @@
     return String(verb?.formePronominale || "").trim();
   }
 
+  function getNonPronominalForm(verb) {
+    if (!verb?.pronominal) return "";
+    const base = normalizeInfinitive(
+      verb?.formeNonPronominale || verb?.infinitifBase || verb?.infinitif_base || verb?.verbeBase || ""
+    );
+    if (!base || /^(?:se\s+|s')/.test(base)) return "";
+    return base;
+  }
+
   function renderConjugations(verb, tense, forms) {
     if (!forms) {
       showMessage("El verbo existe, pero el motor de conjugación aún no está conectado a esta página. La interfaz está preparada; falta integrar el catálogo y el motor canónicos.", true);
@@ -215,6 +224,7 @@
     const presentParticiple = getPresentParticiple(verb) || "—";
     const gerund = presentParticiple === "—" ? "—" : "en " + presentParticiple;
     const pronominalForm = getPronominalForm(verb);
+    const nonPronominalForm = getNonPronominalForm(verb);
     let output = '<section class="verb-summary-card" aria-label="Resumen del verbo">' +
       '<div class="verb-summary-header"><div><span class="eyebrow">Ficha del verbo</span><h2>' + esc(displayLemma) + '</h2></div>' +
       '<span class="pill">' + esc(groupLabel) + '</span></div>' +
@@ -224,6 +234,7 @@
       '<div class="verb-summary-item"><span class="verb-summary-label">Gérondif</span><strong>' + esc(gerund) + '</strong></div>' +
       '</div><div class="verb-summary-actions">' +
       (pronominalForm ? '<button class="button button-secondary" type="button" data-show-pronominal>Ver su forma pronominal</button>' : '') +
+      (nonPronominalForm ? '<button class="button button-secondary" type="button" data-show-non-pronominal>Ver su forma no pronominal</button>' : '') +
       '<button class="button button-primary" type="button" data-practice-this>Practicar este verbo →</button>' +
       '</div></section>';
     for (const [name, data] of entries) {
@@ -305,6 +316,21 @@
         renderConjugations(pronominalVerb, tense, pronominalForms);
       } catch (error) {
         showMessage("No se pudo obtener la conjugación de la forma pronominal.", true);
+      }
+    });
+    results.querySelector("[data-show-non-pronominal]")?.addEventListener("click", async () => {
+      const input = document.getElementById("lookup-verb");
+      input.value = nonPronominalForm;
+      try {
+        const nonPronominalVerb = findVerb(nonPronominalForm);
+        if (!nonPronominalVerb || nonPronominalVerb.pronominal) {
+          showMessage("No se ha encontrado la forma no pronominal «" + nonPronominalForm + "» en el catálogo cargado.", true);
+          return;
+        }
+        const nonPronominalForms = await getForms(nonPronominalVerb, tense);
+        renderConjugations(nonPronominalVerb, tense, nonPronominalForms);
+      } catch (error) {
+        showMessage("No se pudo obtener la conjugación de la forma no pronominal.", true);
       }
     });
   }
