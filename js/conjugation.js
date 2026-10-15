@@ -244,9 +244,28 @@
         // «j'écoute», «j'ai parlé», «j'avais parlé». Las formas pronominales
         // empiezan por «me/m'», por lo que conservan «je».
         const startsWithVowel = /^[aeiouyàâäéèêëîïôöùûüÿœ]/i.test(displayedForm);
-        const elidedPerson = String(person).toLocaleLowerCase("fr") === "je" && startsWithVowel
+        const normalizedPerson = String(person).toLocaleLowerCase("fr");
+        const isSubjunctive = [
+          "subjonctif-present",
+          "subjonctif-passe",
+          "subjonctif-imparfait",
+          "subjonctif-plus-que-parfait"
+        ].includes(name);
+        let elidedPerson = normalizedPerson === "je" && startsWithVowel
           ? "j'"
           : person;
+        if (isSubjunctive) {
+          if (["il", "elle", "on", "ils", "elles"].includes(normalizedPerson)) {
+            elidedPerson = "qu'" + normalizedPerson;
+          } else if (normalizedPerson === "je") {
+            // En forma pronominal, el predicado comienza por «me/m'»:
+            // «que je me sois...», no «que j'me sois...».
+            const startsWithReflexive = /^(?:me|te|se|nous|vous)\s|^(?:m|t|s)['’]/i.test(displayedForm);
+            elidedPerson = startsWithVowel && !startsWithReflexive ? "que j'" : "que je";
+          } else {
+            elidedPerson = "que " + normalizedPerson;
+          }
+        }
         const displayedPerson = isImperative && ["tu", "nous", "vous"].includes(person)
           ? person + "*"
           : elidedPerson;
