@@ -138,6 +138,62 @@ test("los verbos no pronominales con être también mantienen la concordancia", 
 });
 
 
+test("falloir muestra solo il, genera los tiempos compuestos y no ofrece imperativo", () => {
+  const falloir = context.window.COQ_IMPERSONAL_VERBS.falloir;
+  assert.ok(falloir, "El registro complementario de falloir debe cargarse.");
+  assert.equal(falloir.impersonal, true);
+
+  const expectedSimple = {
+    present: "faut",
+    imparfait: "fallait",
+    "passe-simple": "fallut",
+    "futur-simple": "faudra",
+    "conditionnel-present": "faudrait",
+    "subjonctif-present": "faille",
+    "subjonctif-imparfait": "fallût"
+  };
+
+  for (const [tense, form] of Object.entries(expectedSimple)) {
+    assert.deepEqual(
+      Array.from(engine.conjugate(falloir, tense), row => [row.person, row.form]),
+      [["il", form]],
+      `${tense}: falloir debe mostrar únicamente il ${form}`
+    );
+  }
+
+  const expectedCompounds = {
+    "passe-compose": "a fallu",
+    "plus-que-parfait": "avait fallu",
+    "passe-anterieur": "eut fallu",
+    "futur-anterieur": "aura fallu",
+    "conditionnel-passe": "aurait fallu",
+    "subjonctif-passe": "ait fallu",
+    "subjonctif-plus-que-parfait": "eût fallu"
+  };
+
+  for (const [tense, form] of Object.entries(expectedCompounds)) {
+    assert.deepEqual(
+      Array.from(engine.conjugate(falloir, tense), row => [row.person, row.form]),
+      [["il", form]],
+      `${tense}: se esperaba «il ${form}»`
+    );
+  }
+
+  assert.equal(engine.conjugate(falloir, "imperatif-present"), null);
+  assert.equal(engine.conjugate(falloir, "imperatif-passe"), null);
+
+  const all = engine.conjugate(falloir, "all");
+  for (const [tense, rows] of Object.entries(all)) {
+    assert.deepEqual(
+      Array.from(rows, row => row.person),
+      ["il"],
+      `${tense}: falloir debe mostrar solo el sujeto il`
+    );
+  }
+  assert.equal("imperatif-present" in all, false);
+  assert.equal("imperatif-passe" in all, false);
+});
+
 test("pleuvoir solo muestra il e ils y no ofrece formas de imperativo", () => {
   const pleuvoir = context.window.COQ_IMPERSONAL_VERBS.pleuvoir;
   assert.ok(pleuvoir, "El registro complementario de pleuvoir debe cargarse.");
