@@ -23,11 +23,12 @@
     { key: "vous", index: 2, gender: "m", number: "p", inclusive: true }
   ];
 
-  // Sujetos admitidos por cada verbo impersonal según su paradigma.
-  // Pleuvoir conserva il/ils; falloir solo admite il.
+  // Sujetos admitidos por cada verbo de uso restringido.
+  // Advenir y pleuvoir admiten il/ils; falloir solo admite il.
   const IMPERSONAL_SUBJECTS = {
     pleuvoir: ["il", "ils"],
-    falloir: ["il"]
+    falloir: ["il"],
+    advenir: ["il", "ils"]
   };
 
   function getInfinitive(verb) {
