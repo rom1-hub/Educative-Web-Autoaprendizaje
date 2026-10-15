@@ -11,6 +11,7 @@ const context = { window: {} };
 
 for (const relativePath of [
   "data/verbs/local-database.js",
+  "data/verbs/impersonal-database.js",
   "data/verbs/pronominal-database.js",
   "js/conjugation-lookup.js"
 ]) {
@@ -138,20 +139,8 @@ test("los verbos no pronominales con être también mantienen la concordancia", 
 
 
 test("pleuvoir solo muestra il e ils y no ofrece formas de imperativo", () => {
-  const pleuvoir = {
-    infinitif: "pleuvoir",
-    participePasse: "plu",
-    formes: {
-      "présent de l'indicatif": ["", "", "pleut", "", "", "pleuvent"],
-      "imparfait": ["", "", "pleuvait", "", "", "pleuvaient"],
-      "passé simple": ["", "", "plut", "", "", "plurent"],
-      "futur simple": ["", "", "pleuvra", "", "", "pleuvront"],
-      "conditionnel présent": ["", "", "pleuvrait", "", "", "pleuvraient"],
-      "subjonctif présent": ["", "", "pleuve", "", "", "pleuvent"],
-      "subjonctif imparfait": ["", "", "plût", "", "", "plussent"],
-      "impératif présent": ["pleus", "pleuvons", "pleuvez"]
-    }
-  };
+  const pleuvoir = context.window.COQ_IMPERSONAL_VERBS.pleuvoir;
+  assert.ok(pleuvoir, "El registro complementario de pleuvoir debe cargarse.");
 
   const present = engine.conjugate(pleuvoir, "present");
   assert.deepEqual(Array.from(present, row => [row.person, row.form]), [
