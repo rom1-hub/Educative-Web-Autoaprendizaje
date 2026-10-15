@@ -225,26 +225,30 @@
       "imperatif-passe":"Impératif passé"
     };
     const displayLemma = lemma.charAt(0).toLocaleUpperCase("fr") + lemma.slice(1);
-    const impersonalRecords = window.COQ_IMPERSONAL_VERBS || {};
+    const specialVerbRecords = window.COQ_IMPERSONAL_VERBS || {};
     const normalizedLemma = normalizeInfinitive(getBaseInfinitive(verb));
-    const isImpersonal = verb.impersonal === true ||
-      Object.keys(impersonalRecords).some(key => normalizeInfinitive(key) === normalizedLemma);
+    const matchedSpecialRecord = Object.entries(specialVerbRecords)
+      .find(([key]) => normalizeInfinitive(key) === normalizedLemma)?.[1];
+    const verbTypeLabel = verb.typeLabel || matchedSpecialRecord?.typeLabel ||
+      (verb.impersonal === true || matchedSpecialRecord?.impersonal === true ? "Verbo impersonal" : "");
     const group = getVerbGroup(verb);
     const groupLabel = group === 1 ? "1er groupe" : group === 2 ? "2e groupe" : "3e groupe";
     const pastParticiple = String(verb.participePasse || verb.participe_passe || "").trim() || "—";
     const presentParticiple = getPresentParticiple(verb) || "—";
-    const gerund = presentParticiple === "—" ? "—" : "en " + presentParticiple;
+    const gerund = verb.gerondifDisponible === false
+      ? ""
+      : (presentParticiple === "—" ? "—" : "en " + presentParticiple);
     const pronominalForm = getPronominalForm(verb);
     const nonPronominalForm = getNonPronominalForm(verb);
     let output = '<section class="verb-summary-card" aria-label="Resumen del verbo">' +
       '<div class="verb-summary-header"><div><span class="eyebrow">Ficha del verbo</span><div class="verb-summary-title"><h2>' + esc(displayLemma) + '</h2>' +
-      (isImpersonal ? '<span class="verb-type-badge">Verbo impersonal</span>' : '') + '</div></div>' +
+      (verbTypeLabel ? '<span class="verb-type-badge">' + esc(verbTypeLabel) + '</span>' : '') + '</div></div>' +
       '<span class="pill">' + esc(groupLabel) + '</span></div>' +
       '<div class="verb-summary-details">' +
       '<div class="verb-summary-item"><span class="verb-summary-label">Participe passé</span><strong>' + esc(pastParticiple) + '</strong></div>' +
       '<div class="verb-summary-item"><span class="verb-summary-label">Participe présent</span><strong>' + esc(presentParticiple) + '</strong></div>' +
-      '<div class="verb-summary-item"><span class="verb-summary-label">Gérondif</span><strong>' + esc(gerund) + '</strong></div>' +
-      '</div><div class="verb-summary-actions">' +
+      (verb.gerondifDisponible === false ? '' : '<div class="verb-summary-item"><span class="verb-summary-label">Gérondif</span><strong>' + esc(gerund) + '</strong></div>') +
+      '</div><div class="verb-summary-actions">'
       (pronominalForm ? '<button class="button button-secondary" type="button" data-show-pronominal>Ver su forma pronominal</button>' : '') +
       (nonPronominalForm ? '<button class="button button-secondary" type="button" data-show-non-pronominal>Ver su forma no pronominal</button>' : '') +
       '<button class="button button-primary" type="button" data-practice-this>Practicar este verbo →</button>' +
