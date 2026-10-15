@@ -946,6 +946,20 @@ window.COQ_PRONOMINAL_VERBS = {
     "auxiliaire": "être",
     "accordParticipePasse": "sujet",
     "actif": true
+  },
+  "se-agir": {
+    "infinitif": "s'agir",
+    "infinitifBase": "agir",
+    "formeNonPronominale": "agir",
+    "participePasse": "agi",
+    "participePresent": "s'agissant",
+    "auxiliaire": "être",
+    "accordParticipePasse": "aucun",
+    "impersonal": true,
+    "typeLabel": "Verbe pronominal impersonnel",
+    "sujetsAutorises": ["il"],
+    "gerondifDisponible": false,
+    "actif": true
   }
 };
 
