@@ -63,6 +63,13 @@
       : input.replace(/^se\s+/, "").replace(/^s'/, "");
     const fallbackKey = input.replace(/^se\s+/, "").replace(/^s'/, "");
 
+    // Los registros complementarios tienen prioridad para los verbos
+    // impersonales incorporados fuera del catálogo general.
+    const impersonalRecords = window.COQ_IMPERSONAL_VERBS;
+    if (!pronominal && impersonalRecords && impersonalRecords[baseKey]) {
+      return impersonalRecords[baseKey];
+    }
+
     let verb = null;
     if (Array.isArray(database)) {
       verb = database.find(v =>
