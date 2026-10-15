@@ -242,7 +242,7 @@
   }
 
   function imperativePastRows(verb) {
-    if (isImpersonal(verb)) return [];
+    if (hasRestrictedUsage(verb)) return [];
     const auxiliary = selectAuxiliary(verb);
     const auxiliaryForms = IMPERATIVE_AUX_FORMS[auxiliary];
     if (!auxiliaryForms || !getParticiple(verb)) return [];
