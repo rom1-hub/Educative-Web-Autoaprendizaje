@@ -135,3 +135,52 @@ test("los verbos no pronominales con être también mantienen la concordancia", 
   assert.equal(byPerson.elle, "est allée");
   assert.equal(byPerson.ils, "sont allés");
 });
+
+
+test("pleuvoir solo muestra il e ils y no ofrece formas de imperativo", () => {
+  const pleuvoir = {
+    infinitif: "pleuvoir",
+    participePasse: "plu",
+    formes: {
+      "présent de l'indicatif": ["", "", "pleut", "", "", "pleuvent"],
+      "imparfait": ["", "", "pleuvait", "", "", "pleuvaient"],
+      "passé simple": ["", "", "plut", "", "", "plurent"],
+      "futur simple": ["", "", "pleuvra", "", "", "pleuvront"],
+      "conditionnel présent": ["", "", "pleuvrait", "", "", "pleuvraient"],
+      "subjonctif présent": ["", "", "pleuve", "", "", "pleuvent"],
+      "subjonctif imparfait": ["", "", "plût", "", "", "plussent"],
+      "impératif présent": ["pleus", "pleuvons", "pleuvez"]
+    }
+  };
+
+  const present = engine.conjugate(pleuvoir, "present");
+  assert.deepEqual(present.map(row => [row.person, row.form]), [
+    ["il", "pleut"],
+    ["ils", "pleuvent"]
+  ]);
+
+  const passeCompose = engine.conjugate(pleuvoir, "passe-compose");
+  assert.deepEqual(passeCompose.map(row => [row.person, row.form]), [
+    ["il", "a plu"],
+    ["ils", "ont plu"]
+  ]);
+
+  const subjonctifPasse = engine.conjugate(pleuvoir, "subjonctif-passe");
+  assert.deepEqual(subjonctifPasse.map(row => [row.person, row.form]), [
+    ["il", "ait plu"],
+    ["ils", "aient plu"]
+  ]);
+
+  assert.equal(engine.conjugate(pleuvoir, "imperatif-present"), null);
+  assert.equal(engine.conjugate(pleuvoir, "imperatif-passe"), null);
+
+  const all = engine.conjugate(pleuvoir, "all");
+  for (const [tense, rows] of Object.entries(all)) {
+    assert.ok(
+      rows.every(row => row.person === "il" || row.person === "ils"),
+      `${tense}: pleuvoir no debe mostrar sujetos personales`
+    );
+  }
+  assert.equal("imperatif-present" in all, false);
+  assert.equal("imperatif-passe" in all, false);
+});
