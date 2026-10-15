@@ -233,14 +233,22 @@
           : [String(i + 1), value])
         : Object.entries(data || {});
       output += '<div class="conjugation-table-wrap"><table class="conjugation-table"><caption>' + esc(tenseLabels[name] || name) + '</caption><thead><tr><th scope="col">Persona</th><th scope="col">Conjugación</th></tr></thead><tbody>';
+      const isImperative = name === "imperatif-present" || name === "imperatif-passe";
       for (const [person, form] of rows) {
         // El motor entrega el predicado normalizado. No quitar palabras iniciales:
         // pueden ser pronombres reflexivos válidos, especialmente nous/vous.
         const rawForm = String(typeof form === "object" ? (form.form || form.value || JSON.stringify(form)) : form);
         const displayedForm = rawForm.replace(/[\u00A0\u202F]/g, " ").trim();
-        output += '<tr><td>' + esc(person) + '</td><td>' + esc(displayedForm) + '</td></tr>';
+        const displayedPerson = isImperative && ["tu", "nous", "vous"].includes(person)
+          ? person + "*"
+          : person;
+        output += '<tr><td>' + esc(displayedPerson) + '</td><td>' + esc(displayedForm) + '</td></tr>';
       }
-      output += '</tbody></table></div>';
+      output += '</tbody></table>';
+      if (isImperative) {
+        output += '<p class="imperative-subject-note">* En el imperativo, los sujetos no se escriben ni se pronuncian en la oración.</p>';
+      }
+      output += '</div>';
     }
     results.innerHTML = output;
     results.querySelector("[data-practice-this]")?.addEventListener("click", () => {
