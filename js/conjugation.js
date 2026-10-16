@@ -167,6 +167,9 @@
     // « agir » tiene la forma pronominal impersonal « s'agir ».
     if (getBaseInfinitive(verb) === "agir") return "s'agir";
 
+    // « pouvoir » tiene la forma pronominal impersonal y defectiva « se pouvoir ».
+    if (getBaseInfinitive(verb) === "pouvoir") return "se pouvoir";
+
     if (verb?.formePronominaleDisponible !== true) return "";
     return String(verb?.formePronominale || "").trim();
   }
