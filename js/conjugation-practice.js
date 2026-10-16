@@ -75,10 +75,10 @@
   }
 
   function groupOf(verb) {
-    const declared = declaredGroup(verb);
-    if (declared) return declared;
     const base = baseInfinitiveOf(verb);
     if (base === "aller") return 3;
+    const declared = declaredGroup(verb);
+    if (declared) return declared;
     if (/er$/.test(base)) return 1;
     if (/ir$/.test(base) && /issons$/i.test(presentNous(verb))) return 2;
     return 3;
