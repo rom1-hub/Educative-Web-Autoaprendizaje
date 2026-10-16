@@ -80,14 +80,13 @@
       <div class="panel-heading"><div><span class="eyebrow">Práctica personalizada</span><h2>Prepara tu sesión</h2></div><p>Combina los filtros para trabajar los verbos y las formas que necesitas reforzar.</p></div>
       <form id="practice-form" class="conjugation-form practice-form">
         <div class="form-field form-field-verb">
-          <label for="practice-verb">Verbo específico <span class="optional-label">Opcional</span></label>
-          <input id="practice-verb" name="verb" type="search" placeholder="Cualquier verbo francés…" autocomplete="off" spellcheck="false">
-          <small>Si indicas un verbo, la práctica se centrará en él.</small>
+          <label for="practice-verb">Verbo francés</label>
+          <input id="practice-verb" name="verb" type="search" placeholder="Ej. parler, être, aller…" autocomplete="off" spellcheck="false" required>
+          <small>La sesión se centrará exclusivamente en este verbo.</small>
         </div>
         <div class="form-field">
-          <label for="practice-tense">Tiempos verbales</label>
-          <select id="practice-tense" name="tenses">
-            <option value="">Todos los tiempos compatibles</option>
+          <label for="practice-tense">Tiempo verbal</label>
+          <select id="practice-tense" name="tenses" required>
             <option value="present">Présent de l'indicatif</option><option value="imparfait">Imparfait</option><option value="passe-compose">Passé composé</option><option value="plus-que-parfait">Plus-que-parfait</option><option value="passe-simple">Passé simple</option><option value="passe-anterieur">Passé antérieur</option><option value="futur-simple">Futur simple</option><option value="futur-anterieur">Futur antérieur</option><option value="subjonctif-present">Subjonctif présent</option><option value="subjonctif-passe">Subjonctif passé</option><option value="subjonctif-imparfait">Subjonctif imparfait</option><option value="subjonctif-plus-que-parfait">Subjonctif plus-que-parfait</option><option value="conditionnel-present">Conditionnel présent</option><option value="conditionnel-passe">Conditionnel passé</option><option value="imperatif-present">Impératif présent</option><option value="imperatif-passe">Impératif passé</option>
           </select>
         </div>
