@@ -217,7 +217,7 @@
       // Permite escribir el verbo base cuando se ha elegido su construcción
       // pronominal, sin convertirlo en un filtro de familia.
       if (filters.construction === "pronominal" &&
-          !/^(?:se\\s+|s')/.test(requestedVerb)) {
+          !/^(?:se\s+|s')/.test(requestedVerb)) {
         const pronominalMatches = pool.filter(verb =>
           isPronominal(verb) && baseInfinitiveOf(verb) === requestedVerb
         );
