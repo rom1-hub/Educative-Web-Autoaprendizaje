@@ -42,7 +42,30 @@
         "subjonctif imparfait": ["", "", "fallût", "", "", ""]
       }
     },
-        neiger: {
+        pleuvasser: {
+      infinitif: "pleuvasser",
+      infinitive: "pleuvasser",
+      lemma: "pleuvasser",
+      impersonal: true,
+      typeLabel: "Verbe impersonnel",
+      sujetsAutorises: ["il"],
+      groupe: 1,
+      auxiliaire: "avoir",
+      participePasse: "pleuvassé",
+      participePresent: "pleuvassant",
+      accordParticipePasse: "aucun",
+      gerondifDisponible: false,
+      formes: {
+        "présent de l'indicatif": ["", "", "pleuvasse", "", "", ""],
+        "imparfait": ["", "", "pleuvassait", "", "", ""],
+        "passé simple": ["", "", "pleuvassa", "", "", ""],
+        "futur simple": ["", "", "pleuvassera", "", "", ""],
+        "conditionnel présent": ["", "", "pleuvasserait", "", "", ""],
+        "subjonctif présent": ["", "", "pleuvasse", "", "", ""],
+        "subjonctif imparfait": ["", "", "pleuvassât", "", "", ""]
+      }
+    },
+    neiger: {
       infinitif: "neiger",
       infinitive: "neiger",
       lemma: "neiger",
