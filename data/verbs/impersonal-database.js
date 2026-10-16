@@ -42,7 +42,30 @@
         "subjonctif imparfait": ["", "", "fallût", "", "", ""]
       }
     },
-    "grésiller": {
+        neiger: {
+      infinitif: "neiger",
+      infinitive: "neiger",
+      lemma: "neiger",
+      impersonal: true,
+      typeLabel: "Verbe impersonnel",
+      sujetsAutorises: ["il"],
+      groupe: 1,
+      auxiliaire: "avoir",
+      participePasse: "neigé",
+      participePresent: "neigeant",
+      accordParticipePasse: "aucun",
+      gerondifDisponible: false,
+      formes: {
+        "présent de l'indicatif": ["", "", "neige", "", "", ""],
+        "imparfait": ["", "", "neigeait", "", "", ""],
+        "passé simple": ["", "", "neigea", "", "", ""],
+        "futur simple": ["", "", "neigera", "", "", ""],
+        "conditionnel présent": ["", "", "neigerait", "", "", ""],
+        "subjonctif présent": ["", "", "neige", "", "", ""],
+        "subjonctif imparfait": ["", "", "neigeât", "", "", ""]
+      }
+    },
+"grésiller": {
       infinitif: "grésiller",
       infinitive: "grésiller",
       lemma: "grésiller",
