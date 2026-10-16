@@ -911,6 +911,20 @@ window.COQ_PRONOMINAL_VERBS = {
     "accordParticipePasse": "sujet",
     "actif": true
   },
+  "se-pouvoir": {
+    "infinitif": "se pouvoir",
+    "infinitifBase": "pouvoir",
+    "formeNonPronominale": "pouvoir",
+    "participePasse": "pu",
+    "participePresent": "se pouvant",
+    "auxiliaire": "être",
+    "accordParticipePasse": "aucun",
+    "impersonal": true,
+    "typeLabel": "Verbe pronominal impersonnel",
+    "sujetsAutorises": ["il"],
+    "gerondifDisponible": false,
+    "actif": true
+  },
   "se-taire": {
     "infinitif": "se taire",
     "infinitifBase": "taire",
