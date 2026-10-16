@@ -390,6 +390,230 @@
     });
   }
 
+
+  /* ==========================================================
+     SMART VERB SEARCH — ambas barras, catálogo canónico
+     Normaliza acentos/mayúsculas y permite errores tipográficos.
+     ========================================================== */
+  const searchInputs = [
+    { input: document.getElementById("lookup-verb"), kind: "lookup" },
+    { input: document.getElementById("practice-verb"), kind: "practice" }
+  ].filter(item => item.input);
+
+  const normalizeSearchText = value => String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("fr")
+    .replace(/[’‘]/g, "'")
+    .replace(/[^a-z0-9'\s-]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  let verbSuggestionIndex = null;
+  let suggestionSequence = 0;
+
+  function editDistanceWithin(a, b, limit) {
+    if (Math.abs(a.length - b.length) > limit) return limit + 1;
+    let previous = Array.from({ length: b.length + 1 }, (_, i) => i);
+    for (let i = 1; i <= a.length; i++) {
+      const current = [i];
+      let rowMinimum = i;
+      for (let j = 1; j <= b.length; j++) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        current[j] = Math.min(current[j - 1] + 1, previous[j] + 1, previous[j - 1] + cost);
+        rowMinimum = Math.min(rowMinimum, current[j]);
+      }
+      if (rowMinimum > limit) return limit + 1;
+      previous = current;
+    }
+    return previous[b.length];
+  }
+
+  function buildVerbSuggestionIndex() {
+    if (verbSuggestionIndex) return verbSuggestionIndex;
+    const candidates = new Map();
+    const add = (rawLabel, type = "regular") => {
+      const label = String(rawLabel ?? "").trim().replace(/[’‘]/g, "'");
+      const normalized = normalizeSearchText(label);
+      if (!label || normalized.length < 1) return;
+      const key = normalized;
+      const existing = candidates.get(key);
+      // En caso de duplicado, conservar primero la forma canónica más informativa.
+      if (!existing || (existing.type !== "pronominal" && type === "pronominal")) {
+        candidates.set(key, { label, normalized, type });
+      }
+    };
+    const addRecords = (database, defaultType = "regular") => {
+      if (!database) return;
+      const records = Array.isArray(database)
+        ? database.map((record, index) => [String(index), record])
+        : Object.entries(database);
+      for (const [key, record] of records) {
+        const label = record?.infinitif || record?.infinitive || record?.lemma ||
+          record?.verb || record?.verbe || record?.forme || key.replace(/-/g, " ");
+        add(label, defaultType);
+      }
+    };
+
+    addRecords(window.COQ_VERBS);
+    addRecords(window.COQ_IMPERSONAL_VERBS);
+    const pronominalRecords = window.COQ_PRONOMINAL_VERBS;
+    if (pronominalRecords && typeof pronominalRecords === "object") {
+      for (const [key, record] of Object.entries(pronominalRecords)) {
+        add(record?.infinitif || record?.infinitive || key.replace(/^se-/, "se ").replace(/-/g, " "), "pronominal");
+      }
+    }
+    verbSuggestionIndex = [...candidates.values()];
+    return verbSuggestionIndex;
+  }
+
+  function rankVerbSuggestions(rawQuery) {
+    const query = normalizeSearchText(rawQuery);
+    if (!query) return [];
+    const candidates = buildVerbSuggestionIndex();
+    const ranked = [];
+    for (const candidate of candidates) {
+      const value = candidate.normalized;
+      let score = Infinity;
+      if (value === query) score = 0;
+      else if (value.startsWith(query)) score = 10 + (value.length - query.length) / 100;
+      else if (value.includes(query)) score = 30 + value.indexOf(query) / 100;
+      else if (query.length >= 4) {
+        const maxDistance = query.length >= 7 ? 2 : 1;
+        const distance = editDistanceWithin(query, value, maxDistance);
+        if (distance <= maxDistance) score = 50 + distance + Math.abs(value.length - query.length) / 100;
+      }
+      if (Number.isFinite(score)) ranked.push({ ...candidate, score });
+    }
+    ranked.sort((a, b) => a.score - b.score || a.label.localeCompare(b.label, "fr"));
+    return ranked.slice(0, 8);
+  }
+
+  function setupVerbSuggestions({ input, kind }) {
+    const field = input.closest(".form-field-verb");
+    if (!field) return;
+    const listbox = document.createElement("div");
+    const listboxId = "verb-suggestions-" + kind;
+    listbox.className = "verb-suggestions";
+    listbox.id = listboxId;
+    listbox.setAttribute("role", "listbox");
+    listbox.setAttribute("aria-label", "Sugerencias de verbos");
+    listbox.hidden = true;
+    input.setAttribute("role", "combobox");
+    input.setAttribute("aria-autocomplete", "list");
+    input.setAttribute("aria-controls", listboxId);
+    input.setAttribute("aria-expanded", "false");
+    field.append(listbox);
+
+    let matches = [];
+    let activeIndex = -1;
+
+    const hide = () => {
+      listbox.hidden = true;
+      listbox.replaceChildren();
+      input.setAttribute("aria-expanded", "false");
+      input.removeAttribute("aria-activedescendant");
+      matches = [];
+      activeIndex = -1;
+    };
+
+    const selectMatch = match => {
+      if (!match) return;
+      input.value = match.label;
+      hide();
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    };
+
+    const setActive = index => {
+      if (!matches.length) return;
+      activeIndex = (index + matches.length) % matches.length;
+      [...listbox.children].forEach((option, i) => {
+        const active = i === activeIndex;
+        option.classList.toggle("is-active", active);
+        option.setAttribute("aria-selected", String(active));
+      });
+      const activeOption = listbox.children[activeIndex];
+      if (activeOption) {
+        input.setAttribute("aria-activedescendant", activeOption.id);
+        activeOption.scrollIntoView({ block: "nearest" });
+      }
+    };
+
+    const render = () => {
+      const query = input.value.trim();
+      if (!normalizeSearchText(query)) {
+        hide();
+        return;
+      }
+      matches = rankVerbSuggestions(query);
+      activeIndex = -1;
+      listbox.replaceChildren();
+      if (!matches.length) {
+        const empty = document.createElement("div");
+        empty.className = "verb-suggestions-empty";
+        empty.textContent = "No se encontraron sugerencias. Puedes comprobar el infinitivo e intentarlo de nuevo.";
+        listbox.append(empty);
+        listbox.hidden = false;
+        input.setAttribute("aria-expanded", "true");
+        input.removeAttribute("aria-activedescendant");
+        return;
+      }
+      matches.forEach((match, index) => {
+        const option = document.createElement("button");
+        option.type = "button";
+        option.className = "verb-suggestion";
+        option.id = listboxId + "-option-" + index;
+        option.setAttribute("role", "option");
+        option.setAttribute("aria-selected", "false");
+        const name = document.createElement("span");
+        name.className = "verb-suggestion-name";
+        name.textContent = match.label;
+        option.append(name);
+        if (match.type === "pronominal") {
+          const type = document.createElement("span");
+          type.className = "verb-suggestion-type";
+          type.textContent = "Pronominal";
+          option.append(type);
+        }
+        option.addEventListener("pointerdown", event => event.preventDefault());
+        option.addEventListener("click", () => selectMatch(match));
+        listbox.append(option);
+      });
+      listbox.hidden = false;
+      input.setAttribute("aria-expanded", "true");
+      input.removeAttribute("aria-activedescendant");
+    };
+
+    input.addEventListener("input", render);
+    input.addEventListener("focus", () => {
+      if (input.value.trim()) render();
+    });
+    input.addEventListener("keydown", event => {
+      if (listbox.hidden && event.key !== "ArrowDown") return;
+      if (event.key === "ArrowDown") {
+        if (listbox.hidden) render();
+        if (matches.length) {
+          event.preventDefault();
+          setActive(activeIndex + 1);
+        }
+      } else if (event.key === "ArrowUp") {
+        if (matches.length) {
+          event.preventDefault();
+          setActive(activeIndex < 0 ? matches.length - 1 : activeIndex - 1);
+        }
+      } else if (event.key === "Enter" && !listbox.hidden && matches.length) {
+        event.preventDefault();
+        selectMatch(matches[activeIndex >= 0 ? activeIndex : 0]);
+      } else if (event.key === "Escape" && !listbox.hidden) {
+        event.preventDefault();
+        hide();
+      }
+    });
+    input.addEventListener("blur", () => window.setTimeout(hide, 120));
+  }
+
+  searchInputs.forEach(setupVerbSuggestions);
+
   tabs.forEach((tab, index) => {
     tab.addEventListener("click", () => setTab(tab.dataset.tab));
     tab.addEventListener("keydown", event => {
