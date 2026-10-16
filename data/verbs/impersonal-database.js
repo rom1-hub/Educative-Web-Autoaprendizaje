@@ -42,7 +42,30 @@
         "subjonctif imparfait": ["", "", "fallût", "", "", ""]
       }
     },
-        pleuvioter: {
+        pleuvoter: {
+      infinitif: "pleuvoter",
+      infinitive: "pleuvoter",
+      lemma: "pleuvoter",
+      impersonal: true,
+      typeLabel: "Verbe impersonnel",
+      sujetsAutorises: ["il"],
+      groupe: 1,
+      auxiliaire: "avoir",
+      participePasse: "pleuvoté",
+      participePresent: "pleuvotant",
+      accordParticipePasse: "aucun",
+      gerondifDisponible: false,
+      formes: {
+        "présent de l'indicatif": ["", "", "pleuvote", "", "", ""],
+        "imparfait": ["", "", "pleuvotait", "", "", ""],
+        "passé simple": ["", "", "pleuvota", "", "", ""],
+        "futur simple": ["", "", "pleuvotera", "", "", ""],
+        "conditionnel présent": ["", "", "pleuvoterait", "", "", ""],
+        "subjonctif présent": ["", "", "pleuvote", "", "", ""],
+        "subjonctif imparfait": ["", "", "pleuvotât", "", "", ""]
+      }
+    },
+    pleuvioter: {
       infinitif: "pleuvioter",
       infinitive: "pleuvioter",
       lemma: "pleuvioter",
