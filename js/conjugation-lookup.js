@@ -246,6 +246,10 @@
 
   function imperativePastRows(verb) {
     if (hasRestrictedUsage(verb)) return [];
+    // Los verbos limitados a terceras personas (p. ej. « urger »)
+    // no admiten imperativo, aunque tengan participio pasado.
+    if (Array.isArray(verb.sujetsAutorises) &&
+        !verb.sujetsAutorises.some(subject => ["tu", "nous", "vous"].includes(subject))) return [];
     const auxiliary = selectAuxiliary(verb);
     const auxiliaryForms = IMPERATIVE_AUX_FORMS[auxiliary];
     if (!auxiliaryForms || !getParticiple(verb)) return [];
