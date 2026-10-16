@@ -205,25 +205,27 @@
     let pool = buildVerbPool();
     const requestedVerb = normalize(filters.verb);
 
-    // Si se ha indicado un infinitivo, ese verbo tiene prioridad sobre los
-    // metadatos de familia/auxiliar: no deben excluirlo por etiquetas
-    // incompletas o heredadas del catálogo.
+    // El verbo limita el conjunto de candidatos, pero los filtros de
+    // familia, construcción y auxiliar siguen aplicándose después.
     if (requestedVerb) {
-      const exact = pool.filter(verb =>
-        normalize(infinitiveOf(verb)) === requestedVerb
-      );
-      if (exact.length) return exact;
+      let exact = [];
 
-      // Permite escribir el verbo base cuando se ha elegido su construcción
-      // pronominal, sin convertirlo en un filtro de familia.
+      // Si se elige la construcción pronominal, escribir el infinitivo base
+      // (p. ej. «laver») debe seleccionar «se laver», no «laver».
       if (filters.construction === "pronominal" &&
           !/^(?:se\s+|s')/.test(requestedVerb)) {
-        const pronominalMatches = pool.filter(verb =>
+        exact = pool.filter(verb =>
           isPronominal(verb) && baseInfinitiveOf(verb) === requestedVerb
         );
-        if (pronominalMatches.length) return pronominalMatches;
       }
-      return [];
+
+      if (!exact.length) {
+        exact = pool.filter(verb =>
+          normalize(infinitiveOf(verb)) === requestedVerb
+        );
+      }
+      if (!exact.length) return [];
+      pool = exact;
     }
 
     if (filters.construction === "pronominal") pool = pool.filter(isPronominal);
