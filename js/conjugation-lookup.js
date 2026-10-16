@@ -197,16 +197,28 @@
 
     return subjectsFor(verb).map(subject => {
       const entry = forms[subject.index];
-      if (entry == null) return null;
       let form;
       if (Array.isArray(entry)) {
         form = entry.length >= 2 ? entry[entry.length - 1] : "";
-      } else if (typeof entry === "object") {
+      } else if (typeof entry === "object" && entry !== null) {
         form = entry.form ?? entry.value ?? entry.conjugation ?? "";
       } else {
-        form = entry;
+        form = entry ?? "";
       }
       let normalizedForm = String(form ?? "").trim();
+
+      // « Battre » et ses dérivés (-abattre, -rabattre, -combattre…)
+      // n'ont parfois pas la 3e personne du singulier dans la source.
+      // Au présent, elle se déduit de « tu » en retirant le -s final :
+      // tu bats -> il/elle/on bat ; tu combats -> il/elle/on combat.
+      if (!normalizedForm &&
+          subject.index === 2 &&
+          tense === "présent de l'indicatif" &&
+          getInfinitive(verb).endsWith("battre")) {
+        const tuForm = readFormEntry(forms[1]);
+        if (/s$/i.test(tuForm)) normalizedForm = tuForm.slice(0, -1);
+      }
+
       if (!normalizedForm) return null;
       if (verb.pronominal) normalizedForm = reflexivePredicate(subject, normalizedForm);
       return { person: subject.key, form: normalizedForm };
