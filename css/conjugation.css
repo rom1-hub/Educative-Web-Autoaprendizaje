@@ -88,3 +88,6 @@
   .conjugation-table th, .conjugation-table td { padding: .75rem; }
 }
 /* -------- FIN CONJUGACIÓN -------- */
+
+/* Respeta el estado oculto de la pestaña aunque el contenedor tenga tablas. */
+.conjugation-results[hidden] { display: none; }
