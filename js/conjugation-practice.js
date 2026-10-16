@@ -219,10 +219,34 @@
     }
   }
 
+  function sampleVerbsForQuestionGeneration(verbs, limit = 120) {
+    if (verbs.length <= limit) return shuffle(verbs);
+    const groups = new Map([[1, []], [2, []], [3, []]]);
+    for (const verb of shuffle(verbs)) groups.get(groupOf(verb)).push(verb);
+    const selected = [];
+    const order = shuffle([1, 2, 3]);
+    while (selected.length < limit) {
+      let added = false;
+      for (const group of order) {
+        const next = groups.get(group).shift();
+        if (next) {
+          selected.push(next);
+          added = true;
+          if (selected.length >= limit) break;
+        }
+      }
+      if (!added) break;
+    }
+    return selected;
+  }
+
   function getCandidateQuestions(verbs, selectedTense, engine) {
     const tenses = selectedTense ? [selectedTense] : shuffle(TENSES.map(([key]) => key));
     const candidatesByGroup = new Map([[1, []], [2, []], [3, []]]);
-    for (const verb of shuffle(verbs)) {
+    // El catálogo completo puede contener miles de verbos. Una muestra
+    // equilibrada evita recorrer todos los tiempos de todo el catálogo
+    // cada vez que se inicia una sesión.
+    for (const verb of sampleVerbsForQuestionGeneration(verbs)) {
       const verbQuestions = [];
       for (const tense of tenses) {
         for (const row of rowsFor(verb, tense, engine)) {
@@ -403,7 +427,7 @@
         const fill = bar?.querySelector("span");
         if (bar) bar.setAttribute("aria-valuenow", String(index + 1));
         if (fill) fill.style.width = Math.round(((index + 1) / questions.length) * 100) + "%";
-        target.querySelector(".practice-score").textContent = "Puntuación: " + score + " / " + answers.length;
+        target.querySelector(".practice-score").textContent = "Aciertos: " + score + " / " + questions.length;
       });
     };
 
