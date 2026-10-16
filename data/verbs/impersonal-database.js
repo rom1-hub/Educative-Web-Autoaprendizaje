@@ -95,6 +95,7 @@
       lemma: "frire",
       defective: true,
       typeLabel: "Verbe transitif défectif",
+      sujetsAutorises: ["je", "tu", "il", "elle", "nous", "vous", "ils", "elles"],
       groupe: 3,
       auxiliaire: "avoir",
       participePasse: "frit",
