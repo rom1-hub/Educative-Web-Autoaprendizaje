@@ -13,7 +13,7 @@
   <script src="data/verbs/impersonal-database.js?v=frire-record-2" defer></script>
   <script src="data/verbs/pronominal-database.js?v=se-pouvoir-record-1" defer></script>
   <script src="js/conjugation-lookup.js?v=battre-third-singular-1" defer></script>
-  <script src="js/conjugation.js?v=pouvoir-pronominal-link-1" defer></script>
+  <script src="js/conjugation.js?v=separate-tab-results-1" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#contenido">Saltar al contenido</a>
@@ -119,8 +119,11 @@
     </section>
   </section>
 
-  <section class="container conjugation-results" id="conjugation-results" aria-live="polite" aria-atomic="false">
-    <div class="results-empty"><div class="results-symbol" aria-hidden="true">Aa</div><h2>Tu espacio de conjugación</h2><p>Los resultados aparecerán aquí. Busca un verbo para consultar sus formas o configura una sesión de práctica.</p></div>
+  <section class="container conjugation-results" id="lookup-results" data-results-for="lookup" aria-live="polite" aria-atomic="false">
+    <div class="results-empty"><div class="results-symbol" aria-hidden="true">Aa</div><h2>Consulta de conjugación</h2><p>Busca un verbo para consultar sus formas y sus tiempos verbales.</p></div>
+  </section>
+  <section class="container conjugation-results" id="practice-results" data-results-for="practice" aria-live="polite" aria-atomic="false" hidden>
+    <div class="results-empty"><div class="results-symbol" aria-hidden="true">Aa</div><h2>Tu espacio de práctica</h2><p>Configura los filtros y genera una sesión de ejercicios. Los resultados de conjugación no se muestran en esta pestaña.</p></div>
   </section>
 </main>
 <footer class="site-footer">
