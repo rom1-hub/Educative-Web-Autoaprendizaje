@@ -419,7 +419,7 @@
 
   lookupForm.addEventListener("reset", () => {
     window.setTimeout(() => {
-      lookupResults.innerHTML = '<div class="lookupResults-empty"><div class="lookupResults-symbol" aria-hidden="true">Aa</div><h2>Tu espacio de conjugación</h2><p>Los resultados aparecerán aquí. Busca un verbo para consultar sus formas o configura una sesión de práctica.</p></div>';
+      lookupResults.innerHTML = '<div class="results-empty"><div class="results-symbol" aria-hidden="true">Aa</div><h2>Tu espacio de conjugación</h2><p>Los resultados aparecerán aquí. Busca un verbo para consultar sus formas o configura una sesión de práctica.</p></div>';
     }, 0);
   });
 
