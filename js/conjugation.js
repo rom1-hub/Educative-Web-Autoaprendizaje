@@ -7,10 +7,12 @@
   "use strict";
   const tabs = [...document.querySelectorAll("[data-tab]")];
   const panels = [...document.querySelectorAll("[data-panel]")];
-  const results = document.getElementById("conjugation-results");
+  const lookupResults = document.getElementById("lookup-results");
+  const practiceResults = document.getElementById("practice-results");
+  const resultPanels = [...document.querySelectorAll("[data-results-for]")];
   const lookupForm = document.getElementById("lookup-form");
   const practiceForm = document.getElementById("practice-form");
-  if (!tabs.length || !results || !lookupForm || !practiceForm) return;
+  if (!tabs.length || !lookupResults || !practiceResults || !lookupForm || !practiceForm) return;
 
   let activeTab = "lookup";
   let lockedVerbProfile = null;
@@ -28,11 +30,14 @@
       tab.tabIndex = active ? 0 : -1;
     });
     panels.forEach(panel => { panel.hidden = panel.dataset.panel !== name; });
+    resultPanels.forEach(panel => { panel.hidden = panel.dataset.resultsFor !== name; });
   }
 
-  function showMessage(message, isError = false) {
-    results.innerHTML = '<p class="results-message' + (isError ? ' is-error' : '') + '" role="status">' + esc(message) + '</p>';
+  function showMessage(message, isError = false, target = (activeTab === "lookup" ? lookupResults : practiceResults)) {
+    target.innerHTML = '<p class="results-message' + (isError ? ' is-error' : '') + '" role="status">' + esc(message) + '</p>';
   }
+  const showLookupMessage = (message, isError = false) => showMessage(message, isError, lookupResults);
+  const showPracticeMessage = (message, isError = false) => showMessage(message, isError, practiceResults);
 
   function normalizeInfinitive(value) {
     return String(value ?? "")
@@ -185,7 +190,7 @@
 
   function renderConjugations(verb, tense, forms) {
     if (!forms) {
-      showMessage("El verbo existe, pero el motor de conjugación aún no está conectado a esta página. La interfaz está preparada; falta integrar el catálogo y el motor canónicos.", true);
+      showLookupMessage("El verbo existe, pero el motor de conjugación aún no está conectado a esta página. La interfaz está preparada; falta integrar el catálogo y el motor canónicos.", true);
       return;
     }
     const lemma = verb.lemma || verb.infinitive || verb.infinitif || verb.verb || document.getElementById("lookup-verb").value.trim();
@@ -312,8 +317,8 @@
       }
       output += '</div>';
     }
-    results.innerHTML = output;
-    results.querySelector("[data-practice-this]")?.addEventListener("click", () => {
+    lookupResults.innerHTML = output;
+    lookupResults.querySelector("[data-practice-this]")?.addEventListener("click", () => {
       const profile = verb.profile || verb.metadata || verb;
       lockedVerbProfile = {
         lemma,
@@ -327,34 +332,34 @@
       applyLockedProfile();
       document.getElementById("practice-form").scrollIntoView({behavior:"smooth",block:"center"});
     });
-    results.querySelector("[data-show-pronominal]")?.addEventListener("click", async () => {
+    lookupResults.querySelector("[data-show-pronominal]")?.addEventListener("click", async () => {
       const input = document.getElementById("lookup-verb");
       input.value = pronominalForm;
       try {
         const pronominalVerb = findVerb(pronominalForm);
         if (!pronominalVerb) {
-          showMessage("No se ha encontrado la forma pronominal «" + pronominalForm + "» en el catálogo cargado.", true);
+          showLookupMessage("No se ha encontrado la forma pronominal «" + pronominalForm + "» en el catálogo cargado.", true);
           return;
         }
         const pronominalForms = await getForms(pronominalVerb, tense);
         renderConjugations(pronominalVerb, tense, pronominalForms);
       } catch (error) {
-        showMessage("No se pudo obtener la conjugación de la forma pronominal.", true);
+        showLookupMessage("No se pudo obtener la conjugación de la forma pronominal.", true);
       }
     });
-    results.querySelector("[data-show-non-pronominal]")?.addEventListener("click", async () => {
+    lookupResults.querySelector("[data-show-non-pronominal]")?.addEventListener("click", async () => {
       const input = document.getElementById("lookup-verb");
       input.value = nonPronominalForm;
       try {
         const nonPronominalVerb = findVerb(nonPronominalForm);
         if (!nonPronominalVerb || nonPronominalVerb.pronominal) {
-          showMessage("No se ha encontrado la forma no pronominal «" + nonPronominalForm + "» en el catálogo cargado.", true);
+          showLookupMessage("No se ha encontrado la forma no pronominal «" + nonPronominalForm + "» en el catálogo cargado.", true);
           return;
         }
         const nonPronominalForms = await getForms(nonPronominalVerb, tense);
         renderConjugations(nonPronominalVerb, tense, nonPronominalForms);
       } catch (error) {
-        showMessage("No se pudo obtener la conjugación de la forma no pronominal.", true);
+        showLookupMessage("No se pudo obtener la conjugación de la forma no pronominal.", true);
       }
     });
   }
@@ -400,21 +405,21 @@
     event.preventDefault();
     const raw = document.getElementById("lookup-verb").value.trim();
     const tense = document.getElementById("lookup-tense").value;
-    if (!raw) return showMessage("Escribe un verbo francés para realizar la búsqueda.", true);
-    if (!tense) return showMessage("Selecciona un tiempo verbal o «Todos los tiempos verbales».", true);
+    if (!raw) return showLookupMessage("Escribe un verbo francés para realizar la búsqueda.", true);
+    if (!tense) return showLookupMessage("Selecciona un tiempo verbal o «Todos los tiempos verbales».", true);
     const verb = findVerb(raw);
-    if (!verb) return showMessage("No se ha encontrado «" + raw + "» en el catálogo de verbos cargado. El catálogo canónico debe conectarse para consultar cualquier verbo.", true);
+    if (!verb) return showLookupMessage("No se ha encontrado «" + raw + "» en el catálogo de verbos cargado. El catálogo canónico debe conectarse para consultar cualquier verbo.", true);
     try {
       const forms = await getForms(verb, tense);
       renderConjugations(verb, tense, forms);
     } catch (error) {
-      showMessage("No se pudo obtener la conjugación. Revisa la integración del motor de conjugación.", true);
+      showLookupMessage("No se pudo obtener la conjugación. Revisa la integración del motor de conjugación.", true);
     }
   });
 
   lookupForm.addEventListener("reset", () => {
     window.setTimeout(() => {
-      results.innerHTML = '<div class="results-empty"><div class="results-symbol" aria-hidden="true">Aa</div><h2>Tu espacio de conjugación</h2><p>Los resultados aparecerán aquí. Busca un verbo para consultar sus formas o configura una sesión de práctica.</p></div>';
+      lookupResults.innerHTML = '<div class="lookupResults-empty"><div class="lookupResults-symbol" aria-hidden="true">Aa</div><h2>Tu espacio de conjugación</h2><p>Los resultados aparecerán aquí. Busca un verbo para consultar sus formas o configura una sesión de práctica.</p></div>';
     }, 0);
   });
 
@@ -429,10 +434,10 @@
     };
     const engine = window.COQ_PRACTICE_ENGINE || window.CoQPracticeEngine;
     if (engine && typeof engine.start === "function") {
-      engine.start(filters, results);
+      engine.start(filters, practiceResults);
       return;
     }
-    showMessage("Filtros preparados. La generación de ejercicios todavía necesita conectarse al motor de práctica y al catálogo canónico de verbos.", true);
+    showPracticeMessage("Filtros preparados. La generación de ejercicios todavía necesita conectarse al motor de práctica y al catálogo canónico de verbos.", true);
   });
 
   practiceForm.addEventListener("reset", () => {
