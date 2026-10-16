@@ -13,7 +13,7 @@
   <script src="data/verbs/impersonal-database.js?v=frire-record-2" defer></script>
   <script src="data/verbs/pronominal-database.js?v=se-pouvoir-record-1" defer></script>
   <script src="js/conjugation-lookup.js?v=battre-third-singular-1" defer></script>
-  <script src="js/conjugation-practice.js?v=practice-engine-2" defer></script>
+  <script src="js/conjugation-practice.js?v=practice-families-1" defer></script>
   <script src="js/conjugation.js?v=smart-verb-search-1" defer></script>
 </head>
 <body>
@@ -95,8 +95,31 @@
           <label for="practice-family">Grupos verbales y familias</label>
           <select id="practice-family" name="family">
             <option value="">Todos los grupos y familias</option>
-            <optgroup label="Grupos"><option value="premier-groupe">Premier groupe · -ER</option><option value="deuxieme-groupe">Deuxième groupe · -IR</option><option value="troisieme-groupe">Troisième groupe · irréguliers</option></optgroup>
-            <optgroup label="Familias"><option value="ger">-GER</option><option value="cer">-CER</option><option value="eler">-ELER</option><option value="eter">-ETER</option><option value="yer">-YER</option><option value="e-accent">E/È + consonne + -ER</option><option value="ir">-IR</option><option value="dre">-DRE</option><option value="eindre">-EINDRE</option><option value="aindre">-AINDRE</option><option value="oindre">-OINDRE</option><option value="uire">-UIRE</option><option value="irreguliers">Autres verbes irregulares</option></optgroup>
+            <optgroup label="Primer grupo — no seleccionable">
+              <option value="premier-groupe">Todos los verbos del primer grupo</option>
+              <option value="premier-groupe-reguliers">Verbos regulares del primer grupo</option>
+              <option value="ger">Verbos en -GER</option>
+              <option value="cer">Verbos en -CER</option>
+              <option value="eler">Verbos en -ELER</option>
+              <option value="eter">Verbos en -ETER</option>
+              <option value="yer">Verbos en -YER</option>
+              <option value="e-accent">Verbos en -E (È) + CONSONANTE + ER</option>
+            </optgroup>
+            <optgroup label="Segundo grupo — no seleccionable">
+              <option value="deuxieme-groupe">Todos los verbos del segundo grupo</option>
+            </optgroup>
+            <optgroup label="Tercer grupo — no seleccionable">
+              <option value="troisieme-groupe">Todos los verbos del tercer grupo</option>
+              <option value="ir">Verbos en -IR</option>
+              <option value="aitre">Verbos en -AÎTRE</option>
+              <option value="dre">Verbos en -DRE</option>
+              <option value="ire-uire">Verbos en -IRE / -UIRE (incluye faire y plaire)</option>
+              <option value="oudre">Verbos en -OUDRE (10 verbos en el catálogo)</option>
+              <option value="oir-oire">Verbos en -OIR / -OIRE</option>
+              <option value="eindre-combined">Verbos en -EINDRE / -AINDRE / -OINDRE</option>
+              <option value="ttre">Verbos en -TTRE (26 verbos en el catálogo)</option>
+              <option value="top-50" disabled>Los 50 verbos más comunes (lista por determinar)</option>
+            </optgroup>
           </select>
         </div>
         <div class="form-field">

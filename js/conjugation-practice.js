@@ -86,20 +86,39 @@
 
   function familyOf(verb) {
     const base = baseInfinitiveOf(verb);
-    if (base === "aller") return "irreguliers";
-    if (/ger$/.test(base)) return "ger";
-    if (/cer$/.test(base)) return "cer";
-    if (/eler$/.test(base)) return "eler";
-    if (/eter$/.test(base)) return "eter";
-    if (/yer$/.test(base)) return "yer";
-    if (/(?:e|é|è)[^aeiouy]*er$/.test(base)) return "e-accent";
-    if (/eindre$/.test(base)) return "eindre";
-    if (/aindre$/.test(base)) return "aindre";
-    if (/oindre$/.test(base)) return "oindre";
-    if (/uire$/.test(base)) return "uire";
+    const rawBase = String(
+      verb?.formeNonPronominale || verb?.infinitifBase || verb?.infinitif_base ||
+      verb?.verbeBase || infinitiveOf(verb)
+    ).toLocaleLowerCase("fr").replace(/[’‘]/g, "'").trim().replace(/^(?:se\s+|s')/, "");
+    const group = groupOf(verb);
+
+    // Las familias del primer grupo tienen prioridad sobre la categoría
+    // general de verbos regulares en -ER.
+    if (group === 1) {
+      if (/ger$/.test(base)) return "ger";
+      if (/cer$/.test(base)) return "cer";
+      if (/eler$/.test(base)) return "eler";
+      if (/eter$/.test(base)) return "eter";
+      if (/yer$/.test(base)) return "yer";
+      if (/e[^aeiouy]er$/.test(rawBase)) return "e-accent";
+      return "premier-groupe-reguliers";
+    }
+
+    if (group === 2) return "deuxieme-groupe";
+
+    // Orden específico para evitar que las familias en -DRE absorban
+    // -OUDRE y -EINDRE/-AINDRE/-OINDRE.
+    if (/oudre$/.test(base)) return "oudre";
+    if (/ttre$/.test(base)) return "ttre";
+    if (/(?:eindre|aindre|oindre)$/.test(base)) return "eindre-combined";
+    if (/aitre$/.test(base)) return "aitre";
+    if (/(?:oir|oire)$/.test(base)) return "oir-oire";
+    if (/uire$/.test(base) || /ire$/.test(base) || base === "faire" || base === "plaire") {
+      return "ire-uire";
+    }
     if (/dre$/.test(base)) return "dre";
     if (/ir$/.test(base)) return "ir";
-    return groupOf(verb) === 3 ? "irreguliers" : "";
+    return "irreguliers";
   }
 
   function recordList(database) {
@@ -192,8 +211,14 @@
         "deuxieme-groupe": 2,
         "troisieme-groupe": 3
       })[filters.family];
-      if (requestedGroup) pool = pool.filter(verb => groupOf(verb) === requestedGroup);
-      else pool = pool.filter(verb => familyOf(verb) === filters.family);
+      if (requestedGroup) {
+        pool = pool.filter(verb => groupOf(verb) === requestedGroup);
+      } else if (filters.family === "top-50") {
+        // La lista de los 50 verbos se definirá junto con el usuario.
+        pool = [];
+      } else {
+        pool = pool.filter(verb => familyOf(verb) === filters.family);
+      }
     }
 
     if (filters.auxiliary) pool = pool.filter(verb => matchesAuxiliary(verb, filters.auxiliary));

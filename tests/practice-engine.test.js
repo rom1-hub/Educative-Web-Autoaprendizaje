@@ -29,6 +29,10 @@ const verbs = {
     infinitif: "préférer", groupe: 1, auxiliaire: "avoir",
     formes: { "présent de l'indicatif": ["préfère", "préfères", "préfère", "préférons", "préférez", "préfèrent"] }
   },
+  lever: {
+    infinitif: "lever", groupe: 1, auxiliaire: "avoir",
+    formes: { "présent de l'indicatif": ["lève", "lèves", "lève", "levons", "levez", "lèvent"] }
+  },
   laver: {
     infinitif: "laver", groupe: 1, auxiliaire: "avoir",
     formes: { "présent de l'indicatif": ["lave", "laves", "lave", "lavons", "lavez", "lavent"] }
@@ -124,4 +128,54 @@ test("el filtro por familia distingue verbos en -GER", () => {
   engine.start({ verb: "manger", tense: "present", family: "ger" }, target);
   assert.match(target.innerHTML, /Ejercicio 1 de 20/);
   assert.match(target.innerHTML, /manger/);
+});
+
+test("el primer grupo regular excluye familias ortográficas específicas", () => {
+  const regular = makeTarget();
+  engine.start({ verb: "parler", tense: "present", family: "premier-groupe-reguliers" }, regular);
+  assert.match(regular.innerHTML, /parler/);
+
+  const special = makeTarget();
+  engine.start({ verb: "manger", tense: "present", family: "premier-groupe-reguliers" }, special);
+  assert.match(special.innerHTML, /No se encontraron verbos/);
+});
+
+test("el filtro -E (È) + consonante + ER detecta verbos como lever", () => {
+  const target = makeTarget();
+  engine.start({ verb: "lever", tense: "present", family: "e-accent" }, target);
+  assert.match(target.innerHTML, /Ejercicio 1 de 20/);
+});
+
+test("las familias -OUDRE, -TTRE, -DRE y -AÎTRE se clasifican por separado", () => {
+  for (const [verb, family] of [["coudre", "oudre"], ["mettre", "ttre"], ["vendre", "dre"], ["naître", "aitre"]]) {
+    const target = makeTarget();
+    engine.start({ verb, tense: "present", family }, target);
+    assert.match(target.innerHTML, /Ejercicio 1 de 20/, verb + " debe pertenecer a " + family);
+  }
+});
+
+test("la familia -IRE / -UIRE incluye faire y plaire", () => {
+  for (const verb of ["faire", "plaire"]) {
+    const target = makeTarget();
+    engine.start({ verb, tense: "present", family: "ire-uire" }, target);
+    assert.match(target.innerHTML, /Ejercicio 1 de 20/, verb + " debe estar incluido");
+  }
+});
+
+test("la familia combinada -EINDRE / -AINDRE / -OINDRE no se mezcla con -DRE", () => {
+  const target = makeTarget();
+  engine.start({ verb: "peindre", tense: "present", family: "eindre-combined" }, target);
+  assert.match(target.innerHTML, /Ejercicio 1 de 20/);
+
+  const genericDre = makeTarget();
+  engine.start({ verb: "peindre", tense: "present", family: "dre" }, genericDre);
+  assert.match(genericDre.innerHTML, /No se encontraron verbos/);
+});
+
+test("el menú contiene cabeceras por grupo y deja pendiente la lista de los 50 comunes", () => {
+  const html = fs.readFileSync(path.join(root, "conjugacion.html"), "utf8");
+  assert.match(html, /Primer grupo — no seleccionable/);
+  assert.match(html, /Segundo grupo — no seleccionable/);
+  assert.match(html, /Tercer grupo — no seleccionable/);
+  assert.match(html, /value="top-50" disabled/);
 });
