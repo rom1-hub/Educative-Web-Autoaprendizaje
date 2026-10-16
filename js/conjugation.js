@@ -467,6 +467,12 @@
     return verbSuggestionIndex;
   }
 
+  function findCanonicalSuggestion(rawValue) {
+    const normalized = normalizeSearchText(rawValue);
+    if (!normalized) return null;
+    return buildVerbSuggestionIndex().find(candidate => candidate.normalized === normalized) || null;
+  }
+
   function rankVerbSuggestions(rawQuery) {
     const query = normalizeSearchText(rawQuery);
     if (!query) return [];
@@ -627,9 +633,14 @@
 
   lookupForm.addEventListener("submit", async event => {
     event.preventDefault();
-    const raw = document.getElementById("lookup-verb").value.trim();
+    let raw = document.getElementById("lookup-verb").value.trim();
     const tense = document.getElementById("lookup-tense").value;
     if (!raw) return showLookupMessage("Escribe un verbo francés para realizar la búsqueda.", true);
+    const canonical = findCanonicalSuggestion(raw);
+    if (canonical) {
+      raw = canonical.label;
+      document.getElementById("lookup-verb").value = raw;
+    }
     if (!tense) return showLookupMessage("Selecciona un tiempo verbal o «Todos los tiempos verbales».", true);
     const verb = findVerb(raw);
     if (!verb) return showLookupMessage("No se ha encontrado «" + raw + "» en el catálogo de verbos cargado. El catálogo canónico debe conectarse para consultar cualquier verbo.", true);
@@ -649,8 +660,12 @@
 
   practiceForm.addEventListener("submit", event => {
     event.preventDefault();
+    const practiceVerbInput = document.getElementById("practice-verb");
+    const rawPracticeVerb = practiceVerbInput.value.trim();
+    const canonicalPracticeVerb = findCanonicalSuggestion(rawPracticeVerb);
+    if (canonicalPracticeVerb) practiceVerbInput.value = canonicalPracticeVerb.label;
     const filters = {
-      verb: document.getElementById("practice-verb").value.trim(),
+      verb: canonicalPracticeVerb ? canonicalPracticeVerb.label : rawPracticeVerb,
       tense: document.getElementById("practice-tense").value,
       family: document.getElementById("practice-family").value,
       construction: document.getElementById("practice-construction").value,
