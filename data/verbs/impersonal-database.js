@@ -42,7 +42,31 @@
         "subjonctif imparfait": ["", "", "fallût", "", "", ""]
       }
     },
-        pluviner: {
+        urger: {
+      infinitif: "urger",
+      infinitive: "urger",
+      lemma: "urger",
+      impersonal: false,
+      defective: true,
+      typeLabel: "Verbe intransitif défectif",
+      sujetsAutorises: ["il", "elle", "ils", "elles"],
+      groupe: 1,
+      auxiliaire: "avoir",
+      participePasse: "urgé",
+      participePresent: "urgeant",
+      accordParticipePasse: "aucun",
+      gerondifDisponible: false,
+      formes: {
+        "présent de l'indicatif": ["", "", "urge", "", "", "urgent"],
+        "imparfait": ["", "", "urgeait", "", "", "urgeaient"],
+        "passé simple": ["", "", "urgea", "", "", "urgèrent"],
+        "futur simple": ["", "", "urgera", "", "", "urgeront"],
+        "conditionnel présent": ["", "", "urgerait", "", "", "urgeraient"],
+        "subjonctif présent": ["", "", "urge", "", "", "urgent"],
+        "subjonctif imparfait": ["", "", "urgeât", "", "", "urgeassent"]
+      }
+    },
+    pluviner: {
       infinitif: "pluviner",
       infinitive: "pluviner",
       lemma: "pluviner",
