@@ -87,17 +87,17 @@
   function familyOf(verb) {
     const base = baseInfinitiveOf(verb);
     if (base === "aller") return "irreguliers";
-    if (/-ger$/.test(base)) return "ger";
-    if (/-cer$/.test(base)) return "cer";
-    if (/-eler$/.test(base)) return "eler";
-    if (/-eter$/.test(base)) return "eter";
-    if (/-yer$/.test(base)) return "yer";
+    if (/ger$/.test(base)) return "ger";
+    if (/cer$/.test(base)) return "cer";
+    if (/eler$/.test(base)) return "eler";
+    if (/eter$/.test(base)) return "eter";
+    if (/yer$/.test(base)) return "yer";
     if (/(?:e|é|è)[^aeiouy]*er$/.test(base)) return "e-accent";
-    if (/-eindre$/.test(base)) return "eindre";
-    if (/-aindre$/.test(base)) return "aindre";
-    if (/-oindre$/.test(base)) return "oindre";
-    if (/-uire$/.test(base)) return "uire";
-    if (/-dre$/.test(base)) return "dre";
+    if (/eindre$/.test(base)) return "eindre";
+    if (/aindre$/.test(base)) return "aindre";
+    if (/oindre$/.test(base)) return "oindre";
+    if (/uire$/.test(base)) return "uire";
+    if (/dre$/.test(base)) return "dre";
     if (/ir$/.test(base)) return "ir";
     return groupOf(verb) === 3 ? "irreguliers" : "";
   }
@@ -159,10 +159,14 @@
 
   function matchesAuxiliary(verb, requested) {
     if (!requested) return true;
-    const auxiliary = isPronominal(verb)
-      ? "etre"
-      : normalize(verb?.auxiliaire || verb?.auxiliary || (Array.isArray(verb?.auxiliaires) ? verb.auxiliaires.join(" ") : ""));
-    return auxiliary === requested || (requested === "etre" && auxiliary === "être");
+    if (isPronominal(verb)) return requested === "etre";
+    const declared = Array.isArray(verb?.auxiliaires)
+      ? verb.auxiliaires.map(normalize)
+      : [normalize(verb?.auxiliaire || verb?.auxiliary || "avoir")];
+    // Se aplica la misma regla que en el motor de consulta: si hay dos
+    // auxiliares declarados, se prioriza être; si no, se usa avoir.
+    const selected = declared.includes("etre") ? "etre" : "avoir";
+    return selected === requested;
   }
 
   function filterVerbs(filters) {
@@ -235,6 +239,9 @@
       }
     }
 
+    // Conservar una copia completa para poder completar veinte preguntas
+    // cuando un filtro estrecho deja menos combinaciones distintas.
+    const allQuestions = [...candidatesByGroup.values()].flat(2).map(question => ({ ...question }));
     // Una pregunta por verbo en la primera ronda y alternancia de grupos
     // para que «Todos los grupos» no se concentre en el primer grupo.
     const output = [];
@@ -256,8 +263,10 @@
       }
       if (!addedThisRound) {
         const remaining = [...candidatesByGroup.values()].flat(2);
-        if (!remaining.length) break;
-        output.push(...shuffle(remaining).slice(0, MAX_QUESTIONS - output.length));
+        if (remaining.length) {
+          output.push(...shuffle(remaining).slice(0, MAX_QUESTIONS - output.length));
+        }
+        break;
         break;
       }
       round++;
@@ -266,7 +275,6 @@
     // Si el usuario fija un único verbo y un único tiempo, puede haber menos
     // de veinte combinaciones distintas. Completar la sesión sin bloquearla.
     if (output.length && output.length < MAX_QUESTIONS) {
-      const allQuestions = [...candidatesByGroup.values()].flat(2);
       while (output.length < MAX_QUESTIONS) output.push({ ...allQuestions[output.length % allQuestions.length] });
     }
     return shuffle(output).slice(0, MAX_QUESTIONS);
