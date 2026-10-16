@@ -89,6 +89,27 @@
         "subjonctif imparfait": ["", "", "pluvinât", "", "", ""]
       }
     },
+    adirer: {
+      infinitif: "adirer",
+      infinitive: "adirer",
+      lemma: "adirer",
+      groupe: 1,
+      auxiliaire: "avoir",
+      participePasse: "adiré",
+      participePresent: "adirant",
+      accordParticipePasse: "normal",
+      gerondifDisponible: true,
+      formes: {
+        "présent de l'indicatif": ["adire", "adires", "adire", "adirons", "adirez", "adirent"],
+        "imparfait": ["adirais", "adirais", "adirait", "adirions", "adiriez", "adiraient"],
+        "passé simple": ["adirai", "adiras", "adira", "adirâmes", "adirâtes", "adirèrent"],
+        "futur simple": ["adirerai", "adireras", "adirera", "adirerons", "adirerez", "adireront"],
+        "conditionnel présent": ["adirerais", "adirerais", "adirerait", "adirerions", "adireriez", "adireraient"],
+        "subjonctif présent": ["adire", "adires", "adire", "adirions", "adiriez", "adirent"],
+        "subjonctif imparfait": ["adirasse", "adirasses", "adirât", "adirassions", "adirassiez", "adirassent"],
+        "impératif présent": ["adire", "adirons", "adirez"]
+      }
+    },
     pleuvoter: {
       infinitif: "pleuvoter",
       infinitive: "pleuvoter",
