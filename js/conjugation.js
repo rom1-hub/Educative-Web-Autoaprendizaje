@@ -473,6 +473,38 @@
     return buildVerbSuggestionIndex().find(candidate => candidate.normalized === normalized) || null;
   }
 
+  function syncPracticeVerbProfile() {
+    const input = document.getElementById("practice-verb");
+    const raw = input.value.trim();
+    const normalized = normalizeSearchText(raw);
+
+    if (lockedVerbProfile && normalized === normalizeSearchText(lockedVerbProfile.lemma)) return;
+
+    if (lockedVerbProfile) {
+      lockedVerbProfile = null;
+      applyLockedProfile();
+      document.getElementById("practice-family").value = "";
+      document.getElementById("practice-construction").value = "";
+      document.getElementById("practice-auxiliary").value = "";
+    }
+
+    if (!normalized) return;
+    const canonical = findCanonicalSuggestion(raw);
+    if (!canonical) return;
+    const verb = findVerb(canonical.label);
+    if (!verb) return;
+
+    const profile = verb.profile || verb.metadata || verb;
+    lockedVerbProfile = {
+      lemma: canonical.label,
+      group: getVerbGroup(verb),
+      family: profile.family || profile.pattern || "",
+      construction: profile.pronominal ? "pronominal" : "non-pronominal",
+      auxiliary: profile.auxiliary || profile.auxiliaire || ""
+    };
+    applyLockedProfile();
+  }
+
   function rankVerbSuggestions(rawQuery) {
     const query = normalizeSearchText(rawQuery);
     if (!query) return [];
@@ -619,6 +651,10 @@
   }
 
   searchInputs.forEach(setupVerbSuggestions);
+
+  const practiceVerbInput = document.getElementById("practice-verb");
+  practiceVerbInput?.addEventListener("input", syncPracticeVerbProfile);
+  practiceVerbInput?.addEventListener("change", syncPracticeVerbProfile);
 
   tabs.forEach((tab, index) => {
     tab.addEventListener("click", () => setTab(tab.dataset.tab));
