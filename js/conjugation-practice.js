@@ -37,8 +37,21 @@
     .trim();
 
   function infinitiveOf(verb) {
-    return String(verb?.infinitif || verb?.infinitive || verb?.lemma || verb?.verb || "")
+    return String(verb?.infinitif || verb?.infinitive || verb?.lemma || verb?.verb || verb?.verbe || verb?.forme || "")
       .replace(/[’‘]/g, "'").trim();
+  }
+
+  function keyedRecords(database, defaultType = "regular") {
+    if (!database) return [];
+    const entries = Array.isArray(database)
+      ? database.map((record, index) => [String(index), record])
+      : Object.entries(database);
+    return entries.map(([key, record]) => {
+      if (!record || typeof record !== "object") return null;
+      const fallback = String(key).replace(/^se-/, "se ").replace(/-/g, " ");
+      const label = infinitiveOf(record) || fallback;
+      return { ...record, infinitif: label, ...(defaultType === "pronominal" ? { pronominal: true } : {}) };
+    }).filter(Boolean);
   }
 
   function baseInfinitiveOf(verb) {
@@ -136,8 +149,8 @@
       const previous = byInfinitive.get(key);
       byInfinitive.set(key, previous ? { ...previous, ...record } : record);
     };
-    recordList(window.COQ_VERBS).forEach(add);
-    recordList(window.COQ_IMPERSONAL_VERBS).forEach(add);
+    keyedRecords(window.COQ_VERBS).forEach(add);
+    keyedRecords(window.COQ_IMPERSONAL_VERBS).forEach(add);
     return byInfinitive;
   }
 
@@ -156,7 +169,7 @@
     }
 
     const pronominalDatabase = window.COQ_PRONOMINAL_VERBS;
-    for (const record of recordList(pronominalDatabase)) {
+    for (const record of keyedRecords(pronominalDatabase, "pronominal")) {
       const label = infinitiveOf(record);
       const baseKey = baseInfinitiveOf(record);
       const base = bases.get(baseKey);
@@ -190,20 +203,31 @@
 
   function filterVerbs(filters) {
     let pool = buildVerbPool();
+    const requestedVerb = normalize(filters.verb);
+
+    // Si se ha indicado un infinitivo, ese verbo tiene prioridad sobre los
+    // metadatos de familia/auxiliar: no deben excluirlo por etiquetas
+    // incompletas o heredadas del catálogo.
+    if (requestedVerb) {
+      const exact = pool.filter(verb =>
+        normalize(infinitiveOf(verb)) === requestedVerb
+      );
+      if (exact.length) return exact;
+
+      // Permite escribir el verbo base cuando se ha elegido su construcción
+      // pronominal, sin convertirlo en un filtro de familia.
+      if (filters.construction === "pronominal" &&
+          !/^(?:se\\s+|s')/.test(requestedVerb)) {
+        const pronominalMatches = pool.filter(verb =>
+          isPronominal(verb) && baseInfinitiveOf(verb) === requestedVerb
+        );
+        if (pronominalMatches.length) return pronominalMatches;
+      }
+      return [];
+    }
+
     if (filters.construction === "pronominal") pool = pool.filter(isPronominal);
     if (filters.construction === "non-pronominal") pool = pool.filter(verb => !isPronominal(verb));
-
-    const requestedVerb = normalize(filters.verb);
-    if (requestedVerb) {
-      const wantsPronominalBase = filters.construction === "pronominal" &&
-        !/^(?:se\\s+|s')/.test(requestedVerb);
-      const exact = pool.filter(verb =>
-        normalize(infinitiveOf(verb)) === requestedVerb ||
-        (wantsPronominalBase && baseInfinitiveOf(verb) === requestedVerb)
-      );
-      if (!exact.length) return [];
-      pool = exact;
-    }
 
     if (filters.family) {
       const requestedGroup = ({
@@ -320,7 +344,6 @@
         if (remaining.length) {
           output.push(...shuffle(remaining).slice(0, MAX_QUESTIONS - output.length));
         }
-        break;
         break;
       }
       round++;
