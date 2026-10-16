@@ -42,6 +42,28 @@
         "subjonctif imparfait": ["", "", "fallût", "", "", ""]
       }
     },
+    "grêler": {
+      infinitif: "grêler",
+      infinitive: "grêler",
+      lemma: "grêler",
+      impersonal: true,
+      typeLabel: "Verbe impersonnel",
+      sujetsAutorises: ["il", "elle", "ils", "elles"],
+      groupe: 1,
+      auxiliaire: "avoir",
+      participePasse: "grêlé",
+      participePresent: "grêlant",
+      gerondifDisponible: false,
+      formes: {
+        "présent de l'indicatif": ["", "", "grêle", "", "", "grêlent"],
+        "imparfait": ["", "", "grêlait", "", "", "grêlaient"],
+        "passé simple": ["", "", "grêla", "", "", "grêlèrent"],
+        "futur simple": ["", "", "grêlera", "", "", "grêleront"],
+        "conditionnel présent": ["", "", "grêlerait", "", "", "grêleraient"],
+        "subjonctif présent": ["", "", "grêle", "", "", "grêlent"],
+        "subjonctif imparfait": ["", "", "grêlât", "", "", "grêlassent"]
+      }
+    },
     dracher: {
       infinitif: "dracher",
       infinitive: "dracher",
