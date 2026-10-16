@@ -42,6 +42,29 @@
         "subjonctif imparfait": ["", "", "fallût", "", "", ""]
       }
     },
+    "grésiller": {
+      infinitif: "grésiller",
+      infinitive: "grésiller",
+      lemma: "grésiller",
+      impersonal: true,
+      typeLabel: "Verbe impersonnel",
+      sujetsAutorises: ["il"],
+      groupe: 1,
+      auxiliaire: "avoir",
+      participePasse: "grésillé",
+      participePresent: "grésillant",
+      accordParticipePasse: "aucun",
+      gerondifDisponible: false,
+      formes: {
+        "présent de l'indicatif": ["", "", "grésille", "", "", ""],
+        "imparfait": ["", "", "grésillait", "", "", ""],
+        "passé simple": ["", "", "grésilla", "", "", ""],
+        "futur simple": ["", "", "grésillera", "", "", ""],
+        "conditionnel présent": ["", "", "grésillerait", "", "", ""],
+        "subjonctif présent": ["", "", "grésille", "", "", ""],
+        "subjonctif imparfait": ["", "", "grésillât", "", "", ""]
+      }
+    },
     "grêler": {
       infinitif: "grêler",
       infinitive: "grêler",
