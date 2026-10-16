@@ -89,6 +89,24 @@
         "subjonctif imparfait": ["", "", "pluvinât", "", "", ""]
       }
     },
+    frire: {
+      infinitif: "frire",
+      infinitive: "frire",
+      lemma: "frire",
+      defective: true,
+      typeLabel: "Verbe transitif défectif",
+      groupe: 3,
+      auxiliaire: "avoir",
+      participePasse: "frit",
+      participePresent: "friant",
+      accordParticipePasse: "aucun",
+      gerondifDisponible: true,
+      formes: {
+        "présent de l'indicatif": ["fris", "fris", "frit", "", "", ""],
+        "futur simple": ["frirai", "friras", "frira", "frirons", "frirez", "friront"],
+        "impératif présent": ["fris", "", ""]
+      }
+    },
     adirer: {
       infinitif: "adirer",
       infinitive: "adirer",
