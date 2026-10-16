@@ -33,6 +33,34 @@ const verbs = {
     infinitif: "lever", groupe: 1, auxiliaire: "avoir",
     formes: { "présent de l'indicatif": ["lève", "lèves", "lève", "levons", "levez", "lèvent"] }
   },
+  vendre: {
+    infinitif: "vendre", groupe: 3, auxiliaire: "avoir",
+    formes: { "présent de l'indicatif": ["vends", "vends", "vend", "vendons", "vendez", "vendent"] }
+  },
+  coudre: {
+    infinitif: "coudre", groupe: 3, auxiliaire: "avoir",
+    formes: { "présent de l'indicatif": ["couds", "couds", "coud", "cousons", "cousez", "cousent"] }
+  },
+  mettre: {
+    infinitif: "mettre", groupe: 3, auxiliaire: "avoir",
+    formes: { "présent de l'indicatif": ["mets", "mets", "met", "mettons", "mettez", "mettent"] }
+  },
+  faire: {
+    infinitif: "faire", groupe: 3, auxiliaire: "avoir",
+    formes: { "présent de l'indicatif": ["fais", "fais", "fait", "faisons", "faites", "font"] }
+  },
+  plaire: {
+    infinitif: "plaire", groupe: 3, auxiliaire: "avoir",
+    formes: { "présent de l'indicatif": ["plais", "plais", "plaît", "plaisons", "plaisez", "plaisent"] }
+  },
+  naître: {
+    infinitif: "naître", groupe: 3, auxiliaire: "être",
+    formes: { "présent de l'indicatif": ["nais", "nais", "naît", "naissons", "naissez", "naissent"] }
+  },
+  peindre: {
+    infinitif: "peindre", groupe: 3, auxiliaire: "avoir",
+    formes: { "présent de l'indicatif": ["peins", "peins", "peint", "peignons", "peignez", "peignent"] }
+  },
   laver: {
     infinitif: "laver", groupe: 1, auxiliaire: "avoir",
     formes: { "présent de l'indicatif": ["lave", "laves", "lave", "lavons", "lavez", "lavent"] }
