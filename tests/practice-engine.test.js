@@ -102,7 +102,7 @@ test("la sesión genera veinte ejercicios y conserva la forma canónica del verb
   engine.start({ verb: "parler", tense: "present" }, target);
   assert.match(target.innerHTML, /Ejercicio 1 de 20/);
   assert.match(target.innerHTML, /parler/);
-  assert.match(target.innerHTML, /Présent de l'indicatif/);
+  assert.match(target.innerHTML, /Présent de l&#39;indicatif/);
 });
 
 test("el filtro pronominal permite buscar por infinitivo base y muestra la forma pronominal", () => {
