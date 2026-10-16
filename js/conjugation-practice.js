@@ -171,15 +171,20 @@
 
   function filterVerbs(filters) {
     let pool = buildVerbPool();
+    if (filters.construction === "pronominal") pool = pool.filter(isPronominal);
+    if (filters.construction === "non-pronominal") pool = pool.filter(verb => !isPronominal(verb));
+
     const requestedVerb = normalize(filters.verb);
     if (requestedVerb) {
-      const exact = pool.filter(verb => normalize(infinitiveOf(verb)) === requestedVerb);
+      const wantsPronominalBase = filters.construction === "pronominal" &&
+        !/^(?:se\\s+|s')/.test(requestedVerb);
+      const exact = pool.filter(verb =>
+        normalize(infinitiveOf(verb)) === requestedVerb ||
+        (wantsPronominalBase && baseInfinitiveOf(verb) === requestedVerb)
+      );
       if (!exact.length) return [];
       pool = exact;
     }
-
-    if (filters.construction === "pronominal") pool = pool.filter(isPronominal);
-    if (filters.construction === "non-pronominal") pool = pool.filter(verb => !isPronominal(verb));
 
     if (filters.family) {
       const requestedGroup = ({
