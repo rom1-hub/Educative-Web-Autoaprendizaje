@@ -694,7 +694,103 @@
     }, 0);
   });
 
-  practiceForm.addEventListener("submit", event => {
+  let activePractice = null;
+
+  async function requestPractice(url, payload) {
+    let response;
+    try {
+      response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+    } catch {
+      throw new Error("No se pudo conectar con Python. Abre la vista previa desde el entorno de desarrollo con el servidor iniciado.");
+    }
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.detail || "No se pudo procesar la práctica.");
+    return data;
+  }
+
+  function renderPracticeQuestion() {
+    if (!activePractice) return;
+    const { questions, index, score, answers, sessionId } = activePractice;
+    if (index >= questions.length) {
+      const mistakes = answers.filter(item => !item.correct);
+      const percentage = Math.round(score / questions.length * 100);
+      practiceResults.innerHTML =
+        '<section class="practice-summary" aria-label="Resultados de la práctica">' +
+          '<span class="eyebrow">Sesión completada</span><h2>Resultados de tu práctica</h2>' +
+          '<div class="practice-summary-score"><strong>' + score + ' / ' + questions.length + '</strong><span>' + percentage + ' % de respuestas correctas</span></div>' +
+          '<div class="practice-progress" role="progressbar" aria-label="Resultado final" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + percentage + '"><span style="width:' + percentage + '%"></span></div>' +
+          '<p>' + (mistakes.length ? 'Revisa las formas que necesitas reforzar.' : 'Todas las respuestas han sido correctas.') + '</p>' +
+          (mistakes.length ? '<details class="practice-mistakes"><summary>Revisar errores (' + mistakes.length + ')</summary><ul>' +
+            mistakes.map(item => '<li><strong>' + esc(item.person + ' · ' + item.verb + ' · ' + "Présent de l'indicatif") + '</strong><span>Tu respuesta: ' + esc(item.answer) + '</span><span>Forma esperada: ' + esc(item.expected) + '</span></li>').join("") +
+            '</ul></details>' : '') +
+          '<div class="practice-answer-actions"><button class="button button-primary" type="button" data-practice-restart>Repetir práctica</button></div>' +
+        '</section>';
+      practiceResults.querySelector("[data-practice-restart]")?.addEventListener("click", () => practiceForm.requestSubmit());
+      return;
+    }
+
+    const question = questions[index];
+    practiceResults.innerHTML =
+      '<section class="practice-session" aria-label="Sesión de práctica">' +
+        '<div class="practice-session-top"><div><span class="eyebrow">Ejercicio ' + (index + 1) + ' de ' + questions.length + '</span><h2>Conjuga el verbo</h2></div><span class="practice-score">Puntuación: ' + score + ' / ' + index + '</span></div>' +
+        '<div class="practice-progress" role="progressbar" aria-label="Progreso de la práctica" aria-valuemin="0" aria-valuemax="' + questions.length + '" aria-valuenow="' + index + '"><span style="width:' + Math.round(index / questions.length * 100) + '%"></span></div>' +
+        '<div class="practice-prompt"><span class="practice-prompt-label">Présent de l\'indicatif</span><div class="practice-prompt-main"><span class="practice-person">' + esc(question.person) + '</span><span class="practice-verb">' + esc(question.verb) + '</span></div><p>Escribe la forma conjugada sin repetir el sujeto. Se aceptan respuestas sin acentos.</p></div>' +
+        '<form class="practice-answer-form" data-practice-answer-form><label for="practice-answer">Tu respuesta</label><input id="practice-answer" name="answer" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" required><small>Escribe únicamente la forma conjugada.</small><div class="practice-answer-actions"><button class="button button-primary" type="submit">Comprobar respuesta</button></div></form>' +
+        '<div class="practice-feedback" data-practice-feedback aria-live="polite" hidden></div>' +
+      '</section>';
+
+    const form = practiceResults.querySelector("[data-practice-answer-form]");
+    const input = practiceResults.querySelector("#practice-answer");
+    const feedback = practiceResults.querySelector("[data-practice-feedback]");
+    const button = form.querySelector('button[type="submit"]');
+    input.focus();
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      if (button.dataset.next === "true") {
+        activePractice.index++;
+        renderPracticeQuestion();
+        return;
+      }
+      if (!input.value.trim()) return;
+      button.disabled = true;
+      try {
+        const result = await requestPractice("/api/practice/check", {
+          session_id: sessionId, index, answer: input.value.trim()
+        });
+        const correct = result.correct;
+        if (correct) activePractice.score++;
+        activePractice.answers.push({
+          person: question.person, verb: question.verb,
+          answer: input.value.trim(), expected: result.expected, correct
+        });
+        input.disabled = true;
+        feedback.hidden = false;
+        feedback.className = "practice-feedback " + (correct ? "is-correct" : "is-incorrect");
+        feedback.innerHTML = correct
+          ? '<strong>Correcto.</strong> La forma esperada es <span>' + esc(result.expected) + '</span>.'
+          : '<strong>Respuesta incorrecta.</strong> La forma esperada es <span>' + esc(result.expected) + '</span>.';
+        button.textContent = index === questions.length - 1 ? "Ver resultados" : "Siguiente ejercicio";
+        button.dataset.next = "true";
+        button.disabled = false;
+        practiceResults.querySelector(".practice-score").textContent = "Aciertos: " + activePractice.score + " / " + questions.length;
+        const bar = practiceResults.querySelector(".practice-progress");
+        bar.setAttribute("aria-valuenow", String(index + 1));
+        bar.querySelector("span").style.width = Math.round((index + 1) / questions.length * 100) + "%";
+        button.focus();
+      } catch (error) {
+        feedback.hidden = false;
+        feedback.className = "practice-feedback is-incorrect";
+        feedback.textContent = error.message;
+        button.disabled = false;
+      }
+    });
+  }
+
+  practiceForm.addEventListener("submit", async event => {
     event.preventDefault();
     const practiceVerbInput = document.getElementById("practice-verb");
     const rawPracticeVerb = practiceVerbInput.value.trim();
@@ -707,12 +803,18 @@
       construction: document.getElementById("practice-construction").value,
       auxiliary: document.getElementById("practice-auxiliary").value
     };
-    const engine = window.COQ_PRACTICE_ENGINE || window.CoQPracticeEngine;
-    if (engine && typeof engine.start === "function") {
-      engine.start(filters, practiceResults);
+    if (!filters.verb) {
+      showPracticeMessage("Para esta primera categoría, escribe un verbo regular del primer grupo, por ejemplo «parler».", true);
       return;
     }
-    showPracticeMessage("Filtros preparados. La generación de ejercicios todavía necesita conectarse al motor de práctica y al catálogo canónico de verbos.", true);
+    showPracticeMessage("Generando ejercicios con Python…");
+    try {
+      const data = await requestPractice("/api/practice/generate", filters);
+      activePractice = { sessionId: data.session_id, questions: data.questions, index: 0, score: 0, answers: [] };
+      renderPracticeQuestion();
+    } catch (error) {
+      showPracticeMessage(error.message, true);
+    }
   });
 
   practiceForm.addEventListener("reset", () => {
