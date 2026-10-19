@@ -7,6 +7,8 @@ on:
     paths:
       - "conjugacion.html"
       - "js/conjugation*.js"
+      - "backend/**"
+      - "requirements.txt"
       - "data/verbs/**"
       - "tests/**"
       - ".github/workflows/conjugation-tests.yml"
@@ -20,7 +22,7 @@ permissions:
 
 jobs:
   test:
-    name: Run conjugation tests
+    name: Run JavaScript and Python tests
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -29,5 +31,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Run test suite
+      - name: Run remaining JavaScript tests
         run: node --test tests/*.test.js
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Python dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run Python practice tests
+        run: python -m unittest discover -s tests -p "test_*.py"
