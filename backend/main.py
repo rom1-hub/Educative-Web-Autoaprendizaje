@@ -211,25 +211,21 @@ def generate_practice(request: GenerateRequest) -> dict:
 
     category_mode = request.family == "premier-groupe-reguliers" and not request.verb.strip()
     if category_mode:
-        selected_verbs = REGULAR_FIRST_GROUP_VERBS.copy()
-        random.shuffle(selected_verbs)
+        # Una pregunta por verbo: 20 infinitivos distintos elegidos al azar.
+        # Esta categoría incluye únicamente verbos regulares no pronominales.
+        if len(REGULAR_FIRST_GROUP_VERBS) < 20:
+            raise HTTPException(500, "El catálogo debe contener al menos 20 verbos regulares del primer grupo.")
+        selected_verbs = random.sample(REGULAR_FIRST_GROUP_VERBS, k=20)
         questions = []
-        while len(questions) < 20:
-            for verb in selected_verbs:
-                forms = regular_er_forms(verb, request.tense)
-                random.shuffle(forms)
-                for form in forms:
-                    questions.append({
-                        "person": form["person"],
-                        "verb": form["verb"],
-                        "tense": form["tense"],
-                        "answer": form["form"],
-                    })
-                    if len(questions) == 20:
-                        break
-                if len(questions) == 20:
-                    break
-            random.shuffle(selected_verbs)
+        for verb in selected_verbs:
+            forms = regular_er_forms(verb, request.tense)
+            form = random.choice(forms)
+            questions.append({
+                "person": form["person"],
+                "verb": form["verb"],
+                "tense": form["tense"],
+                "answer": form["form"],
+            })
     else:
         if not request.verb.strip():
             raise HTTPException(422, "Escribe un verbo o selecciona «Verbos regulares del primer grupo».")
