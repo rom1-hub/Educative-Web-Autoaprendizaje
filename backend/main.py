@@ -70,9 +70,10 @@ def regular_first_group_verbs() -> tuple[str, ...]:
     try:
         source = catalog_path.read_text(encoding="utf-8")
         prefix = "window.COQ_VERBS="
-        if not source.startswith(prefix):
+        prefix_index = source.find(prefix)
+        if prefix_index < 0:
             raise ValueError("No se reconoce el formato del catálogo de verbos.")
-        payload = source[len(prefix):].strip()
+        payload = source[prefix_index + len(prefix):].strip()
         # El archivo define el catálogo y después declara la versión en otra
         # instrucción JavaScript; solo el primer objeto es JSON.
         payload = payload.split(";\nwindow.", 1)[0].strip()
