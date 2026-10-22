@@ -60,7 +60,7 @@ COMPOUND_TENSES = {
 
 def normalize(value: str) -> str:
     value = unicodedata.normalize("NFC", value or "").lower().replace("’", "'")
-    return re.sub(r"\\s+", " ", value.strip())
+    return re.sub(r"\s+", " ", value.strip())
 
 
 def regular_er_forms(verb: str, tense: str) -> list[dict[str, str]]:
