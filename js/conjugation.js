@@ -808,7 +808,7 @@
         const correct = result.correct;
         if (correct) activePractice.score++;
         activePractice.answers.push({
-          person: question.person, verb: question.verb,
+          person: question.person, verb: question.verb, tense: question.tense,
           answer: input.value.trim(), expected: result.expected, correct
         });
         input.disabled = true;
