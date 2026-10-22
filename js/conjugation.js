@@ -865,7 +865,11 @@
 
   practiceForm.addEventListener("reset", () => {
     lockedVerbProfile = null;
-    window.setTimeout(() => applyLockedProfile(), 0);
+    activePractice = null;
+    window.setTimeout(() => {
+      applyLockedProfile();
+      practiceResults.innerHTML = '<div class="results-empty"><div class="results-symbol" aria-hidden="true">Aa</div><h2>Tu espacio de práctica</h2><p>Configura los filtros y genera una sesión de ejercicios. Los resultados de conjugación no se muestran en esta pestaña.</p></div>';
+    }, 0);
   });
 
   setTab("lookup");
