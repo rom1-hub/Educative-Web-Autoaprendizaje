@@ -242,7 +242,9 @@ def generate_practice(request: GenerateRequest) -> dict:
         raise HTTPException(422, "Selecciona un tiempo verbal válido.")
     if request.family not in ("", "premier-groupe", "premier-groupe-reguliers"):
         raise HTTPException(422, "Esta primera versión solo incluye los verbos regulares del primer grupo.")
-    if request.construction not in ("", "non-pronominal"):
+    # Aceptar la variante histórica usada por algunos clientes además del
+    # valor canónico «non-pronominal».
+    if request.construction not in ("", "non-pronominal", "non-pronomial"):
         raise HTTPException(422, "Esta categoría solo incluye verbos no pronominales.")
     if request.tense in COMPOUND_TENSES and request.auxiliary == "etre":
         raise HTTPException(422, "« Parler » utiliza el auxiliar avoir en los tiempos compuestos. Selecciona Avoir o ambos auxiliares.")
