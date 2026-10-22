@@ -856,10 +856,12 @@
           } else {
             feedback.hidden = false;
             feedback.className = "practice-feedback is-incorrect";
-            feedback.textContent = "Escribe la respuesta correcta que aparece arriba para pasar a la siguiente pregunta.";
+            feedback.innerHTML =
+              '<strong>Respuesta incorrecta. Respuesta correcta: ' + esc(result.expected) + '.</strong>' +
+              '<p>Escribe la respuesta correcta en el campo y pulsa «Comprobar respuesta» para pasar a la siguiente pregunta.</p>' +
+              '<p>Escribe la respuesta correcta que aparece arriba para pasar a la siguiente pregunta.</p>';
             button.disabled = false;
             input.focus();
-            input.select();
           }
         } catch (error) {
           feedback.hidden = false;
@@ -908,7 +910,6 @@
         feedback.className = "practice-feedback is-incorrect";
         if (attempts === 1) {
           feedback.textContent = "Respuesta incorrecta. Intenta de nuevo.";
-          input.value = "";
           button.disabled = false;
           input.focus();
         } else {
@@ -916,7 +917,6 @@
           feedback.innerHTML =
             '<strong>Respuesta incorrecta. Respuesta correcta: ' + esc(result.expected) + '.</strong>' +
             '<p>Escribe la respuesta correcta en el campo y pulsa «Comprobar respuesta» para pasar a la siguiente pregunta.</p>';
-          input.value = "";
           button.disabled = false;
           input.focus();
         }
