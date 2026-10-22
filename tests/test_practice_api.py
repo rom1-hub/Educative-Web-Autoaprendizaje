@@ -33,6 +33,23 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
         self.assertEqual({q["tense"] for q in result["questions"]}, {"present"})
         self.assertNotIn("answer", result["questions"][0])
 
+    def test_category_uses_catalog_and_returns_twenty_distinct_verbs(self):
+        from backend.main import regular_first_group_verbs
+
+        catalog_verbs = regular_first_group_verbs()
+        self.assertGreater(len(catalog_verbs), 35)
+        self.assertEqual(len(catalog_verbs), len(set(catalog_verbs)))
+
+        result = generate_practice(GenerateRequest(
+            family="premier-groupe-reguliers",
+            construction="non-pronomial",
+            tense="present",
+        ))
+        self.assertEqual(result["total"], 20)
+        verbs = [question["verb"] for question in result["questions"]]
+        self.assertEqual(len(set(verbs)), 20)
+        self.assertTrue(set(verbs).issubset(set(catalog_verbs)))
+
     def test_answer_check_accepts_missing_accents_and_case(self):
         session = generate_practice(GenerateRequest(verb="parler", tense="present"))
         first = session["questions"][0]
