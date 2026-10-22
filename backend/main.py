@@ -252,11 +252,7 @@ def check_answer(request: CheckRequest) -> dict:
     question = questions[request.index]
     actual = normalize(request.answer)
     expected = normalize(question["answer"])
-    strip_accents = lambda text: "".join(
-        char for char in unicodedata.normalize("NFD", text)
-        if unicodedata.category(char) != "Mn"
-    )
-    correct = bool(actual) and strip_accents(actual) == strip_accents(expected)
+    correct = bool(actual) and actual == expected
     return {"correct": correct, "expected": question["answer"]}
 
 
