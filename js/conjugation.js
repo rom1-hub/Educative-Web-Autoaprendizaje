@@ -721,6 +721,25 @@
 
   let activePractice = null;
 
+  const PRACTICE_TENSE_LABELS = {
+    "present": "Présent de l'indicatif",
+    "imparfait": "Imparfait",
+    "passe-compose": "Passé composé",
+    "plus-que-parfait": "Plus-que-parfait",
+    "passe-simple": "Passé simple",
+    "passe-anterieur": "Passé antérieur",
+    "futur-simple": "Futur simple",
+    "futur-anterieur": "Futur antérieur",
+    "subjonctif-present": "Subjonctif présent",
+    "subjonctif-passe": "Subjonctif passé",
+    "subjonctif-imparfait": "Subjonctif imparfait",
+    "subjonctif-plus-que-parfait": "Subjonctif plus-que-parfait",
+    "conditionnel-present": "Conditionnel présent",
+    "conditionnel-passe": "Conditionnel passé",
+    "imperatif-present": "Impératif présent",
+    "imperatif-passe": "Impératif passé"
+  };
+
   async function requestPractice(url, payload) {
     let response;
     try {
@@ -750,7 +769,7 @@
           '<div class="practice-progress" role="progressbar" aria-label="Resultado final" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + percentage + '"><span style="width:' + percentage + '%"></span></div>' +
           '<p>' + (mistakes.length ? 'Revisa las formas que necesitas reforzar.' : 'Todas las respuestas han sido correctas.') + '</p>' +
           (mistakes.length ? '<details class="practice-mistakes"><summary>Revisar errores (' + mistakes.length + ')</summary><ul>' +
-            mistakes.map(item => '<li><strong>' + esc(item.person + ' · ' + item.verb + ' · ' + "Présent de l'indicatif") + '</strong><span>Tu respuesta: ' + esc(item.answer) + '</span><span>Forma esperada: ' + esc(item.expected) + '</span></li>').join("") +
+            mistakes.map(item => '<li><strong>' + esc(item.person + ' · ' + item.verb + ' · ' + (PRACTICE_TENSE_LABELS[item.tense] || item.tense)) + '</strong><span>Tu respuesta: ' + esc(item.answer) + '</span><span>Forma esperada: ' + esc(item.expected) + '</span></li>').join("") +
             '</ul></details>' : '') +
           '<div class="practice-answer-actions"><button class="button button-primary" type="button" data-practice-restart>Repetir práctica</button></div>' +
         '</section>';
@@ -763,7 +782,7 @@
       '<section class="practice-session" aria-label="Sesión de práctica">' +
         '<div class="practice-session-top"><div><span class="eyebrow">Ejercicio ' + (index + 1) + ' de ' + questions.length + '</span><h2>Conjuga el verbo</h2></div><span class="practice-score">Puntuación: ' + score + ' / ' + index + '</span></div>' +
         '<div class="practice-progress" role="progressbar" aria-label="Progreso de la práctica" aria-valuemin="0" aria-valuemax="' + questions.length + '" aria-valuenow="' + index + '"><span style="width:' + Math.round(index / questions.length * 100) + '%"></span></div>' +
-        '<div class="practice-prompt"><span class="practice-prompt-label">Présent de l\'indicatif</span><div class="practice-prompt-main"><span class="practice-person">' + esc(question.person) + '</span><span class="practice-verb">' + esc(question.verb) + '</span></div><p>Escribe la forma conjugada sin repetir el sujeto. Se aceptan respuestas sin acentos.</p></div>' +
+        '<div class="practice-prompt"><span class="practice-prompt-label">' + esc(PRACTICE_TENSE_LABELS[question.tense] || question.tense) + '</span><div class="practice-prompt-main"><span class="practice-person">' + esc(question.person) + '</span><span class="practice-verb">' + esc(question.verb) + '</span></div><p>Escribe la forma conjugada sin repetir el sujeto. Se aceptan respuestas sin acentos.</p>' + (question.tense === "imperatif-present" || question.tense === "imperatif-passe" ? '<small>* En el imperativo, los sujetos no se escriben y no se pronuncian.</small>' : '') + '</div>' +
         '<form class="practice-answer-form" data-practice-answer-form><label for="practice-answer">Tu respuesta</label><input id="practice-answer" name="answer" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" required><small>Escribe únicamente la forma conjugada.</small><div class="practice-answer-actions"><button class="button button-primary" type="submit">Comprobar respuesta</button></div></form>' +
         '<div class="practice-feedback" data-practice-feedback aria-live="polite" hidden></div>' +
       '</section>';
