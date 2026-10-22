@@ -57,15 +57,49 @@ COMPOUND_TENSES = {
     "imperatif-passe",
 }
 
-# Verbos regulares en -ER sin cambios ortográficos especiales.
-REGULAR_FIRST_GROUP_VERBS = [
-    "parler", "aimer", "adorer", "habiter", "jouer", "travailler",
-    "regarder", "écouter", "demander", "donner", "chercher", "trouver",
-    "porter", "penser", "marcher", "chanter", "danser", "visiter",
-    "cuisiner", "dessiner", "étudier", "oublier", "utiliser", "quitter",
-    "fermer", "préparer", "téléphoner", "terminer", "expliquer",
-    "emprunter", "garder", "louer", "montrer", "détester", "raconter",
-]
+@lru_cache(maxsize=1)
+def regular_first_group_verbs() -> tuple[str, ...]:
+    """
+    Read the canonical frontend catalog and keep only explicitly tagged,
+    non-pronominal regular first-group verbs supported by this conjugator.
+    The catalog is cached for the lifetime of the backend process.
+    """
+    catalog_path = ROOT / "data" / "verbs" / "local-database.js"
+    try:
+        source = catalog_path.read_text(encoding="utf-8")
+        prefix = "window.COQ_VERBS="
+        if not source.startswith(prefix):
+            raise ValueError("No se reconoce el formato del catálogo de verbos.")
+        payload = source[len(prefix):].strip()
+        if payload.endswith(";"):
+            payload = payload[:-1]
+        catalog = json.loads(payload)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        raise HTTPException(
+            500,
+            "No se pudo cargar el catálogo canónico de verbos para generar la práctica."
+        ) from exc
+
+    candidates = []
+    for entry in catalog.values():
+        if not isinstance(entry, dict):
+            continue
+        lemma = normalize(entry.get("infinitif") or entry.get("id") or "")
+        if (
+            entry.get("groupe") != 1
+            or entry.get("familyId") != "er-regular"
+            or entry.get("pronominal") is not False
+            or entry.get("construction") != "non-pronomiale"
+            or not lemma
+        ):
+            continue
+        try:
+            regular_er_forms(lemma, "present")
+        except HTTPException:
+            continue
+        candidates.append(lemma)
+
+    return tuple(sorted(set(candidates)))
 
 
 def normalize(value: str) -> str:
@@ -213,9 +247,13 @@ def generate_practice(request: GenerateRequest) -> dict:
     if category_mode:
         # Una pregunta por verbo: 20 infinitivos distintos elegidos al azar.
         # Esta categoría incluye únicamente verbos regulares no pronominales.
-        if len(REGULAR_FIRST_GROUP_VERBS) < 20:
-            raise HTTPException(500, "El catálogo debe contener al menos 20 verbos regulares del primer grupo.")
-        selected_verbs = random.sample(REGULAR_FIRST_GROUP_VERBS, k=20)
+        available_verbs = regular_first_group_verbs()
+        if len(available_verbs) < 20:
+            raise HTTPException(
+                500,
+                f"El catálogo solo contiene {len(available_verbs)} verbos compatibles; se necesitan al menos 20."
+            )
+        selected_verbs = random.sample(available_verbs, k=20)
         questions = []
         for verb in selected_verbs:
             forms = regular_er_forms(verb, request.tense)
