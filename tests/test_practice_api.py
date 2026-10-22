@@ -48,10 +48,37 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
         ))
         self.assertTrue(result["correct"])
 
-    def test_rejects_unimplemented_tense_with_clear_message(self):
-        with self.assertRaises(HTTPException) as context:
-            generate_practice(GenerateRequest(verb="parler", tense="passe-compose"))
-        self.assertIn("présent", context.exception.detail)
+    def test_generates_practice_for_all_tenses(self):
+        tenses = [
+            "present", "imparfait", "passe-compose", "plus-que-parfait",
+            "passe-simple", "passe-anterieur", "futur-simple", "futur-anterieur",
+            "subjonctif-present", "subjonctif-passe", "subjonctif-imparfait",
+            "subjonctif-plus-que-parfait", "conditionnel-present",
+            "conditionnel-passe", "imperatif-present", "imperatif-passe",
+        ]
+        for tense in tenses:
+            with self.subTest(tense=tense):
+                result = generate_practice(GenerateRequest(verb="parler", tense=tense))
+                self.assertEqual(result["total"], 20)
+                self.assertEqual(len(result["questions"]), 20)
+                self.assertEqual({question["tense"] for question in result["questions"]}, {tense})
+                self.assertNotIn("answer", result["questions"][0])
+
+    def test_compound_tenses_use_avoir_for_parler(self):
+        session = generate_practice(GenerateRequest(verb="parler", tense="passe-compose"))
+        answers = {row["person"]: row["answer"] for row in __import__("backend.main", fromlist=["SESSIONS"]).SESSIONS[session["session_id"]]}
+        self.assertEqual(answers["je"], "ai parlé")
+        self.assertEqual(answers["nous"], "avons parlé")
+
+    def test_subjunctive_prompts_include_que(self):
+        session = generate_practice(GenerateRequest(verb="parler", tense="subjonctif-present"))
+        from backend.main import SESSIONS
+        prompts = {row["person"] for row in SESSIONS[session["session_id"]]}
+        self.assertTrue({"que je", "que tu", "qu'il", "que nous"}.issubset(prompts))
+
+    def test_rejects_etre_for_compound_parler(self):
+        with self.assertRaises(HTTPException):
+            generate_practice(GenerateRequest(verb="parler", tense="passe-compose", auxiliary="etre"))
 
 
 if __name__ == "__main__":
