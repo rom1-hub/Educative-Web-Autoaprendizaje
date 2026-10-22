@@ -945,8 +945,8 @@
         ? document.getElementById("practice-auxiliary").value
         : ""
     };
-    if (!filters.verb) {
-      showPracticeMessage("Para esta primera categoría, escribe un verbo regular del primer grupo, por ejemplo «parler».", true);
+    if (!filters.verb && filters.family !== "premier-groupe-reguliers") {
+      showPracticeMessage("Escribe un verbo o selecciona «Verbos regulares del primer grupo» para generar una práctica automática.", true);
       return;
     }
     showPracticeMessage("Generando ejercicios con Python…");
