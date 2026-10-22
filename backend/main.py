@@ -71,6 +71,9 @@ def regular_first_group_verbs() -> tuple[str, ...]:
         if not source.startswith(prefix):
             raise ValueError("No se reconoce el formato del catálogo de verbos.")
         payload = source[len(prefix):].strip()
+        # El archivo define el catálogo y después declara la versión en otra
+        # instrucción JavaScript; solo el primer objeto es JSON.
+        payload = payload.split(";\\nwindow.", 1)[0].strip()
         if payload.endswith(";"):
             payload = payload[:-1]
         catalog = json.loads(payload)
