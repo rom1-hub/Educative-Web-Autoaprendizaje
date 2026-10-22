@@ -168,7 +168,7 @@ def regular_er_present(verb: str) -> list[dict[str, str]]:
 
 
 class GenerateRequest(BaseModel):
-    verb: str = Field(min_length=1, max_length=80)
+    verb: str = Field(default="", max_length=80)
     tense: str = "present"
     family: str = ""
     construction: str = ""
