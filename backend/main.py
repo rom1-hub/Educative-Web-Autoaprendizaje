@@ -57,7 +57,7 @@ COMPOUND_TENSES = {
     "imperatif-passe",
 }
 
-@lru_cache(maxsize=1)
+@functools.lru_cache(maxsize=1)
 def regular_first_group_verbs() -> tuple[str, ...]:
     """
     Read the canonical frontend catalog and keep only explicitly tagged,
