@@ -762,18 +762,33 @@
     if (index >= questions.length) {
       const mistakes = answers.filter(item => !item.correct);
       const percentage = Math.round(score / questions.length * 100);
-      practiceResults.innerHTML =
-        '<section class="practice-summary" aria-label="Resultados de la práctica">' +
-          '<span class="eyebrow">Sesión completada</span><h2>Resultados de tu práctica</h2>' +
+      practiceResults.innerHTML = '';
+      document.getElementById("practice-results-modal")?.remove();
+      const modal = document.createElement("div");
+      modal.id = "practice-results-modal";
+      modal.className = "practice-results-modal";
+      modal.setAttribute("role", "presentation");
+      modal.innerHTML =
+        '<div class="practice-results-dialog" role="dialog" aria-modal="true" aria-labelledby="practice-results-title" tabindex="-1">' +
+          '<span class="eyebrow">Sesión completada</span><h2 id="practice-results-title">Resultados de tu práctica</h2>' +
           '<div class="practice-summary-score"><strong>' + score + ' / ' + questions.length + '</strong><span>' + percentage + ' % de respuestas correctas</span></div>' +
           '<div class="practice-progress" role="progressbar" aria-label="Resultado final" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + percentage + '"><span style="width:' + percentage + '%"></span></div>' +
           '<p>' + (mistakes.length ? 'Revisa las formas que necesitas reforzar.' : 'Todas las respuestas han sido correctas.') + '</p>' +
           (mistakes.length ? '<details class="practice-mistakes"><summary>Revisar errores (' + mistakes.length + ')</summary><ul>' +
             mistakes.map(item => '<li><strong>' + esc(item.person + ' · ' + item.verb + ' · ' + (PRACTICE_TENSE_LABELS[item.tense] || item.tense)) + '</strong><span>Tu respuesta: ' + esc(item.answer) + '</span><span>Forma esperada: ' + esc(item.expected) + '</span></li>').join("") +
             '</ul></details>' : '') +
-          '<div class="practice-answer-actions"><button class="button button-primary" type="button" data-practice-restart>Repetir práctica</button></div>' +
-        '</section>';
-      practiceResults.querySelector("[data-practice-restart]")?.addEventListener("click", () => practiceForm.requestSubmit());
+          '<div class="practice-answer-actions"><button class="button button-primary" type="button" data-practice-continue>Seguir practicando</button></div>' +
+        '</div>';
+      document.body.appendChild(modal);
+      const dialog = modal.querySelector(".practice-results-dialog");
+      dialog.focus();
+      modal.querySelector("[data-practice-continue]")?.addEventListener("click", () => {
+        modal.remove();
+        practiceForm.reset();
+        setTab("practice");
+        practiceForm.scrollIntoView({ behavior: "smooth", block: "center" });
+        window.setTimeout(() => document.getElementById("practice-verb")?.focus({ preventScroll: true }), 350);
+      });
       return;
     }
 
