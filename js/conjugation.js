@@ -364,15 +364,39 @@
     });
   }
 
+  const COMPOUND_TENSES = new Set([
+    "passe-compose",
+    "plus-que-parfait",
+    "passe-anterieur",
+    "futur-anterieur",
+    "subjonctif-passe",
+    "subjonctif-plus-que-parfait",
+    "conditionnel-passe",
+    "imperatif-passe"
+  ]);
+
+  function isCompoundTense(tense) {
+    return COMPOUND_TENSES.has(tense);
+  }
+
   function applyLockedProfile() {
     const family = document.getElementById("practice-family");
     const construction = document.getElementById("practice-construction");
     const auxiliary = document.getElementById("practice-auxiliary");
+    const compoundTense = isCompoundTense(document.getElementById("practice-tense").value);
+
     [family, construction, auxiliary].forEach(select => {
-      select.disabled = Boolean(lockedVerbProfile);
-      select.closest(".form-field")?.classList.toggle("is-locked", Boolean(lockedVerbProfile));
+      const locked = Boolean(lockedVerbProfile) || (select === auxiliary && !compoundTense);
+      select.disabled = locked;
+      select.closest(".form-field")?.classList.toggle("is-locked", locked);
       select.parentElement.querySelector(".locked-note")?.remove();
     });
+
+    // En tiempos simples no se aplica ningún filtro de auxiliar.
+    // Si hay un perfil de verbo fijado, conservamos su auxiliar para restaurarlo
+    // al volver a seleccionar un tiempo compuesto.
+    if (!compoundTense && !lockedVerbProfile) auxiliary.value = "";
+
     if (!lockedVerbProfile) return;
     const setIfAvailable = (select, value, aliases = {}) => {
       const normalized = aliases[value] || value;
@@ -381,7 +405,7 @@
     setIfAvailable(family, lockedVerbProfile.group, {"1":"premier-groupe","2":"deuxieme-groupe","3":"troisieme-groupe","premier groupe":"premier-groupe","deuxième groupe":"deuxieme-groupe","troisième groupe":"troisieme-groupe"});
     setIfAvailable(family, lockedVerbProfile.family);
     setIfAvailable(construction, lockedVerbProfile.construction);
-    setIfAvailable(auxiliary, lockedVerbProfile.auxiliary, {"être":"etre","être":"etre","avoir":"avoir","avoir et être":""});
+    setIfAvailable(auxiliary, lockedVerbProfile.auxiliary, {"être":"etre","avoir":"avoir","avoir et être":""});
     [family, construction, auxiliary].forEach(select => {
       const note = document.createElement("small");
       note.className = "locked-note";
@@ -655,6 +679,7 @@
   const practiceVerbInput = document.getElementById("practice-verb");
   practiceVerbInput?.addEventListener("input", syncPracticeVerbProfile);
   practiceVerbInput?.addEventListener("change", syncPracticeVerbProfile);
+  document.getElementById("practice-tense")?.addEventListener("change", applyLockedProfile);
 
   tabs.forEach((tab, index) => {
     tab.addEventListener("click", () => setTab(tab.dataset.tab));
@@ -801,7 +826,9 @@
       tense: document.getElementById("practice-tense").value,
       family: document.getElementById("practice-family").value,
       construction: document.getElementById("practice-construction").value,
-      auxiliary: document.getElementById("practice-auxiliary").value
+      auxiliary: isCompoundTense(document.getElementById("practice-tense").value)
+        ? document.getElementById("practice-auxiliary").value
+        : ""
     };
     if (!filters.verb) {
       showPracticeMessage("Para esta primera categoría, escribe un verbo regular del primer grupo, por ejemplo «parler».", true);
