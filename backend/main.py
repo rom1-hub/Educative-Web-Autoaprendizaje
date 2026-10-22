@@ -200,17 +200,35 @@ def generate_practice(request: GenerateRequest) -> dict:
         raise HTTPException(422, "Selecciona un auxiliar válido.")
 
     forms = regular_er_forms(request.verb, request.tense)
-    pool = forms.copy()
-    random.shuffle(pool)
+    # Repartir las formas por ciclos barajados independientes para evitar
+    # que la misma secuencia corta se repita dentro de una sesión.
     questions = []
-    for index in range(20):
-        form = pool[index % len(pool)]
-        questions.append({
-            "person": form["person"],
-            "verb": form["verb"],
-            "tense": form["tense"],
-            "answer": form["form"],
-        })
+    while len(questions) < 20:
+        cycle = forms.copy()
+        random.shuffle(cycle)
+
+        # Si es posible, evitar que el ciclo nuevo empiece con la misma
+        # persona que terminó el ciclo anterior.
+        if len(forms) > 1 and questions:
+            previous_person = questions[-1]["person"]
+            if cycle[0]["person"] == previous_person:
+                alternatives = [
+                    i for i, item in enumerate(cycle)
+                    if item["person"] != previous_person
+                ]
+                if alternatives:
+                    swap_index = random.choice(alternatives)
+                    cycle[0], cycle[swap_index] = cycle[swap_index], cycle[0]
+
+        for form in cycle:
+            questions.append({
+                "person": form["person"],
+                "verb": form["verb"],
+                "tense": form["tense"],
+                "answer": form["form"],
+            })
+            if len(questions) == 20:
+                break
 
     session_id = uuid.uuid4().hex
     SESSIONS[session_id] = questions
