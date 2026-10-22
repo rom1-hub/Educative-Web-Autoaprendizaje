@@ -190,7 +190,7 @@ def health() -> dict[str, str]:
 def generate_practice(request: GenerateRequest) -> dict:
     if request.tense not in TENSE_LABELS:
         raise HTTPException(422, "Selecciona un tiempo verbal válido.")
-    if request.family not in ("", "premier-groupe-reguliers"):
+    if request.family not in ("", "premier-groupe", "premier-groupe-reguliers"):
         raise HTTPException(422, "Esta primera versión solo incluye los verbos regulares del primer grupo.")
     if request.construction not in ("", "non-pronominal"):
         raise HTTPException(422, "Esta categoría solo incluye verbos no pronominales.")
