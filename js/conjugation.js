@@ -752,7 +752,26 @@
       throw new Error("No se pudo conectar con Python. Abre la vista previa desde el entorno de desarrollo con el servidor iniciado.");
     }
     const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.detail || "No se pudo procesar la práctica.");
+    if (!response.ok) {
+      const detail = data?.detail;
+      let message = "No se pudo procesar la práctica.";
+      if (typeof detail === "string" && detail.trim()) {
+        message = detail;
+      } else if (Array.isArray(detail)) {
+        message = detail.map(item => {
+          if (typeof item === "string") return item;
+          if (item && typeof item === "object") {
+            const location = Array.isArray(item.loc) ? item.loc.filter(part => part !== "body").join(" → ") : "";
+            const reason = item.msg || item.message || JSON.stringify(item);
+            return location ? location + ": " + reason : reason;
+          }
+          return String(item);
+        }).join(" · ");
+      } else if (detail && typeof detail === "object") {
+        message = detail.message || detail.msg || JSON.stringify(detail);
+      }
+      throw new Error(message);
+    }
     return data;
   }
 
