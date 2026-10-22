@@ -29,6 +29,9 @@ PERSONS = [
 ]
 IMPERATIVE_PERSONS = [("tu*", 0), ("nous*", 1), ("vous*", 2)]
 SESSIONS: dict[str, list[dict[str, str]]] = {}
+# Evita repetir los infinitivos de las últimas prácticas de categoría en este proceso.
+RECENT_CATEGORY_VERBS: list[str] = []
+RECENT_CATEGORY_VERBS_LIMIT = 60
 
 TENSE_LABELS = {
     "present": "Présent de l'indicatif",
@@ -261,7 +264,14 @@ def generate_practice(request: GenerateRequest) -> dict:
                 500,
                 f"El catálogo solo contiene {len(available_verbs)} verbos compatibles; se necesitan al menos 20."
             )
-        selected_verbs = random.sample(available_verbs, k=20)
+        # Evitar repetir los verbos de las tres prácticas de categoría anteriores
+        # mientras haya suficientes candidatos nuevos.
+        recent = set(RECENT_CATEGORY_VERBS)
+        fresh_verbs = [verb for verb in available_verbs if verb not in recent]
+        pool = fresh_verbs if len(fresh_verbs) >= 20 else list(available_verbs)
+        selected_verbs = random.sample(pool, k=20)
+        RECENT_CATEGORY_VERBS.extend(selected_verbs)
+        del RECENT_CATEGORY_VERBS[:-RECENT_CATEGORY_VERBS_LIMIT]
         questions = []
         for verb in selected_verbs:
             forms = regular_er_forms(verb, request.tense)
