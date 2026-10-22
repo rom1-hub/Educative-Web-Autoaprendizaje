@@ -194,3 +194,34 @@
   .practice-answer-actions .button { flex: 1 1 100%; }
 }
 
+
+/* Ventana modal de resultados al completar una práctica */
+.practice-results-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  overflow-y: auto;
+  background: rgba(5, 18, 43, .68);
+  backdrop-filter: blur(4px);
+}
+.practice-results-dialog {
+  width: min(100%, 680px);
+  max-height: min(88vh, 900px);
+  overflow-y: auto;
+  padding: clamp(1.25rem, 4vw, 2.25rem);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg, 1.25rem);
+  background: #fff;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .28);
+  color: var(--color-ink);
+}
+.practice-results-dialog h2 { margin-block: .4rem 1.25rem; }
+.practice-results-dialog > p { color: var(--color-muted); }
+.practice-results-dialog .practice-answer-actions { margin-top: 1.5rem; }
+@media (max-width: 560px) {
+  .practice-results-modal { padding: .6rem; }
+  .practice-results-dialog { max-height: 92vh; padding: 1.1rem; border-radius: 1rem; }
+}
