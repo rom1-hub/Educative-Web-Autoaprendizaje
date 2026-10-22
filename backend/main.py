@@ -57,6 +57,16 @@ COMPOUND_TENSES = {
     "imperatif-passe",
 }
 
+# Verbos regulares en -ER sin cambios ortográficos especiales.
+REGULAR_FIRST_GROUP_VERBS = [
+    "parler", "aimer", "adorer", "habiter", "jouer", "travailler",
+    "regarder", "écouter", "demander", "donner", "chercher", "trouver",
+    "porter", "penser", "marcher", "chanter", "danser", "visiter",
+    "cuisiner", "dessiner", "étudier", "oublier", "utiliser", "quitter",
+    "fermer", "préparer", "téléphoner", "terminer", "expliquer",
+    "emprunter", "garder", "louer", "montrer", "détester", "raconter",
+]
+
 
 def normalize(value: str) -> str:
     value = unicodedata.normalize("NFC", value or "").lower().replace("’", "'")
@@ -199,36 +209,60 @@ def generate_practice(request: GenerateRequest) -> dict:
     if request.auxiliary not in ("", "avoir", "etre"):
         raise HTTPException(422, "Selecciona un auxiliar válido.")
 
-    forms = regular_er_forms(request.verb, request.tense)
-    # Repartir las formas por ciclos barajados independientes para evitar
-    # que la misma secuencia corta se repita dentro de una sesión.
-    questions = []
-    while len(questions) < 20:
-        cycle = forms.copy()
-        random.shuffle(cycle)
+    category_mode = request.family == "premier-groupe-reguliers" and not request.verb.strip()
+    if category_mode:
+        selected_verbs = REGULAR_FIRST_GROUP_VERBS.copy()
+        random.shuffle(selected_verbs)
+        questions = []
+        while len(questions) < 20:
+            for verb in selected_verbs:
+                forms = regular_er_forms(verb, request.tense)
+                random.shuffle(forms)
+                for form in forms:
+                    questions.append({
+                        "person": form["person"],
+                        "verb": form["verb"],
+                        "tense": form["tense"],
+                        "answer": form["form"],
+                    })
+                    if len(questions) == 20:
+                        break
+                if len(questions) == 20:
+                    break
+            random.shuffle(selected_verbs)
+    else:
+        if not request.verb.strip():
+            raise HTTPException(422, "Escribe un verbo o selecciona «Verbos regulares del primer grupo».")
+        forms = regular_er_forms(request.verb, request.tense)
+        # Repartir las formas por ciclos barajados independientes para evitar
+        # que la misma secuencia corta se repita dentro de una sesión.
+        questions = []
+        while len(questions) < 20:
+            cycle = forms.copy()
+            random.shuffle(cycle)
 
-        # Si es posible, evitar que el ciclo nuevo empiece con la misma
-        # persona que terminó el ciclo anterior.
-        if len(forms) > 1 and questions:
-            previous_person = questions[-1]["person"]
-            if cycle[0]["person"] == previous_person:
-                alternatives = [
-                    i for i, item in enumerate(cycle)
-                    if item["person"] != previous_person
-                ]
-                if alternatives:
-                    swap_index = random.choice(alternatives)
-                    cycle[0], cycle[swap_index] = cycle[swap_index], cycle[0]
+            # Si es posible, evitar que el ciclo nuevo empiece con la misma
+            # persona que terminó el ciclo anterior.
+            if len(forms) > 1 and questions:
+                previous_person = questions[-1]["person"]
+                if cycle[0]["person"] == previous_person:
+                    alternatives = [
+                        i for i, item in enumerate(cycle)
+                        if item["person"] != previous_person
+                    ]
+                    if alternatives:
+                        swap_index = random.choice(alternatives)
+                        cycle[0], cycle[swap_index] = cycle[swap_index], cycle[0]
 
-        for form in cycle:
-            questions.append({
-                "person": form["person"],
-                "verb": form["verb"],
-                "tense": form["tense"],
-                "answer": form["form"],
-            })
-            if len(questions) == 20:
-                break
+            for form in cycle:
+                questions.append({
+                    "person": form["person"],
+                    "verb": form["verb"],
+                    "tense": form["tense"],
+                    "answer": form["form"],
+                })
+                if len(questions) == 20:
+                    break
 
     session_id = uuid.uuid4().hex
     SESSIONS[session_id] = questions
