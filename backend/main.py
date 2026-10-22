@@ -4,61 +4,167 @@ import random
 import re
 import uuid
 import unicodedata
-from typing import Literal
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-ROOT = __import__("pathlib").Path(__file__).resolve().parents[1]
-app = FastAPI(title="Coq — práctica de conjugación", version="0.1.0")
+ROOT = Path(__file__).resolve().parents[1]
+app = FastAPI(title="Coq — práctica de conjugación", version="0.2.0")
 
 PERSONS = [
-    ("je", "je"),
-    ("tu", "tu"),
-    ("il", "il"),
-    ("elle", "elle"),
-    ("on", "on"),
-    ("nous", "nous"),
-    ("vous", "vous"),
-    ("ils", "ils"),
-    ("elles", "elles"),
+    ("je", 0),
+    ("tu", 1),
+    ("il", 2),
+    ("elle", 2),
+    ("on", 2),
+    ("nous", 3),
+    ("vous", 4),
+    ("ils", 5),
+    ("elles", 5),
 ]
+IMPERATIVE_PERSONS = [("tu*", 0), ("nous*", 1), ("vous*", 2)]
 SESSIONS: dict[str, list[dict[str, str]]] = {}
+
+TENSE_LABELS = {
+    "present": "Présent de l'indicatif",
+    "imparfait": "Imparfait",
+    "passe-compose": "Passé composé",
+    "plus-que-parfait": "Plus-que-parfait",
+    "passe-simple": "Passé simple",
+    "passe-anterieur": "Passé antérieur",
+    "futur-simple": "Futur simple",
+    "futur-anterieur": "Futur antérieur",
+    "subjonctif-present": "Subjonctif présent",
+    "subjonctif-passe": "Subjonctif passé",
+    "subjonctif-imparfait": "Subjonctif imparfait",
+    "subjonctif-plus-que-parfait": "Subjonctif plus-que-parfait",
+    "conditionnel-present": "Conditionnel présent",
+    "conditionnel-passe": "Conditionnel passé",
+    "imperatif-present": "Impératif présent",
+    "imperatif-passe": "Impératif passé",
+}
+COMPOUND_TENSES = {
+    "passe-compose",
+    "plus-que-parfait",
+    "passe-anterieur",
+    "futur-anterieur",
+    "subjonctif-passe",
+    "subjonctif-plus-que-parfait",
+    "conditionnel-passe",
+    "imperatif-passe",
+}
 
 
 def normalize(value: str) -> str:
     value = unicodedata.normalize("NFC", value or "").lower().replace("’", "'")
-    return re.sub(r"\s+", " ", value.strip())
+    return re.sub(r"\\s+", " ", value.strip())
 
 
-def regular_er_present(verb: str) -> list[dict[str, str]]:
-    """First supported category: regular first-group verbs in présent."""
+def regular_er_forms(verb: str, tense: str) -> list[dict[str, str]]:
+    """Conjugate a regular first-group -ER verb in the selected tense."""
     lemma = normalize(verb)
     if not re.fullmatch(r"[a-zàâçéèêëîïôûùüÿœæ'-]+er", lemma):
-        raise HTTPException(422, "Esta primera categoría solo admite infinitivos regulares en -ER.")
+        raise HTTPException(422, "Esta categoría solo admite infinitivos regulares en -ER.")
     if lemma == "aller" or re.search(r"(?:ger|cer|eler|eter|yer)$", lemma):
         raise HTTPException(422, "Este verbo pertenece a una familia con reglas particulares todavía no implementada.")
     if re.search(r"[eéèê][^aeiouyàâéèêëîïôûùüÿœæ]er$", lemma):
         raise HTTPException(422, "Este verbo pertenece a una familia con cambio ortográfico todavía no implementada.")
+    if tense not in TENSE_LABELS:
+        raise HTTPException(422, "Selecciona un tiempo verbal válido.")
 
     stem = lemma[:-2]
-    forms = [
-        stem + "e",
-        stem + "es",
-        stem + "e",
-        stem + "e",
-        stem + "e",
-        stem + "ons",
-        stem + "ez",
-        stem + "ent",
-        stem + "ent",
-    ]
-    return [
-        {"person": person, "form": form, "verb": lemma, "tense": "present"}
-        for (person, _), form in zip(PERSONS, forms)
-    ]
+    infinitive = lemma
+    participle = stem + "é"
+    present = [stem + suffix for suffix in ("e", "es", "e", "e", "e", "ons", "ez", "ent", "ent")]
+    imparfait = [stem + suffix for suffix in ("ais", "ais", "ait", "ait", "ait", "ions", "iez", "aient", "aient")]
+    passe_simple = [stem + suffix for suffix in ("ai", "as", "a", "a", "a", "âmes", "âtes", "èrent", "èrent")]
+    future = [infinitive + suffix for suffix in ("ai", "as", "a", "a", "a", "ons", "ez", "ont", "ont")]
+    conditional = [infinitive + suffix for suffix in ("ais", "ais", "ait", "ait", "ait", "ions", "iez", "aient", "aient")]
+    subj_present = [stem + suffix for suffix in ("e", "es", "e", "e", "e", "ions", "iez", "ent", "ent")]
+    subj_imparfait = [stem + suffix for suffix in ("asse", "asses", "ât", "ât", "ât", "assions", "assiez", "assent", "assent")]
+
+    avoir = {
+        "present": ["ai", "as", "a", "a", "a", "avons", "avez", "ont", "ont"],
+        "imparfait": ["avais", "avais", "avait", "avait", "avait", "avions", "aviez", "avaient", "avaient"],
+        "passe-simple": ["eus", "eus", "eut", "eut", "eut", "eûmes", "eûtes", "eurent", "eurent"],
+        "futur-simple": ["aurai", "auras", "aura", "aura", "aura", "aurons", "aurez", "auront", "auront"],
+        "conditionnel-present": ["aurais", "aurais", "aurait", "aurait", "aurait", "aurions", "auriez", "auraient", "auraient"],
+        "subjonctif-present": ["aie", "aies", "ait", "ait", "ait", "ayons", "ayez", "aient", "aient"],
+        "subjonctif-imparfait": ["eusse", "eusses", "eût", "eût", "eût", "eussions", "eussiez", "eussent", "eussent"],
+    }
+    simple_forms = {
+        "present": present,
+        "imparfait": imparfait,
+        "passe-simple": passe_simple,
+        "futur-simple": future,
+        "conditionnel-present": conditional,
+        "subjonctif-present": subj_present,
+        "subjonctif-imparfait": subj_imparfait,
+    }
+    compound_aux_tense = {
+        "passe-compose": "present",
+        "plus-que-parfait": "imparfait",
+        "passe-anterieur": "passe-simple",
+        "futur-anterieur": "futur-simple",
+        "conditionnel-passe": "conditionnel-present",
+        "subjonctif-passe": "subjonctif-present",
+        "subjonctif-plus-que-parfait": "subjonctif-imparfait",
+    }
+
+    if tense == "imperatif-present":
+        return [
+            {"person": person, "form": form, "verb": lemma, "tense": tense}
+            for (person, _), form in zip(IMPERATIVE_PERSONS, (stem + "e", stem + "ons", stem + "ez"))
+        ]
+    if tense == "imperatif-passe":
+        return [
+            {"person": person, "form": aux + " " + participle, "verb": lemma, "tense": tense}
+            for (person, _), aux in zip(IMPERATIVE_PERSONS, ("aie", "ayons", "ayez"))
+        ]
+
+    if tense in simple_forms:
+        forms = simple_forms[tense]
+        rows = []
+        for index, (person, _) in enumerate(PERSONS):
+            display_person = person
+            if tense.startswith("subjonctif-"):
+                display_person = {
+                    "je": "que je", "tu": "que tu", "il": "qu'il",
+                    "elle": "qu'elle", "on": "qu'on", "nous": "que nous",
+                    "vous": "que vous", "ils": "qu'ils", "elles": "qu'elles",
+                }[person]
+            rows.append({"person": display_person, "form": forms[index], "verb": lemma, "tense": tense})
+        return rows
+
+    aux_tense = compound_aux_tense.get(tense)
+    if aux_tense:
+        aux_forms = avoir[aux_tense]
+        rows = []
+        for index, (person, _) in enumerate(PERSONS):
+            display_person = person
+            if tense.startswith("subjonctif-"):
+                display_person = {
+                    "je": "que je", "tu": "que tu", "il": "qu'il",
+                    "elle": "qu'elle", "on": "qu'on", "nous": "que nous",
+                    "vous": "que vous", "ils": "qu'ils", "elles": "qu'elles",
+                }[person]
+            rows.append({
+                "person": display_person,
+                "form": aux_forms[index] + " " + participle,
+                "verb": lemma,
+                "tense": tense,
+            })
+        return rows
+
+    raise HTTPException(422, "Este tiempo verbal todavía no está implementado.")
+
+
+def regular_er_present(verb: str) -> list[dict[str, str]]:
+    """Backward-compatible helper used by the existing present-tense tests."""
+    return regular_er_forms(verb, "present")
 
 
 class GenerateRequest(BaseModel):
@@ -82,15 +188,18 @@ def health() -> dict[str, str]:
 
 @app.post("/api/practice/generate")
 def generate_practice(request: GenerateRequest) -> dict:
-    if request.tense != "present":
-        raise HTTPException(422, "La primera categoría implementada es el présent de l'indicatif.")
+    if request.tense not in TENSE_LABELS:
+        raise HTTPException(422, "Selecciona un tiempo verbal válido.")
     if request.family not in ("", "premier-groupe-reguliers"):
         raise HTTPException(422, "Esta primera versión solo incluye los verbos regulares del primer grupo.")
     if request.construction not in ("", "non-pronominal"):
-        raise HTTPException(422, "Esta primera categoría solo incluye verbos no pronominales.")
-    if request.auxiliary not in ("", "avoir"):
-        raise HTTPException(422, "El filtro de auxiliar no se aplica a esta categoría.")
-    forms = regular_er_present(request.verb)
+        raise HTTPException(422, "Esta categoría solo incluye verbos no pronominales.")
+    if request.tense in COMPOUND_TENSES and request.auxiliary == "etre":
+        raise HTTPException(422, "« Parler » utiliza el auxiliar avoir en los tiempos compuestos. Selecciona Avoir o ambos auxiliares.")
+    if request.auxiliary not in ("", "avoir", "etre"):
+        raise HTTPException(422, "Selecciona un auxiliar válido.")
+
+    forms = regular_er_forms(request.verb, request.tense)
     pool = forms.copy()
     random.shuffle(pool)
     questions = []
@@ -100,18 +209,18 @@ def generate_practice(request: GenerateRequest) -> dict:
             "person": form["person"],
             "verb": form["verb"],
             "tense": form["tense"],
+            "answer": form["form"],
         })
+
     session_id = uuid.uuid4().hex
-    SESSIONS[session_id] = [
-        {"person": item["person"], "verb": item["verb"], "tense": item["tense"],
-         "answer": forms[ next(i for i, row in enumerate(forms) if row["person"] == item["person"]) ]["form"]}
-        for item in questions
-    ]
+    SESSIONS[session_id] = questions
     return {
         "session_id": session_id,
         "total": len(questions),
-        "questions": [{"index": i, **{k: v for k, v in item.items() if k != "answer"}}
-                      for i, item in enumerate(SESSIONS[session_id])],
+        "questions": [
+            {"index": i, **{key: value for key, value in item.items() if key != "answer"}}
+            for i, item in enumerate(questions)
+        ],
     }
 
 
