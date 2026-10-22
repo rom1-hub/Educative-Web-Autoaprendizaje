@@ -806,40 +806,121 @@
     const input = practiceResults.querySelector("#practice-answer");
     const feedback = practiceResults.querySelector("[data-practice-feedback]");
     const button = form.querySelector('button[type="submit"]');
+    let attempts = 0;
+    let solutionRequired = false;
+    let firstAnswerRecorded = false;
+    let firstAnswer = "";
+    let expectedAnswer = "";
+    let questionFinished = false;
     input.focus();
-    form.addEventListener("submit", async event => {
-      event.preventDefault();
-      if (button.dataset.next === "true") {
+
+    function updateProgress() {
+      practiceResults.querySelector(".practice-score").textContent =
+        "Aciertos: " + activePractice.score + " / " + questions.length;
+      const bar = practiceResults.querySelector(".practice-progress");
+      bar.setAttribute("aria-valuenow", String(index + (questionFinished ? 1 : 0)));
+      bar.querySelector("span").style.width =
+        Math.round((index + (questionFinished ? 1 : 0)) / questions.length * 100) + "%";
+    }
+
+    function moveToNextQuestion() {
+      if (questionFinished) return;
+      questionFinished = true;
+      input.disabled = true;
+      button.disabled = true;
+      window.setTimeout(() => {
+        if (!activePractice || activePractice.index !== index) return;
         activePractice.index++;
         renderPracticeQuestion();
+      }, 1000);
+    }
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      if (button.disabled || questionFinished || !input.value.trim()) return;
+      const submittedAnswer = input.value.trim();
+
+      // Tras dos errores, la solución se ha mostrado: solo la respuesta correcta
+      // permite continuar, sin volver a contar la pregunta ni alterar la puntuación.
+      if (solutionRequired) {
+        button.disabled = true;
+        try {
+          const result = await requestPractice("/api/practice/check", {
+            session_id: sessionId, index, answer: submittedAnswer
+          });
+          if (result.correct) {
+            feedback.hidden = false;
+            feedback.className = "practice-feedback is-correct";
+            feedback.textContent = "Respuesta correcta. Pasando a la siguiente pregunta…";
+            moveToNextQuestion();
+          } else {
+            feedback.hidden = false;
+            feedback.className = "practice-feedback is-incorrect";
+            feedback.textContent = "Escribe la respuesta correcta que aparece arriba para pasar a la siguiente pregunta.";
+            button.disabled = false;
+            input.focus();
+            input.select();
+          }
+        } catch (error) {
+          feedback.hidden = false;
+          feedback.className = "practice-feedback is-incorrect";
+          feedback.textContent = error.message;
+          button.disabled = false;
+        }
         return;
       }
-      if (!input.value.trim()) return;
+
       button.disabled = true;
       try {
         const result = await requestPractice("/api/practice/check", {
-          session_id: sessionId, index, answer: input.value.trim()
+          session_id: sessionId, index, answer: submittedAnswer
         });
-        const correct = result.correct;
-        if (correct) activePractice.score++;
-        activePractice.answers.push({
-          person: question.person, verb: question.verb, tense: question.tense,
-          answer: input.value.trim(), expected: result.expected, correct
-        });
-        input.disabled = true;
+        attempts++;
+        expectedAnswer = result.expected;
+
+        if (result.correct) {
+          if (!firstAnswerRecorded) {
+            activePractice.score++;
+            activePractice.answers.push({
+              person: question.person, verb: question.verb, tense: question.tense,
+              answer: submittedAnswer, expected: result.expected, correct: true
+            });
+            firstAnswerRecorded = true;
+          }
+          feedback.hidden = false;
+          feedback.className = "practice-feedback is-correct";
+          feedback.textContent = "Respuesta correcta. Pasando a la siguiente pregunta…";
+          updateProgress();
+          moveToNextQuestion();
+          return;
+        }
+
+        if (!firstAnswerRecorded) {
+          firstAnswer = submittedAnswer;
+          activePractice.answers.push({
+            person: question.person, verb: question.verb, tense: question.tense,
+            answer: firstAnswer, expected: result.expected, correct: false
+          });
+          firstAnswerRecorded = true;
+        }
+
         feedback.hidden = false;
-        feedback.className = "practice-feedback " + (correct ? "is-correct" : "is-incorrect");
-        feedback.innerHTML = correct
-          ? '<strong>Correcto.</strong> La forma esperada es <span>' + esc(result.expected) + '</span>.'
-          : '<strong>Respuesta incorrecta.</strong> La forma esperada es <span>' + esc(result.expected) + '</span>.';
-        button.textContent = index === questions.length - 1 ? "Ver resultados" : "Siguiente ejercicio";
-        button.dataset.next = "true";
-        button.disabled = false;
-        practiceResults.querySelector(".practice-score").textContent = "Aciertos: " + activePractice.score + " / " + questions.length;
-        const bar = practiceResults.querySelector(".practice-progress");
-        bar.setAttribute("aria-valuenow", String(index + 1));
-        bar.querySelector("span").style.width = Math.round((index + 1) / questions.length * 100) + "%";
-        button.focus();
+        feedback.className = "practice-feedback is-incorrect";
+        if (attempts === 1) {
+          feedback.textContent = "Respuesta incorrecta. Intenta de nuevo.";
+          input.value = "";
+          button.disabled = false;
+          input.focus();
+        } else {
+          solutionRequired = true;
+          feedback.innerHTML =
+            '<strong>Respuesta incorrecta. Respuesta correcta: ' + esc(result.expected) + '.</strong>' +
+            '<p>Escribe la respuesta correcta en el campo y pulsa «Comprobar respuesta» para pasar a la siguiente pregunta.</p>';
+          input.value = "";
+          button.disabled = false;
+          input.focus();
+        }
+        updateProgress();
       } catch (error) {
         feedback.hidden = false;
         feedback.className = "practice-feedback is-incorrect";
