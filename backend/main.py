@@ -62,6 +62,27 @@ COMPOUND_TENSES = {
     "imperatif-passe",
 }
 
+def is_supported_pronominal_variant(entry: dict, catalog: dict) -> bool:
+    """Recognize a pronominal form whose base has a supported regular -ER entry."""
+    if entry.get("pronominal") is not True or entry.get("construction") != "pronomiale":
+        return False
+    base = normalize(entry.get("infinitif_base") or "")
+    base_entry = catalog.get(base)
+    return (
+        isinstance(base_entry, dict)
+        and base_entry.get("pronominal") is False
+        and base_entry.get("construction") in ("non-pronomiale", "non-pronominale")
+        and base_entry.get("pattern") == entry.get("pattern")
+    )
+
+
+def is_supported_family_entry(entry: dict, catalog: dict) -> bool:
+    return (
+        entry.get("pronominal") is False
+        and entry.get("construction") in ("non-pronomiale", "non-pronominale")
+    ) or is_supported_pronominal_variant(entry, catalog)
+
+
 def is_supported_first_group_entry(entry: dict, catalog: dict) -> bool:
     """Recognize regular first-group verbs, including pronominal records catalogued as group 3."""
     if entry.get("pronominal") is False:
@@ -106,7 +127,7 @@ def ger_family_verbs() -> tuple[str, ...]:
             continue
         lemma = normalize(entry.get("infinitif_base") or entry.get("infinitif") or entry.get("id") or "")
         display_lemma = normalize(entry.get("infinitif") or lemma)
-        if is_supported_first_group_entry(entry, catalog) and entry.get("pattern") in {"man:ger", "abr:éger"} and lemma.endswith("ger") and lemma:
+        if is_supported_family_entry(entry, catalog) and entry.get("pattern") in {"man:ger", "abr:éger"} and lemma.endswith("ger") and lemma:
             candidates.append(display_lemma)
     return tuple(sorted(set(candidates)))
 
@@ -135,7 +156,7 @@ def cer_family_verbs() -> tuple[str, ...]:
         lemma = normalize(entry.get("infinitif_base") or entry.get("infinitif") or entry.get("id") or "")
         display_lemma = normalize(entry.get("infinitif") or lemma)
         if (
-            is_supported_first_group_entry(entry, catalog)
+            is_supported_family_entry(entry, catalog)
             and entry.get("pattern") in {"pla:cer", "dép:ecer"}
             and lemma.endswith("cer")
             and lemma
@@ -210,7 +231,7 @@ def pronominal_first_group_verbs() -> tuple[str, ...]:
         if not isinstance(entry, dict):
             continue
         display_lemma = normalize(entry.get("infinitif") or entry.get("id") or "")
-        if entry.get("pronominal") is True and display_lemma and is_supported_first_group_entry(entry, catalog):
+        if entry.get("pronominal") is True and display_lemma and is_supported_pronominal_variant(entry, catalog):
             try:
                 regular_er_forms(display_lemma, "present")
             except HTTPException:
@@ -245,7 +266,7 @@ def eler_family_patterns() -> dict[str, str]:
         display_lemma = normalize(entry.get("infinitif") or lemma)
         pattern = entry.get("pattern")
         if (
-            is_supported_first_group_entry(entry, catalog)
+            is_supported_family_entry(entry, catalog)
             and lemma.endswith(("eler", "éler"))
             and (pattern in supported or lemma == "dénickeler")
         ):
@@ -283,7 +304,7 @@ def eter_family_patterns() -> dict[str, str]:
         display_lemma = normalize(entry.get("infinitif") or lemma)
         pattern = entry.get("pattern")
         if (
-            is_supported_first_group_entry(entry, catalog)
+            is_supported_family_entry(entry, catalog)
             and lemma.endswith(("eter", "éter"))
             and lemma != "duveter"
             and pattern in supported
@@ -327,7 +348,7 @@ def e_accent_family_patterns() -> dict[str, str]:
         display_lemma = normalize(entry.get("infinitif") or lemma)
         pattern = entry.get("pattern")
         if (
-            is_supported_first_group_entry(entry, catalog)
+            is_supported_family_entry(entry, catalog)
             and lemma.endswith("er")
             and not lemma.endswith(("ger", "cer", "eler", "éler", "eter", "éter"))
             and (pattern in supported or lemma == "promener")
@@ -362,7 +383,7 @@ def yer_family_patterns() -> dict[str, str]:
         lemma = normalize(entry.get("infinitif_base") or entry.get("infinitif") or entry.get("id") or "")
         display_lemma = normalize(entry.get("infinitif") or lemma)
         pattern = entry.get("pattern")
-        if is_supported_first_group_entry(entry, catalog) and lemma.endswith("yer") and pattern in supported:
+        if is_supported_family_entry(entry, catalog) and lemma.endswith("yer") and pattern in supported:
             patterns[display_lemma] = pattern
     return patterns
 
