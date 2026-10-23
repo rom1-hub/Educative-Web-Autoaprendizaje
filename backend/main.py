@@ -84,7 +84,7 @@ def ger_family_verbs() -> tuple[str, ...]:
         if not isinstance(entry, dict):
             continue
         lemma = normalize(entry.get("infinitif") or entry.get("id") or "")
-        if entry.get("pattern") == "man:ger" and entry.get("pronominal") is False and entry.get("construction") == "non-pronominale" and lemma.endswith("ger") and lemma:
+        if entry.get("pattern") == "man:ger" and entry.get("pronominal") is False and entry.get("construction") in ("non-pronomiale", "non-pronominale") and lemma.endswith("ger") and lemma:
             candidates.append(lemma)
     return tuple(sorted(set(candidates)))
 
@@ -125,7 +125,7 @@ def regular_first_group_verbs() -> tuple[str, ...]:
             entry.get("groupe") != 1
             or entry.get("familyId") != "er-regular"
             or entry.get("pronominal") is not False
-            or entry.get("construction") != "non-pronominale"
+            or entry.get("construction") != "non-pronomiale"
             or not lemma
         ):
             continue
@@ -167,7 +167,7 @@ def regular_er_forms(verb: str, tense: str) -> list[dict[str, str]]:
     imparfait = [stem + suffix for suffix in ("ais", "ais", "ait", "ait", "ait", "ions", "iez", "aient", "aient")]
     passe_simple = [stem + suffix for suffix in ("ai", "as", "a", "a", "a", "âmes", "âtes", "èrent", "èrent")]
     if is_ger_family:
-        passe_simple = [stem + "e" + suffix for suffix in ("ai", "as", "a", "a", "a", "âmes", "âtes", "èrent", "èrent")]
+        passe_simple = [stem + ("e" if index < 7 else "") + suffix for index, suffix in enumerate(("ai", "as", "a", "a", "a", "âmes", "âtes", "èrent", "èrent"))]
     future = [infinitive + suffix for suffix in ("ai", "as", "a", "a", "a", "ons", "ez", "ont", "ont")]
     conditional = [infinitive + suffix for suffix in ("ais", "ais", "ait", "ait", "ait", "ions", "iez", "aient", "aient")]
     subj_present = [stem + suffix for suffix in ("e", "es", "e", "e", "e", "ions", "iez", "ent", "ent")]
