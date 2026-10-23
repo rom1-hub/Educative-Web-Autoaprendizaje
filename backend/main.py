@@ -491,6 +491,19 @@ def regular_er_forms(verb: str, tense: str, family: str = "") -> list[dict[str, 
     if is_pronominal:
         for key, values in simple_forms.items():
             simple_forms[key] = [reflexive_prefix(form, index) for index, form in enumerate(values)]
+
+    no_participle_agreement = {"se parler", "se téléphoner", "se demander"}
+
+    def participle_for_person(person: str) -> str:
+        if not is_pronominal or display_lemma in no_participle_agreement:
+            return participle
+        if person in ("elle",):
+            return participle + "e"
+        if person in ("elles",):
+            return participle + "es"
+        if person in ("nous", "vous", "ils", "nous*", "vous*"):
+            return participle + "s"
+        return participle
     compound_aux_tense = {
         "passe-compose": "present",
         "plus-que-parfait": "imparfait",
@@ -516,7 +529,7 @@ def regular_er_forms(verb: str, tense: str, family: str = "") -> list[dict[str, 
     if tense == "imperatif-passe":
         imperative_aux = ("sois-toi", "soyons-nous", "soyez-vous") if is_pronominal else ("aie", "ayons", "ayez")
         return [
-            {"person": person, "form": aux + " " + participle, "verb": display_lemma, "tense": tense}
+            {"person": person, "form": aux + " " + participle_for_person(person), "verb": display_lemma, "tense": tense}
             for (person, _), aux in zip(IMPERATIVE_PERSONS, imperative_aux)
         ]
 
@@ -557,7 +570,7 @@ def regular_er_forms(verb: str, tense: str, family: str = "") -> list[dict[str, 
                 }[person]
             rows.append({
                 "person": display_person,
-                "form": reflexive_prefix(aux_forms[index], index) + " " + participle if is_pronominal else aux_forms[index] + " " + participle,
+                "form": reflexive_prefix(aux_forms[index], index) + " " + participle_for_person(person) if is_pronominal else aux_forms[index] + " " + participle,
                 "verb": display_lemma,
                 "tense": tense,
             })
@@ -715,6 +728,11 @@ def check_answer(request: CheckRequest) -> dict:
                 accepted.add(expected.replace("i", "y", 1))
         elif tense in ("futur-simple", "conditionnel-present"):
             accepted.add(expected.replace("ier", "yer"))
+    if verb.startswith(("se ", "s'")) and tense in COMPOUND_TENSES and verb not in {"se parler", "se téléphoner", "se demander"}:
+        prefix, separator, past_participle = expected.rpartition(" ")
+        if separator and past_participle.endswith("é"):
+            for ending in ("é", "ée", "és", "ées"):
+                accepted.add(prefix + " " + past_participle[:-1] + ending)
     correct = bool(actual) and actual in accepted
     return {"correct": correct, "expected": question["answer"]}
 
