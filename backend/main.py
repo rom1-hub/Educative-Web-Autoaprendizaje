@@ -197,8 +197,7 @@ def eler_family_patterns() -> dict[str, str]:
         lemma = normalize(entry.get("infinitif") or entry.get("id") or "")
         pattern = entry.get("pattern")
         if (
-            entry.get("familyId") == "er-eler"
-            and entry.get("pronominal") is False
+            entry.get("pronominal") is False
             and lemma.endswith("eler")
             and (pattern in supported or lemma == "dénickeler")
         ):
