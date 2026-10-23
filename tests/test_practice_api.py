@@ -48,6 +48,14 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
         self.assertEqual({q["tense"] for q in result["questions"]}, {"present"})
         self.assertNotIn("answer", result["questions"][0])
 
+    def test_individual_e_accent_verb_works_without_explicit_family(self):
+        result = generate_practice(GenerateRequest(verb="lever", tense="present"))
+        self.assertEqual(result["total"], 20)
+        self.assertEqual({q["verb"] for q in result["questions"]}, {"lever"})
+        from backend.main import regular_er_forms
+        self.assertEqual([row["form"] for row in regular_er_forms("lever", "present")][0:6],
+                         ["lève", "lèves", "lève", "lève", "lève", "levons"])
+
     def test_category_uses_catalog_and_returns_twenty_distinct_verbs(self):
         from backend.main import regular_first_group_verbs
 
