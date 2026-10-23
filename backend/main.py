@@ -64,7 +64,7 @@ COMPOUND_TENSES = {
 
 @functools.lru_cache(maxsize=1)
 def ger_family_verbs() -> tuple[str, ...]:
-    """Return canonical non-pronominal verbs in the orthographic -ger (man:ger) family."""
+    """Return canonical non-pronominal verbs in the orthographic -GER families."""
     catalog_path = ROOT / "data" / "verbs" / "local-database.js"
     try:
         source = catalog_path.read_text(encoding="utf-8")
@@ -84,14 +84,14 @@ def ger_family_verbs() -> tuple[str, ...]:
         if not isinstance(entry, dict):
             continue
         lemma = normalize(entry.get("infinitif") or entry.get("id") or "")
-        if entry.get("pattern") == "man:ger" and entry.get("pronominal") is False and entry.get("construction") in ("non-pronomiale", "non-pronominale") and lemma.endswith("ger") and lemma:
+        if entry.get("pattern") in {"man:ger", "abr:éger"} and entry.get("pronominal") is False and entry.get("construction") in ("non-pronomiale", "non-pronominale") and lemma.endswith("ger") and lemma:
             candidates.append(lemma)
     return tuple(sorted(set(candidates)))
 
 
 @functools.lru_cache(maxsize=1)
 def cer_family_verbs() -> tuple[str, ...]:
-    """Return canonical non-pronominal verbs in the orthographic -cer (pla:cer) family."""
+    """Return canonical non-pronominal verbs in the orthographic -CER families."""
     catalog_path = ROOT / "data" / "verbs" / "local-database.js"
     try:
         source = catalog_path.read_text(encoding="utf-8")
@@ -112,7 +112,7 @@ def cer_family_verbs() -> tuple[str, ...]:
             continue
         lemma = normalize(entry.get("infinitif") or entry.get("id") or "")
         if (
-            entry.get("pattern") == "pla:cer"
+            entry.get("pattern") in {"pla:cer", "dép:ecer"}
             and entry.get("pronominal") is False
             and entry.get("construction") in ("non-pronomiale", "non-pronominale")
             and lemma.endswith("cer")
@@ -190,7 +190,7 @@ def eler_family_patterns() -> dict[str, str]:
         raise HTTPException(500, "No se pudo cargar el catálogo canónico de verbos para generar la práctica.") from exc
 
     patterns = {}
-    supported = {"app:eler", "p:eler", "harc:eler"}
+    supported = {"app:eler", "p:eler", "harc:eler", "rév:éler"}
     for entry in catalog.values():
         if not isinstance(entry, dict):
             continue
@@ -198,7 +198,7 @@ def eler_family_patterns() -> dict[str, str]:
         pattern = entry.get("pattern")
         if (
             entry.get("pronominal") is False
-            and lemma.endswith("eler")
+            and lemma.endswith(("eler", "éler"))
             and (pattern in supported or lemma == "dénickeler")
         ):
             patterns[lemma] = "app:eler" if lemma in ("harceler", "dénickeler") else pattern
@@ -227,7 +227,7 @@ def eter_family_patterns() -> dict[str, str]:
         raise HTTPException(500, "No se pudo cargar el catálogo canónico de verbos para generar la práctica.") from exc
 
     patterns = {}
-    supported = {"ach:eter", "j:eter"}
+    supported = {"ach:eter", "j:eter", "décr:éter", "héb:éter"}
     for entry in catalog.values():
         if not isinstance(entry, dict):
             continue
@@ -235,7 +235,7 @@ def eter_family_patterns() -> dict[str, str]:
         pattern = entry.get("pattern")
         if (
             entry.get("pronominal") is False
-            and lemma.endswith("eter")
+            and lemma.endswith(("eter", "éter"))
             and lemma != "duveter"
             and pattern in supported
         ):
@@ -332,20 +332,43 @@ def regular_er_forms(verb: str, tense: str, family: str = "") -> list[dict[str, 
         raise HTTPException(422, "Esta categoría solo admite infinitivos regulares en -ER.")
     is_ger_family = lemma.endswith("ger")
     is_cer_family = lemma.endswith("cer")
-    is_eler_family = lemma.endswith("eler")
-    is_eter_family = lemma.endswith("eter")
+    is_eler_family = lemma.endswith(("eler", "éler"))
+    is_eter_family = lemma.endswith(("eter", "éter"))
     is_yer_family = lemma.endswith("yer")
     yer_pattern = yer_family_patterns().get(lemma) if is_yer_family else None
-    e_accent_pattern = e_accent_family_patterns().get(lemma) if family == "e-accent" else None
+    eler_pattern = eler_family_patterns().get(lemma) if is_eler_family else None
+    eter_pattern = eter_family_patterns().get(lemma) if is_eter_family else None
+    # La terminación específica prevalece sobre una alternancia E/È genérica.
+    suffix_family = (
+        "ger" if is_ger_family else
+        "cer" if is_cer_family else
+        "eler" if is_eler_family else
+        "eter" if is_eter_family else
+        "yer" if is_yer_family else
+        ""
+    )
+    e_accent_pattern = e_accent_family_patterns().get(lemma) if not suffix_family and family in ("", "e-accent") else None
     is_e_accent_family = e_accent_pattern is not None
     if lemma == "aller" or (re.search(r"(?:eter|yer)$", lemma) and not (is_eter_family or is_yer_family)):
         raise HTTPException(422, "Este verbo pertenece a una familia con reglas particulares todavía no implementada.")
     if is_ger_family and lemma not in ger_family_verbs():
         raise HTTPException(422, "Este verbo no pertenece a la familia ortográfica -GER compatible (manger, changer, nager…).")
-    if is_eler_family and lemma not in eler_family_patterns():
+    if is_eler_family and eler_pattern is None:
         raise HTTPException(422, "Este verbo no pertenece a la familia -ELER compatible.")
-    if is_eter_family and lemma not in eter_family_patterns():
+    if is_eter_family and eter_pattern is None:
         raise HTTPException(422, "Este verbo no pertenece a la familia -ETER compatible.")
+    if family == "e-accent" and (suffix_family or e_accent_pattern is None):
+        raise HTTPException(422, "El verbo escrito no pertenece a la familia E (È) + CONSONANTE + ER compatible.")
+    if family == "ger" and not is_ger_family:
+        raise HTTPException(422, "El verbo escrito no pertenece a la familia ortográfica -GER compatible.")
+    if family == "cer" and not is_cer_family:
+        raise HTTPException(422, "El verbo escrito no pertenece a la familia ortográfica -CER compatible.")
+    if family == "eler" and not is_eler_family:
+        raise HTTPException(422, "El verbo escrito no pertenece a la familia -ELER compatible.")
+    if family == "eter" and not is_eter_family:
+        raise HTTPException(422, "El verbo escrito no pertenece a la familia -ETER compatible.")
+    if family == "yer" and not is_yer_family:
+        raise HTTPException(422, "El verbo escrito no pertenece a la familia -YER compatible.")
     if is_yer_family and yer_pattern is None:
         raise HTTPException(422, "Este verbo no pertenece a la familia -YER compatible.")
     if is_cer_family and lemma not in cer_family_verbs():
@@ -358,22 +381,24 @@ def regular_er_forms(verb: str, tense: str, family: str = "") -> list[dict[str, 
     stem = lemma[:-2]
     infinitive = lemma
     participle = stem + "é"
-    eler_pattern = eler_family_patterns().get(lemma) if is_eler_family else None
-    eter_pattern = eter_family_patterns().get(lemma) if is_eter_family else None
     if yer_pattern in ("netto:yer", "pa:yer", "env:oyer"):
         strong_stem = stem[:-1] + "i"
     elif eter_pattern == "ach:eter":
         strong_stem = stem[:-2] + "è" + stem[-1]
     elif eter_pattern == "j:eter":
         strong_stem = stem + stem[-1]
-    elif is_e_accent_family:
-        # Alternancia de la vocal del radical: céder -> cède, lever -> lève.
+    elif eler_pattern == "app:eler":
+        strong_stem = stem + "l"
+    elif eler_pattern == "p:eler":
+        strong_stem = stem[:-2] + "è" + stem[-1]
+    elif is_e_accent_family or (is_ger_family and re.search(r"[éèê]", stem)) or eler_pattern == "rév:éler" or eter_pattern in ("décr:éter", "héb:éter"):
+        # Alternancia E/È en las formas con e muda: lever -> lève, protéger -> protège.
         strong_stem = re.sub(r"[eé](?=[^aeiouyàâéèêëîïôûùüÿœæ]$)", "è", stem)
     else:
-        strong_stem = (stem + "l") if eler_pattern == "app:eler" else (stem[:-2] + "è" + stem[-1]) if eler_pattern == "p:eler" else stem
+        strong_stem = stem
     present = [stem + suffix for suffix in ("e", "es", "e", "e", "e", "ons", "ez", "ent", "ent")]
     if is_eler_family or is_eter_family or is_yer_family or is_e_accent_family:
-        present = [(strong_stem if (is_eler_family or is_eter_family or is_e_accent_family or yer_pattern in ("netto:yer", "pa:yer", "env:oyer")) and i not in (5, 6) else stem) + ending for i, ending in enumerate(("e", "es", "e", "e", "e", "ons", "ez", "ent", "ent"))]
+        present = [(strong_stem if (is_eler_family or is_eter_family or is_e_accent_family or (is_ger_family and strong_stem != stem) or yer_pattern in ("netto:yer", "pa:yer", "env:oyer")) and i not in (5, 6) else stem) + ending for i, ending in enumerate(("e", "es", "e", "e", "e", "ons", "ez", "ent", "ent"))]
     if is_ger_family:
         present[5] = stem + "eons"
     if is_cer_family:
@@ -391,7 +416,7 @@ def regular_er_forms(verb: str, tense: str, family: str = "") -> list[dict[str, 
     if is_cer_family:
         passe_simple = [(stem[:-1] + "ç" if index < 7 else stem) + suffix for index, suffix in enumerate(("ai", "as", "a", "a", "a", "âmes", "âtes", "èrent", "èrent"))]
     future = [infinitive + suffix for suffix in ("ai", "as", "a", "a", "a", "ons", "ez", "ont", "ont")]
-    if is_eler_family or is_eter_family:
+    if eler_pattern in ("app:eler", "p:eler", "harc:eler") or eter_pattern in ("ach:eter", "j:eter"):
         future = [strong_stem + "er" + suffix for suffix in ("ai", "as", "a", "a", "a", "ons", "ez", "ont", "ont")]
     elif is_e_accent_family and e_accent_pattern in ("l:ever", "m:ener", "p:eser", "s:emer", "rec:eper", "rec:éper"):
         future = [strong_stem + "er" + suffix for suffix in ("ai", "as", "a", "a", "a", "ons", "ez", "ont", "ont")]
@@ -401,7 +426,7 @@ def regular_er_forms(verb: str, tense: str, family: str = "") -> list[dict[str, 
         future_stem = lemma[:-4] + "err"
         future = [future_stem + suffix for suffix in ("ai", "as", "a", "a", "a", "ons", "ez", "ont", "ont")]
     conditional = [infinitive + suffix for suffix in ("ais", "ais", "ait", "ait", "ait", "ions", "iez", "aient", "aient")]
-    if is_eler_family or is_eter_family:
+    if eler_pattern in ("app:eler", "p:eler", "harc:eler") or eter_pattern in ("ach:eter", "j:eter"):
         conditional = [strong_stem + "er" + suffix for suffix in ("ais", "ais", "ait", "ait", "ait", "ions", "iez", "aient", "aient")]
     elif is_e_accent_family and e_accent_pattern in ("l:ever", "m:ener", "p:eser", "s:emer", "rec:eper", "rec:éper"):
         conditional = [strong_stem + "er" + suffix for suffix in ("ais", "ais", "ait", "ait", "ait", "ions", "iez", "aient", "aient")]
@@ -412,7 +437,7 @@ def regular_er_forms(verb: str, tense: str, family: str = "") -> list[dict[str, 
         conditional = [future_stem + suffix for suffix in ("ais", "ais", "ait", "ait", "ait", "ions", "iez", "aient", "aient")]
     subj_present = [stem + suffix for suffix in ("e", "es", "e", "e", "e", "ions", "iez", "ent", "ent")]
     if is_eler_family or is_eter_family or is_yer_family or is_e_accent_family:
-        subj_present = [(strong_stem if (is_eler_family or is_eter_family or is_e_accent_family or yer_pattern in ("netto:yer", "pa:yer", "env:oyer")) and i not in (5, 6) else stem) + ending for i, ending in enumerate(("e", "es", "e", "e", "e", "ions", "iez", "ent", "ent"))]
+        subj_present = [(strong_stem if (is_eler_family or is_eter_family or is_e_accent_family or (is_ger_family and strong_stem != stem) or yer_pattern in ("netto:yer", "pa:yer", "env:oyer")) and i not in (5, 6) else stem) + ending for i, ending in enumerate(("e", "es", "e", "e", "e", "ions", "iez", "ent", "ent"))]
     subj_imparfait = [stem + suffix for suffix in ("asse", "asses", "ât", "ât", "ât", "assions", "assiez", "assent", "assent")]
     if is_cer_family:
         subj_imparfait = [stem[:-1] + "ç" + suffix for suffix in ("asse", "asses", "ât", "ât", "ât", "assions", "assiez", "assent", "assent")]
@@ -448,7 +473,7 @@ def regular_er_forms(verb: str, tense: str, family: str = "") -> list[dict[str, 
     if tense == "imperatif-present":
         return [
             {"person": person, "form": form, "verb": lemma, "tense": tense}
-            for (person, _), form in zip(IMPERATIVE_PERSONS, ((strong_stem if (is_eler_family or is_eter_family or is_e_accent_family or (is_yer_family and yer_pattern in ("netto:yer", "pa:yer", "env:oyer"))) else stem) + "e", (stem + "eons" if is_ger_family else stem[:-1] + "çons" if is_cer_family else stem + "ons"), stem + "ez"))
+            for (person, _), form in zip(IMPERATIVE_PERSONS, ((strong_stem if (is_eler_family or is_eter_family or is_e_accent_family or (is_ger_family and strong_stem != stem) or (is_yer_family and yer_pattern in ("netto:yer", "pa:yer", "env:oyer"))) else stem) + "e", (stem + "eons" if is_ger_family else stem[:-1] + "çons" if is_cer_family else stem + "ons"), stem + "ez"))
         ]
     if tense == "imperatif-passe":
         return [
