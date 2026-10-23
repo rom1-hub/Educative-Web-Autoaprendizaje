@@ -133,6 +133,48 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
         self.assertTrue(result["correct"])
 
 
+    def test_pronominal_variants_work_in_each_family_across_all_tenses(self):
+        from backend.main import TENSE_LABELS
+
+        examples = (
+            ("se laver", "premier-groupe-reguliers"),
+            ("s'allonger", "ger"),
+            ("s'efforcer", "cer"),
+            ("s'appeler", "eler"),
+            ("s'inquiéter", "eter"),
+            ("s'ennuyer", "yer"),
+            ("se lever", "e-accent"),
+            ("se promener", "e-accent"),
+        )
+        for verb, family in examples:
+            for tense in TENSE_LABELS:
+                with self.subTest(verb=verb, family=family, tense=tense):
+                    result = generate_practice(GenerateRequest(
+                        verb=verb,
+                        family=family,
+                        construction="pronominal",
+                        tense=tense,
+                    ))
+                    self.assertEqual(result["total"], 20)
+                    self.assertEqual({question["verb"] for question in result["questions"]}, {verb})
+                    self.assertEqual({question["tense"] for question in result["questions"]}, {tense})
+
+    def test_pronominal_random_mode_filters_each_family(self):
+        families = ("premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent")
+        for family in families:
+            with self.subTest(family=family):
+                result = generate_practice(GenerateRequest(
+                    family=family,
+                    construction="pronominal",
+                    tense="present",
+                ))
+                self.assertEqual(result["total"], 20)
+                self.assertTrue(all(
+                    question["verb"].startswith(("se ", "s'"))
+                    for question in result["questions"]
+                ))
+
+
     def test_category_uses_catalog_and_returns_twenty_distinct_verbs(self):
         from backend.main import regular_first_group_verbs
 
