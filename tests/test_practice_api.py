@@ -86,12 +86,13 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
         self.assertEqual(len(SESSIONS[result["session_id"]]), 20)
 
     def test_ger_family_supports_all_sixteen_tenses(self):
-        tenses = ["present", "imparfait", "passe-compose", "plus-que-parfait", "passe-simple", "passe-anterieur", "futur-simple", "futur-anterieur", "subjonctif-present", "subjonctif-passe", "subjonctif-imparfait", "subjonctif-plus-que-parfait", "conditionnel-present", "conditionnel-passe", "imperatif-present", "imperatif-passe"]
-        for tense in tenses:
-            with self.subTest(tense=tense):
-                result = generate_practice(GenerateRequest(verb="manger", family="ger", tense=tense))
-                self.assertEqual(result["total"], 20)
-                self.assertEqual({q["tense"] for q in result["questions"]}, {tense})
+        from backend.main import TENSE_LABELS
+        for verb in ("manger", "protéger"):
+            for tense in TENSE_LABELS:
+                with self.subTest(verb=verb, tense=tense):
+                    result = generate_practice(GenerateRequest(verb=verb, family="ger", tense=tense))
+                    self.assertEqual(result["total"], 20)
+                    self.assertEqual({q["tense"] for q in result["questions"]}, {tense})
 
     def test_ger_family_includes_accented_ger_patterns_but_rejects_other_families(self):
         from backend.main import ger_family_verbs, regular_er_forms
@@ -165,12 +166,13 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
         self.assertEqual(len(SESSIONS[result["session_id"]]), 20)
 
     def test_cer_family_supports_all_sixteen_tenses_individually(self):
-        tenses = ["present", "imparfait", "passe-compose", "plus-que-parfait", "passe-simple", "passe-anterieur", "futur-simple", "futur-anterieur", "subjonctif-present", "subjonctif-passe", "subjonctif-imparfait", "subjonctif-plus-que-parfait", "conditionnel-present", "conditionnel-passe", "imperatif-present", "imperatif-passe"]
-        for tense in tenses:
-            with self.subTest(tense=tense):
-                result = generate_practice(GenerateRequest(verb="commencer", family="cer", tense=tense))
-                self.assertEqual(result["total"], 20)
-                self.assertEqual({q["tense"] for q in result["questions"]}, {tense})
+        from backend.main import TENSE_LABELS
+        for verb in ("commencer", "dépecer"):
+            for tense in TENSE_LABELS:
+                with self.subTest(verb=verb, tense=tense):
+                    result = generate_practice(GenerateRequest(verb=verb, family="cer", tense=tense))
+                    self.assertEqual(result["total"], 20)
+                    self.assertEqual({q["tense"] for q in result["questions"]}, {tense})
 
     def test_cer_family_rejects_other_spelling_patterns(self):
         for verb in ("protéger", "s'efforcer"):
