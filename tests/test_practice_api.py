@@ -34,7 +34,7 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
             "changions", "changiez", "changeaient", "changeaient",
         ])
         self.assertEqual([row["form"] for row in regular_er_forms("manger", "imperatif-present")], ["mange", "mangeons", "mangez"])
-        for verb in ("placer", "appeler", "payer", "aller", "lever", "protéger", "jogger"):
+        for verb in ("appeler", "payer", "aller", "lever", "protéger", "jogger"):
             with self.subTest(verb=verb), self.assertRaises(HTTPException):
                 regular_er_present(verb)
 
@@ -87,6 +87,75 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
         for verb in ("protéger", "jogger", "placer"):
             with self.subTest(verb=verb), self.assertRaises(HTTPException):
                 generate_practice(GenerateRequest(verb=verb, family="ger", tense="present"))
+
+    def test_cer_family_catalog_uses_only_pla_cer_non_pronominal_verbs(self):
+        from backend.main import cer_family_verbs
+
+        available = set(cer_family_verbs())
+        self.assertEqual(len(available), 122)
+        self.assertTrue({"commencer", "annoncer", "avancer", "placer"}.issubset(available))
+        self.assertNotIn("dépecer", available)
+        self.assertNotIn("redépecer", available)
+        self.assertNotIn("s'efforcer", available)
+
+    def test_cer_family_spelling_rules(self):
+        from backend.main import regular_er_forms
+
+        self.assertEqual(
+            [row["form"] for row in regular_er_forms("commencer", "present")],
+            ["commence", "commences", "commence", "commence", "commence", "commençons", "commencez", "commencent", "commencent"],
+        )
+        self.assertEqual(
+            [row["form"] for row in regular_er_forms("commencer", "imparfait")],
+            ["commençais", "commençais", "commençait", "commençait", "commençait", "commencions", "commenciez", "commençaient", "commençaient"],
+        )
+        self.assertEqual(
+            [row["form"] for row in regular_er_forms("commencer", "passe-simple")],
+            ["commençai", "commenças", "commença", "commença", "commença", "commençâmes", "commençâtes", "commencèrent", "commencèrent"],
+        )
+        self.assertEqual(
+            [row["form"] for row in regular_er_forms("commencer", "subjonctif-present")],
+            ["commence", "commences", "commence", "commence", "commence", "commencions", "commenciez", "commencent", "commencent"],
+        )
+        self.assertEqual(
+            [row["form"] for row in regular_er_forms("commencer", "subjonctif-imparfait")],
+            ["commençasse", "commençasses", "commençât", "commençât", "commençât", "commençassions", "commençassiez", "commençassent", "commençassent"],
+        )
+        self.assertEqual(
+            [row["form"] for row in regular_er_forms("commencer", "imperatif-present")],
+            ["commence", "commençons", "commencez"],
+        )
+        self.assertEqual(
+            [row["form"] for row in regular_er_forms("placer", "present")],
+            ["place", "places", "place", "place", "place", "plaçons", "placez", "placent", "placent"],
+        )
+
+    def test_cer_family_random_mode_uses_twenty_distinct_catalog_verbs(self):
+        from backend.main import SESSIONS, cer_family_verbs
+
+        available = set(cer_family_verbs())
+        result = generate_practice(GenerateRequest(family="cer", tense="present"))
+        self.assertEqual(result["total"], 20)
+        verbs = [question["verb"] for question in result["questions"]]
+        self.assertEqual(len(set(verbs)), 20)
+        self.assertTrue(set(verbs).issubset(available))
+        self.assertNotIn("answer", result["questions"][0])
+        self.assertEqual(len(SESSIONS[result["session_id"]]), 20)
+
+    def test_cer_family_supports_all_sixteen_tenses_individually(self):
+        tenses = ["present", "imparfait", "passe-compose", "plus-que-parfait", "passe-simple", "passe-anterieur", "futur-simple", "futur-anterieur", "subjonctif-present", "subjonctif-passe", "subjonctif-imparfait", "subjonctif-plus-que-parfait", "conditionnel-present", "conditionnel-passe", "imperatif-present", "imperatif-passe"]
+        for tense in tenses:
+            with self.subTest(tense=tense):
+                result = generate_practice(GenerateRequest(verb="commencer", family="cer", tense=tense))
+                self.assertEqual(result["total"], 20)
+                self.assertEqual({q["tense"] for q in result["questions"]}, {tense})
+
+    def test_cer_family_rejects_other_spelling_patterns(self):
+        for verb in ("dépecer", "redépecer", "protéger", "s'efforcer"):
+            with self.subTest(verb=verb), self.assertRaises(HTTPException):
+                generate_practice(GenerateRequest(verb=verb, family="cer", tense="present"))
+        with self.assertRaises(HTTPException):
+            generate_practice(GenerateRequest(verb="commencer", family="ger", tense="present"))
 
     def test_answer_check_accepts_missing_accents_and_case(self):
         session = generate_practice(GenerateRequest(verb="parler", tense="present"))
