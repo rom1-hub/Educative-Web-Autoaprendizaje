@@ -20,8 +20,13 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
              "parlons", "parlez", "parlent", "parlent"],
         )
 
-    def test_rejects_spelling_change_families_for_now(self):
-        for verb in ("manger", "placer", "appeler", "payer", "aller", "lever"):
+    def test_supports_ger_family_spelling_rules(self):
+        forms = regular_er_present("manger")
+        self.assertEqual([row["form"] for row in forms], ["mange", "manges", "mange", "mange", "mange", "mangeons", "mangez", "mangent", "mangent"])
+        from backend.main import regular_er_forms
+        self.assertEqual([row["form"] for row in regular_er_forms("manger", "passe-simple")], ["mangeai", "mangeas", "mangea", "mangea", "mangea", "mangeâmes", "mangeâtes", "mangèrent", "mangèrent"])
+        self.assertEqual([row["form"] for row in regular_er_forms("manger", "imperatif-present")], ["mange", "mangeons", "mangez"])
+        for verb in ("placer", "appeler", "payer", "aller", "lever", "protéger", "jogger"):
             with self.subTest(verb=verb), self.assertRaises(HTTPException):
                 regular_er_present(verb)
 
@@ -49,6 +54,31 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
         verbs = [question["verb"] for question in result["questions"]]
         self.assertEqual(len(set(verbs)), 20)
         self.assertTrue(set(verbs).issubset(set(catalog_verbs)))
+
+    def test_ger_family_random_mode_uses_twenty_distinct_catalog_verbs(self):
+        from backend.main import SESSIONS, ger_family_verbs
+        available = set(ger_family_verbs())
+        self.assertGreaterEqual(len(available), 20)
+        result = generate_practice(GenerateRequest(family="ger", tense="present"))
+        self.assertEqual(result["total"], 20)
+        verbs = [question["verb"] for question in result["questions"]]
+        self.assertEqual(len(set(verbs)), 20)
+        self.assertTrue(set(verbs).issubset(available))
+        self.assertNotIn("answer", result["questions"][0])
+        self.assertEqual(len(SESSIONS[result["session_id"]]), 20)
+
+    def test_ger_family_supports_all_sixteen_tenses(self):
+        tenses = ["present", "imparfait", "passe-compose", "plus-que-parfait", "passe-simple", "passe-anterieur", "futur-simple", "futur-anterieur", "subjonctif-present", "subjonctif-passe", "subjonctif-imparfait", "subjonctif-plus-que-parfait", "conditionnel-present", "conditionnel-passe", "imperatif-present", "imperatif-passe"]
+        for tense in tenses:
+            with self.subTest(tense=tense):
+                result = generate_practice(GenerateRequest(verb="manger", family="ger", tense=tense))
+                self.assertEqual(result["total"], 20)
+                self.assertEqual({q["tense"] for q in result["questions"]}, {tense})
+
+    def test_ger_family_rejects_other_spelling_patterns(self):
+        for verb in ("protéger", "jogger", "placer"):
+            with self.subTest(verb=verb), self.assertRaises(HTTPException):
+                generate_practice(GenerateRequest(verb=verb, family="ger", tense="present"))
 
     def test_answer_check_accepts_missing_accents_and_case(self):
         session = generate_practice(GenerateRequest(verb="parler", tense="present"))
