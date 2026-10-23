@@ -268,7 +268,7 @@ def e_accent_family_patterns() -> dict[str, str]:
     # prioridad: -GER, -CER, -ELER y -ETER no entran en esta familia.
     supported = {
         "c:éder", "réf:érer", "cr:émer", "ali:éner", "l:éser",
-        "l:ever", "m:ener", "p:eser", "s:emer",
+        "l:ever", "m:ener", "p:eser", "s:emer", "rec:eper", "rec:éper",
     }
     patterns = {}
     for entry in catalog.values():
@@ -393,7 +393,7 @@ def regular_er_forms(verb: str, tense: str, family: str = "") -> list[dict[str, 
     future = [infinitive + suffix for suffix in ("ai", "as", "a", "a", "a", "ons", "ez", "ont", "ont")]
     if is_eler_family or is_eter_family:
         future = [strong_stem + "er" + suffix for suffix in ("ai", "as", "a", "a", "a", "ons", "ez", "ont", "ont")]
-    elif is_e_accent_family and e_accent_pattern in ("l:ever", "m:ener", "p:eser", "s:emer"):
+    elif is_e_accent_family and e_accent_pattern in ("l:ever", "m:ener", "p:eser", "s:emer", "rec:eper", "rec:éper"):
         future = [strong_stem + "er" + suffix for suffix in ("ai", "as", "a", "a", "a", "ons", "ez", "ont", "ont")]
     elif yer_pattern in ("netto:yer", "pa:yer"):
         future = [strong_stem + "er" + suffix for suffix in ("ai", "as", "a", "a", "a", "ons", "ez", "ont", "ont")]
@@ -403,7 +403,7 @@ def regular_er_forms(verb: str, tense: str, family: str = "") -> list[dict[str, 
     conditional = [infinitive + suffix for suffix in ("ais", "ais", "ait", "ait", "ait", "ions", "iez", "aient", "aient")]
     if is_eler_family or is_eter_family:
         conditional = [strong_stem + "er" + suffix for suffix in ("ais", "ais", "ait", "ait", "ait", "ions", "iez", "aient", "aient")]
-    elif is_e_accent_family and e_accent_pattern in ("l:ever", "m:ener", "p:eser", "s:emer"):
+    elif is_e_accent_family and e_accent_pattern in ("l:ever", "m:ener", "p:eser", "s:emer", "rec:eper", "rec:éper"):
         conditional = [strong_stem + "er" + suffix for suffix in ("ais", "ais", "ait", "ait", "ait", "ions", "iez", "aient", "aient")]
     elif yer_pattern in ("netto:yer", "pa:yer"):
         conditional = [strong_stem + "er" + suffix for suffix in ("ais", "ais", "ait", "ait", "ait", "ions", "iez", "aient", "aient")]
