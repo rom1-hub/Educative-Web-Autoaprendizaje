@@ -191,7 +191,7 @@
     return pronoun + " " + form;
   }
 
-  // Corrección puntual del registro de dénickeler sin alterar otros verbos.
+  // Excepciones ortográficas para harceler y dénickeler.
   // Se conserva el infinitivo y el participio del catálogo; las formas
   // simples siguen la variante con doble l elegida para esta plataforma.
   function doubleLExceptionForm(verb, tense, index) {
