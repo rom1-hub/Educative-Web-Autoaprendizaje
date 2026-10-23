@@ -397,7 +397,7 @@ def regular_er_forms(verb: str, tense: str, family: str = "") -> list[dict[str, 
     else:
         strong_stem = stem
     present = [stem + suffix for suffix in ("e", "es", "e", "e", "e", "ons", "ez", "ent", "ent")]
-    if is_eler_family or is_eter_family or is_yer_family or is_e_accent_family:
+    if is_ger_family or is_eler_family or is_eter_family or is_yer_family or is_e_accent_family:
         present = [(strong_stem if (is_eler_family or is_eter_family or is_e_accent_family or (is_ger_family and strong_stem != stem) or yer_pattern in ("netto:yer", "pa:yer", "env:oyer")) and i not in (5, 6) else stem) + ending for i, ending in enumerate(("e", "es", "e", "e", "e", "ons", "ez", "ent", "ent"))]
     if is_ger_family:
         present[5] = stem + "eons"
@@ -436,7 +436,7 @@ def regular_er_forms(verb: str, tense: str, family: str = "") -> list[dict[str, 
         future_stem = lemma[:-4] + "err"
         conditional = [future_stem + suffix for suffix in ("ais", "ais", "ait", "ait", "ait", "ions", "iez", "aient", "aient")]
     subj_present = [stem + suffix for suffix in ("e", "es", "e", "e", "e", "ions", "iez", "ent", "ent")]
-    if is_eler_family or is_eter_family or is_yer_family or is_e_accent_family:
+    if is_ger_family or is_eler_family or is_eter_family or is_yer_family or is_e_accent_family:
         subj_present = [(strong_stem if (is_eler_family or is_eter_family or is_e_accent_family or (is_ger_family and strong_stem != stem) or yer_pattern in ("netto:yer", "pa:yer", "env:oyer")) and i not in (5, 6) else stem) + ending for i, ending in enumerate(("e", "es", "e", "e", "e", "ions", "iez", "ent", "ent"))]
     subj_imparfait = [stem + suffix for suffix in ("asse", "asses", "ât", "ât", "ât", "assions", "assiez", "assent", "assent")]
     if is_cer_family:
