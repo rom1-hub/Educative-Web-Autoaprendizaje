@@ -248,6 +248,59 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
             generate_practice(GenerateRequest(verb="parler", tense="passe-compose", auxiliary="etre"))
 
 
+class EAccentFamilyTests(unittest.TestCase):
+    def test_e_accent_catalog_excludes_specific_suffix_families(self):
+        from backend.main import e_accent_family_patterns
+        patterns = e_accent_family_patterns()
+        verbs = set(patterns)
+        self.assertGreaterEqual(len(verbs), 20)
+        self.assertTrue({"céder", "espérer", "lever", "mener", "peser", "semer"}.issubset(verbs))
+        self.assertNotIn("protéger", verbs)
+        self.assertNotIn("révéler", verbs)
+        self.assertNotIn("acheter", verbs)
+        self.assertNotIn("jeter", verbs)
+        self.assertNotIn("dépecer", verbs)
+
+    def test_e_accent_spelling_rules(self):
+        from backend.main import regular_er_forms
+        cases = {
+            ("céder", "present"): ["cède", "cédons", "cèdent"],
+            ("espérer", "present"): ["espère", "espérons", "espèrent"],
+            ("lever", "present"): ["lève", "levons", "lèvent"],
+            ("lever", "futur-simple"): ["lèverai", "lèverons", "lèveront"],
+            ("mener", "futur-simple"): ["mènerai", "mènerons", "mèneront"],
+            ("peser", "conditionnel-present"): ["pèserais", "pèserions", "pèseraient"],
+        }
+        for (verb, tense), expected in cases.items():
+            with self.subTest(verb=verb, tense=tense):
+                forms = regular_er_forms(verb, tense, "e-accent")
+                self.assertEqual([forms[i]["form"] for i in (0, 5, 7)], expected)
+
+    def test_e_accent_supports_all_sixteen_tenses_individually(self):
+        from backend.main import TENSE_LABELS
+        for verb in ("céder", "espérer", "lever", "mener"):
+            for tense in TENSE_LABELS:
+                with self.subTest(verb=verb, tense=tense):
+                    result = generate_practice(GenerateRequest(verb=verb, family="e-accent", tense=tense))
+                    self.assertEqual(result["total"], 20)
+                    self.assertEqual({q["tense"] for q in result["questions"]}, {tense})
+
+    def test_e_accent_random_practice_uses_twenty_distinct_catalog_verbs(self):
+        from backend.main import SESSIONS, e_accent_family_patterns
+        available = set(e_accent_family_patterns())
+        result = generate_practice(GenerateRequest(family="e-accent", tense="present"))
+        verbs = [q["verb"] for q in result["questions"]]
+        self.assertEqual(len(verbs), 20)
+        self.assertEqual(len(set(verbs)), 20)
+        self.assertTrue(set(verbs).issubset(available))
+        self.assertEqual(len(SESSIONS[result["session_id"]]), 20)
+
+    def test_e_accent_rejects_verbs_from_specific_families(self):
+        for verb in ("protéger", "révéler", "acheter", "jeter", "dépecer", "parler"):
+            with self.subTest(verb=verb), self.assertRaises(HTTPException):
+                generate_practice(GenerateRequest(verb=verb, family="e-accent", tense="present"))
+
+
 class EterFamilyTests(unittest.TestCase):
     def test_eter_catalog_and_random_practice(self):
         from backend.main import eter_family_patterns, eter_family_verbs, SESSIONS
