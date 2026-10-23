@@ -76,9 +76,9 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
 
         catalog_verbs = set(regular_first_group_verbs())
         self.assertIn("se laver", catalog_verbs)
-        self.assertIn("se lever", catalog_verbs)
         self.assertIn("s'arrêter", catalog_verbs)
         self.assertIn("se lever", e_accent_family_patterns())
+        self.assertIn("se promener", e_accent_family_patterns())
 
         self.assertEqual(
             [row["form"] for row in regular_er_forms("se laver", "present")][:6],
@@ -117,7 +117,7 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
             tense="present",
         ))
         self.assertEqual(family["total"], 20)
-        self.assertEqual({question["verb"] for question in family["questions"]}, {"se lever"})
+        self.assertTrue({question["verb"] for question in family["questions"]}.issubset({"se lever", "se promener"}))
 
         SESSIONS["pronominal-agreement-test"] = [{
             "person": "je",
@@ -189,9 +189,8 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
         from backend.main import cer_family_verbs
 
         available = set(cer_family_verbs())
-        self.assertEqual(len(available), 125)
-        self.assertTrue({"commencer", "annoncer", "avancer", "placer", "dépecer"}.issubset(available))
-        self.assertNotIn("s'efforcer", available)
+        self.assertEqual(len(available), 126)
+        self.assertTrue({"commencer", "annoncer", "avancer", "placer", "dépecer", "s'efforcer"}.issubset(available))
         from backend.main import regular_er_forms
         self.assertEqual([row["form"] for row in regular_er_forms("dépecer", "present", "cer")][0:6],
                          ["dépece", "dépeces", "dépece", "dépece", "dépece", "dépeçons"])
@@ -252,7 +251,7 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
                     self.assertEqual({q["tense"] for q in result["questions"]}, {tense})
 
     def test_cer_family_rejects_other_spelling_patterns(self):
-        for verb in ("protéger", "s'efforcer"):
+        for verb in ("protéger",):
             with self.subTest(verb=verb), self.assertRaises(HTTPException):
                 generate_practice(GenerateRequest(verb=verb, family="cer", tense="present"))
         with self.assertRaises(HTTPException):
@@ -263,7 +262,7 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
         available = set(eler_family_verbs())
         self.assertGreaterEqual(len(available), 20)
         self.assertTrue({"appeler", "geler", "harceler", "dénickeler", "révéler"}.issubset(available))
-        self.assertNotIn("s'appeler", available)
+        self.assertIn("s'appeler", available)
         result = generate_practice(GenerateRequest(family="eler", tense="present"))
         self.assertEqual(result["total"], 20)
         self.assertEqual(len({q["verb"] for q in result["questions"]}), 20)
@@ -299,7 +298,7 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
                     self.assertEqual({q["tense"] for q in result["questions"]}, {tense})
 
     def test_eler_rejects_unrelated_verbs(self):
-        for verb in ("parler", "manger", "commencer", "s'appeler", "aller"):
+        for verb in ("parler", "manger", "commencer", "aller"):
             with self.subTest(verb=verb), self.assertRaises(HTTPException):
                 generate_practice(GenerateRequest(verb=verb, family="eler", tense="present"))
 
@@ -413,11 +412,11 @@ class EterFamilyTests(unittest.TestCase):
         from backend.main import eter_family_patterns, eter_family_verbs, SESSIONS
         patterns = eter_family_patterns()
         available = set(eter_family_verbs())
-        self.assertEqual(len(available), 104)
-        self.assertEqual(len(patterns), 104)
+        self.assertEqual(len(available), 105)
+        self.assertEqual(len(patterns), 105)
         self.assertEqual(sum(pattern == "ach:eter" for pattern in patterns.values()), 13)
         self.assertEqual(sum(pattern == "j:eter" for pattern in patterns.values()), 69)
-        self.assertEqual(sum(pattern == "décr:éter" for pattern in patterns.values()), 21)
+        self.assertEqual(sum(pattern == "décr:éter" for pattern in patterns.values()), 22)
         self.assertEqual(sum(pattern == "héb:éter" for pattern in patterns.values()), 1)
         self.assertIn("répéter", available)
         self.assertIn("hébéter", available)
@@ -486,7 +485,7 @@ class YerFamilyTests(unittest.TestCase):
         self.assertGreaterEqual(len(verbs), 20)
         self.assertEqual(len(patterns), len(verbs))
         self.assertTrue({"payer", "balayer", "essayer", "nettoyer", "envoyer", "renvoyer", "grasseyer"}.issubset(verbs))
-        self.assertNotIn("s'ennuyer", verbs)
+        self.assertTrue({"s'ennuyer", "s'essuyer"}.issubset(verbs))
         self.assertNotIn("capeyer", verbs)
 
     def test_yer_present_and_future_forms(self):
@@ -550,7 +549,7 @@ class YerFamilyTests(unittest.TestCase):
         for verb in ("parler", "payer"):
             with self.subTest(verb=verb), self.assertRaises(HTTPException):
                 generate_practice(GenerateRequest(verb=verb, family="eter", tense="present"))
-        for verb in ("parler", "capeyer", "s'ennuyer", "aller"):
+        for verb in ("parler", "capeyer", "aller"):
             with self.subTest(verb=verb), self.assertRaises(HTTPException):
                 generate_practice(GenerateRequest(verb=verb, family="yer", tense="present"))
 
