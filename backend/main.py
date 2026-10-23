@@ -248,6 +248,45 @@ def eter_family_verbs() -> tuple[str, ...]:
 
 
 @functools.lru_cache(maxsize=1)
+def e_accent_family_patterns() -> dict[str, str]:
+    """Return canonical non-pronominal E/È + consonant + ER verbs, excluding specific suffix families."""
+    catalog_path = ROOT / "data" / "verbs" / "local-database.js"
+    try:
+        source = catalog_path.read_text(encoding="utf-8")
+        prefix = "window.COQ_VERBS="
+        prefix_index = source.find(prefix)
+        if prefix_index < 0:
+            raise ValueError("No se reconoce el formato del catálogo de verbos.")
+        payload = source[prefix_index + len(prefix):].strip().split(";\\nwindow.", 1)[0].strip()
+        if payload.endswith(";"):
+            payload = payload[:-1]
+        catalog = json.loads(payload)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        raise HTTPException(500, "No se pudo cargar el catálogo canónico de verbos para generar la práctica.") from exc
+
+    # Lista blanca de patrones del catálogo. La terminación específica tiene
+    # prioridad: -GER, -CER, -ELER y -ETER no entran en esta familia.
+    supported = {
+        "c:éder", "réf:érer", "cr:émer", "ali:éner", "l:éser",
+        "l:ever", "m:ener", "p:eser", "s:emer",
+    }
+    patterns = {}
+    for entry in catalog.values():
+        if not isinstance(entry, dict):
+            continue
+        lemma = normalize(entry.get("infinitif") or entry.get("id") or "")
+        pattern = entry.get("pattern")
+        if (
+            entry.get("pronominal") is False
+            and lemma.endswith("er")
+            and not lemma.endswith(("ger", "cer", "eler", "eter"))
+            and pattern in supported
+        ):
+            patterns[lemma] = pattern
+    return patterns
+
+
+@functools.lru_cache(maxsize=1)
 def yer_family_patterns() -> dict[str, str]:
     """Return canonical non-pronominal -YER verbs with explicitly supported patterns."""
     catalog_path = ROOT / "data" / "verbs" / "local-database.js"
