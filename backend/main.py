@@ -279,7 +279,7 @@ def e_accent_family_patterns() -> dict[str, str]:
         if (
             entry.get("pronominal") is False
             and lemma.endswith("er")
-            and not lemma.endswith(("ger", "cer", "eler", "eter"))
+            and not lemma.endswith(("ger", "cer", "eler", "éler", "eter", "éter"))
             and pattern in supported
         ):
             patterns[lemma] = pattern
