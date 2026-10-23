@@ -248,5 +248,68 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
             generate_practice(GenerateRequest(verb="parler", tense="passe-compose", auxiliary="etre"))
 
 
+class EterFamilyTests(unittest.TestCase):
+    def test_eter_catalog_and_random_practice(self):
+        from backend.main import eter_family_patterns, eter_family_verbs, SESSIONS
+        patterns = eter_family_patterns()
+        available = set(eter_family_verbs())
+        self.assertEqual(len(available), 82)
+        self.assertEqual(len(patterns), 82)
+        self.assertEqual(sum(pattern == "ach:eter" for pattern in patterns.values()), 13)
+        self.assertEqual(sum(pattern == "j:eter" for pattern in patterns.values()), 69)
+        self.assertIn("acheter", available)
+        self.assertIn("jeter", available)
+        self.assertNotIn("duveter", available)
+        result = generate_practice(GenerateRequest(family="eter", tense="present"))
+        self.assertEqual(result["total"], 20)
+        self.assertEqual(len({q["verb"] for q in result["questions"]}), 20)
+        self.assertTrue({q["verb"] for q in result["questions"]}.issubset(available))
+        self.assertEqual(len(SESSIONS[result["session_id"]]), 20)
+
+    def test_eter_spelling_patterns(self):
+        from backend.main import regular_er_forms
+        cases = {
+            ("acheter", "present"): ["achète", "achetons", "achètent"],
+            ("acheter", "futur-simple"): ["achèterai", "achèterons", "achèteront"],
+            ("acheter", "conditionnel-present"): ["achèterais", "achèterions", "achèteraient"],
+            ("acheter", "subjonctif-present"): ["achète", "achetions", "achètent"],
+            ("acheter", "imperatif-present"): ["achète", "achetons", "achetez"],
+            ("jeter", "present"): ["jette", "jetons", "jettent"],
+            ("jeter", "futur-simple"): ["jetterai", "jetterons", "jetteront"],
+            ("jeter", "conditionnel-present"): ["jetterais", "jetterions", "jetteraient"],
+            ("jeter", "subjonctif-present"): ["jette", "jetions", "jettent"],
+            ("jeter", "imperatif-present"): ["jette", "jetons", "jetez"],
+        }
+        for (verb, tense), expected in cases.items():
+            with self.subTest(verb=verb, tense=tense):
+                forms = regular_er_forms(verb, tense)
+                if tense == "imperatif-present":
+                    actual = [forms[i]["form"] for i in range(3)]
+                else:
+                    actual = [forms[i]["form"] for i in (0, 5, 7)]
+                self.assertEqual(actual, expected)
+
+    def test_eter_all_sixteen_tenses(self):
+        from backend.main import TENSE_LABELS
+        for verb in ("acheter", "jeter", "haleter"):
+            for tense in TENSE_LABELS:
+                with self.subTest(verb=verb, tense=tense):
+                    result = generate_practice(GenerateRequest(verb=verb, family="eter", tense=tense))
+                    self.assertEqual(result["total"], 20)
+                    self.assertEqual({q["tense"] for q in result["questions"]}, {tense})
+
+    def test_eter_rejects_unrelated_or_unsupported_verbs(self):
+        for verb in ("parler", "manger", "commencer", "duveter", "aller", "protéger"):
+            with self.subTest(verb=verb), self.assertRaises(HTTPException):
+                generate_practice(GenerateRequest(verb=verb, family="eter", tense="present"))
+        with self.assertRaises(HTTPException):
+            generate_practice(GenerateRequest(verb="acheter", family="ger", tense="present"))
+
+    def test_eter_does_not_change_regular_compound_tenses(self):
+        from backend.main import regular_er_forms
+        self.assertEqual(regular_er_forms("acheter", "passe-compose")[0]["form"], "ai acheté")
+        self.assertEqual(regular_er_forms("jeter", "plus-que-parfait")[6]["form"], "aviez jeté")
+
+
 if __name__ == "__main__":
     unittest.main()
