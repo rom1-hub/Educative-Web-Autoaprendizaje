@@ -157,6 +157,49 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
         with self.assertRaises(HTTPException):
             generate_practice(GenerateRequest(verb="commencer", family="ger", tense="present"))
 
+    def test_eler_catalog_and_random_practice(self):
+        from backend.main import eler_family_verbs, SESSIONS
+        available = set(eler_family_verbs())
+        self.assertGreaterEqual(len(available), 20)
+        self.assertTrue({"appeler", "geler", "harceler", "dénickeler"}.issubset(available))
+        self.assertNotIn("s'appeler", available)
+        result = generate_practice(GenerateRequest(family="eler", tense="present"))
+        self.assertEqual(result["total"], 20)
+        self.assertEqual(len({q["verb"] for q in result["questions"]}), 20)
+        self.assertTrue({q["verb"] for q in result["questions"]}.issubset(available))
+        self.assertEqual(len(SESSIONS[result["session_id"]]), 20)
+
+    def test_eler_spelling_patterns(self):
+        from backend.main import regular_er_forms
+        cases = {
+            ("appeler", "present"): ["appelle", "appelons", "appellent"],
+            ("appeler", "futur-simple"): ["appellerai", "appellerons", "appelleront"],
+            ("geler", "present"): ["gèle", "gelons", "gèlent"],
+            ("geler", "futur-simple"): ["gèlerai", "gèlerons", "gèleront"],
+            ("harceler", "present"): ["harcelle", "harcelons", "harcellent"],
+            ("harceler", "imparfait"): ["harcelais", "harcelions", "harcelaient"],
+            ("dénickeler", "present"): ["dénickelle", "dénickelons", "dénickellent"],
+            ("dénickeler", "conditionnel-present"): ["dénickellerais", "dénickellerions", "dénickelleraient"],
+        }
+        for (verb, tense), expected in cases.items():
+            with self.subTest(verb=verb, tense=tense):
+                forms = regular_er_forms(verb, tense)
+                self.assertEqual([forms[i]["form"] for i in (0, 5, 7)], expected)
+
+    def test_eler_all_sixteen_tenses(self):
+        from backend.main import TENSE_LABELS
+        for verb in ("appeler", "geler", "harceler", "dénickeler"):
+            for tense in TENSE_LABELS:
+                with self.subTest(verb=verb, tense=tense):
+                    result = generate_practice(GenerateRequest(verb=verb, family="eler", tense=tense))
+                    self.assertEqual(result["total"], 20)
+                    self.assertEqual({q["tense"] for q in result["questions"]}, {tense})
+
+    def test_eler_rejects_unrelated_verbs(self):
+        for verb in ("parler", "manger", "commencer", "s'appeler", "aller"):
+            with self.subTest(verb=verb), self.assertRaises(HTTPException):
+                generate_practice(GenerateRequest(verb=verb, family="eler", tense="present"))
+
     def test_answer_check_accepts_missing_accents_and_case(self):
         session = generate_practice(GenerateRequest(verb="parler", tense="present"))
         first = session["questions"][0]
