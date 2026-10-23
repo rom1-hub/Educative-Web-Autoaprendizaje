@@ -49,12 +49,22 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
         self.assertNotIn("answer", result["questions"][0])
 
     def test_individual_e_accent_verb_works_without_explicit_family(self):
-        result = generate_practice(GenerateRequest(verb="lever", tense="present"))
-        self.assertEqual(result["total"], 20)
-        self.assertEqual({q["verb"] for q in result["questions"]}, {"lever"})
-        from backend.main import regular_er_forms
-        self.assertEqual([row["form"] for row in regular_er_forms("lever", "present")][0:6],
-                         ["lève", "lèves", "lève", "lève", "lève", "levons"])
+        from backend.main import regular_er_forms, e_accent_family_patterns
+        self.assertIn("lever", e_accent_family_patterns())
+        self.assertIn("promener", e_accent_family_patterns())
+        for family in ("", "premier-groupe-reguliers", "e-accent"):
+            with self.subTest(family=family):
+                result = generate_practice(GenerateRequest(verb="lever", family=family, tense="present"))
+                self.assertEqual(result["total"], 20)
+                self.assertEqual({q["verb"] for q in result["questions"]}, {"lever"})
+                self.assertEqual([row["form"] for row in regular_er_forms("lever", "present", family)][0:6],
+                                 ["lève", "lèves", "lève", "lève", "lève", "levons"])
+        self.assertEqual([row["form"] for row in regular_er_forms("promener", "present")][0:6],
+                         ["promène", "promènes", "promène", "promène", "promène", "promenons"])
+        self.assertEqual([row["form"] for row in regular_er_forms("promener", "futur-simple")][0:3],
+                         ["promènerai", "promèneras", "promènera"])
+        self.assertEqual([row["form"] for row in regular_er_forms("promener", "conditionnel-present")][0:3],
+                         ["promènerais", "promènerais", "promènerait"])
 
     def test_category_uses_catalog_and_returns_twenty_distinct_verbs(self):
         from backend.main import regular_first_group_verbs
