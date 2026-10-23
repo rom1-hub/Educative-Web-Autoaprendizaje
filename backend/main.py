@@ -165,6 +165,9 @@ def regular_er_forms(verb: str, tense: str) -> list[dict[str, str]]:
     if is_ger_family:
         present[5] = stem + "eons"
     imparfait = [stem + suffix for suffix in ("ais", "ais", "ait", "ait", "ait", "ions", "iez", "aient", "aient")]
+    if is_ger_family:
+        # En -GER, la « e » se conserva salvo con nous y vous: mangeais, mais mangions.
+        imparfait = [stem + ("e" if index not in (5, 6) else "") + suffix for index, suffix in enumerate(("ais", "ais", "ait", "ait", "ait", "ions", "iez", "aient", "aient"))]
     passe_simple = [stem + suffix for suffix in ("ai", "as", "a", "a", "a", "âmes", "âtes", "èrent", "èrent")]
     if is_ger_family:
         passe_simple = [stem + ("e" if index < 7 else "") + suffix for index, suffix in enumerate(("ai", "as", "a", "a", "a", "âmes", "âtes", "èrent", "èrent"))]
