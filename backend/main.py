@@ -174,6 +174,42 @@ def regular_first_group_verbs() -> tuple[str, ...]:
     return tuple(sorted(set(candidates)))
 
 
+@functools.lru_cache(maxsize=1)
+def pronominal_first_group_verbs() -> tuple[str, ...]:
+    """Return supported canonical pronominal verbs in the regular first group."""
+    catalog_path = ROOT / "data" / "verbs" / "local-database.js"
+    try:
+        source = catalog_path.read_text(encoding="utf-8")
+        prefix = "window.COQ_VERBS="
+        prefix_index = source.find(prefix)
+        if prefix_index < 0:
+            raise ValueError("No se reconoce el formato del catálogo de verbos.")
+        payload = source[prefix_index + len(prefix):].strip().split(";\\nwindow.", 1)[0].strip()
+        if payload.endswith(";"):
+            payload = payload[:-1]
+        catalog = json.loads(payload)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        raise HTTPException(500, "No se pudo cargar el catálogo canónico de verbos para generar la práctica.") from exc
+
+    candidates = []
+    for entry in catalog.values():
+        if not isinstance(entry, dict):
+            continue
+        display_lemma = normalize(entry.get("infinitif") or entry.get("id") or "")
+        if (
+            entry.get("groupe") == 1
+            and entry.get("familyId") == "er-regular"
+            and entry.get("pronominal") is True
+            and entry.get("construction") == "pronomiale"
+            and display_lemma
+        ):
+            try:
+                regular_er_forms(display_lemma, "present")
+            except HTTPException:
+                continue
+            candidates.append(display_lemma)
+    return tuple(sorted(set(candidates)))
+
 
 @functools.lru_cache(maxsize=1)
 def eler_family_patterns() -> dict[str, str]:
@@ -611,8 +647,8 @@ def generate_practice(request: GenerateRequest) -> dict:
         raise HTTPException(422, "Selecciona una familia de verbos válida.")
     # Aceptar la variante histórica usada por algunos clientes además del
     # valor canónico «non-pronominal».
-    if request.construction not in ("", "non-pronominal", "non-pronomial"):
-        raise HTTPException(422, "Esta categoría solo incluye verbos no pronominales.")
+    if request.construction not in ("", "pronominal", "non-pronominal", "non-pronomial"):
+        raise HTTPException(422, "Selecciona una construcción verbal válida.")
     if request.tense in COMPOUND_TENSES and request.auxiliary == "etre":
         raise HTTPException(422, "« Parler » utiliza el auxiliar avoir en los tiempos compuestos. Selecciona Avoir o ambos auxiliares.")
     if request.auxiliary not in ("", "avoir", "etre"):
@@ -622,18 +658,19 @@ def generate_practice(request: GenerateRequest) -> dict:
     if category_mode:
         # Una pregunta por verbo: 20 infinitivos distintos elegidos al azar.
         # Cada categoría usa exclusivamente los verbos admitidos por el catálogo.
-        available_verbs = {"ger": ger_family_verbs, "cer": cer_family_verbs, "eler": eler_family_verbs, "eter": eter_family_verbs, "yer": yer_family_verbs, "e-accent": lambda: tuple(sorted(e_accent_family_patterns()))}.get(request.family, lambda: regular_first_group_verbs())()
-        if len(available_verbs) < 20:
-            raise HTTPException(
-                500,
-                f"El catálogo solo contiene {len(available_verbs)} verbos compatibles con esta familia; se necesitan al menos 20."
-            )
-        # Evitar repetir los verbos de las tres prácticas de categoría anteriores
-        # mientras haya suficientes candidatos nuevos.
+        available_verbs = list({"ger": ger_family_verbs, "cer": cer_family_verbs, "eler": eler_family_verbs, "eter": eter_family_verbs, "yer": yer_family_verbs, "e-accent": lambda: tuple(sorted(e_accent_family_patterns()))}.get(request.family, lambda: regular_first_group_verbs())())
+        pronomial_verbs = set(pronominal_first_group_verbs())
+        if request.construction == "pronominal":
+            available_verbs = [verb for verb in available_verbs if verb in pronomial_verbs]
+        elif request.construction in ("non-pronomial", "non-pronominal"):
+            available_verbs = [verb for verb in available_verbs if verb not in pronomial_verbs]
+        if not available_verbs:
+            raise HTTPException(422, "No hay verbos compatibles con esta familia y construcción en el catálogo.")
+        # Evitar repetir infinitivos recientes cuando haya suficientes candidatos.
         recent = set(RECENT_CATEGORY_VERBS)
         fresh_verbs = [verb for verb in available_verbs if verb not in recent]
-        pool = fresh_verbs if len(fresh_verbs) >= 20 else list(available_verbs)
-        selected_verbs = random.sample(pool, k=20)
+        pool = fresh_verbs if len(fresh_verbs) >= min(20, len(available_verbs)) else available_verbs
+        selected_verbs = random.sample(pool, k=20) if len(pool) >= 20 else random.choices(pool, k=20)
         RECENT_CATEGORY_VERBS.extend(selected_verbs)
         del RECENT_CATEGORY_VERBS[:-RECENT_CATEGORY_VERBS_LIMIT]
         questions = []
@@ -649,6 +686,11 @@ def generate_practice(request: GenerateRequest) -> dict:
     else:
         if not request.verb.strip():
             raise HTTPException(422, "Escribe un verbo o selecciona una familia para generar una práctica automática.")
+        typed_pronominal = normalize(request.verb).startswith(("se ", "s'"))
+        if request.construction == "pronominal" and not typed_pronominal:
+            raise HTTPException(422, "La construcción seleccionada requiere un verbo pronominal, por ejemplo «se laver».")
+        if request.construction in ("non-pronomial", "non-pronominal") and typed_pronominal:
+            raise HTTPException(422, "El verbo escrito es pronominal; cambia el filtro de construcción.")
         if request.family == "ger" and normalize(request.verb) not in ger_family_verbs():
             raise HTTPException(422, "El verbo escrito no pertenece a la familia ortográfica -GER compatible (manger, changer, nager…).")
         if request.family == "cer" and normalize(request.verb) not in cer_family_verbs():
