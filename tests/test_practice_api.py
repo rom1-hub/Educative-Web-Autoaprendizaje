@@ -25,6 +25,14 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
         self.assertEqual([row["form"] for row in forms], ["mange", "manges", "mange", "mange", "mange", "mangeons", "mangez", "mangent", "mangent"])
         from backend.main import regular_er_forms
         self.assertEqual([row["form"] for row in regular_er_forms("manger", "passe-simple")], ["mangeai", "mangeas", "mangea", "mangea", "mangea", "mangeâmes", "mangeâtes", "mangèrent", "mangèrent"])
+        self.assertEqual([row["form"] for row in regular_er_forms("manger", "imparfait")], [
+            "mangeais", "mangeais", "mangeait", "mangeait", "mangeait",
+            "mangions", "mangiez", "mangeaient", "mangeaient",
+        ])
+        self.assertEqual([row["form"] for row in regular_er_forms("changer", "imparfait")], [
+            "changeais", "changeais", "changeait", "changeait", "changeait",
+            "changions", "changiez", "changeaient", "changeaient",
+        ])
         self.assertEqual([row["form"] for row in regular_er_forms("manger", "imperatif-present")], ["mange", "mangeons", "mangez"])
         for verb in ("placer", "appeler", "payer", "aller", "lever", "protéger", "jogger"):
             with self.subTest(verb=verb), self.assertRaises(HTTPException):
