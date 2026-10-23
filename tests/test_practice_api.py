@@ -311,5 +311,83 @@ class EterFamilyTests(unittest.TestCase):
         self.assertEqual(regular_er_forms("jeter", "plus-que-parfait")[6]["form"], "aviez jeté")
 
 
+
+class YerFamilyTests(unittest.TestCase):
+    def test_yer_catalog_contains_only_supported_non_pronominal_patterns(self):
+        from backend.main import yer_family_patterns, yer_family_verbs
+        patterns = yer_family_patterns()
+        verbs = set(yer_family_verbs())
+        self.assertGreaterEqual(len(verbs), 20)
+        self.assertEqual(len(patterns), len(verbs))
+        self.assertTrue({"payer", "balayer", "essayer", "nettoyer", "envoyer", "renvoyer", "grasseyer"}.issubset(verbs))
+        self.assertNotIn("s'ennuyer", verbs)
+        self.assertNotIn("capeyer", verbs)
+
+    def test_yer_present_and_future_forms(self):
+        from backend.main import regular_er_forms
+        cases = {
+            ("payer", "present"): ["paie", "payons", "paient"],
+            ("balayer", "present"): ["balaie", "balayons", "balaient"],
+            ("nettoyer", "present"): ["nettoie", "nettoyons", "nettoient"],
+            ("envoyer", "present"): ["envoie", "envoyons", "envoient"],
+            ("payer", "futur-simple"): ["paierai", "paierons", "paieront"],
+            ("nettoyer", "futur-simple"): ["nettoierai", "nettoierons", "nettoieront"],
+            ("envoyer", "futur-simple"): ["enverrai", "enverrons", "enverront"],
+            ("renvoyer", "conditionnel-present"): ["renverrais", "renverrions", "renverraient"],
+            ("grasseyer", "present"): ["grasseye", "grasseyons", "grasseyent"],
+        }
+        for (verb, tense), expected in cases.items():
+            with self.subTest(verb=verb, tense=tense):
+                forms = regular_er_forms(verb, tense)
+                self.assertEqual([forms[i]["form"] for i in (0, 5, 7)], expected)
+
+    def test_yer_accepts_valid_ayer_variants(self):
+        from backend.main import SESSIONS
+        cases = [
+            ("payer", "present", "je", "paye"),
+            ("payer", "present", "ils", "payent"),
+            ("payer", "futur-simple", "je", "payerai"),
+            ("payer", "conditionnel-present", "je", "payerais"),
+            ("payer", "subjonctif-present", "que je", "paye"),
+        ]
+        for verb, tense, person, answer in cases:
+            with self.subTest(verb=verb, tense=tense, answer=answer):
+                session = generate_practice(GenerateRequest(verb=verb, family="yer", tense=tense))
+                index = next(i for i, q in enumerate(SESSIONS[session["session_id"]]) if q["person"] == person)
+                result = check_answer(CheckRequest(session_id=session["session_id"], index=index, answer=answer))
+                self.assertTrue(result["correct"])
+        session = generate_practice(GenerateRequest(verb="payer", family="yer", tense="present"))
+        index = next(i for i, q in enumerate(SESSIONS[session["session_id"]]) if q["person"] == "je")
+        result = check_answer(CheckRequest(session_id=session["session_id"], index=index, answer="paie"))
+        self.assertTrue(result["correct"])
+
+    def test_yer_supports_all_sixteen_tenses_individually(self):
+        from backend.main import TENSE_LABELS
+        for verb in ("payer", "nettoyer", "envoyer", "grasseyer"):
+            for tense in TENSE_LABELS:
+                with self.subTest(verb=verb, tense=tense):
+                    result = generate_practice(GenerateRequest(verb=verb, family="yer", tense=tense))
+                    self.assertEqual(result["total"], 20)
+                    self.assertEqual({q["tense"] for q in result["questions"]}, {tense})
+
+    def test_yer_random_practice_uses_twenty_distinct_catalog_verbs(self):
+        from backend.main import SESSIONS, yer_family_verbs
+        available = set(yer_family_verbs())
+        result = generate_practice(GenerateRequest(family="yer", tense="present"))
+        verbs = [q["verb"] for q in result["questions"]]
+        self.assertEqual(len(verbs), 20)
+        self.assertEqual(len(set(verbs)), 20)
+        self.assertTrue(set(verbs).issubset(available))
+        self.assertEqual(len(SESSIONS[result["session_id"]]), 20)
+
+    def test_yer_rejects_unsupported_verbs_and_patterns(self):
+        for verb in ("parler", "payer"):
+            with self.subTest(verb=verb), self.assertRaises(HTTPException):
+                generate_practice(GenerateRequest(verb=verb, family="eter", tense="present"))
+        for verb in ("parler", "capeyer", "s'ennuyer", "aller"):
+            with self.subTest(verb=verb), self.assertRaises(HTTPException):
+                generate_practice(GenerateRequest(verb=verb, family="yer", tense="present"))
+
+
 if __name__ == "__main__":
     unittest.main()
