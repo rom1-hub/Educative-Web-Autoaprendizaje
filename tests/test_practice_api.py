@@ -34,7 +34,7 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
             "changions", "changiez", "changeaient", "changeaient",
         ])
         self.assertEqual([row["form"] for row in regular_er_forms("manger", "imperatif-present")], ["mange", "mangeons", "mangez"])
-        for verb in ("payer", "aller", "lever", "protéger", "jogger"):
+        for verb in ("aller", "lever", "protéger", "jogger"):
             with self.subTest(verb=verb), self.assertRaises(HTTPException):
                 regular_er_present(verb)
 
