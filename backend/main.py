@@ -174,18 +174,20 @@ def regular_first_group_verbs() -> tuple[str, ...]:
 
 @functools.lru_cache(maxsize=1)
 def eler_family_patterns() -> dict[str, str]:
-    """Only canonical, non-pronominal -ELER verbs with a supported spelling pattern."""
+    """Return canonical non-pronominal -ELER verbs with a supported spelling pattern."""
     catalog_path = ROOT / "data" / "verbs" / "local-database.js"
     try:
         source = catalog_path.read_text(encoding="utf-8")
         prefix = "window.COQ_VERBS="
-        start = source.find(prefix)
-        if start < 0:
-            raise ValueError("Formato del catálogo desconocido")
-        payload = source[start + len(prefix):].strip().split(";\nwindow.", 1)[0].strip()
-        catalog = json.loads(payload.removesuffix(";"))
+        prefix_index = source.find(prefix)
+        if prefix_index < 0:
+            raise ValueError("No se reconoce el formato del catálogo de verbos.")
+        payload = source[prefix_index + len(prefix):].strip().split(";\\nwindow.", 1)[0].strip()
+        if payload.endswith(";"):
+            payload = payload[:-1]
+        catalog = json.loads(payload)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
-        raise HTTPException(500, "No se pudo cargar el catálogo canónico de verbos.") from exc
+        raise HTTPException(500, "No se pudo cargar el catálogo canónico de verbos para generar la práctica.") from exc
 
     patterns = {}
     supported = {"app:eler", "p:eler", "harc:eler"}
@@ -195,9 +197,8 @@ def eler_family_patterns() -> dict[str, str]:
         lemma = normalize(entry.get("infinitif") or entry.get("id") or "")
         pattern = entry.get("pattern")
         if (
-            entry.get("groupe") == 1
+            entry.get("familyId") == "er-eler"
             and entry.get("pronominal") is False
-            and entry.get("construction") in ("non-pronomiale", "non-pronominale")
             and lemma.endswith("eler")
             and (pattern in supported or lemma == "dénickeler")
         ):
@@ -207,6 +208,7 @@ def eler_family_patterns() -> dict[str, str]:
 
 def eler_family_verbs() -> tuple[str, ...]:
     return tuple(sorted(eler_family_patterns()))
+
 
 def normalize(value: str) -> str:
     value = unicodedata.normalize("NFC", value or "").lower().replace("’", "'")
