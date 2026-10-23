@@ -964,7 +964,7 @@
         ? document.getElementById("practice-auxiliary").value
         : ""
     };
-    if (!filters.verb && !["premier-groupe-reguliers", "ger", "cer"].includes(filters.family)) {
+    if (!filters.verb && !["premier-groupe-reguliers", "ger", "cer", "eler"].includes(filters.family)) {
       showPracticeMessage("Escribe un verbo o selecciona una familia para generar una práctica automática.", true);
       return;
     }
