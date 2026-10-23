@@ -373,7 +373,7 @@ def regular_er_forms(verb: str, tense: str, family: str = "") -> list[dict[str, 
         raise HTTPException(422, "Este verbo no pertenece a la familia -YER compatible.")
     if is_cer_family and lemma not in cer_family_verbs():
         raise HTTPException(422, "Este verbo no pertenece a la familia ortográfica -CER compatible (commencer, annoncer, avancer…).")
-    if not (is_eler_family or is_eter_family or is_e_accent_family) and re.search(r"[eéèê][^aeiouyàâéèêëîïôûùüÿœæ]er$", lemma):
+    if not suffix_family and not is_e_accent_family and re.search(r"[eéèê][^aeiouyàâéèêëîïôûùüÿœæ]er$", lemma):
         raise HTTPException(422, "Este verbo pertenece a una familia con cambio ortográfico todavía no implementada.")
     if tense not in TENSE_LABELS:
         raise HTTPException(422, "Selecciona un tiempo verbal válido.")
