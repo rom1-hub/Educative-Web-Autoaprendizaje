@@ -194,9 +194,9 @@
   // Corrección puntual del registro de dénickeler sin alterar otros verbos.
   // Se conserva el infinitivo y el participio del catálogo; las formas
   // simples siguen la variante con doble l elegida para esta plataforma.
-  function denickelerForm(tense, index) {
-    const weak = "dénickel";
-    const strong = "dénickell";
+  function doubleLExceptionForm(verb, tense, index) {
+    const weak = verb.slice(0, -2);
+    const strong = weak + "l";
     const endings = {
       "présent de l'indicatif": ["e", "es", "e", "ons", "ez", "ent"],
       "imparfait": ["ais", "ais", "ait", "ions", "iez", "aient"],
@@ -229,8 +229,8 @@
         form = entry ?? "";
       }
       let normalizedForm = String(form ?? "").trim();
-      if (getInfinitive(verb) === "dénickeler") {
-        const corrected = denickelerForm(tense, subject.index);
+      if (["dénickeler", "harceler"].includes(getInfinitive(verb))) {
+        const corrected = doubleLExceptionForm(getInfinitive(verb), tense, subject.index);
         if (corrected !== null) normalizedForm = corrected;
       }
 
@@ -270,8 +270,9 @@
 
     return IMPERATIVE_SUBJECTS.map((subject, index) => {
       let form = readFormEntry(forms[index]);
-      if (getInfinitive(verb) === "dénickeler") {
-        form = ["dénickelle", "dénickelons", "dénickelez"][index];
+      if (["dénickeler", "harceler"].includes(getInfinitive(verb))) {
+        const weak = getInfinitive(verb).slice(0, -2);
+        form = [weak + "le", weak + "ons", weak + "ez"][index];
       }
       if (!form) return null;
 
