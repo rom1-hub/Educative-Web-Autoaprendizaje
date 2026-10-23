@@ -191,6 +191,29 @@
     return pronoun + " " + form;
   }
 
+  // Corrección puntual del registro de dénickeler sin alterar otros verbos.
+  // Se conserva el infinitivo y el participio del catálogo; las formas
+  // simples siguen la variante con doble l elegida para esta plataforma.
+  function denickelerForm(tense, index) {
+    const weak = "dénickel";
+    const strong = "dénickell";
+    const endings = {
+      "présent de l'indicatif": ["e", "es", "e", "ons", "ez", "ent"],
+      "imparfait": ["ais", "ais", "ait", "ions", "iez", "aient"],
+      "passé simple": ["ai", "as", "a", "âmes", "âtes", "èrent"],
+      "futur simple": ["ai", "as", "a", "ons", "ez", "ont"],
+      "conditionnel présent": ["ais", "ais", "ait", "ions", "iez", "aient"],
+      "subjonctif présent": ["e", "es", "e", "ions", "iez", "ent"],
+      "subjonctif imparfait": ["asse", "asses", "ât", "assions", "assiez", "assent"]
+    };
+    const suffix = endings[tense]?.[index];
+    if (suffix === undefined) return null;
+    const strongPresent = (tense === "présent de l'indicatif" || tense === "subjonctif présent")
+      && ![3, 4].includes(index);
+    const strongFuture = tense === "futur simple" || tense === "conditionnel présent";
+    return (strongFuture ? strong + "er" : strongPresent ? strong : weak) + suffix;
+  }
+
   function simpleRows(verb, tense) {
     const forms = verb.formes && verb.formes[tense];
     if (!Array.isArray(forms)) return [];
@@ -206,6 +229,10 @@
         form = entry ?? "";
       }
       let normalizedForm = String(form ?? "").trim();
+      if (getInfinitive(verb) === "dénickeler") {
+        const corrected = denickelerForm(tense, subject.index);
+        if (corrected !== null) normalizedForm = corrected;
+      }
 
       // « Battre » et ses dérivés (-abattre, -rabattre, -combattre…)
       // n'ont parfois pas la 3e personne du singulier dans la source.
@@ -243,6 +270,9 @@
 
     return IMPERATIVE_SUBJECTS.map((subject, index) => {
       let form = readFormEntry(forms[index]);
+      if (getInfinitive(verb) === "dénickeler") {
+        form = ["dénickelle", "dénickelons", "dénickelez"][index];
+      }
       if (!form) return null;
 
       if (verb.pronominal && !/-(?:toi|nous|vous|t'en|nous-en|vous-en|y|en)$/i.test(form)) {
