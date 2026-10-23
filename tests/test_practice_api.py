@@ -296,7 +296,7 @@ class EAccentFamilyTests(unittest.TestCase):
         self.assertEqual(len(SESSIONS[result["session_id"]]), 20)
 
     def test_e_accent_rejects_verbs_from_specific_families(self):
-        for verb in ("protéger", "révéler", "acheter", "jeter", "dépecer", "parler"):
+        for verb in ("protéger", "abréger", "révéler", "répéter", "hébéter", "acheter", "jeter", "dépecer", "parler"):
             with self.subTest(verb=verb), self.assertRaises(HTTPException):
                 generate_practice(GenerateRequest(verb=verb, family="e-accent", tense="present"))
 
