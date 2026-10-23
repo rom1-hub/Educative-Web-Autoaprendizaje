@@ -254,7 +254,7 @@ class EAccentFamilyTests(unittest.TestCase):
         patterns = e_accent_family_patterns()
         verbs = set(patterns)
         self.assertGreaterEqual(len(verbs), 20)
-        self.assertTrue({"céder", "espérer", "lever", "mener", "peser", "semer"}.issubset(verbs))
+        self.assertTrue({"céder", "espérer", "lever", "mener", "peser", "semer", "receper", "recéper"}.issubset(verbs))
         self.assertNotIn("protéger", verbs)
         self.assertNotIn("révéler", verbs)
         self.assertNotIn("acheter", verbs)
@@ -270,6 +270,10 @@ class EAccentFamilyTests(unittest.TestCase):
             ("lever", "futur-simple"): ["lèverai", "lèverons", "lèveront"],
             ("mener", "futur-simple"): ["mènerai", "mènerons", "mèneront"],
             ("peser", "conditionnel-present"): ["pèserais", "pèserions", "pèseraient"],
+            ("receper", "present"): ["recèpe", "recepons", "recèpent"],
+            ("receper", "futur-simple"): ["recèperai", "recèperons", "recèperont"],
+            ("recéper", "present"): ["recèpe", "recépons", "recèpent"],
+            ("recéper", "futur-simple"): ["recèperai", "recèperons", "recèperont"],
         }
         for (verb, tense), expected in cases.items():
             with self.subTest(verb=verb, tense=tense):
