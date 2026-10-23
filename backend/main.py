@@ -182,7 +182,7 @@ def eler_family_patterns() -> dict[str, str]:
         start = source.find(prefix)
         if start < 0:
             raise ValueError("Formato del catálogo desconocido")
-        payload = source[start + len(prefix):].strip().split(";\\nwindow.", 1)[0].strip()
+        payload = source[start + len(prefix):].strip().split(";\nwindow.", 1)[0].strip()
         catalog = json.loads(payload.removesuffix(";"))
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         raise HTTPException(500, "No se pudo cargar el catálogo canónico de verbos.") from exc
