@@ -182,7 +182,7 @@ def eler_family_patterns() -> dict[str, str]:
         prefix_index = source.find(prefix)
         if prefix_index < 0:
             raise ValueError("No se reconoce el formato del catálogo de verbos.")
-        payload = source[prefix_index + len(prefix):].strip().split(";\\nwindow.", 1)[0].strip()
+        payload = source[prefix_index + len(prefix):].strip().split(";\nwindow.", 1)[0].strip()
         if payload.endswith(";"):
             payload = payload[:-1]
         catalog = json.loads(payload)
