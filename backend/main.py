@@ -84,7 +84,7 @@ def ger_family_verbs() -> tuple[str, ...]:
         if not isinstance(entry, dict):
             continue
         lemma = normalize(entry.get("infinitif") or entry.get("id") or "")
-        if entry.get("pattern") == "man:ger" and entry.get("pronominal") is False and entry.get("construction") == "non-pronomiale" and lemma.endswith("ger") and lemma:
+        if entry.get("pattern") == "man:ger" and entry.get("pronominal") is False and entry.get("construction") == "non-pronominale" and lemma.endswith("ger") and lemma:
             candidates.append(lemma)
     return tuple(sorted(set(candidates)))
 
@@ -125,7 +125,7 @@ def regular_first_group_verbs() -> tuple[str, ...]:
             entry.get("groupe") != 1
             or entry.get("familyId") != "er-regular"
             or entry.get("pronominal") is not False
-            or entry.get("construction") != "non-pronomiale"
+            or entry.get("construction") != "non-pronominale"
             or not lemma
         ):
             continue
