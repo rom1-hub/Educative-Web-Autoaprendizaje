@@ -268,7 +268,7 @@ def e_accent_family_patterns() -> dict[str, str]:
     # prioridad: -GER, -CER, -ELER y -ETER no entran en esta familia.
     supported = {
         "c:éder", "réf:érer", "cr:émer", "ali:éner", "l:éser",
-        "l:ever", "m:ener", "p:eser", "s:emer", "rec:eper", "rec:éper",
+        "l:ever", "m:ener", "prom:ener", "p:eser", "s:emer", "rec:eper", "rec:éper",
     }
     patterns = {}
     for entry in catalog.values():
@@ -347,7 +347,7 @@ def regular_er_forms(verb: str, tense: str, family: str = "") -> list[dict[str, 
         "yer" if is_yer_family else
         ""
     )
-    e_accent_pattern = e_accent_family_patterns().get(lemma) if not suffix_family and family in ("", "e-accent") else None
+    e_accent_pattern = e_accent_family_patterns().get(lemma) if not suffix_family else None
     is_e_accent_family = e_accent_pattern is not None
     if lemma == "aller" or (re.search(r"(?:eter|yer)$", lemma) and not (is_eter_family or is_yer_family)):
         raise HTTPException(422, "Este verbo pertenece a una familia con reglas particulares todavía no implementada.")
@@ -418,7 +418,7 @@ def regular_er_forms(verb: str, tense: str, family: str = "") -> list[dict[str, 
     future = [infinitive + suffix for suffix in ("ai", "as", "a", "a", "a", "ons", "ez", "ont", "ont")]
     if eler_pattern in ("app:eler", "p:eler", "harc:eler") or eter_pattern in ("ach:eter", "j:eter"):
         future = [strong_stem + "er" + suffix for suffix in ("ai", "as", "a", "a", "a", "ons", "ez", "ont", "ont")]
-    elif is_e_accent_family and e_accent_pattern in ("l:ever", "m:ener", "p:eser", "s:emer", "rec:eper", "rec:éper"):
+    elif is_e_accent_family and e_accent_pattern in ("l:ever", "m:ener", "prom:ener", "p:eser", "s:emer", "rec:eper", "rec:éper"):
         future = [strong_stem + "er" + suffix for suffix in ("ai", "as", "a", "a", "a", "ons", "ez", "ont", "ont")]
     elif yer_pattern in ("netto:yer", "pa:yer"):
         future = [strong_stem + "er" + suffix for suffix in ("ai", "as", "a", "a", "a", "ons", "ez", "ont", "ont")]
