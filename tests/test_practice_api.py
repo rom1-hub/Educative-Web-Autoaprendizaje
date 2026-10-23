@@ -66,6 +66,73 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
         self.assertEqual([row["form"] for row in regular_er_forms("promener", "conditionnel-present")][0:3],
                          ["promènerais", "promènerais", "promènerait"])
 
+    def test_pronominal_first_group_verbs_are_conjugated_and_classified(self):
+        from backend.main import (
+            TENSE_LABELS,
+            e_accent_family_patterns,
+            regular_er_forms,
+            regular_first_group_verbs,
+        )
+
+        catalog_verbs = set(regular_first_group_verbs())
+        self.assertIn("se laver", catalog_verbs)
+        self.assertIn("se lever", catalog_verbs)
+        self.assertIn("s'arrêter", catalog_verbs)
+        self.assertIn("se lever", e_accent_family_patterns())
+
+        self.assertEqual(
+            [row["form"] for row in regular_er_forms("se laver", "present")][:6],
+            ["me lave", "te laves", "se lave", "se lave", "se lave", "nous lavons"],
+        )
+        self.assertEqual(
+            [row["form"] for row in regular_er_forms("se lever", "futur-simple")][:3],
+            ["me lèverai", "te lèveras", "se lèvera"],
+        )
+        self.assertEqual(
+            [row["form"] for row in regular_er_forms("se laver", "passe-compose")][:6],
+            ["me suis lavé", "t'es lavé", "s'est lavé", "s'est lavée", "s'est lavé", "nous sommes lavés"],
+        )
+        self.assertEqual(
+            [row["form"] for row in regular_er_forms("se laver", "imperatif-present")],
+            ["lave-toi", "lavons-nous", "lavez-vous"],
+        )
+        for tense in TENSE_LABELS:
+            with self.subTest(tense=tense):
+                self.assertTrue(regular_er_forms("se laver", tense))
+
+    def test_pronominal_construction_filter_works_for_individual_and_small_families(self):
+        from backend.main import SESSIONS, check_answer, pronominal_first_group_verbs
+
+        self.assertIn("se laver", pronominal_first_group_verbs())
+        individual = generate_practice(GenerateRequest(
+            verb="se laver",
+            construction="pronominal",
+            tense="present",
+        ))
+        self.assertEqual({question["verb"] for question in individual["questions"]}, {"se laver"})
+
+        family = generate_practice(GenerateRequest(
+            family="e-accent",
+            construction="pronominal",
+            tense="present",
+        ))
+        self.assertEqual(family["total"], 20)
+        self.assertEqual({question["verb"] for question in family["questions"]}, {"se lever"})
+
+        SESSIONS["pronominal-agreement-test"] = [{
+            "person": "je",
+            "verb": "se laver",
+            "tense": "passe-compose",
+            "answer": "me suis lavé",
+        }]
+        result = check_answer(CheckRequest(
+            session_id="pronominal-agreement-test",
+            index=0,
+            answer="me suis lavée",
+        ))
+        self.assertTrue(result["correct"])
+
+
     def test_category_uses_catalog_and_returns_twenty_distinct_verbs(self):
         from backend.main import regular_first_group_verbs
 
