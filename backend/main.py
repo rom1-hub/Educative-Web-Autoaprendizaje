@@ -62,6 +62,27 @@ COMPOUND_TENSES = {
     "imperatif-passe",
 }
 
+def is_supported_first_group_entry(entry: dict, catalog: dict) -> bool:
+    """Recognize regular first-group verbs, including pronominal records catalogued as group 3."""
+    if entry.get("pronominal") is False:
+        return (
+            entry.get("groupe") == 1
+            and entry.get("familyId") == "er-regular"
+            and entry.get("construction") in ("non-pronomiale", "non-pronominale")
+        )
+    if entry.get("pronominal") is not True or entry.get("construction") != "pronomiale":
+        return False
+    base = normalize(entry.get("infinitif_base") or "")
+    base_entry = catalog.get(base)
+    return (
+        isinstance(base_entry, dict)
+        and base_entry.get("groupe") == 1
+        and base_entry.get("familyId") == "er-regular"
+        and base_entry.get("pronominal") is False
+        and base_entry.get("construction") in ("non-pronomiale", "non-pronominale")
+    )
+
+
 @functools.lru_cache(maxsize=1)
 def ger_family_verbs() -> tuple[str, ...]:
     """Return canonical non-pronominal verbs in the orthographic -GER families."""
@@ -85,7 +106,7 @@ def ger_family_verbs() -> tuple[str, ...]:
             continue
         lemma = normalize(entry.get("infinitif_base") or entry.get("infinitif") or entry.get("id") or "")
         display_lemma = normalize(entry.get("infinitif") or lemma)
-        if entry.get("pattern") in {"man:ger", "abr:éger"} and entry.get("pronominal") in (False, True) and entry.get("construction") in ("non-pronomiale", "non-pronominale", "pronomiale") and lemma.endswith("ger") and lemma:
+        if is_supported_first_group_entry(entry, catalog) and entry.get("pattern") in {"man:ger", "abr:éger"} and lemma.endswith("ger") and lemma:
             candidates.append(display_lemma)
     return tuple(sorted(set(candidates)))
 
@@ -114,9 +135,8 @@ def cer_family_verbs() -> tuple[str, ...]:
         lemma = normalize(entry.get("infinitif_base") or entry.get("infinitif") or entry.get("id") or "")
         display_lemma = normalize(entry.get("infinitif") or lemma)
         if (
-            entry.get("pattern") in {"pla:cer", "dép:ecer"}
-            and entry.get("pronominal") in (False, True)
-            and entry.get("construction") in ("non-pronomiale", "non-pronominale", "pronomiale")
+            is_supported_first_group_entry(entry, catalog)
+            and entry.get("pattern") in {"pla:cer", "dép:ecer"}
             and lemma.endswith("cer")
             and lemma
         ):
@@ -157,13 +177,7 @@ def regular_first_group_verbs() -> tuple[str, ...]:
             continue
         lemma = normalize(entry.get("infinitif_base") or entry.get("infinitif") or entry.get("id") or "")
         display_lemma = normalize(entry.get("infinitif") or lemma)
-        if (
-            entry.get("groupe") != 1
-            or entry.get("familyId") != "er-regular"
-            or entry.get("pronominal") not in (False, True)
-            or entry.get("construction") not in ("non-pronomiale", "non-pronominale", "pronomiale")
-            or not lemma
-        ):
+        if not lemma or not is_supported_first_group_entry(entry, catalog):
             continue
         try:
             regular_er_forms(display_lemma, "present")
@@ -196,13 +210,7 @@ def pronominal_first_group_verbs() -> tuple[str, ...]:
         if not isinstance(entry, dict):
             continue
         display_lemma = normalize(entry.get("infinitif") or entry.get("id") or "")
-        if (
-            entry.get("groupe") == 1
-            and entry.get("familyId") == "er-regular"
-            and entry.get("pronominal") is True
-            and entry.get("construction") == "pronomiale"
-            and display_lemma
-        ):
+        if entry.get("pronominal") is True and display_lemma and is_supported_first_group_entry(entry, catalog):
             try:
                 regular_er_forms(display_lemma, "present")
             except HTTPException:
@@ -237,8 +245,7 @@ def eler_family_patterns() -> dict[str, str]:
         display_lemma = normalize(entry.get("infinitif") or lemma)
         pattern = entry.get("pattern")
         if (
-            entry.get("pronominal") in (False, True)
-            and entry.get("construction") in ("non-pronomiale", "non-pronominale", "pronomiale")
+            is_supported_first_group_entry(entry, catalog)
             and lemma.endswith(("eler", "éler"))
             and (pattern in supported or lemma == "dénickeler")
         ):
@@ -276,8 +283,7 @@ def eter_family_patterns() -> dict[str, str]:
         display_lemma = normalize(entry.get("infinitif") or lemma)
         pattern = entry.get("pattern")
         if (
-            entry.get("pronominal") in (False, True)
-            and entry.get("construction") in ("non-pronomiale", "non-pronominale", "pronomiale")
+            is_supported_first_group_entry(entry, catalog)
             and lemma.endswith(("eter", "éter"))
             and lemma != "duveter"
             and pattern in supported
@@ -321,8 +327,7 @@ def e_accent_family_patterns() -> dict[str, str]:
         display_lemma = normalize(entry.get("infinitif") or lemma)
         pattern = entry.get("pattern")
         if (
-            entry.get("pronominal") in (False, True)
-            and entry.get("construction") in ("non-pronomiale", "non-pronominale", "pronomiale")
+            is_supported_first_group_entry(entry, catalog)
             and lemma.endswith("er")
             and not lemma.endswith(("ger", "cer", "eler", "éler", "eter", "éter"))
             and (pattern in supported or lemma == "promener")
@@ -357,7 +362,7 @@ def yer_family_patterns() -> dict[str, str]:
         lemma = normalize(entry.get("infinitif_base") or entry.get("infinitif") or entry.get("id") or "")
         display_lemma = normalize(entry.get("infinitif") or lemma)
         pattern = entry.get("pattern")
-        if entry.get("pronominal") in (False, True) and entry.get("construction") in ("non-pronomiale", "non-pronominale", "pronomiale") and lemma.endswith("yer") and pattern in supported:
+        if is_supported_first_group_entry(entry, catalog) and lemma.endswith("yer") and pattern in supported:
             patterns[display_lemma] = pattern
     return patterns
 
