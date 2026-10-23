@@ -171,6 +171,43 @@ def regular_first_group_verbs() -> tuple[str, ...]:
     return tuple(sorted(set(candidates)))
 
 
+
+@functools.lru_cache(maxsize=1)
+def eler_family_patterns() -> dict[str, str]:
+    """Only canonical, non-pronominal -ELER verbs with a supported spelling pattern."""
+    catalog_path = ROOT / "data" / "verbs" / "local-database.js"
+    try:
+        source = catalog_path.read_text(encoding="utf-8")
+        prefix = "window.COQ_VERBS="
+        start = source.find(prefix)
+        if start < 0:
+            raise ValueError("Formato del catálogo desconocido")
+        payload = source[start + len(prefix):].strip().split(";\\nwindow.", 1)[0].strip()
+        catalog = json.loads(payload.removesuffix(";"))
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        raise HTTPException(500, "No se pudo cargar el catálogo canónico de verbos.") from exc
+
+    patterns = {}
+    supported = {"app:eler", "p:eler", "harc:eler"}
+    for entry in catalog.values():
+        if not isinstance(entry, dict):
+            continue
+        lemma = normalize(entry.get("infinitif") or entry.get("id") or "")
+        pattern = entry.get("pattern")
+        if (
+            entry.get("groupe") == 1
+            and entry.get("pronominal") is False
+            and entry.get("construction") in ("non-pronomiale", "non-pronominale")
+            and lemma.endswith("eler")
+            and (pattern in supported or lemma == "dénickeler")
+        ):
+            patterns[lemma] = "app:eler" if lemma in ("harceler", "dénickeler") else pattern
+    return patterns
+
+
+def eler_family_verbs() -> tuple[str, ...]:
+    return tuple(sorted(eler_family_patterns()))
+
 def normalize(value: str) -> str:
     value = unicodedata.normalize("NFC", value or "").lower().replace("’", "'")
     return re.sub(r"\s+", " ", value.strip())
@@ -183,13 +220,16 @@ def regular_er_forms(verb: str, tense: str) -> list[dict[str, str]]:
         raise HTTPException(422, "Esta categoría solo admite infinitivos regulares en -ER.")
     is_ger_family = lemma.endswith("ger")
     is_cer_family = lemma.endswith("cer")
-    if lemma == "aller" or re.search(r"(?:eler|eter|yer)$", lemma):
+    is_eler_family = lemma.endswith("eler")
+    if lemma == "aller" or re.search(r"(?:eter|yer)$", lemma):
         raise HTTPException(422, "Este verbo pertenece a una familia con reglas particulares todavía no implementada.")
     if is_ger_family and lemma not in ger_family_verbs():
         raise HTTPException(422, "Este verbo no pertenece a la familia ortográfica -GER compatible (manger, changer, nager…).")
+    if is_eler_family and lemma not in eler_family_patterns():
+        raise HTTPException(422, "Este verbo no pertenece a la familia -ELER compatible.")
     if is_cer_family and lemma not in cer_family_verbs():
         raise HTTPException(422, "Este verbo no pertenece a la familia ortográfica -CER compatible (commencer, annoncer, avancer…).")
-    if re.search(r"[eéèê][^aeiouyàâéèêëîïôûùüÿœæ]er$", lemma):
+    if not is_eler_family and re.search(r"[eéèê][^aeiouyàâéèêëîïôûùüÿœæ]er$", lemma):
         raise HTTPException(422, "Este verbo pertenece a una familia con cambio ortográfico todavía no implementada.")
     if tense not in TENSE_LABELS:
         raise HTTPException(422, "Selecciona un tiempo verbal válido.")
@@ -197,7 +237,11 @@ def regular_er_forms(verb: str, tense: str) -> list[dict[str, str]]:
     stem = lemma[:-2]
     infinitive = lemma
     participle = stem + "é"
+    eler_pattern = eler_family_patterns().get(lemma) if is_eler_family else None
+    strong_stem = (stem + "l") if eler_pattern == "app:eler" else (stem[:-2] + "è" + stem[-1]) if eler_pattern == "p:eler" else stem
     present = [stem + suffix for suffix in ("e", "es", "e", "e", "e", "ons", "ez", "ent", "ent")]
+    if is_eler_family:
+        present = [(strong_stem if i not in (5, 6) else stem) + ending for i, ending in enumerate(("e", "es", "e", "e", "e", "ons", "ez", "ent", "ent"))]
     if is_ger_family:
         present[5] = stem + "eons"
     if is_cer_family:
@@ -215,8 +259,14 @@ def regular_er_forms(verb: str, tense: str) -> list[dict[str, str]]:
     if is_cer_family:
         passe_simple = [(stem[:-1] + "ç" if index < 7 else stem) + suffix for index, suffix in enumerate(("ai", "as", "a", "a", "a", "âmes", "âtes", "èrent", "èrent"))]
     future = [infinitive + suffix for suffix in ("ai", "as", "a", "a", "a", "ons", "ez", "ont", "ont")]
+    if is_eler_family:
+        future = [strong_stem + "er" + suffix for suffix in ("ai", "as", "a", "a", "a", "ons", "ez", "ont", "ont")]
     conditional = [infinitive + suffix for suffix in ("ais", "ais", "ait", "ait", "ait", "ions", "iez", "aient", "aient")]
+    if is_eler_family:
+        conditional = [strong_stem + "er" + suffix for suffix in ("ais", "ais", "ait", "ait", "ait", "ions", "iez", "aient", "aient")]
     subj_present = [stem + suffix for suffix in ("e", "es", "e", "e", "e", "ions", "iez", "ent", "ent")]
+    if is_eler_family:
+        subj_present = [(strong_stem if i not in (5, 6) else stem) + ending for i, ending in enumerate(("e", "es", "e", "e", "e", "ions", "iez", "ent", "ent"))]
     subj_imparfait = [stem + suffix for suffix in ("asse", "asses", "ât", "ât", "ât", "assions", "assiez", "assent", "assent")]
     if is_cer_family:
         subj_imparfait = [stem[:-1] + "ç" + suffix for suffix in ("asse", "asses", "ât", "ât", "ât", "assions", "assiez", "assent", "assent")]
@@ -252,7 +302,7 @@ def regular_er_forms(verb: str, tense: str) -> list[dict[str, str]]:
     if tense == "imperatif-present":
         return [
             {"person": person, "form": form, "verb": lemma, "tense": tense}
-            for (person, _), form in zip(IMPERATIVE_PERSONS, (stem + "e", (stem + "eons" if is_ger_family else stem[:-1] + "çons" if is_cer_family else stem + "ons"), stem + "ez"))
+            for (person, _), form in zip(IMPERATIVE_PERSONS, ((strong_stem if is_eler_family else stem) + "e", (stem + "eons" if is_ger_family else stem[:-1] + "çons" if is_cer_family else stem + "ons"), stem + "ez"))
         ]
     if tense == "imperatif-passe":
         return [
@@ -325,7 +375,7 @@ def health() -> dict[str, str]:
 def generate_practice(request: GenerateRequest) -> dict:
     if request.tense not in TENSE_LABELS:
         raise HTTPException(422, "Selecciona un tiempo verbal válido.")
-    if request.family not in ("", "premier-groupe", "premier-groupe-reguliers", "ger", "cer"):
+    if request.family not in ("", "premier-groupe", "premier-groupe-reguliers", "ger", "cer", "eler"):
         raise HTTPException(422, "Selecciona una familia de verbos válida.")
     # Aceptar la variante histórica usada por algunos clientes además del
     # valor canónico «non-pronominal».
@@ -336,11 +386,11 @@ def generate_practice(request: GenerateRequest) -> dict:
     if request.auxiliary not in ("", "avoir", "etre"):
         raise HTTPException(422, "Selecciona un auxiliar válido.")
 
-    category_mode = request.family in ("premier-groupe-reguliers", "ger", "cer") and not request.verb.strip()
+    category_mode = request.family in ("premier-groupe-reguliers", "ger", "cer", "eler") and not request.verb.strip()
     if category_mode:
         # Una pregunta por verbo: 20 infinitivos distintos elegidos al azar.
         # Cada categoría usa exclusivamente los verbos admitidos por el catálogo.
-        available_verbs = {"ger": ger_family_verbs, "cer": cer_family_verbs}.get(request.family, lambda: regular_first_group_verbs())()
+        available_verbs = {"ger": ger_family_verbs, "cer": cer_family_verbs, "eler": eler_family_verbs}.get(request.family, lambda: regular_first_group_verbs())()
         if len(available_verbs) < 20:
             raise HTTPException(
                 500,
@@ -371,6 +421,8 @@ def generate_practice(request: GenerateRequest) -> dict:
             raise HTTPException(422, "El verbo escrito no pertenece a la familia ortográfica -GER compatible (manger, changer, nager…).")
         if request.family == "cer" and normalize(request.verb) not in cer_family_verbs():
             raise HTTPException(422, "El verbo escrito no pertenece a la familia ortográfica -CER compatible (commencer, annoncer, avancer…).")
+        if request.family == "eler" and normalize(request.verb) not in eler_family_patterns():
+            raise HTTPException(422, "El verbo escrito no pertenece a la familia -ELER compatible.")
         forms = regular_er_forms(request.verb, request.tense)
         # Repartir las formas por ciclos barajados independientes para evitar
         # que la misma secuencia corta se repita dentro de una sesión.
