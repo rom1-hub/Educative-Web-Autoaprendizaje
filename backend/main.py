@@ -734,8 +734,8 @@ def regular_er_forms(verb: str, tense: str, family: str = "") -> list[dict[str, 
             return form
         pronouns = ("me", "te", "se", "se", "se", "nous", "vous", "se", "se")
         pronoun = pronouns[index]
-        if form[:1] in "aeiouyàâéèêëîïôùûüœæh":
-            pronoun = {"me": "m'", "te": "t'", "se": "s'"}.get(pronoun, pronoun)
+        if pronoun in ("me", "te", "se") and form[:1] in "aeiouyàâéèêëîïôùûüœæh":
+            pronoun = {"me": "m'", "te": "t'", "se": "s'"}[pronoun]
             return pronoun + form
         return pronoun + " " + form
 
