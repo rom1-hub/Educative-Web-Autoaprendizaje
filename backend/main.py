@@ -508,7 +508,7 @@ def expand_practice_etre_subject_variants(
                 "subject_gender": gender,
                 "subject_number": number,
                 "subject_variant": label,
-                "form": prefix + participle + ending,
+                "form": prefix + separator + participle + ending,
             })
     return expanded
 
