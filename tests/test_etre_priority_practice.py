@@ -72,7 +72,13 @@ class EtrePriorityPracticeTests(unittest.TestCase):
                             answer,
                             r"^(?:ai|as|a|avons|avez|ont|avais|avait|avions|aviez|avaient) ",
                         )
-                        self.assertIn(participle_stem, answer)
+                        person_base = person.replace("que ", "").replace("qu'", "")
+                        ending = "e" if person_base == "elle" else "es" if person_base == "elles" else "s" if person_base in ("nous", "vous", "ils", "nous*", "vous*") else ""
+                        expected_participle = participle_stem + "é" + ending
+                        self.assertTrue(
+                            answer.endswith(expected_participle),
+                            f"{verb}/{tense}/{person}: participio esperado {expected_participle!r}, obtenido {answer!r}",
+                        )
 
     def test_simple_tense_keeps_ordinary_conjugation(self):
         expected = {
