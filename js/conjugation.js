@@ -47,6 +47,22 @@
       .replace(/\s+/g, " ");
   }
 
+  // Auxiliares con prioridad de être en el motor de práctica Python.
+  // Estos verbos no deben clasificarse como regulares del primer grupo solo por terminar en -er.
+  const PRACTICE_ETRE_PRIORITY_VERBS = new Set([
+    "entrer", "monter", "descendre", "passer", "sortir", "retourner", "arriver"
+  ]);
+
+  function isPracticeEtrePriorityVerb(value) {
+    const lemma = typeof value === "object" ? getBaseInfinitive(value) : value;
+    return PRACTICE_ETRE_PRIORITY_VERBS.has(normalizeInfinitive(lemma));
+  }
+
+  function getPracticeAuxiliary(verb, profile) {
+    if (isPracticeEtrePriorityVerb(verb)) return "etre";
+    return profile.auxiliary || profile.auxiliaire || "";
+  }
+
   function findVerb(raw) {
     const database = window.COQ_VERBS;
 
@@ -325,7 +341,7 @@
         group,
         family: profile.family || profile.pattern || "",
         construction: profile.pronominal ? "pronominal" : "non-pronominal",
-        auxiliary: profile.auxiliary || profile.auxiliaire || ""
+        auxiliary: getPracticeAuxiliary(verb, profile)
       };
       document.getElementById("practice-verb").value = lemma;
       setTab("practice");
@@ -402,10 +418,15 @@
       const normalized = aliases[value] || value;
       if ([...select.options].some(option => option.value === normalized)) select.value = normalized;
     };
-    setIfAvailable(family, lockedVerbProfile.group, {"1":"premier-groupe","2":"deuxieme-groupe","3":"troisieme-groupe","premier groupe":"premier-groupe","deuxième groupe":"deuxieme-groupe","troisième groupe":"troisieme-groupe"});
-    setIfAvailable(family, lockedVerbProfile.family);
+    if (isPracticeEtrePriorityVerb(lockedVerbProfile.lemma)) {
+      // La API solo admite estos verbos por su regla especial, no como familia regular -ER.
+      family.value = "";
+    } else {
+      setIfAvailable(family, lockedVerbProfile.group, {"1":"premier-groupe","2":"deuxieme-groupe","3":"troisieme-groupe","premier groupe":"premier-groupe","deuxième groupe":"deuxieme-groupe","troisième groupe":"troisieme-groupe"});
+      setIfAvailable(family, lockedVerbProfile.family);
+    }
     setIfAvailable(construction, lockedVerbProfile.construction);
-    setIfAvailable(auxiliary, lockedVerbProfile.auxiliary, {"être":"etre","avoir":"avoir","avoir et être":""});
+    setIfAvailable(auxiliary, isPracticeEtrePriorityVerb(lockedVerbProfile.lemma) ? "etre" : lockedVerbProfile.auxiliary, {"être":"etre","avoir":"avoir","avoir et être":""});
     [family, construction, auxiliary].forEach(select => {
       const note = document.createElement("small");
       note.className = "locked-note";
@@ -524,7 +545,7 @@
       group: getVerbGroup(verb),
       family: profile.family || profile.pattern || "",
       construction: profile.pronominal ? "pronominal" : "non-pronominal",
-      auxiliary: profile.auxiliary || profile.auxiliaire || ""
+      auxiliary: getPracticeAuxiliary(verb, profile)
     };
     applyLockedProfile();
   }
