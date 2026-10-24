@@ -661,6 +661,32 @@ class EtrePriorityCompoundTests(unittest.TestCase):
             row["answer"] for row in SESSIONS[session["session_id"]]
         }.issubset(expected))
 
+    def test_priority_verbs_keep_supported_simple_er_tenses(self):
+        from backend.main import regular_er_forms
+
+        for verb, expected in (
+            ("entrer", "entre"),
+            ("monter", "monte"),
+            ("passer", "passe"),
+            ("retourner", "retourne"),
+            ("arriver", "arrive"),
+        ):
+            with self.subTest(verb=verb):
+                self.assertEqual(regular_er_forms(verb, "present")[0]["form"], expected)
+
+    def test_etre_auxiliary_filter_can_select_priority_verbs_in_random_category(self):
+        from backend.main import ETRE_PRIORITY_PARTICIPLES, SESSIONS, regular_first_group_verbs
+
+        available_priority_verbs = set(regular_first_group_verbs()) & set(ETRE_PRIORITY_PARTICIPLES)
+        self.assertTrue(available_priority_verbs)
+        session = generate_practice(GenerateRequest(
+            family="premier-groupe-reguliers",
+            tense="passe-compose",
+            auxiliary="etre",
+        ))
+        generated_verbs = {question["verb"] for question in session["questions"]}
+        self.assertTrue(generated_verbs.issubset(available_priority_verbs))
+
 
 if __name__ == "__main__":
     unittest.main()
