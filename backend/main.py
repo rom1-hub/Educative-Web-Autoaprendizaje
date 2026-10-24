@@ -407,6 +407,112 @@ ETRE_PRIORITY_PARTICIPLES = {
     "arriver": "arrivé",
 }
 
+# Contextos de sujeto exclusivos de «Practicar».
+# Cada variante conserva el pronombre base y añade el género/número necesario
+# para mostrar el contexto y validar la concordancia del participio.
+PRACTICE_SUBJECT_VARIANTS = {
+    "je": [
+        ("masculin", "singulier", "masculin singulier"),
+        ("féminin", "singulier", "féminin singulier"),
+    ],
+    "tu": [
+        ("masculin", "singulier", "masculin singulier"),
+        ("féminin", "singulier", "féminin singulier"),
+    ],
+    "il": [("masculin", "singulier", None)],
+    "elle": [("féminin", "singulier", None)],
+    "on": [
+        ("masculin", "singulier", "impersonnel, masculin singulier"),
+        ("masculin", "pluriel", "masculin pluriel"),
+        ("féminin", "pluriel", "féminin pluriel"),
+    ],
+    "nous": [
+        ("masculin", "pluriel", "masculin pluriel"),
+        ("féminin", "pluriel", "féminin pluriel"),
+    ],
+    "vous": [
+        ("masculin", "singulier", "masculin singulier"),
+        ("féminin", "singulier", "féminin singulier"),
+        ("masculin", "pluriel", "masculin pluriel"),
+        ("féminin", "pluriel", "féminin pluriel"),
+    ],
+    "ils": [("masculin", "pluriel", None)],
+    "elles": [("féminin", "pluriel", None)],
+}
+PRONOMINAL_NO_SUBJECT_AGREEMENT = {"se parler", "se téléphoner", "se demander"}
+
+
+def canonical_practice_person(person: str) -> str:
+    """Return the base pronoun without subjunctive framing."""
+    if person.startswith("que "):
+        return person[4:]
+    if person.startswith("qu'"):
+        return person[3:]
+    return person
+
+
+def expand_practice_etre_subject_variants(
+    forms: list[dict[str, str]], verb: str, tense: str
+) -> list[dict[str, str]]:
+    """Expand only practice prompts whose être participle agrees with the subject."""
+    display_verb = normalize(verb)
+    if tense not in COMPOUND_TENSES or tense == "imperatif-passe":
+        return forms
+
+    is_pronominal = display_verb.startswith(("se ", "s'"))
+    if not is_pronominal and display_verb not in ETRE_PRIORITY_PARTICIPLES:
+        return forms
+    if is_pronominal and display_verb in PRONOMINAL_NO_SUBJECT_AGREEMENT:
+        return forms
+
+    expanded = []
+    for form in forms:
+        original_person = form["person"]
+        person_key = canonical_practice_person(original_person)
+        variants = PRACTICE_SUBJECT_VARIANTS.get(person_key)
+        if not variants:
+            expanded.append({**form, "person_key": person_key})
+            continue
+
+        answer = form["form"]
+        prefix, separator, participle = answer.rpartition(" ")
+        if not separator:
+            expanded.append({**form, "person_key": person_key})
+            continue
+
+        # Remove the agreement already applied to the canonical nine-person form,
+        # then apply the ending for the selected context.
+        if person_key == "elle" and participle.endswith("e"):
+            participle = participle[:-1]
+        elif person_key == "elles" and participle.endswith("es"):
+            participle = participle[:-2]
+        elif person_key in ("nous", "vous", "ils") and participle.endswith("s"):
+            participle = participle[:-1]
+
+        display_prefix = original_person if original_person.startswith(("que ", "qu'")) else person_key
+        for gender, number, description in variants:
+            label = f"{display_prefix} ({description})" if description else original_person
+            if gender == "féminin" and number == "singulier":
+                ending = "e"
+            elif gender == "féminin" and number == "pluriel":
+                ending = "es"
+            elif gender == "masculin" and number == "pluriel":
+                ending = "s"
+            else:
+                ending = ""
+
+            expanded.append({
+                **form,
+                "person": label,
+                "person_key": person_key,
+                "subject_gender": gender,
+                "subject_number": number,
+                "subject_variant": label,
+                "form": prefix + participle + ending,
+            })
+    return expanded
+
+
 
 def etre_priority_compound_forms(verb: str, tense: str) -> list[dict[str, str]]:
     """Conjugate the selected auxiliary-priority verbs with être in compound tenses."""
@@ -796,12 +902,15 @@ def generate_practice(request: GenerateRequest) -> dict:
         questions = []
         for verb in selected_verbs:
             forms = regular_er_forms(verb, request.tense, family)
+            forms = expand_practice_etre_subject_variants(forms, verb, request.tense)
             form = random.choice(forms)
             questions.append({
                 "person": form["person"],
+                "person_key": form.get("person_key", form["person"]),
                 "verb": form["verb"],
                 "tense": form["tense"],
                 "answer": form["form"],
+                **{key: form[key] for key in ("subject_gender", "subject_number", "subject_variant") if key in form},
             })
     else:
         if not request.verb.strip():
@@ -824,6 +933,7 @@ def generate_practice(request: GenerateRequest) -> dict:
         if family == "e-accent" and normalize(request.verb) not in e_accent_family_patterns():
             raise HTTPException(422, "El verbo escrito no pertenece a la familia E (È) + CONSONANTE + ER compatible.")
         forms = regular_er_forms(request.verb, request.tense, family)
+        forms = expand_practice_etre_subject_variants(forms, request.verb, request.tense)
         # Repartir las formas por ciclos barajados independientes para evitar
         # que la misma secuencia corta se repita dentro de una sesión.
         questions = []
@@ -847,9 +957,11 @@ def generate_practice(request: GenerateRequest) -> dict:
             for form in cycle:
                 questions.append({
                     "person": form["person"],
+                    "person_key": form.get("person_key", form["person"]),
                     "verb": form["verb"],
                     "tense": form["tense"],
                     "answer": form["form"],
+                    **{key: form[key] for key in ("subject_gender", "subject_number", "subject_variant") if key in form},
                 })
                 if len(questions) == 20:
                     break
@@ -881,7 +993,7 @@ def check_answer(request: CheckRequest) -> dict:
     tense = question.get("tense", "")
     yer_patterns = yer_family_patterns()
     if yer_patterns.get(verb) == "pa:yer":
-        person = question.get("person", "")
+        person = question.get("person_key", question.get("person", ""))
         if tense in ("present", "subjonctif-present") and person not in ("nous", "vous", "que nous", "que vous"):
             if expected:
                 accepted.add(expected.replace("i", "y", 1))
@@ -890,7 +1002,12 @@ def check_answer(request: CheckRequest) -> dict:
                 accepted.add(expected.replace("i", "y", 1))
         elif tense in ("futur-simple", "conditionnel-present"):
             accepted.add(expected.replace("ier", "yer"))
-    if verb.startswith(("se ", "s'")) and tense in COMPOUND_TENSES and verb not in {"se parler", "se téléphoner", "se demander"}:
+    if (
+        verb.startswith(("se ", "s'"))
+        and tense in COMPOUND_TENSES
+        and verb not in PRONOMINAL_NO_SUBJECT_AGREEMENT
+        and not question.get("subject_gender")
+    ):
         prefix, separator, past_participle = expected.rpartition(" ")
         if separator and past_participle.endswith("é"):
             for ending in ("é", "ée", "és", "ées"):
