@@ -703,13 +703,21 @@
   practiceVerbInput?.addEventListener("input", syncPracticeVerbProfile);
   practiceVerbInput?.addEventListener("change", syncPracticeVerbProfile);
   document.getElementById("practice-tense")?.addEventListener("change", applyLockedProfile);
-  document.getElementById("practice-construction")?.addEventListener("change", () => {
-    const construction = document.getElementById("practice-construction");
+  const constructionSelect = document.getElementById("practice-construction");
+  let previousConstruction = constructionSelect?.value ?? "";
+  constructionSelect?.addEventListener("change", () => {
     const auxiliary = document.getElementById("practice-auxiliary");
     const compoundTense = isCompoundTense(document.getElementById("practice-tense").value);
-    if (construction.value !== "pronominal" && compoundTense && !lockedVerbProfile) {
+    const currentConstruction = constructionSelect.value;
+
+    // Al salir del modo exclusivamente pronominal, restaurar la selección neutral.
+    // Los cambios entre las otras dos construcciones conservan la elección manual.
+    if (!lockedVerbProfile && compoundTense &&
+        previousConstruction === "pronominal" && currentConstruction !== "pronominal") {
       auxiliary.value = "";
     }
+
+    previousConstruction = currentConstruction;
     applyLockedProfile();
   });
 
