@@ -875,8 +875,9 @@ def generate_practice(request: GenerateRequest) -> dict:
     category_mode = family in ("premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent") and not request.verb.strip()
     if request.tense in COMPOUND_TENSES and request.auxiliary == "etre":
         selected_verb = normalize(request.verb)
-        if selected_verb and selected_verb not in ETRE_PRIORITY_PARTICIPLES:
-            raise HTTPException(422, "Este ejercicio solo permite seleccionar Être para los verbos configurados con prioridad de este auxiliar.")
+        is_pronominal_verb = selected_verb.startswith(("se ", "s'"))
+        if selected_verb and selected_verb not in ETRE_PRIORITY_PARTICIPLES and not is_pronominal_verb:
+            raise HTTPException(422, "Être solo está disponible para los verbos pronominales y los verbos configurados con prioridad de este auxiliar.")
         if not selected_verb and not category_mode:
             raise HTTPException(422, "Selecciona un verbo compatible con el auxiliar Être.")
     if category_mode:
@@ -889,7 +890,10 @@ def generate_practice(request: GenerateRequest) -> dict:
         elif request.construction in ("non-pronomial", "non-pronominal"):
             available_verbs = [verb for verb in available_verbs if verb not in pronomial_verbs]
         if request.tense in COMPOUND_TENSES and request.auxiliary == "etre":
-            available_verbs = [verb for verb in available_verbs if verb in ETRE_PRIORITY_PARTICIPLES]
+            available_verbs = [
+                verb for verb in available_verbs
+                if verb in ETRE_PRIORITY_PARTICIPLES or verb.startswith(("se ", "s'"))
+            ]
         if not available_verbs:
             raise HTTPException(422, "No hay verbos compatibles con esta familia y construcción en el catálogo.")
         # Evitar repetir infinitivos recientes cuando haya suficientes candidatos.
