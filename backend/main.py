@@ -752,7 +752,13 @@ def health() -> dict[str, str]:
 def generate_practice(request: GenerateRequest) -> dict:
     if request.tense not in TENSE_LABELS:
         raise HTTPException(422, "Selecciona un tiempo verbal válido.")
-    if request.family not in ("", "premier-groupe", "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent"):
+    family = request.family
+    selected_verb = normalize(request.verb)
+    # Compatibilidad con clientes que aún clasifican estos infinitivos -ER como grupo 3.
+    # Solo se normalizan alias de grupo; una familia ortográfica incompatible sigue rechazándose.
+    if selected_verb in ETRE_PRIORITY_PARTICIPLES and family in ("premier-groupe", "premier-groupe-reguliers", "troisieme-groupe"):
+        family = ""
+    if family not in ("", "premier-groupe", "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent"):
         raise HTTPException(422, "Selecciona una familia de verbos válida.")
     # Aceptar la variante histórica usada por algunos clientes además del
     # valor canónico «non-pronominal».
@@ -760,7 +766,7 @@ def generate_practice(request: GenerateRequest) -> dict:
         raise HTTPException(422, "Selecciona una construcción verbal válida.")
     if request.auxiliary not in ("", "avoir", "etre"):
         raise HTTPException(422, "Selecciona un auxiliar válido.")
-    category_mode = request.family in ("premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent") and not request.verb.strip()
+    category_mode = family in ("premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent") and not request.verb.strip()
     if request.tense in COMPOUND_TENSES and request.auxiliary == "etre":
         selected_verb = normalize(request.verb)
         if selected_verb and selected_verb not in ETRE_PRIORITY_PARTICIPLES:
@@ -770,7 +776,7 @@ def generate_practice(request: GenerateRequest) -> dict:
     if category_mode:
         # Una pregunta por verbo: 20 infinitivos distintos elegidos al azar.
         # Cada categoría usa exclusivamente los verbos admitidos por el catálogo.
-        available_verbs = list({"ger": ger_family_verbs, "cer": cer_family_verbs, "eler": eler_family_verbs, "eter": eter_family_verbs, "yer": yer_family_verbs, "e-accent": lambda: tuple(sorted(e_accent_family_patterns()))}.get(request.family, lambda: regular_first_group_verbs())())
+        available_verbs = list({"ger": ger_family_verbs, "cer": cer_family_verbs, "eler": eler_family_verbs, "eter": eter_family_verbs, "yer": yer_family_verbs, "e-accent": lambda: tuple(sorted(e_accent_family_patterns()))}.get(family, lambda: regular_first_group_verbs())())
         pronomial_verbs = set(pronominal_first_group_verbs())
         if request.construction == "pronominal":
             available_verbs = [verb for verb in available_verbs if verb in pronomial_verbs]
@@ -789,7 +795,7 @@ def generate_practice(request: GenerateRequest) -> dict:
         del RECENT_CATEGORY_VERBS[:-RECENT_CATEGORY_VERBS_LIMIT]
         questions = []
         for verb in selected_verbs:
-            forms = regular_er_forms(verb, request.tense, request.family)
+            forms = regular_er_forms(verb, request.tense, family)
             form = random.choice(forms)
             questions.append({
                 "person": form["person"],
@@ -805,19 +811,19 @@ def generate_practice(request: GenerateRequest) -> dict:
             raise HTTPException(422, "La construcción seleccionada requiere un verbo pronominal, por ejemplo «se laver».")
         if request.construction in ("non-pronomial", "non-pronominal") and typed_pronominal:
             raise HTTPException(422, "El verbo escrito es pronominal; cambia el filtro de construcción.")
-        if request.family == "ger" and normalize(request.verb) not in ger_family_verbs():
+        if family == "ger" and normalize(request.verb) not in ger_family_verbs():
             raise HTTPException(422, "El verbo escrito no pertenece a la familia ortográfica -GER compatible (manger, changer, nager…).")
-        if request.family == "cer" and normalize(request.verb) not in cer_family_verbs():
+        if family == "cer" and normalize(request.verb) not in cer_family_verbs():
             raise HTTPException(422, "El verbo escrito no pertenece a la familia ortográfica -CER compatible (commencer, annoncer, avancer…).")
-        if request.family == "eler" and normalize(request.verb) not in eler_family_patterns():
+        if family == "eler" and normalize(request.verb) not in eler_family_patterns():
             raise HTTPException(422, "El verbo escrito no pertenece a la familia -ELER compatible.")
-        if request.family == "eter" and normalize(request.verb) not in eter_family_patterns():
+        if family == "eter" and normalize(request.verb) not in eter_family_patterns():
             raise HTTPException(422, "El verbo escrito no pertenece a la familia -ETER compatible.")
-        if request.family == "yer" and normalize(request.verb) not in yer_family_patterns():
+        if family == "yer" and normalize(request.verb) not in yer_family_patterns():
             raise HTTPException(422, "El verbo escrito no pertenece a la familia -YER compatible.")
-        if request.family == "e-accent" and normalize(request.verb) not in e_accent_family_patterns():
+        if family == "e-accent" and normalize(request.verb) not in e_accent_family_patterns():
             raise HTTPException(422, "El verbo escrito no pertenece a la familia E (È) + CONSONANTE + ER compatible.")
-        forms = regular_er_forms(request.verb, request.tense, request.family)
+        forms = regular_er_forms(request.verb, request.tense, family)
         # Repartir las formas por ciclos barajados independientes para evitar
         # que la misma secuencia corta se repita dentro de una sesión.
         questions = []
