@@ -60,18 +60,32 @@ class EtrePriorityPracticeTests(unittest.TestCase):
                     session = main.SESSIONS[result["session_id"]]
                     self.assertEqual(result["total"], 20)
                     self.assertEqual(len(session), 20)
+                    normal_subjects = {
+                        "je (masculin singulier)", "je (féminin singulier)",
+                        "tu (masculin singulier)", "tu (féminin singulier)",
+                        "il", "elle",
+                        "on (impersonnel, masculin singulier)",
+                        "on (masculin pluriel)", "on (féminin pluriel)",
+                        "nous (masculin pluriel)", "nous (féminin pluriel)",
+                        "vous (masculin singulier)", "vous (féminin singulier)",
+                        "vous (masculin pluriel)", "vous (féminin pluriel)",
+                        "ils", "elles",
+                    }
+                    subjunctive_subjects = {
+                        "que je (masculin singulier)", "que je (féminin singulier)",
+                        "que tu (masculin singulier)", "que tu (féminin singulier)",
+                        "qu'il", "qu'elle",
+                        "qu'on (impersonnel, masculin singulier)",
+                        "qu'on (masculin pluriel)", "qu'on (féminin pluriel)",
+                        "que nous (masculin pluriel)", "que nous (féminin pluriel)",
+                        "que vous (masculin singulier)", "que vous (féminin singulier)",
+                        "que vous (masculin pluriel)", "que vous (féminin pluriel)",
+                        "qu'ils", "qu'elles",
+                    }
                     expected_subjects = (
-                        {"tu*", "nous*", "vous*"} if tense == "imperatif-passe" else {
-                            "je (masculin singulier)", "je (féminin singulier)",
-                            "tu (masculin singulier)", "tu (féminin singulier)",
-                            "il", "elle",
-                            "on (impersonnel, masculin singulier)",
-                            "on (masculin pluriel)", "on (féminin pluriel)",
-                            "nous (masculin pluriel)", "nous (féminin pluriel)",
-                            "vous (masculin singulier)", "vous (féminin singulier)",
-                            "vous (masculin pluriel)", "vous (féminin pluriel)",
-                            "ils", "elles",
-                        }
+                        {"tu*", "nous*", "vous*"} if tense == "imperatif-passe"
+                        else subjunctive_subjects if tense.startswith("subjonctif-")
+                        else normal_subjects
                     )
                     self.assertEqual({question["person"] for question in session}, expected_subjects)
                     for question in session:
