@@ -26,12 +26,12 @@ class EtrePriorityPracticeTests(unittest.TestCase):
             "nous": "serions", "vous": "seriez", "ils": "seraient", "elles": "seraient",
         },
         "subjonctif-passe": {
-            "que je": "sois", "que tu": "sois", "qu'il": "soit", "que elle": "soit",
+            "que je": "sois", "que tu": "sois", "qu'il": "soit", "qu'elle": "soit",
             "qu'on": "soit", "que nous": "soyons", "que vous": "soyez",
             "qu'ils": "soient", "qu'elles": "soient",
         },
         "subjonctif-plus-que-parfait": {
-            "que je": "fusse", "que tu": "fusses", "qu'il": "fût", "que elle": "fût",
+            "que je": "fusse", "que tu": "fusses", "qu'il": "fût", "qu'elle": "fût",
             "qu'on": "fût", "que nous": "fussions", "que vous": "fussiez",
             "qu'ils": "fussent", "qu'elles": "fussent",
         },
