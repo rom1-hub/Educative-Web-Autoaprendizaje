@@ -138,6 +138,33 @@ test("los verbos no pronominales con être también mantienen la concordancia", 
 });
 
 
+test("monter, passer y retourner usan être en los tiempos compuestos", () => {
+  const expected = {
+    monter: { elle: "est montée", ils: "sont montés" },
+    passer: { elle: "est passée", ils: "sont passés" },
+    retourner: { elle: "est retournée", ils: "sont retournés" }
+  };
+
+  for (const [infinitive, forms] of Object.entries(expected)) {
+    const verb = findBase(infinitive);
+    assert.ok(verb, `Falta el verbo del catálogo: ${infinitive}`);
+    assert.equal(engine.selectAuxiliary(verb), "être", `${infinitive}: auxiliar incorrecto`);
+
+    for (const tense of compoundTenses) {
+      const rows = engine.conjugate(verb, tense);
+      assert.ok(rows, `${infinitive}, ${tense}: no se generaron formas`);
+      const byPerson = Object.fromEntries(rows.map(row => [row.person, row.form]));
+      assert.match(byPerson.elle, /^est |^était |^fut |^sera |^serait |^soit |^fût /);
+      assert.match(byPerson.ils, /^sont |^étaient |^furent |^seront |^seraient |^soient |^fussent /);
+    }
+
+    const compound = Object.fromEntries(engine.conjugate(verb, "passe-compose").map(row => [row.person, row.form]));
+    assert.equal(compound.elle, forms.elle);
+    assert.equal(compound.ils, forms.ils);
+  }
+});
+
+
 test("advenir solo muestra il e ils, usa être y no presenta gerundio", () => {
   const advenir = context.window.COQ_IMPERSONAL_VERBS.advenir;
   assert.ok(advenir, "El registro complementario de advenir debe cargarse.");
