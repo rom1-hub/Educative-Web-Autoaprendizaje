@@ -60,8 +60,20 @@ class EtrePriorityPracticeTests(unittest.TestCase):
                     session = main.SESSIONS[result["session_id"]]
                     self.assertEqual(result["total"], 20)
                     self.assertEqual(len(session), 20)
+                    expected_subjects = {
+                        "je (masculin singulier)", "je (féminin singulier)",
+                        "tu (masculin singulier)", "tu (féminin singulier)",
+                        "il", "elle",
+                        "on (impersonnel, masculin singulier)",
+                        "on (masculin pluriel)", "on (féminin pluriel)",
+                        "nous (masculin pluriel)", "nous (féminin pluriel)",
+                        "vous (masculin singulier)", "vous (féminin singulier)",
+                        "vous (masculin pluriel)", "vous (féminin pluriel)",
+                        "ils", "elles",
+                    }
+                    self.assertEqual({question["person"] for question in session}, expected_subjects)
                     for question in session:
-                        person = question["person"]
+                        person = question["person_key"]
                         expected_auxiliary = auxiliary_by_person[person]
                         answer = question["answer"]
                         self.assertTrue(
@@ -72,13 +84,40 @@ class EtrePriorityPracticeTests(unittest.TestCase):
                             answer,
                             r"^(?:ai|as|a|avons|avez|ont|avais|avait|avions|aviez|avaient) ",
                         )
-                        person_base = person.replace("que ", "").replace("qu'", "")
-                        ending = "e" if person_base == "elle" else "es" if person_base == "elles" else "s" if person_base in ("nous", "vous", "ils", "nous*", "vous*") else ""
+                        gender = question["subject_gender"]
+                        number = question["subject_number"]
+                        ending = "e" if gender == "féminin" and number == "singulier" else "es" if gender == "féminin" and number == "pluriel" else "s" if gender == "masculin" and number == "pluriel" else ""
                         expected_participle = participle_stem + "é" + ending
                         self.assertTrue(
                             answer.endswith(expected_participle),
                             f"{verb}/{tense}/{person}: participio esperado {expected_participle!r}, obtenido {answer!r}",
                         )
+
+    def test_wrong_participle_agreement_is_rejected_for_explicit_context(self):
+        result = main.generate_practice(main.GenerateRequest(
+            verb="monter",
+            tense="passe-compose",
+            family="",
+            construction="non-pronominal",
+            auxiliary="etre",
+        ))
+        session = main.SESSIONS[result["session_id"]]
+        index = next(
+            i for i, question in enumerate(session)
+            if question["person"] == "je (féminin singulier)"
+        )
+        correct = main.check_answer(main.CheckRequest(
+            session_id=result["session_id"],
+            index=index,
+            answer="suis montée",
+        ))
+        incorrect = main.check_answer(main.CheckRequest(
+            session_id=result["session_id"],
+            index=index,
+            answer="suis monté",
+        ))
+        self.assertTrue(correct["correct"])
+        self.assertFalse(incorrect["correct"])
 
     def test_simple_tense_keeps_ordinary_conjugation(self):
         expected = {
