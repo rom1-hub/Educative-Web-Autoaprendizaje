@@ -60,21 +60,29 @@ class EtrePriorityPracticeTests(unittest.TestCase):
                     session = main.SESSIONS[result["session_id"]]
                     self.assertEqual(result["total"], 20)
                     self.assertEqual(len(session), 20)
-                    expected_subjects = {
-                        "je (masculin singulier)", "je (féminin singulier)",
-                        "tu (masculin singulier)", "tu (féminin singulier)",
-                        "il", "elle",
-                        "on (impersonnel, masculin singulier)",
-                        "on (masculin pluriel)", "on (féminin pluriel)",
-                        "nous (masculin pluriel)", "nous (féminin pluriel)",
-                        "vous (masculin singulier)", "vous (féminin singulier)",
-                        "vous (masculin pluriel)", "vous (féminin pluriel)",
-                        "ils", "elles",
-                    }
+                    expected_subjects = (
+                        {"tu*", "nous*", "vous*"} if tense == "imperatif-passe" else {
+                            "je (masculin singulier)", "je (féminin singulier)",
+                            "tu (masculin singulier)", "tu (féminin singulier)",
+                            "il", "elle",
+                            "on (impersonnel, masculin singulier)",
+                            "on (masculin pluriel)", "on (féminin pluriel)",
+                            "nous (masculin pluriel)", "nous (féminin pluriel)",
+                            "vous (masculin singulier)", "vous (féminin singulier)",
+                            "vous (masculin pluriel)", "vous (féminin pluriel)",
+                            "ils", "elles",
+                        }
+                    )
                     self.assertEqual({question["person"] for question in session}, expected_subjects)
                     for question in session:
                         person = question["person_key"]
-                        expected_auxiliary = auxiliary_by_person[person]
+                        auxiliary_person = (
+                            {"je": "que je", "tu": "que tu", "il": "qu'il", "elle": "qu'elle",
+                             "on": "qu'on", "nous": "que nous", "vous": "que vous",
+                             "ils": "qu'ils", "elles": "qu'elles"}.get(person, person)
+                            if tense.startswith("subjonctif-") else person
+                        )
+                        expected_auxiliary = auxiliary_by_person[auxiliary_person]
                         answer = question["answer"]
                         self.assertTrue(
                             answer.startswith(expected_auxiliary + " "),
@@ -84,9 +92,12 @@ class EtrePriorityPracticeTests(unittest.TestCase):
                             answer,
                             r"^(?:ai|as|a|avons|avez|ont|avais|avait|avions|aviez|avaient) ",
                         )
-                        gender = question["subject_gender"]
-                        number = question["subject_number"]
-                        ending = "e" if gender == "féminin" and number == "singulier" else "es" if gender == "féminin" and number == "pluriel" else "s" if gender == "masculin" and number == "pluriel" else ""
+                        if tense == "imperatif-passe":
+                            ending = "s" if person in ("nous*", "vous*") else ""
+                        else:
+                            gender = question["subject_gender"]
+                            number = question["subject_number"]
+                            ending = "e" if gender == "féminin" and number == "singulier" else "es" if gender == "féminin" and number == "pluriel" else "s" if gender == "masculin" and number == "pluriel" else ""
                         expected_participle = participle_stem + "é" + ending
                         self.assertTrue(
                             answer.endswith(expected_participle),
