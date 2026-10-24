@@ -92,6 +92,20 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
             [row["form"] for row in regular_er_forms("se laver", "passe-compose")][:6],
             ["me suis lavé", "t'es lavé", "s'est lavé", "s'est lavée", "s'est lavé", "nous sommes lavés"],
         )
+
+        # Every supported pronominal verb must keep a space after "vous",
+        # including compound tenses whose auxiliary begins with a vowel.
+        pronominal_verbs = ("se laver", "se réveiller", "se parler")
+        non_imperative_tenses = (
+            tense for tense in TENSE_LABELS
+            if tense not in ("imperatif-present", "imperatif-passe")
+        )
+        for verb in pronominal_verbs:
+            for tense in non_imperative_tenses:
+                with self.subTest(verb=verb, tense=tense):
+                    forms = regular_er_forms(verb, tense)
+                    self.assertGreater(len(forms), 6)
+                    self.assertTrue(forms[6]["form"].startswith("vous "), forms[6]["form"])
         self.assertEqual(
             [row["form"] for row in regular_er_forms("se laver", "imperatif-present")],
             ["lave-toi", "lavons-nous", "lavez-vous"],
