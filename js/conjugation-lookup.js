@@ -115,8 +115,17 @@
   function selectAuxiliary(verb) {
     // Los verbos pronominales forman sus tiempos compuestos con être.
     if (verb?.pronominal) return "être";
+
+    // Prioridad pedagógica para los verbos que se trabajan aquí con être.
+    // El catálogo general declara avoir para algunas de estas entradas, por lo
+    // que esta regla explícita debe prevalecer sobre el dato genérico.
+    const etrePriorityVerbs = new Set([
+      "aller", "arriver", "entrer", "monter", "passer", "retourner"
+    ]);
+    if (etrePriorityVerbs.has(getInfinitive(verb))) return "être";
+
     const declared = Array.isArray(verb.auxiliaires) ? verb.auxiliaires : [verb.auxiliaire || "avoir"];
-    // Para los verbos no pronominales, se respeta el auxiliar del catálogo.
+    // Para los demás verbos no pronominales, se respeta el auxiliar del catálogo.
     if (declared.includes("être")) return "être";
     return "avoir";
   }
