@@ -400,9 +400,10 @@
     const construction = document.getElementById("practice-construction");
     const auxiliary = document.getElementById("practice-auxiliary");
     const compoundTense = isCompoundTense(document.getElementById("practice-tense").value);
+    const pronominalOnly = construction.value === "pronominal";
 
     [family, construction, auxiliary].forEach(select => {
-      const locked = Boolean(lockedVerbProfile) || (select === auxiliary && !compoundTense);
+      const locked = Boolean(lockedVerbProfile) || (select === auxiliary && (!compoundTense || pronominalOnly));
       select.disabled = locked;
       select.closest(".form-field")?.classList.toggle("is-locked", locked);
       select.parentElement.querySelector(".locked-note")?.remove();
@@ -412,6 +413,7 @@
     // Si hay un perfil de verbo fijado, conservamos su auxiliar para restaurarlo
     // al volver a seleccionar un tiempo compuesto.
     if (!compoundTense && !lockedVerbProfile) auxiliary.value = "";
+    if (compoundTense && pronominalOnly && !lockedVerbProfile) auxiliary.value = "etre";
 
     if (!lockedVerbProfile) return;
     const setIfAvailable = (select, value, aliases = {}) => {
@@ -701,6 +703,15 @@
   practiceVerbInput?.addEventListener("input", syncPracticeVerbProfile);
   practiceVerbInput?.addEventListener("change", syncPracticeVerbProfile);
   document.getElementById("practice-tense")?.addEventListener("change", applyLockedProfile);
+  document.getElementById("practice-construction")?.addEventListener("change", () => {
+    const construction = document.getElementById("practice-construction");
+    const auxiliary = document.getElementById("practice-auxiliary");
+    const compoundTense = isCompoundTense(document.getElementById("practice-tense").value);
+    if (construction.value !== "pronominal" && compoundTense && !lockedVerbProfile) {
+      auxiliary.value = "";
+    }
+    applyLockedProfile();
+  });
 
   tabs.forEach((tab, index) => {
     tab.addEventListener("click", () => setTab(tab.dataset.tab));
