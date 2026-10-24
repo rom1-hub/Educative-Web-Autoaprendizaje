@@ -159,6 +159,49 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
                     self.assertEqual({question["verb"] for question in result["questions"]}, {verb})
                     self.assertEqual({question["tense"] for question in result["questions"]}, {tense})
 
+    def test_pronominal_compound_practice_accepts_etre(self):
+        from backend.main import COMPOUND_TENSES
+
+        examples = (
+            ("se laver", ""),
+            ("s'arrêter", "premier-groupe-reguliers"),
+            ("se lever", "e-accent"),
+            ("s'efforcer", "cer"),
+        )
+        for verb, family in examples:
+            for tense in COMPOUND_TENSES:
+                with self.subTest(verb=verb, tense=tense):
+                    result = generate_practice(GenerateRequest(
+                        verb=verb,
+                        family=family,
+                        construction="pronominal",
+                        tense=tense,
+                        auxiliary="etre",
+                    ))
+                    self.assertEqual(result["total"], 20)
+                    self.assertEqual({question["verb"] for question in result["questions"]}, {verb})
+                    self.assertEqual({question["tense"] for question in result["questions"]}, {tense})
+
+        category = generate_practice(GenerateRequest(
+            family="e-accent",
+            construction="pronominal",
+            tense="passe-compose",
+            auxiliary="etre",
+        ))
+        self.assertEqual(category["total"], 20)
+        self.assertTrue(all(
+            question["verb"].startswith(("se ", "s'"))
+            for question in category["questions"]
+        ))
+
+    def test_etre_auxiliary_still_rejects_unconfigured_non_pronominal_verbs(self):
+        with self.assertRaises(HTTPException):
+            generate_practice(GenerateRequest(
+                verb="parler",
+                tense="passe-compose",
+                auxiliary="etre",
+            ))
+
     def test_pronominal_random_mode_filters_each_family(self):
         families = ("premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent")
         for family in families:
