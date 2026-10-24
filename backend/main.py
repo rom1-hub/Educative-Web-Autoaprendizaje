@@ -397,9 +397,89 @@ def normalize(value: str) -> str:
     return re.sub(r"\s+", " ", value.strip())
 
 
+ETRE_PRIORITY_PARTICIPLES = {
+    "entrer": "entré",
+    "monter": "monté",
+    "descendre": "descendu",
+    "passer": "passé",
+    "sortir": "sorti",
+    "retourner": "retourné",
+    "arriver": "arrivé",
+}
+
+
+def etre_priority_compound_forms(verb: str, tense: str) -> list[dict[str, str]]:
+    """Conjugate the selected auxiliary-priority verbs with être in compound tenses."""
+    participle = ETRE_PRIORITY_PARTICIPLES[verb]
+    etre = {
+        "present": ["suis", "es", "est", "est", "est", "sommes", "êtes", "sont", "sont"],
+        "imparfait": ["étais", "étais", "était", "était", "était", "étions", "étiez", "étaient", "étaient"],
+        "passe-simple": ["fus", "fus", "fut", "fut", "fut", "fûmes", "fûtes", "furent", "furent"],
+        "futur-simple": ["serai", "seras", "sera", "sera", "sera", "serons", "serez", "seront", "seront"],
+        "conditionnel-present": ["serais", "serais", "serait", "serait", "serait", "serions", "seriez", "seraient", "seraient"],
+        "subjonctif-present": ["sois", "sois", "soit", "soit", "soit", "soyons", "soyez", "soient", "soient"],
+        "subjonctif-imparfait": ["fusse", "fusses", "fût", "fût", "fût", "fussions", "fussiez", "fussent", "fussent"],
+    }
+    compound_aux_tense = {
+        "passe-compose": "present",
+        "plus-que-parfait": "imparfait",
+        "passe-anterieur": "passe-simple",
+        "futur-anterieur": "futur-simple",
+        "conditionnel-passe": "conditionnel-present",
+        "subjonctif-passe": "subjonctif-present",
+        "subjonctif-plus-que-parfait": "subjonctif-imparfait",
+    }
+
+    def agreed_participle(person: str) -> str:
+        if person in ("elle",):
+            return participle + "e"
+        if person in ("elles",):
+            return participle + "es"
+        if person in ("nous", "vous", "ils", "nous*", "vous*"):
+            return participle + "s"
+        return participle
+
+    subjunctive_labels = {
+        "je": "que je", "tu": "que tu", "il": "qu'il",
+        "elle": "qu'elle", "on": "qu'on", "nous": "que nous",
+        "vous": "que vous", "ils": "qu'ils", "elles": "qu'elles",
+    }
+    if tense == "imperatif-passe":
+        imperative_aux = ("sois", "soyons", "soyez")
+        return [
+            {
+                "person": person,
+                "form": aux + " " + agreed_participle(person),
+                "verb": verb,
+                "tense": tense,
+            }
+            for (person, _), aux in zip(IMPERATIVE_PERSONS, imperative_aux)
+        ]
+
+    aux_tense = compound_aux_tense.get(tense)
+    if aux_tense is None:
+        raise HTTPException(422, "Este verbo solo está habilitado en esta corrección para los tiempos compuestos.")
+    return [
+        {
+            "person": subjunctive_labels.get(person, person) if tense.startswith("subjonctif-") else person,
+            "form": etre[aux_tense][index] + " " + agreed_participle(person),
+            "verb": verb,
+            "tense": tense,
+        }
+        for index, (person, _) in enumerate(PERSONS)
+    ]
+
+
 def regular_er_forms(verb: str, tense: str, family: str = "") -> list[dict[str, str]]:
     """Conjugate a regular first-group -ER verb in the selected tense."""
     display_lemma = normalize(verb)
+    if display_lemma in ETRE_PRIORITY_PARTICIPLES:
+        if family:
+            raise HTTPException(422, "Este verbo no pertenece a las familias regulares del primer grupo.")
+        if tense not in COMPOUND_TENSES:
+            raise HTTPException(422, "Esta corrección habilita estos verbos únicamente en los tiempos compuestos.")
+        return etre_priority_compound_forms(display_lemma, tense)
+
     is_pronominal = display_lemma.startswith("se ") or display_lemma.startswith("s'")
     if display_lemma.startswith("se "):
         lemma = display_lemma[3:].strip()
@@ -675,10 +755,12 @@ def generate_practice(request: GenerateRequest) -> dict:
     # valor canónico «non-pronominal».
     if request.construction not in ("", "pronominal", "non-pronominal", "non-pronomial"):
         raise HTTPException(422, "Selecciona una construcción verbal válida.")
-    if request.tense in COMPOUND_TENSES and request.auxiliary == "etre":
-        raise HTTPException(422, "« Parler » utiliza el auxiliar avoir en los tiempos compuestos. Selecciona Avoir o ambos auxiliares.")
     if request.auxiliary not in ("", "avoir", "etre"):
         raise HTTPException(422, "Selecciona un auxiliar válido.")
+    if request.tense in COMPOUND_TENSES and request.auxiliary == "etre":
+        selected_verb = normalize(request.verb)
+        if selected_verb not in ETRE_PRIORITY_PARTICIPLES:
+            raise HTTPException(422, "Este ejercicio solo permite seleccionar Être para los verbos configurados con prioridad de este auxiliar.")
 
     category_mode = request.family in ("premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent") and not request.verb.strip()
     if category_mode:
