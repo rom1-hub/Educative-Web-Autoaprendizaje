@@ -473,12 +473,15 @@ def etre_priority_compound_forms(verb: str, tense: str) -> list[dict[str, str]]:
 def regular_er_forms(verb: str, tense: str, family: str = "") -> list[dict[str, str]]:
     """Conjugate a regular first-group -ER verb in the selected tense."""
     display_lemma = normalize(verb)
-    if display_lemma in ETRE_PRIORITY_PARTICIPLES:
-        if family:
+    if display_lemma in ETRE_PRIORITY_PARTICIPLES and tense in COMPOUND_TENSES:
+        allowed_first_group_families = ("", "premier-groupe", "premier-groupe-reguliers")
+        if family not in allowed_first_group_families:
+            raise HTTPException(422, "Este verbo no pertenece a la familia seleccionada.")
+        if display_lemma in ("descendre", "sortir") and family:
             raise HTTPException(422, "Este verbo no pertenece a las familias regulares del primer grupo.")
-        if tense not in COMPOUND_TENSES:
-            raise HTTPException(422, "Esta corrección habilita estos verbos únicamente en los tiempos compuestos.")
         return etre_priority_compound_forms(display_lemma, tense)
+    if display_lemma in ("descendre", "sortir"):
+        raise HTTPException(422, "Esta corrección habilita estos verbos únicamente en los tiempos compuestos.")
 
     is_pronominal = display_lemma.startswith("se ") or display_lemma.startswith("s'")
     if display_lemma.startswith("se "):
@@ -757,12 +760,13 @@ def generate_practice(request: GenerateRequest) -> dict:
         raise HTTPException(422, "Selecciona una construcción verbal válida.")
     if request.auxiliary not in ("", "avoir", "etre"):
         raise HTTPException(422, "Selecciona un auxiliar válido.")
+    category_mode = request.family in ("premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent") and not request.verb.strip()
     if request.tense in COMPOUND_TENSES and request.auxiliary == "etre":
         selected_verb = normalize(request.verb)
-        if selected_verb not in ETRE_PRIORITY_PARTICIPLES:
+        if selected_verb and selected_verb not in ETRE_PRIORITY_PARTICIPLES:
             raise HTTPException(422, "Este ejercicio solo permite seleccionar Être para los verbos configurados con prioridad de este auxiliar.")
-
-    category_mode = request.family in ("premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent") and not request.verb.strip()
+        if not selected_verb and not category_mode:
+            raise HTTPException(422, "Selecciona un verbo compatible con el auxiliar Être.")
     if category_mode:
         # Una pregunta por verbo: 20 infinitivos distintos elegidos al azar.
         # Cada categoría usa exclusivamente los verbos admitidos por el catálogo.
@@ -772,6 +776,8 @@ def generate_practice(request: GenerateRequest) -> dict:
             available_verbs = [verb for verb in available_verbs if verb in pronomial_verbs]
         elif request.construction in ("non-pronomial", "non-pronominal"):
             available_verbs = [verb for verb in available_verbs if verb not in pronomial_verbs]
+        if request.tense in COMPOUND_TENSES and request.auxiliary == "etre":
+            available_verbs = [verb for verb in available_verbs if verb in ETRE_PRIORITY_PARTICIPLES]
         if not available_verbs:
             raise HTTPException(422, "No hay verbos compatibles con esta familia y construcción en el catálogo.")
         # Evitar repetir infinitivos recientes cuando haya suficientes candidatos.
