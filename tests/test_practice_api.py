@@ -96,7 +96,7 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
         # Every supported pronominal verb must keep a space after "vous",
         # including compound tenses whose auxiliary begins with a vowel.
         pronominal_verbs = ("se laver", "se réveiller", "se parler")
-        non_imperative_tenses = (
+        non_imperative_tenses = tuple(
             tense for tense in TENSE_LABELS
             if tense not in ("imperatif-present", "imperatif-passe")
         )
