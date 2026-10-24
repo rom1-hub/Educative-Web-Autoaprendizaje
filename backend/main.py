@@ -892,7 +892,8 @@ def generate_practice(request: GenerateRequest) -> dict:
         if request.tense in COMPOUND_TENSES and request.auxiliary == "etre":
             available_verbs = [
                 verb for verb in available_verbs
-                if verb in ETRE_PRIORITY_PARTICIPLES or verb.startswith(("se ", "s'"))
+                if verb in ETRE_PRIORITY_PARTICIPLES
+                or (request.construction == "pronominal" and verb.startswith(("se ", "s'")))
             ]
         if not available_verbs:
             raise HTTPException(422, "No hay verbos compatibles con esta familia y construcción en el catálogo.")
