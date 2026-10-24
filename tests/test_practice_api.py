@@ -598,7 +598,7 @@ class YerFamilyTests(unittest.TestCase):
 
 class EtrePriorityCompoundTests(unittest.TestCase):
     def test_priority_verbs_use_etre_for_every_compound_tense(self):
-        from backend.main import COMPOUND_TENSES, SESSIONS, TENSE_LABELS, regular_er_forms
+        from backend.main import COMPOUND_TENSES, SESSIONS, TENSE_LABELS, expand_practice_etre_subject_variants, regular_er_forms
 
         verbs = {
             "entrer": "entré",
@@ -643,15 +643,20 @@ class EtrePriorityCompoundTests(unittest.TestCase):
                         auxiliary="etre",
                     ))
                     self.assertEqual(session["total"], 20)
+                    expected_practice_forms = expand_practice_etre_subject_variants(forms, verb, tense)
                     session_answers = {
                         row["answer"] for row in SESSIONS[session["session_id"]]
                     }
-                    self.assertTrue(session_answers.issubset({row["form"] for row in forms}))
+                    self.assertTrue(session_answers.issubset({row["form"] for row in expected_practice_forms}))
 
     def test_priority_rule_overrides_avoir_filter_for_listed_verbs(self):
-        from backend.main import SESSIONS, regular_er_forms
+        from backend.main import SESSIONS, expand_practice_etre_subject_variants, regular_er_forms
 
-        expected = {row["form"] for row in regular_er_forms("monter", "passe-compose")}
+        expected = {
+            row["form"] for row in expand_practice_etre_subject_variants(
+                regular_er_forms("monter", "passe-compose"), "monter", "passe-compose"
+            )
+        }
         session = generate_practice(GenerateRequest(
             verb="monter",
             tense="passe-compose",
