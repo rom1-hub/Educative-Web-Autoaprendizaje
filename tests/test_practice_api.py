@@ -596,5 +596,71 @@ class YerFamilyTests(unittest.TestCase):
                 generate_practice(GenerateRequest(verb=verb, family="yer", tense="present"))
 
 
+class EtrePriorityCompoundTests(unittest.TestCase):
+    def test_priority_verbs_use_etre_for_every_compound_tense(self):
+        from backend.main import COMPOUND_TENSES, SESSIONS, TENSE_LABELS, regular_er_forms
+
+        verbs = {
+            "entrer": "entré",
+            "monter": "monté",
+            "descendre": "descendu",
+            "passer": "passé",
+            "sortir": "sorti",
+            "retourner": "retourné",
+            "arriver": "arrivé",
+        }
+        expected_auxiliaries = {
+            "passe-compose": ["suis", "es", "est", "est", "est", "sommes", "êtes", "sont", "sont"],
+            "plus-que-parfait": ["étais", "étais", "était", "était", "était", "étions", "étiez", "étaient", "étaient"],
+            "passe-anterieur": ["fus", "fus", "fut", "fut", "fut", "fûmes", "fûtes", "furent", "furent"],
+            "futur-anterieur": ["serai", "seras", "sera", "sera", "sera", "serons", "serez", "seront", "seront"],
+            "subjonctif-passe": ["sois", "sois", "soit", "soit", "soit", "soyons", "soyez", "soient", "soient"],
+            "subjonctif-plus-que-parfait": ["fusse", "fusses", "fût", "fût", "fût", "fussions", "fussiez", "fussent", "fussent"],
+            "conditionnel-passe": ["serais", "serais", "serait", "serait", "serait", "serions", "seriez", "seraient", "seraient"],
+        }
+        for verb, participle in verbs.items():
+            for tense in TENSE_LABELS:
+                if tense not in COMPOUND_TENSES:
+                    continue
+                with self.subTest(verb=verb, tense=tense):
+                    forms = regular_er_forms(verb, tense)
+                    if tense == "imperatif-passe":
+                        self.assertEqual([row["form"].split()[0] for row in forms], ["sois", "soyons", "soyez"])
+                        self.assertEqual([row["person"] for row in forms], ["tu*", "nous*", "vous*"])
+                    else:
+                        self.assertEqual([row["form"].split()[0] for row in forms], expected_auxiliaries[tense])
+                    for row in forms:
+                        self.assertIn(row["form"].split()[-1], {
+                            participle,
+                            participle + "e",
+                            participle + "s",
+                            participle + "es",
+                        })
+
+                    session = generate_practice(GenerateRequest(
+                        verb=verb,
+                        tense=tense,
+                        auxiliary="etre",
+                    ))
+                    self.assertEqual(session["total"], 20)
+                    session_answers = {
+                        row["answer"] for row in SESSIONS[session["session_id"]]
+                    }
+                    self.assertTrue(session_answers.issubset({row["form"] for row in forms}))
+
+    def test_priority_rule_overrides_avoir_filter_for_listed_verbs(self):
+        from backend.main import SESSIONS, regular_er_forms
+
+        expected = {row["form"] for row in regular_er_forms("monter", "passe-compose")}
+        session = generate_practice(GenerateRequest(
+            verb="monter",
+            tense="passe-compose",
+            auxiliary="avoir",
+        ))
+        self.assertTrue({
+            row["answer"] for row in SESSIONS[session["session_id"]]
+        }.issubset(expected))
+
+
 if __name__ == "__main__":
     unittest.main()
