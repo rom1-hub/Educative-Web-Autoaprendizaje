@@ -58,8 +58,8 @@ function conjugatePronominal(infinitive, tense) {
   return engine.conjugate({ ...base, ...specific, pronominal: true }, tense);
 }
 
-test("la base pronominal contiene 106 registros y las excepciones definidas", () => {
-  assert.equal(Object.keys(pronominalVerbs).length, 106);
+test("la base pronominal contiene 112 registros y las excepciones definidas", () => {
+  assert.equal(Object.keys(pronominalVerbs).length, 112);
   assert.equal(findPronominal("se parler").accordParticipePasse, "aucun");
   assert.equal(findPronominal("se téléphoner").accordParticipePasse, "aucun");
   assert.equal(findPronominal("s'enfuir").participePasse, "enfui");
