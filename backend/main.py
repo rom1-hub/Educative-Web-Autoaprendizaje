@@ -439,7 +439,7 @@ PRACTICE_SUBJECT_VARIANTS = {
     "ils": [("masculin", "pluriel", None)],
     "elles": [("féminin", "pluriel", None)],
 }
-PRONOMINAL_NO_SUBJECT_AGREEMENT = {"se parler", "se téléphoner", "se demander"}
+PRONOMINAL_NO_SUBJECT_AGREEMENT = {"se parler", "se téléphoner", "se demander", "s'agir", "se pouvoir"}
 
 
 def canonical_practice_person(person: str) -> str:
@@ -830,6 +830,237 @@ def regular_er_forms(verb: str, tense: str, family: str = "") -> list[dict[str, 
     raise HTTPException(422, "Este tiempo verbal todavía no está implementado.")
 
 
+
+def _load_js_object(relative_path: str, variable: str) -> dict:
+    """Load the first JSON object assigned to a window variable in a JS catalog."""
+    path = ROOT / relative_path
+    try:
+        source = path.read_text(encoding="utf-8")
+        match = re.search(r"window\." + re.escape(variable) + r"\s*=\s*", source)
+        if not match:
+            raise ValueError(f"No se encontró la variable {variable}.")
+        payload, _ = json.JSONDecoder().raw_decode(source, match.end())
+        if not isinstance(payload, dict):
+            raise ValueError(f"La variable {variable} no contiene un objeto.")
+        return payload
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        raise HTTPException(
+            500, "No se pudo cargar el catálogo canónico de verbos para generar la práctica."
+        ) from exc
+
+
+@functools.lru_cache(maxsize=1)
+def second_group_catalog() -> dict[str, dict]:
+    """Return valid canonical second-group records indexed by normalized infinitive."""
+    catalog = _load_js_object("data/verbs/local-database.js", "COQ_VERBS")
+    result = {}
+    required_forms = {
+        "présent de l'indicatif", "imparfait", "passé simple", "futur simple",
+        "conditionnel présent", "subjonctif présent", "subjonctif imparfait",
+        "impératif présent",
+    }
+    for key, entry in catalog.items():
+        if not isinstance(entry, dict):
+            continue
+        group = entry.get("groupe", entry.get("group"))
+        if str(group) != "2" or entry.get("pronominal") is True:
+            continue
+        if entry.get("construction") not in ("non-pronomiale", "non-pronominale"):
+            continue
+        forms = entry.get("formes")
+        if not isinstance(forms, dict) or not required_forms.issubset(forms):
+            continue
+        if any(not isinstance(forms[name], list) or len(forms[name]) != (3 if name == "impératif présent" else 6)
+               for name in required_forms):
+            continue
+        lemma = normalize(entry.get("infinitif") or key)
+        result[lemma] = entry
+    return result
+
+
+@functools.lru_cache(maxsize=1)
+def second_group_pronominal_catalog() -> dict[str, dict]:
+    """Return active pronominal records whose non-pronominal base belongs to group two."""
+    records = _load_js_object("data/verbs/pronominal-database.js", "COQ_PRONOMINAL_VERBS")
+    bases = second_group_catalog()
+    result = {}
+    for record in records.values():
+        if not isinstance(record, dict) or record.get("actif") is False:
+            continue
+        lemma = normalize(record.get("infinitif") or "")
+        base = normalize(record.get("formeNonPronominale") or record.get("infinitifBase") or "")
+        if lemma and base in bases:
+            result[lemma] = record
+    return result
+
+
+@functools.lru_cache(maxsize=1)
+def second_group_verbs() -> tuple[str, ...]:
+    """Return canonical non-pronominal second-group infinitives supported by the catalog."""
+    return tuple(sorted(second_group_catalog()))
+
+
+@functools.lru_cache(maxsize=1)
+def second_group_pronominal_verbs() -> tuple[str, ...]:
+    """Return supported pronominal variants of second-group verbs."""
+    return tuple(sorted(second_group_pronominal_catalog()))
+
+
+def is_second_group_verb(verb: str) -> bool:
+    """Recognize a second-group base or a registered pronominal variant."""
+    lemma = normalize(verb)
+    if lemma in second_group_catalog() or lemma in second_group_pronominal_catalog():
+        return True
+    if lemma.startswith("se ") or lemma.startswith("s'"):
+        return lemma in second_group_pronominal_catalog()
+    return False
+
+
+def second_group_forms(verb: str, tense: str) -> list[dict[str, str]]:
+    """Build all 16 tense forms from canonical second-group forms and metadata."""
+    display_lemma = normalize(verb)
+    is_pronominal = display_lemma.startswith(("se ", "s'"))
+    pronominal_record = second_group_pronominal_catalog().get(display_lemma) if is_pronominal else None
+    if is_pronominal and pronominal_record is None:
+        raise HTTPException(422, "La variante pronominal no está registrada para el segundo grupo.")
+    base = normalize(
+        (pronominal_record or {}).get("formeNonPronominale")
+        or (pronominal_record or {}).get("infinitifBase")
+        or display_lemma.removeprefix("se ").removeprefix("s'")
+    )
+    entry = second_group_catalog().get(base)
+    if entry is None:
+        raise HTTPException(422, "El verbo escrito no pertenece al segundo grupo compatible.")
+    if tense not in TENSE_LABELS:
+        raise HTTPException(422, "Selecciona un tiempo verbal válido.")
+
+    impersonal = bool((pronominal_record or {}).get("impersonal"))
+    if impersonal and tense in ("imperatif-present", "imperatif-passe"):
+        raise HTTPException(422, "Este verbo impersonal no admite imperativo.")
+
+    person_rows = PERSONS
+    person_indexes = [0, 1, 2, 2, 2, 3, 4, 5, 5]
+    subjunctive_labels = {
+        "je": "que je", "tu": "que tu", "il": "qu'il",
+        "elle": "qu'elle", "on": "qu'on", "nous": "que nous",
+        "vous": "que vous", "ils": "qu'ils", "elles": "qu'elles",
+    }
+    no_agreement = is_pronominal and (pronominal_record or {}).get("accordParticipePasse") != "sujet"
+    participle = str(
+        (pronominal_record or {}).get("participePasse")
+        or entry.get("participePasse") or ""
+    ).strip()
+    if not participle:
+        raise HTTPException(422, "Falta el participio pasado canónico del verbo.")
+
+    def reflexive_prefix(form: str, index: int) -> str:
+        if not is_pronominal:
+            return form
+        pronoun = ("me", "te", "se", "se", "se", "nous", "vous", "se", "se")[index]
+        if pronoun in ("me", "te", "se") and form[:1] in "aeiouyàâéèêëîïôùûüœæh":
+            return {"me": "m'", "te": "t'", "se": "s'"}[pronoun] + form
+        return pronoun + " " + form
+
+    def agreed_participle(person: str) -> str:
+        if not is_pronominal or no_agreement:
+            return participle
+        if person in ("elle",):
+            return participle + "e"
+        if person in ("elles",):
+            return participle + "es"
+        if person in ("nous", "vous", "ils", "nous*", "vous*"):
+            return participle + "s"
+        return participle
+
+    if tense in (
+        "present", "imparfait", "passe-simple", "futur-simple",
+        "conditionnel-present", "subjonctif-present", "subjonctif-imparfait",
+    ):
+        form_key = {
+            "present": "présent de l'indicatif",
+            "imparfait": "imparfait",
+            "passe-simple": "passé simple",
+            "futur-simple": "futur simple",
+            "conditionnel-present": "conditionnel présent",
+            "subjonctif-present": "subjonctif présent",
+            "subjonctif-imparfait": "subjonctif imparfait",
+        }[tense]
+        stored = entry["formes"][form_key]
+        rows = []
+        indices = [2] if impersonal else range(len(person_rows))
+        for index in indices:
+            person, _ = person_rows[index]
+            form = reflexive_prefix(stored[person_indexes[index]], index)
+            rows.append({
+                "person": subjunctive_labels[person] if tense.startswith("subjonctif-") else person,
+                "form": form, "verb": display_lemma, "tense": tense,
+            })
+        return rows
+
+    if tense == "imperatif-present":
+        stored = entry["formes"]["impératif présent"]
+        rows = []
+        for (person, _), form in zip(IMPERATIVE_PERSONS, stored):
+            if is_pronominal:
+                suffix = {"tu*": "-toi", "nous*": "-nous", "vous*": "-vous"}[person]
+                form += suffix
+            rows.append({"person": person, "form": form, "verb": display_lemma, "tense": tense})
+        return rows
+
+    if tense in COMPOUND_TENSES:
+        # COQ exercise contract: non-pronominal second-group verbs use avoir;
+        # registered pronominal variants use être and their configured agreement.
+        auxiliary = "être" if is_pronominal else "avoir"
+        aux_tense = {
+            "passe-compose": "present",
+            "plus-que-parfait": "imparfait",
+            "passe-anterieur": "passe-simple",
+            "futur-anterieur": "futur-simple",
+            "conditionnel-passe": "conditionnel-present",
+            "subjonctif-passe": "subjonctif-present",
+            "subjonctif-plus-que-parfait": "subjonctif-imparfait",
+        }
+        avoir_forms = {
+            "present": ["ai", "as", "a", "a", "a", "avons", "avez", "ont", "ont"],
+            "imparfait": ["avais", "avais", "avait", "avait", "avait", "avions", "aviez", "avaient", "avaient"],
+            "passe-simple": ["eus", "eus", "eut", "eut", "eut", "eûmes", "eûtes", "eurent", "eurent"],
+            "futur-simple": ["aurai", "auras", "aura", "aura", "aura", "aurons", "aurez", "auront", "auront"],
+            "conditionnel-present": ["aurais", "aurais", "aurait", "aurait", "aurait", "aurions", "auriez", "auraient", "auraient"],
+            "subjonctif-present": ["aie", "aies", "ait", "ait", "ait", "ayons", "ayez", "aient", "aient"],
+            "subjonctif-imparfait": ["eusse", "eusses", "eût", "eût", "eût", "eussions", "eussiez", "eussent", "eussent"],
+        }
+        etre_forms = {
+            "present": ["suis", "es", "est", "est", "est", "sommes", "êtes", "sont", "sont"],
+            "imparfait": ["étais", "étais", "était", "était", "était", "étions", "étiez", "étaient", "étaient"],
+            "passe-simple": ["fus", "fus", "fut", "fut", "fut", "fûmes", "fûtes", "furent", "furent"],
+            "futur-simple": ["serai", "seras", "sera", "sera", "sera", "serons", "serez", "seront", "seront"],
+            "conditionnel-present": ["serais", "serais", "serait", "serait", "serait", "serions", "seriez", "seraient", "seraient"],
+            "subjonctif-present": ["sois", "sois", "soit", "soit", "soit", "soyons", "soyez", "soient", "soient"],
+            "subjonctif-imparfait": ["fusse", "fusses", "fût", "fût", "fût", "fussions", "fussiez", "fussent", "fussent"],
+        }
+        if tense == "imperatif-passe":
+            aux_forms = ("sois-toi", "soyons-nous", "soyez-vous") if is_pronominal else ("aie", "ayons", "ayez")
+            return [
+                {"person": person, "form": aux + " " + agreed_participle(person),
+                 "verb": display_lemma, "tense": tense}
+                for (person, _), aux in zip(IMPERATIVE_PERSONS, aux_forms)
+            ]
+        key = aux_tense[tense]
+        aux_forms = etre_forms[key] if auxiliary == "être" else avoir_forms[key]
+        rows = []
+        indices = [2] if impersonal else range(len(person_rows))
+        for index in indices:
+            person, _ = person_rows[index]
+            form = reflexive_prefix(aux_forms[index], index) + " " + agreed_participle(person) if is_pronominal else aux_forms[index] + " " + participle
+            rows.append({
+                "person": subjunctive_labels[person] if tense.startswith("subjonctif-") else person,
+                "form": form, "verb": display_lemma, "tense": tense,
+            })
+        return rows
+
+    raise HTTPException(422, "Este tiempo verbal todavía no está implementado.")
+
+
 def regular_er_present(verb: str) -> list[dict[str, str]]:
     """Backward-compatible helper used by the existing present-tense tests."""
     return regular_er_forms(verb, "present")
@@ -864,7 +1095,7 @@ def generate_practice(request: GenerateRequest) -> dict:
     # Solo se normalizan alias de grupo; una familia ortográfica incompatible sigue rechazándose.
     if selected_verb in ETRE_PRIORITY_PARTICIPLES and family in ("premier-groupe", "premier-groupe-reguliers", "troisieme-groupe"):
         family = ""
-    if family not in ("", "premier-groupe", "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent"):
+    if family not in ("", "premier-groupe", "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe"):
         raise HTTPException(422, "Selecciona una familia de verbos válida.")
     # Aceptar la variante histórica usada por algunos clientes además del
     # valor canónico «non-pronominal».
@@ -872,7 +1103,7 @@ def generate_practice(request: GenerateRequest) -> dict:
         raise HTTPException(422, "Selecciona una construcción verbal válida.")
     if request.auxiliary not in ("", "avoir", "etre"):
         raise HTTPException(422, "Selecciona un auxiliar válido.")
-    category_mode = family in ("premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent") and not request.verb.strip()
+    category_mode = family in ("premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe") and not request.verb.strip()
     if request.tense in COMPOUND_TENSES and request.auxiliary == "etre":
         selected_verb = normalize(request.verb)
         is_pronominal_verb = selected_verb.startswith(("se ", "s'"))
@@ -883,8 +1114,10 @@ def generate_practice(request: GenerateRequest) -> dict:
     if category_mode:
         # Una pregunta por verbo: 20 infinitivos distintos elegidos al azar.
         # Cada categoría usa exclusivamente los verbos admitidos por el catálogo.
-        available_verbs = list({"ger": ger_family_verbs, "cer": cer_family_verbs, "eler": eler_family_verbs, "eter": eter_family_verbs, "yer": yer_family_verbs, "e-accent": lambda: tuple(sorted(e_accent_family_patterns()))}.get(family, lambda: regular_first_group_verbs())())
+        available_verbs = list({"ger": ger_family_verbs, "cer": cer_family_verbs, "eler": eler_family_verbs, "eter": eter_family_verbs, "yer": yer_family_verbs, "e-accent": lambda: tuple(sorted(e_accent_family_patterns())), "deuxieme-groupe": lambda: second_group_verbs() + second_group_pronominal_verbs()}.get(family, lambda: regular_first_group_verbs())())
         pronomial_verbs = set(pronominal_first_group_verbs())
+        if family == "deuxieme-groupe":
+            pronomial_verbs.update(second_group_pronominal_verbs())
         if request.construction == "pronominal":
             available_verbs = [verb for verb in available_verbs if verb in pronomial_verbs]
         elif request.construction in ("non-pronomial", "non-pronominal"):
@@ -892,9 +1125,12 @@ def generate_practice(request: GenerateRequest) -> dict:
         if request.tense in COMPOUND_TENSES and request.auxiliary == "etre":
             available_verbs = [
                 verb for verb in available_verbs
-                if verb in ETRE_PRIORITY_PARTICIPLES
+                if (family == "deuxieme-groupe" and verb in second_group_pronominal_verbs())
+                or verb in ETRE_PRIORITY_PARTICIPLES
                 or (request.construction == "pronominal" and verb.startswith(("se ", "s'")))
             ]
+        elif family == "deuxieme-groupe" and request.tense in COMPOUND_TENSES and request.auxiliary == "avoir":
+            available_verbs = [verb for verb in available_verbs if verb not in second_group_pronominal_verbs()]
         if not available_verbs:
             raise HTTPException(422, "No hay verbos compatibles con esta familia y construcción en el catálogo.")
         # Evitar repetir infinitivos recientes cuando haya suficientes candidatos.
@@ -906,7 +1142,7 @@ def generate_practice(request: GenerateRequest) -> dict:
         del RECENT_CATEGORY_VERBS[:-RECENT_CATEGORY_VERBS_LIMIT]
         questions = []
         for verb in selected_verbs:
-            forms = regular_er_forms(verb, request.tense, family)
+            forms = second_group_forms(verb, request.tense) if family == "deuxieme-groupe" else regular_er_forms(verb, request.tense, family)
             forms = expand_practice_etre_subject_variants(forms, verb, request.tense)
             form = random.choice(forms)
             questions.append({
@@ -937,7 +1173,19 @@ def generate_practice(request: GenerateRequest) -> dict:
             raise HTTPException(422, "El verbo escrito no pertenece a la familia -YER compatible.")
         if family == "e-accent" and normalize(request.verb) not in e_accent_family_patterns():
             raise HTTPException(422, "El verbo escrito no pertenece a la familia E (È) + CONSONANTE + ER compatible.")
-        forms = regular_er_forms(request.verb, request.tense, family)
+        use_second_group = family == "deuxieme-groupe" or (not family and is_second_group_verb(selected_verb))
+        if family == "deuxieme-groupe" and not is_second_group_verb(selected_verb):
+            raise HTTPException(422, "El verbo escrito no pertenece al segundo grupo compatible.")
+        if use_second_group:
+            if family not in ("", "deuxieme-groupe"):
+                raise HTTPException(422, "El verbo del segundo grupo no pertenece a la familia seleccionada.")
+            if request.tense in COMPOUND_TENSES and request.auxiliary:
+                expected_auxiliary = "etre" if typed_pronominal else "avoir"
+                if request.auxiliary != expected_auxiliary:
+                    raise HTTPException(422, "El auxiliar seleccionado no corresponde a este verbo.")
+            forms = second_group_forms(request.verb, request.tense)
+        else:
+            forms = regular_er_forms(request.verb, request.tense, family)
         forms = expand_practice_etre_subject_variants(forms, request.verb, request.tense)
         # Repartir las formas por ciclos barajados independientes para evitar
         # que la misma secuencia corta se repita dentro de una sesión.
