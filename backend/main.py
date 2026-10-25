@@ -1143,6 +1143,14 @@ def generate_practice(request: GenerateRequest) -> dict:
             ]
         elif family == "deuxieme-groupe" and request.tense in COMPOUND_TENSES and request.auxiliary == "avoir":
             available_verbs = [verb for verb in available_verbs if verb not in second_group_pronominal_verbs()]
+        # Los verbos impersonales no admiten imperativo. Filtrarlos antes del
+        # muestreo evita que un único candidato incompatible rompa la sesión.
+        if family == "deuxieme-groupe" and request.tense in ("imperatif-present", "imperatif-passe"):
+            pronominal_catalog = second_group_pronominal_catalog()
+            available_verbs = [
+                verb for verb in available_verbs
+                if not pronominal_catalog.get(verb, {}).get("impersonal")
+            ]
         if not available_verbs:
             raise HTTPException(422, "No hay verbos compatibles con esta familia y construcción en el catálogo.")
         # En el segundo grupo, la opción mixta conserva la proporción acordada:
@@ -1159,8 +1167,25 @@ def generate_practice(request: GenerateRequest) -> dict:
                 pronominal_pool = fresh_pronominal
             if len(fresh_non_pronominal) >= 12:
                 non_pronominal_pool = fresh_non_pronominal
-            if len(pronominal_pool) >= 8 and len(non_pronominal_pool) >= 12:
-                selected_verbs = random.sample(non_pronominal_pool, k=12) + random.sample(pronominal_pool, k=8)
+            # Objetivo habitual: 12 no pronominales y 8 pronominales.
+            # Si un tiempo excluye verbos impersonales, se ajusta la cuota sin
+            # repetir infinitivos ni abandonar la sesión de 20 preguntas.
+            pronominal_count = min(8, len(pronominal_pool))
+            non_pronominal_count = min(20 - pronominal_count, len(non_pronominal_pool))
+            remaining = 20 - pronominal_count - non_pronominal_count
+            if remaining:
+                extra_pronominal = min(remaining, len(pronominal_pool) - pronominal_count)
+                pronominal_count += extra_pronominal
+                remaining -= extra_pronominal
+            if remaining:
+                extra_non_pronominal = min(remaining, len(non_pronominal_pool) - non_pronominal_count)
+                non_pronominal_count += extra_non_pronominal
+                remaining -= extra_non_pronominal
+            if remaining == 0:
+                selected_verbs = (
+                    random.sample(non_pronominal_pool, k=non_pronominal_count)
+                    + random.sample(pronominal_pool, k=pronominal_count)
+                )
                 random.shuffle(selected_verbs)
 
         if selected_verbs is None:
@@ -1210,6 +1235,12 @@ def generate_practice(request: GenerateRequest) -> dict:
         if use_second_group:
             if family not in ("", "deuxieme-groupe"):
                 raise HTTPException(422, "El verbo del segundo grupo no pertenece a la familia seleccionada.")
+            pronominal_record = second_group_pronominal_catalog().get(selected_verb)
+            if pronominal_record and pronominal_record.get("impersonal"):
+                raise HTTPException(
+                    422,
+                    "«s'agir» es un verbo pronominal impersonal y no admite una práctica individual de 20 preguntas. Puede aparecer en «Todos los verbos del segundo grupo».",
+                )
             if request.tense in COMPOUND_TENSES and request.auxiliary:
                 expected_auxiliary = "etre" if typed_pronominal else "avoir"
                 if request.auxiliary != expected_auxiliary:
