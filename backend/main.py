@@ -1154,100 +1154,6 @@ def regular_er_present(verb: str) -> list[dict[str, str]]:
     return regular_er_forms(verb, "present")
 
 
-def evanouir_forms(tense: str) -> list[dict[str, str]]:
-    """Conjugate the registered pronominal verb s'évanouir for individual practice."""
-    display_lemma = "s'évanouir"
-    if tense not in TENSE_LABELS:
-        raise HTTPException(422, "Selecciona un tiempo verbal válido.")
-
-    simple_forms = {
-        "present": ["évanouis", "évanouis", "évanouit", "évanouit", "évanouit", "évanouissons", "évanouissez", "évanouissent", "évanouissent"],
-        "imparfait": ["évanouissais", "évanouissais", "évanouissait", "évanouissait", "évanouissait", "évanouissions", "évanouissiez", "évanouissaient", "évanouissaient"],
-        "passe-simple": ["évanouis", "évanouis", "évanouit", "évanouit", "évanouit", "évanouîmes", "évanouîtes", "évanouirent", "évanouirent"],
-        "futur-simple": ["évanouirai", "évanouiras", "évanouira", "évanouira", "évanouira", "évanouirons", "évanouirez", "évanouiront", "évanouiront"],
-        "conditionnel-present": ["évanouirais", "évanouirais", "évanouirait", "évanouirait", "évanouirait", "évanouirions", "évanouiriez", "évanouiraient", "évanouiraient"],
-        "subjonctif-present": ["évanouisse", "évanouisses", "évanouisse", "évanouisse", "évanouisse", "évanouissions", "évanouissiez", "évanouissent", "évanouissent"],
-        "subjonctif-imparfait": ["évanouisse", "évanouisses", "évanouît", "évanouît", "évanouît", "évanouissions", "évanouissiez", "évanouissent", "évanouissent"],
-    }
-    subjunctive_labels = {
-        "je": "que je", "tu": "que tu", "il": "qu'il",
-        "elle": "qu'elle", "on": "qu'on", "nous": "que nous",
-        "vous": "que vous", "ils": "qu'ils", "elles": "qu'elles",
-    }
-    reflexive_pronouns = ("me", "te", "se", "se", "se", "nous", "vous", "se", "se")
-
-    def reflexive_prefix(word: str, index: int) -> str:
-        pronoun = reflexive_pronouns[index]
-        if pronoun in ("me", "te", "se") and word[:1].lower() in "aeiouyàâéèêëîïôùûüœæh":
-            return {"me": "m'", "te": "t'", "se": "s'"}[pronoun] + word
-        return pronoun + " " + word
-
-    def agreed_participle(person: str) -> str:
-        if person == "elle":
-            return "évanouie"
-        if person == "elles":
-            return "évanouies"
-        if person in ("nous", "vous", "ils"):
-            return "évanouis"
-        return "évanoui"
-
-    if tense in simple_forms:
-        rows = []
-        for index, (person, _) in enumerate(PERSONS):
-            form = reflexive_prefix(simple_forms[tense][index], index)
-            rows.append({
-                "person": subjunctive_labels[person] if tense.startswith("subjonctif-") else person,
-                "person_key": person,
-                "form": form,
-                "verb": display_lemma,
-                "tense": tense,
-            })
-        return rows
-
-    if tense == "imperatif-present":
-        return [
-            {"person": person, "person_key": person.rstrip("*"), "form": form, "verb": display_lemma, "tense": tense}
-            for person, form in zip(
-                ("tu*", "nous*", "vous*"),
-                ("évanouis-toi", "évanouissons-nous", "évanouissez-vous"),
-            )
-        ]
-
-    if tense == "imperatif-passe":
-        return [
-            {"person": person, "person_key": person.rstrip("*"), "form": form, "verb": display_lemma, "tense": tense}
-            for person, form in zip(
-                ("tu*", "nous*", "vous*"),
-                ("sois-toi évanoui", "soyons-nous évanouis", "soyez-vous évanouis"),
-            )
-        ]
-
-    compound_auxiliaries = {
-        "passe-compose": ["suis", "es", "est", "est", "est", "sommes", "êtes", "sont", "sont"],
-        "plus-que-parfait": ["étais", "étais", "était", "était", "était", "étions", "étiez", "étaient", "étaient"],
-        "passe-anterieur": ["fus", "fus", "fut", "fut", "fut", "fûmes", "fûtes", "furent", "furent"],
-        "futur-anterieur": ["serai", "seras", "sera", "sera", "sera", "serons", "serez", "seront", "seront"],
-        "conditionnel-passe": ["serais", "serais", "serait", "serait", "serait", "serions", "seriez", "seraient", "seraient"],
-        "subjonctif-passe": ["sois", "sois", "soit", "soit", "soit", "soyons", "soyez", "soient", "soient"],
-        "subjonctif-plus-que-parfait": ["fusse", "fusses", "fût", "fût", "fût", "fussions", "fussiez", "fussent", "fussent"],
-    }
-    auxiliaries = compound_auxiliaries.get(tense)
-    if auxiliaries is None:
-        raise HTTPException(422, "Este tiempo verbal no está implementado para s'évanouir.")
-
-    rows = []
-    for index, (person, _) in enumerate(PERSONS):
-        auxiliary = auxiliaries[index]
-        form = reflexive_prefix(auxiliary, index) + " " + agreed_participle(person)
-        rows.append({
-            "person": subjunctive_labels[person] if tense.startswith("subjonctif-") else person,
-            "person_key": person,
-            "form": form,
-            "verb": display_lemma,
-            "tense": tense,
-        })
-    return rows
-
 
 class GenerateRequest(BaseModel):
     verb: str = Field(default="", max_length=80)
@@ -1427,8 +1333,8 @@ def generate_practice(request: GenerateRequest) -> dict:
             raise HTTPException(422, "El verbo escrito no pertenece a la familia -YER compatible.")
         if family == "e-accent" and normalize(request.verb) not in e_accent_family_patterns():
             raise HTTPException(422, "El verbo escrito no pertenece a la familia E (È) + CONSONANTE + ER compatible.")
-        use_second_group = family == "deuxieme-groupe" or (not family and is_second_group_verb(selected_verb)) or selected_verb == "s'évanouir"
-        if family == "deuxieme-groupe" and not is_second_group_verb(selected_verb) and selected_verb != "s'évanouir":
+        use_second_group = family == "deuxieme-groupe" or (not family and is_second_group_verb(selected_verb))
+        if family == "deuxieme-groupe" and not is_second_group_verb(selected_verb):
             raise HTTPException(422, "El verbo escrito no pertenece al segundo grupo compatible.")
         if use_second_group:
             if family not in ("", "deuxieme-groupe"):
@@ -1443,7 +1349,7 @@ def generate_practice(request: GenerateRequest) -> dict:
                 expected_auxiliary = "etre" if typed_pronominal else "avoir"
                 if request.auxiliary != expected_auxiliary:
                     raise HTTPException(422, "El auxiliar seleccionado no corresponde a este verbo.")
-            forms = evanouir_forms(request.tense) if selected_verb == "s'évanouir" else second_group_forms(request.verb, request.tense)
+            forms = second_group_forms(request.verb, request.tense)
         else:
             forms = regular_er_forms(request.verb, request.tense, family)
         forms = expand_practice_etre_subject_variants(forms, request.verb, request.tense)

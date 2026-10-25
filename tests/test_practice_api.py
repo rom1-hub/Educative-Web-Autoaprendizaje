@@ -12,8 +12,12 @@ from backend.main import (
 
 
 class EvanouirIndividualPracticeTests(unittest.TestCase):
-    def test_s_evanouir_has_canonical_forms_across_all_sixteen_tenses(self):
-        from backend.main import evanouir_forms, TENSE_LABELS
+    def test_s_evanouir_uses_canonical_second_group_forms_in_all_sixteen_tenses(self):
+        from backend.main import (
+            TENSE_LABELS,
+            second_group_forms,
+            second_group_pronominal_verbs,
+        )
 
         expected = {
             "present": ("m'évanouis", "s'évanouit", "nous évanouissons"),
@@ -34,9 +38,11 @@ class EvanouirIndividualPracticeTests(unittest.TestCase):
             "imperatif-passe": ("sois-toi évanoui", "soyons-nous évanouis", "soyez-vous évanouis"),
         }
         self.assertEqual(set(expected), set(TENSE_LABELS))
+        self.assertIn("s'évanouir", second_group_pronominal_verbs())
+
         for tense, expected_forms in expected.items():
             with self.subTest(tense=tense):
-                forms = evanouir_forms(tense)
+                forms = second_group_forms("s'évanouir", tense)
                 self.assertTrue(forms)
                 self.assertEqual(forms[0]["form"], expected_forms[0])
                 if tense.startswith("subjonctif-"):
