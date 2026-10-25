@@ -822,7 +822,7 @@ class SecondGroupIntegrationTests(unittest.TestCase):
             with self.subTest(verb=verb):
                 forms = second_group_forms(verb, "passe-compose")
                 self.assertEqual(len(forms), 9)
-                self.assertTrue(all(row["form"].endswith(participle) for row in forms))
+                self.assertTrue(all(any(row["form"].endswith(participle + ending) for ending in ("", "e", "s", "es")) for row in forms))
                 self.assertTrue(all("suis" in row["form"] or "es " in row["form"] or "est " in row["form"] or "sommes" in row["form"] or "êtes" in row["form"] or "sont" in row["form"] for row in forms))
 
     def test_second_group_auxiliary_filter_is_enforced(self):
