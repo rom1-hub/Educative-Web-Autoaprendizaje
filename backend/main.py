@@ -179,8 +179,8 @@ def impersonal_verb_catalog() -> dict[str, dict]:
         # El archivo es JavaScript, no JSON puro: algunas claves de nivel superior
         # no están entre comillas. Normalizarlas antes de decodificar el objeto.
         payload = re.sub(
-            r'(?m)([{,]\\s*)([A-Za-z_$][A-Za-z0-9_$]*)\\s*:',
-            r'\\1"\\2":',
+            r'(?m)([{,]\s*)([A-Za-z_$][A-Za-z0-9_$]*)\s*:',
+            r'\1"\2":',
             payload,
         )
         catalog, _ = json.JSONDecoder().raw_decode(payload)
