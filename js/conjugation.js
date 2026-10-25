@@ -60,6 +60,7 @@
 
   function getPracticeAuxiliary(verb, profile) {
     if (isPracticeEtrePriorityVerb(verb)) return "etre";
+    if (!profile.pronominal && !verb?.pronominal && getVerbGroup(verb) === 2) return "avoir";
     return profile.auxiliary || profile.auxiliaire || "";
   }
 
@@ -1006,7 +1007,7 @@
         ? document.getElementById("practice-auxiliary").value
         : ""
     };
-    if (!filters.verb && !["premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent"].includes(filters.family)) {
+    if (!filters.verb && !["premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe"].includes(filters.family)) {
       showPracticeMessage("Escribe un verbo o selecciona una familia para generar una práctica automática.", true);
       return;
     }
