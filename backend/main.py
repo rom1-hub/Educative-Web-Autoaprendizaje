@@ -176,6 +176,13 @@ def impersonal_verb_catalog() -> dict[str, dict]:
         if marker_index < 0:
             raise ValueError("No se encontró el catálogo complementario de verbos impersonales.")
         payload = source[marker_index + len(marker):].lstrip()
+        # El archivo es JavaScript, no JSON puro: algunas claves de nivel superior
+        # no están entre comillas. Normalizarlas antes de decodificar el objeto.
+        payload = re.sub(
+            r'(?m)([{,]\\s*)([A-Za-z_$][A-Za-z0-9_$]*)\\s*:',
+            r'\\1"\\2":',
+            payload,
+        )
         catalog, _ = json.JSONDecoder().raw_decode(payload)
         if not isinstance(catalog, dict):
             raise ValueError("El catálogo complementario no contiene un objeto.")
