@@ -1135,11 +1135,30 @@ def generate_practice(request: GenerateRequest) -> dict:
             available_verbs = [verb for verb in available_verbs if verb not in second_group_pronominal_verbs()]
         if not available_verbs:
             raise HTTPException(422, "No hay verbos compatibles con esta familia y construcción en el catálogo.")
-        # Evitar repetir infinitivos recientes cuando haya suficientes candidatos.
-        recent = set(RECENT_CATEGORY_VERBS)
-        fresh_verbs = [verb for verb in available_verbs if verb not in recent]
-        pool = fresh_verbs if len(fresh_verbs) >= min(20, len(available_verbs)) else available_verbs
-        selected_verbs = random.sample(pool, k=20) if len(pool) >= 20 else random.choices(pool, k=20)
+        # En el segundo grupo, la opción mixta conserva la proporción acordada:
+        # 12 preguntas no pronominales (60 %) y 8 pronominales (40 %).
+        selected_verbs = None
+        if family == "deuxieme-groupe" and not request.construction and not request.auxiliary:
+            pronominal_set = set(second_group_pronominal_verbs())
+            pronominal_pool = [verb for verb in available_verbs if verb in pronominal_set]
+            non_pronominal_pool = [verb for verb in available_verbs if verb not in pronominal_set]
+            recent = set(RECENT_CATEGORY_VERBS)
+            fresh_pronominal = [verb for verb in pronominal_pool if verb not in recent]
+            fresh_non_pronominal = [verb for verb in non_pronominal_pool if verb not in recent]
+            if len(fresh_pronominal) >= 8:
+                pronominal_pool = fresh_pronominal
+            if len(fresh_non_pronominal) >= 12:
+                non_pronominal_pool = fresh_non_pronominal
+            if len(pronominal_pool) >= 8 and len(non_pronominal_pool) >= 12:
+                selected_verbs = random.sample(non_pronominal_pool, k=12) + random.sample(pronominal_pool, k=8)
+                random.shuffle(selected_verbs)
+
+        if selected_verbs is None:
+            # Evitar repetir infinitivos recientes cuando haya suficientes candidatos.
+            recent = set(RECENT_CATEGORY_VERBS)
+            fresh_verbs = [verb for verb in available_verbs if verb not in recent]
+            pool = fresh_verbs if len(fresh_verbs) >= min(20, len(available_verbs)) else available_verbs
+            selected_verbs = random.sample(pool, k=20) if len(pool) >= 20 else random.choices(pool, k=20)
         RECENT_CATEGORY_VERBS.extend(selected_verbs)
         del RECENT_CATEGORY_VERBS[:-RECENT_CATEGORY_VERBS_LIMIT]
         questions = []
