@@ -972,6 +972,15 @@ def second_group_forms(verb: str, tense: str) -> list[dict[str, str]]:
             return participle + "s"
         return participle
 
+    def canonical_form(value) -> str:
+        # Algunas entradas canónicas guardan cada forma como [sujeto, conjugación].
+        # La práctica pide escribir únicamente la forma conjugada, sin repetir el sujeto.
+        if isinstance(value, (list, tuple)):
+            if not value:
+                raise HTTPException(500, "Hay una forma verbal canónica vacía.")
+            value = value[-1]
+        return str(value)
+
     if tense in (
         "present", "imparfait", "passe-simple", "futur-simple",
         "conditionnel-present", "subjonctif-present", "subjonctif-imparfait",
@@ -990,7 +999,7 @@ def second_group_forms(verb: str, tense: str) -> list[dict[str, str]]:
         indices = [2] if impersonal else range(len(person_rows))
         for index in indices:
             person, _ = person_rows[index]
-            form = reflexive_prefix(stored[person_indexes[index]], index)
+            form = reflexive_prefix(canonical_form(stored[person_indexes[index]]), index)
             rows.append({
                 "person": subjunctive_labels[person] if tense.startswith("subjonctif-") else person,
                 "form": form, "verb": display_lemma, "tense": tense,
@@ -1000,7 +1009,8 @@ def second_group_forms(verb: str, tense: str) -> list[dict[str, str]]:
     if tense == "imperatif-present":
         stored = entry["formes"]["impératif présent"]
         rows = []
-        for (person, _), form in zip(IMPERATIVE_PERSONS, stored):
+        for (person, _), raw_form in zip(IMPERATIVE_PERSONS, stored):
+            form = canonical_form(raw_form)
             if is_pronominal:
                 suffix = {"tu*": "-toi", "nous*": "-nous", "vous*": "-vous"}[person]
                 form += suffix
