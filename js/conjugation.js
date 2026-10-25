@@ -499,6 +499,7 @@
       for (const [key, record] of records) {
         const label = record?.infinitif || record?.infinitive || record?.lemma ||
           record?.verb || record?.verbe || record?.forme || key.replace(/-/g, " ");
+        if (defaultType !== "pronominal" && normalizeInfinitive(label) === "évanouir") continue;
         add(label, defaultType);
       }
     };
@@ -738,6 +739,9 @@
     let raw = document.getElementById("lookup-verb").value.trim();
     const tense = document.getElementById("lookup-tense").value;
     if (!raw) return showLookupMessage("Escribe un verbo francés para realizar la búsqueda.", true);
+    if (normalizeInfinitive(raw) === "évanouir") {
+      return showLookupMessage("La forma no pronominal «évanouir» no está disponible. Busca «s'évanouir».", true);
+    }
     const canonical = findCanonicalSuggestion(raw);
     if (canonical) {
       raw = canonical.label;

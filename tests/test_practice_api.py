@@ -11,6 +11,70 @@ from backend.main import (
 )
 
 
+class EvanouirIndividualPracticeTests(unittest.TestCase):
+    def test_s_evanouir_has_canonical_forms_across_all_sixteen_tenses(self):
+        from backend.main import evanouir_forms, TENSE_LABELS
+
+        expected = {
+            "present": ("m'évanouis", "s'évanouit", "nous évanouissons"),
+            "imparfait": ("m'évanouissais", "s'évanouissait", "nous évanouissions"),
+            "passe-simple": ("m'évanouis", "s'évanouit", "nous évanouîmes"),
+            "futur-simple": ("m'évanouirai", "s'évanouira", "nous évanouirons"),
+            "conditionnel-present": ("m'évanouirais", "s'évanouirait", "nous évanouirions"),
+            "subjonctif-present": ("m'évanouisse", "s'évanouisse", "nous évanouissions"),
+            "subjonctif-imparfait": ("m'évanouisse", "s'évanouît", "nous évanouissions"),
+            "passe-compose": ("me suis évanoui", "s'est évanoui", "nous sommes évanouis"),
+            "plus-que-parfait": ("m'étais évanoui", "s'était évanoui", "nous étions évanouis"),
+            "passe-anterieur": ("me fus évanoui", "se fut évanoui", "nous fûmes évanouis"),
+            "futur-anterieur": ("me serai évanoui", "se sera évanoui", "nous serons évanouis"),
+            "conditionnel-passe": ("me serais évanoui", "se serait évanoui", "nous serions évanouis"),
+            "subjonctif-passe": ("me sois évanoui", "se soit évanoui", "nous soyons évanouis"),
+            "subjonctif-plus-que-parfait": ("me fusse évanoui", "se fût évanoui", "nous fussions évanouis"),
+            "imperatif-present": ("évanouis-toi", "évanouissons-nous", "évanouissez-vous"),
+            "imperatif-passe": ("sois-toi évanoui", "soyons-nous évanouis", "soyez-vous évanouis"),
+        }
+        self.assertEqual(set(expected), set(TENSE_LABELS))
+        for tense, expected_forms in expected.items():
+            with self.subTest(tense=tense):
+                forms = evanouir_forms(tense)
+                self.assertTrue(forms)
+                self.assertEqual(forms[0]["form"], expected_forms[0])
+                if tense.startswith("subjonctif-"):
+                    self.assertEqual(forms[2]["form"], expected_forms[1])
+                    self.assertEqual(forms[5]["form"], expected_forms[2])
+                elif tense.startswith("imperatif-"):
+                    self.assertEqual(forms[1]["form"], expected_forms[1])
+                    self.assertEqual(forms[2]["form"], expected_forms[2])
+                else:
+                    self.assertEqual(forms[2]["form"], expected_forms[1])
+                    self.assertEqual(forms[5]["form"], expected_forms[2])
+
+    def test_s_evanouir_generates_twenty_individual_questions_in_every_tense(self):
+        from backend.main import COMPOUND_TENSES, SESSIONS, TENSE_LABELS
+
+        for tense in TENSE_LABELS:
+            with self.subTest(tense=tense):
+                result = generate_practice(GenerateRequest(
+                    verb="s'évanouir",
+                    tense=tense,
+                    family="deuxieme-groupe",
+                    construction="pronominal",
+                    auxiliary="etre" if tense in COMPOUND_TENSES else "",
+                ))
+                self.assertEqual(result["total"], 20)
+                self.assertEqual(len(result["questions"]), 20)
+                self.assertEqual({q["verb"] for q in result["questions"]}, {"s'évanouir"})
+                stored = SESSIONS[result["session_id"]]
+                self.assertTrue(all(item["answer"] for item in stored))
+                self.assertTrue(all(any(stem in item["answer"] for stem in ("évanoui", "évanouî")) for item in stored))
+
+    def test_non_pronominal_evanouir_is_rejected_for_individual_practice(self):
+        with self.assertRaises(HTTPException) as error:
+            generate_practice(GenerateRequest(verb="évanouir", tense="present"))
+        self.assertEqual(error.exception.status_code, 422)
+        self.assertIn("s'évanouir", str(error.exception.detail))
+
+
 class RegularFirstGroupPresentTests(unittest.TestCase):
     def test_parler_present_forms(self):
         forms = regular_er_present("parler")
