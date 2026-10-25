@@ -750,5 +750,74 @@ class EtrePriorityCompoundTests(unittest.TestCase):
         self.assertTrue(generated_verbs.issubset(available_priority_verbs))
 
 
+class SecondGroupIntegrationTests(unittest.TestCase):
+    def test_catalog_exposes_second_group_and_pronominal_candidates(self):
+        from backend.main import second_group_verbs, second_group_pronominal_verbs
+        verbs = set(second_group_verbs())
+        pronominal = set(second_group_pronominal_verbs())
+        self.assertGreaterEqual(len(verbs), 300)
+        self.assertTrue({"finir", "choisir", "agir", "évanouir"}.issubset(verbs))
+        self.assertTrue({
+            "s'accroupir", "se blottir", "s'enorgueillir",
+            "se pourrir", "se tapir", "s'ébaubir", "s'évanouir", "s'agir",
+        }.issubset(pronominal))
+
+    def test_second_group_present_and_compound_forms(self):
+        from backend.main import SESSIONS
+        session = generate_practice(GenerateRequest(verb="finir", family="deuxieme-groupe", tense="present"))
+        answers = {row["person"]: row["answer"] for row in SESSIONS[session["session_id"]]}
+        self.assertEqual(answers["je"], "finis")
+        self.assertEqual(answers["nous"], "finissons")
+
+        session = generate_practice(GenerateRequest(verb="finir", family="deuxieme-groupe", tense="passe-compose"))
+        answers = {row["person"]: row["answer"] for row in SESSIONS[session["session_id"]]}
+        self.assertEqual(answers["je"], "ai fini")
+        self.assertEqual(answers["nous"], "avons fini")
+
+        session = generate_practice(GenerateRequest(verb="accroupir", family="deuxieme-groupe", tense="passe-compose"))
+        answers = {row["person"]: row["answer"] for row in SESSIONS[session["session_id"]]}
+        self.assertEqual(answers["je"], "ai accroupi")
+
+    def test_pronominal_second_group_uses_etre_and_agreement(self):
+        from backend.main import SESSIONS
+        session = generate_practice(GenerateRequest(verb="s'évanouir", tense="passe-compose"))
+        answers = {row["person"]: row["answer"] for row in SESSIONS[session["session_id"]]}
+        self.assertEqual(answers["je"], "me suis évanoui")
+        self.assertEqual(answers["elle"], "s'est évanouie")
+        self.assertEqual(answers["nous"], "nous sommes évanouis")
+
+    def test_all_sixteen_tenses_for_second_group(self):
+        from backend.main import TENSE_LABELS
+        for verb in ("finir", "s'évanouir"):
+            for tense in TENSE_LABELS:
+                with self.subTest(verb=verb, tense=tense):
+                    result = generate_practice(GenerateRequest(verb=verb, family="deuxieme-groupe", tense=tense))
+                    self.assertEqual(result["total"], 20)
+                    self.assertEqual({q["tense"] for q in result["questions"]}, {tense})
+
+    def test_random_second_group_uses_distinct_non_pronominal_verbs(self):
+        from backend.main import SESSIONS, second_group_verbs
+        available = set(second_group_verbs())
+        result = generate_practice(GenerateRequest(family="deuxieme-groupe", tense="present", construction="non-pronominal"))
+        verbs = [q["verb"] for q in result["questions"]]
+        self.assertEqual(len(verbs), 20)
+        self.assertEqual(len(set(verbs)), 20)
+        self.assertTrue(set(verbs).issubset(available))
+        self.assertEqual(len(SESSIONS[result["session_id"]]), 20)
+
+    def test_second_group_auxiliary_filter_is_enforced(self):
+        with self.assertRaises(HTTPException):
+            generate_practice(GenerateRequest(verb="finir", family="deuxieme-groupe", tense="passe-compose", auxiliary="etre"))
+        with self.assertRaises(HTTPException):
+            generate_practice(GenerateRequest(verb="s'évanouir", family="deuxieme-groupe", tense="passe-compose", auxiliary="avoir"))
+
+    def test_impersonal_pronominal_verb_keeps_only_il(self):
+        from backend.main import SESSIONS
+        result = generate_practice(GenerateRequest(verb="s'agir", family="deuxieme-groupe", tense="present"))
+        questions = SESSIONS[result["session_id"]]
+        self.assertEqual({row["person"] for row in questions}, {"il"})
+        self.assertEqual({row["answer"] for row in questions}, {"s'agit"})
+
+
 if __name__ == "__main__":
     unittest.main()
