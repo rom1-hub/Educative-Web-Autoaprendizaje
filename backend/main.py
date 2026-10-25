@@ -166,6 +166,73 @@ def cer_family_verbs() -> tuple[str, ...]:
 
 
 @functools.lru_cache(maxsize=1)
+def impersonal_verb_catalog() -> dict[str, dict]:
+    """Load complementary metadata for impersonal and defective verbs."""
+    path = ROOT / "data" / "verbs" / "impersonal-database.js"
+    try:
+        source = path.read_text(encoding="utf-8")
+        marker = "window.COQ_IMPERSONAL_VERBS || {},"
+        marker_index = source.find(marker)
+        if marker_index < 0:
+            raise ValueError("No se encontró el catálogo complementario de verbos impersonales.")
+        payload = source[marker_index + len(marker):].lstrip()
+        catalog, _ = json.JSONDecoder().raw_decode(payload)
+        if not isinstance(catalog, dict):
+            raise ValueError("El catálogo complementario no contiene un objeto.")
+        return {
+            normalize(entry.get("infinitif") or key): entry
+            for key, entry in catalog.items()
+            if isinstance(entry, dict)
+        }
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        raise HTTPException(
+            500, "No se pudo cargar el catálogo complementario de verbos impersonales."
+        ) from exc
+
+
+def impersonal_er_forms(verb: str, tense: str) -> list[dict[str, str]]:
+    """Build a single valid practice prompt for a supported impersonal -ER verb."""
+    display_lemma = normalize(verb)
+    record = impersonal_verb_catalog().get(display_lemma)
+    if not record or record.get("impersonal") is not True:
+        raise HTTPException(422, "El verbo no está registrado como impersonal.")
+    if tense in ("imperatif-present", "imperatif-passe"):
+        raise HTTPException(422, "Los verbos impersonales no admiten imperativo.")
+
+    simple_keys = {
+        "present": "présent de l'indicatif",
+        "imparfait": "imparfait",
+        "passe-simple": "passé simple",
+        "futur-simple": "futur simple",
+        "conditionnel-present": "conditionnel présent",
+        "subjonctif-present": "subjonctif présent",
+        "subjonctif-imparfait": "subjonctif imparfait",
+    }
+    if tense in simple_keys:
+        values = record.get("formes", {}).get(simple_keys[tense])
+        if not isinstance(values, list) or len(values) < 3 or not values[2]:
+            raise HTTPException(422, "No hay una forma canónica disponible para este verbo y tiempo verbal.")
+        person = "qu'il" if tense.startswith("subjonctif-") else "il"
+        form = str(values[2])
+    elif tense in COMPOUND_TENSES:
+        # Reutilizar el auxiliar generado por el motor y el participio canónico.
+        auxiliary_rows = regular_er_forms("parler", tense)
+        auxiliary_row = next(
+            (row for row in auxiliary_rows if row["person"] in ("il", "qu'il")),
+            None,
+        )
+        participle = str(record.get("participePasse") or "").strip()
+        if not auxiliary_row or not participle or " " not in auxiliary_row["form"]:
+            raise HTTPException(422, "No hay una forma compuesta canónica disponible para este verbo y tiempo verbal.")
+        form = auxiliary_row["form"].rsplit(" ", 1)[0] + " " + participle
+        person = auxiliary_row["person"]
+    else:
+        raise HTTPException(422, "Este tiempo verbal no está implementado para el verbo impersonal.")
+
+    return [{"person": person, "form": form, "verb": display_lemma, "tense": tense}]
+
+
+@functools.lru_cache(maxsize=1)
 def regular_first_group_verbs() -> tuple[str, ...]:
     """
     Read the canonical frontend catalog and keep only explicitly tagged,
@@ -206,6 +273,10 @@ def regular_first_group_verbs() -> tuple[str, ...]:
             continue
         candidates.append(display_lemma)
 
+    # Neiger est un verbe impersonnel du premier groupe, fourni par le catalogue complémentaire.
+    neiger = impersonal_verb_catalog().get("neiger")
+    if neiger and neiger.get("impersonal") is True and str(neiger.get("groupe")) == "1":
+        candidates.append("neiger")
     return tuple(sorted(set(candidates)))
 
 
@@ -1114,6 +1185,11 @@ def generate_practice(request: GenerateRequest) -> dict:
     if request.auxiliary not in ("", "avoir", "etre"):
         raise HTTPException(422, "Selecciona un auxiliar válido.")
     category_mode = family in ("premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe") and not request.verb.strip()
+    if selected_verb == "neiger" and not category_mode:
+        raise HTTPException(
+            422,
+            "«neiger» es un verbo impersonal y no admite una práctica individual de 20 preguntas. Puede aparecer en «Todos los verbos del primer grupo» en los tiempos compatibles.",
+        )
     if request.tense in COMPOUND_TENSES and request.auxiliary == "etre":
         selected_verb = normalize(request.verb)
         is_pronominal_verb = selected_verb.startswith(("se ", "s'"))
@@ -1150,6 +1226,12 @@ def generate_practice(request: GenerateRequest) -> dict:
             available_verbs = [
                 verb for verb in available_verbs
                 if not pronominal_catalog.get(verb, {}).get("impersonal")
+            ]
+        if request.tense in ("imperatif-present", "imperatif-passe"):
+            impersonal_catalog = impersonal_verb_catalog()
+            available_verbs = [
+                verb for verb in available_verbs
+                if not impersonal_catalog.get(verb, {}).get("impersonal")
             ]
         if not available_verbs:
             raise HTTPException(422, "No hay verbos compatibles con esta familia y construcción en el catálogo.")
@@ -1198,7 +1280,12 @@ def generate_practice(request: GenerateRequest) -> dict:
         del RECENT_CATEGORY_VERBS[:-RECENT_CATEGORY_VERBS_LIMIT]
         questions = []
         for verb in selected_verbs:
-            forms = second_group_forms(verb, request.tense) if family == "deuxieme-groupe" else regular_er_forms(verb, request.tense, family)
+            if family == "deuxieme-groupe":
+                forms = second_group_forms(verb, request.tense)
+            elif impersonal_verb_catalog().get(verb, {}).get("impersonal"):
+                forms = impersonal_er_forms(verb, request.tense)
+            else:
+                forms = regular_er_forms(verb, request.tense, family)
             forms = expand_practice_etre_subject_variants(forms, verb, request.tense)
             form = random.choice(forms)
             questions.append({
