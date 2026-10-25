@@ -783,7 +783,7 @@ class SecondGroupIntegrationTests(unittest.TestCase):
         session = generate_practice(GenerateRequest(verb="s'évanouir", tense="passe-compose"))
         answers = {row["person"]: row["answer"] for row in SESSIONS[session["session_id"]]}
         self.assertIn("me suis évanoui", answers.values())
-        self.assertIn("m'évanouie", answers.values())
+        self.assertIn("me suis évanouie", answers.values())
         self.assertIn("s'est évanouie", answers.values())
         self.assertTrue(any(answer.startswith("nous sommes évanouis") for answer in answers.values()))
 
