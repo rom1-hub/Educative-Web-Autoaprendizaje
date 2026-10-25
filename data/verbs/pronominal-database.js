@@ -974,6 +974,60 @@ window.COQ_PRONOMINAL_VERBS = {
     "sujetsAutorises": ["il"],
     "gerondifDisponible": false,
     "actif": true
+  },
+"se-accroupir": {
+    "infinitif": "s'accroupir",
+    "infinitifBase": "accroupir",
+    "formeNonPronominale": "accroupir",
+    "participePasse": "accroupi",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-blottir": {
+    "infinitif": "se blottir",
+    "infinitifBase": "blottir",
+    "formeNonPronominale": "blottir",
+    "participePasse": "blotti",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-enorgueillir": {
+    "infinitif": "s'enorgueillir",
+    "infinitifBase": "enorgueillir",
+    "formeNonPronominale": "enorgueillir",
+    "participePasse": "enorgueilli",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-pourrir": {
+    "infinitif": "se pourrir",
+    "infinitifBase": "pourrir",
+    "formeNonPronominale": "pourrir",
+    "participePasse": "pourri",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-tapir": {
+    "infinitif": "se tapir",
+    "infinitifBase": "tapir",
+    "formeNonPronominale": "tapir",
+    "participePasse": "tapi",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-ebaubir": {
+    "infinitif": "s'ébaubir",
+    "infinitifBase": "ébaubir",
+    "formeNonPronominale": "ébaubir",
+    "participePasse": "ébaubi",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
   }
 };
 
