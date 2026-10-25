@@ -796,6 +796,18 @@ class SecondGroupIntegrationTests(unittest.TestCase):
                     self.assertEqual(result["total"], 20)
                     self.assertEqual({q["tense"] for q in result["questions"]}, {tense})
 
+
+
+    def test_mixed_second_group_practice_uses_sixty_forty_ratio(self):
+        from backend.main import second_group_pronominal_verbs
+        result = generate_practice(GenerateRequest(family="deuxieme-groupe", tense="present"))
+        verbs = [question["verb"] for question in result["questions"]]
+        pronominal = set(second_group_pronominal_verbs())
+        self.assertEqual(len(verbs), 20)
+        self.assertEqual(len(set(verbs)), 20)
+        self.assertEqual(sum(verb in pronominal for verb in verbs), 8)
+        self.assertEqual(sum(verb not in pronominal for verb in verbs), 12)
+
     def test_random_second_group_uses_distinct_non_pronominal_verbs(self):
         from backend.main import SESSIONS, second_group_verbs
         available = set(second_group_verbs())
