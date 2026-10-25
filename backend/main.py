@@ -1115,9 +1115,11 @@ def generate_practice(request: GenerateRequest) -> dict:
         # Una pregunta por verbo: 20 infinitivos distintos elegidos al azar.
         # Cada categoría usa exclusivamente los verbos admitidos por el catálogo.
         available_verbs = list({"ger": ger_family_verbs, "cer": cer_family_verbs, "eler": eler_family_verbs, "eter": eter_family_verbs, "yer": yer_family_verbs, "e-accent": lambda: tuple(sorted(e_accent_family_patterns())), "deuxieme-groupe": lambda: second_group_verbs() + second_group_pronominal_verbs()}.get(family, lambda: regular_first_group_verbs())())
-        pronomial_verbs = set(pronominal_first_group_verbs())
-        if family == "deuxieme-groupe":
-            pronomial_verbs.update(second_group_pronominal_verbs())
+        pronomial_verbs = (
+            set(second_group_pronominal_verbs())
+            if family == "deuxieme-groupe"
+            else set(pronominal_first_group_verbs())
+        )
         if request.construction == "pronominal":
             available_verbs = [verb for verb in available_verbs if verb in pronomial_verbs]
         elif request.construction in ("non-pronomial", "non-pronominal"):
