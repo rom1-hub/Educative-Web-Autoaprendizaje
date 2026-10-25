@@ -806,6 +806,25 @@ class SecondGroupIntegrationTests(unittest.TestCase):
         self.assertTrue(set(verbs).issubset(available))
         self.assertEqual(len(SESSIONS[result["session_id"]]), 20)
 
+
+
+    def test_all_added_pronominal_variants_have_compound_forms(self):
+        from backend.main import second_group_forms
+        expected = {
+            "s'accroupir": "accroupi",
+            "se blottir": "blotti",
+            "s'enorgueillir": "enorgueilli",
+            "se pourrir": "pourri",
+            "se tapir": "tapi",
+            "s'ébaubir": "ébaubi",
+        }
+        for verb, participle in expected.items():
+            with self.subTest(verb=verb):
+                forms = second_group_forms(verb, "passe-compose")
+                self.assertEqual(len(forms), 9)
+                self.assertTrue(all(row["form"].endswith(participle) for row in forms))
+                self.assertTrue(all("suis" in row["form"] or "es " in row["form"] or "est " in row["form"] or "sommes" in row["form"] or "êtes" in row["form"] or "sont" in row["form"] for row in forms))
+
     def test_second_group_auxiliary_filter_is_enforced(self):
         with self.assertRaises(HTTPException):
             generate_practice(GenerateRequest(verb="finir", family="deuxieme-groupe", tense="passe-compose", auxiliary="etre"))
