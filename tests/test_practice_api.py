@@ -843,12 +843,50 @@ class SecondGroupIntegrationTests(unittest.TestCase):
         with self.assertRaises(HTTPException):
             generate_practice(GenerateRequest(verb="s'évanouir", family="deuxieme-groupe", tense="passe-compose", auxiliary="avoir"))
 
-    def test_impersonal_pronominal_verb_keeps_only_il(self):
-        from backend.main import SESSIONS
-        result = generate_practice(GenerateRequest(verb="s'agir", family="deuxieme-groupe", tense="present"))
+    def test_impersonal_pronominal_verb_is_rejected_for_individual_practice(self):
+        for tense in ("present", "passe-compose", "imperatif-present", "imperatif-passe"):
+            with self.subTest(tense=tense), self.assertRaises(HTTPException) as context:
+                generate_practice(GenerateRequest(
+                    verb="s'agir", family="deuxieme-groupe", tense=tense
+                ))
+            self.assertEqual(context.exception.status_code, 422)
+            self.assertIn("práctica individual", str(context.exception.detail))
+
+    def test_impersonal_verb_remains_available_in_random_second_group_practice(self):
+        from unittest.mock import patch
+        from backend.main import SESSIONS, second_group_pronominal_verbs
+
+        self.assertIn("s'agir", second_group_pronominal_verbs())
+
+        def sample_including_s_agir(population, k):
+            population = list(population)
+            if "s'agir" in population:
+                return ["s'agir"] + [verb for verb in population if verb != "s'agir"][:k - 1]
+            return population[:k]
+
+        with patch("backend.main.random.sample", side_effect=sample_including_s_agir):
+            result = generate_practice(GenerateRequest(
+                family="deuxieme-groupe", tense="present"
+            ))
+
         questions = SESSIONS[result["session_id"]]
-        self.assertEqual({row["person"] for row in questions}, {"il"})
-        self.assertEqual({row["answer"] for row in questions}, {"s'agit"})
+        agir_questions = [row for row in questions if row["verb"] == "s'agir"]
+        self.assertEqual(len(agir_questions), 1)
+        self.assertEqual(agir_questions[0]["person"], "il")
+        self.assertEqual(agir_questions[0]["answer"], "s'agit")
+
+    def test_impersonal_verb_is_filtered_from_random_imperative_practice(self):
+        from backend.main import SESSIONS
+
+        for tense in ("imperatif-present", "imperatif-passe"):
+            with self.subTest(tense=tense):
+                result = generate_practice(GenerateRequest(
+                    family="deuxieme-groupe", tense=tense
+                ))
+                questions = SESSIONS[result["session_id"]]
+                self.assertEqual(len(questions), 20)
+                self.assertNotIn("s'agir", {row["verb"] for row in questions})
+                self.assertEqual(len({row["verb"] for row in questions}), 20)
 
 
 if __name__ == "__main__":
