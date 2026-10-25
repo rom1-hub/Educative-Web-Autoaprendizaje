@@ -889,5 +889,79 @@ class SecondGroupIntegrationTests(unittest.TestCase):
                 self.assertEqual(len({row["verb"] for row in questions}), 20)
 
 
+    def test_neiger_is_rejected_for_individual_practice_in_every_tense(self):
+        from backend.main import TENSE_LABELS
+
+        for tense in TENSE_LABELS:
+            with self.subTest(tense=tense), self.assertRaises(HTTPException) as context:
+                generate_practice(GenerateRequest(verb="neiger", tense=tense))
+            self.assertEqual(context.exception.status_code, 422)
+            self.assertIn("verbo impersonal", str(context.exception.detail))
+            self.assertIn("práctica individual", str(context.exception.detail))
+
+    def test_neiger_impersonal_forms_use_only_il_and_canonical_participle(self):
+        from backend.main import impersonal_er_forms, regular_first_group_verbs
+
+        self.assertIn("neiger", regular_first_group_verbs())
+        cases = {
+            "present": ("il", "neige"),
+            "imparfait": ("il", "neigeait"),
+            "passe-simple": ("il", "neigea"),
+            "futur-simple": ("il", "neigera"),
+            "conditionnel-present": ("il", "neigerait"),
+            "subjonctif-present": ("qu'il", "neige"),
+            "subjonctif-imparfait": ("qu'il", "neigeât"),
+            "passe-compose": ("il", "a neigé"),
+            "plus-que-parfait": ("il", "avait neigé"),
+            "passe-anterieur": ("il", "eut neigé"),
+            "futur-anterieur": ("il", "aura neigé"),
+            "conditionnel-passe": ("il", "aurait neigé"),
+            "subjonctif-passe": ("qu'il", "ait neigé"),
+            "subjonctif-plus-que-parfait": ("qu'il", "eût neigé"),
+        }
+        for tense, expected in cases.items():
+            with self.subTest(tense=tense):
+                forms = impersonal_er_forms("neiger", tense)
+                self.assertEqual(len(forms), 1)
+                self.assertEqual((forms[0]["person"], forms[0]["form"]), expected)
+
+        for tense in ("imperatif-present", "imperatif-passe"):
+            with self.subTest(tense=tense), self.assertRaises(HTTPException):
+                impersonal_er_forms("neiger", tense)
+
+    def test_neiger_can_appear_once_in_random_first_group_practice(self):
+        from unittest.mock import patch
+        from backend.main import SESSIONS
+
+        def sample_including_neiger(population, k):
+            population = list(population)
+            if "neiger" in population:
+                return ["neiger"] + [verb for verb in population if verb != "neiger"][:k - 1]
+            return population[:k]
+
+        with patch("backend.main.random.sample", side_effect=sample_including_neiger):
+            result = generate_practice(GenerateRequest(
+                family="premier-groupe-reguliers", tense="present"
+            ))
+
+        questions = SESSIONS[result["session_id"]]
+        neiger_questions = [row for row in questions if row["verb"] == "neiger"]
+        self.assertEqual(len(neiger_questions), 1)
+        self.assertEqual(neiger_questions[0]["person"], "il")
+        self.assertEqual(neiger_questions[0]["answer"], "neige")
+
+    def test_neiger_is_excluded_from_random_first_group_imperative_practice(self):
+        from backend.main import SESSIONS
+
+        for tense in ("imperatif-present", "imperatif-passe"):
+            with self.subTest(tense=tense):
+                result = generate_practice(GenerateRequest(
+                    family="premier-groupe-reguliers", tense=tense
+                ))
+                questions = SESSIONS[result["session_id"]]
+                self.assertEqual(len(questions), 20)
+                self.assertNotIn("neiger", {row["verb"] for row in questions})
+
+
 if __name__ == "__main__":
     unittest.main()
