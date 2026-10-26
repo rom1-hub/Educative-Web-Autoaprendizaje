@@ -2575,6 +2575,12 @@ def third_group_ttre_forms(verb: str, tense: str, auxiliary: str = "") -> list[d
             if form_index >= len(stored):
                 raise HTTPException(422, "El catálogo no contiene todas las formas necesarias para este tiempo verbal.")
             form = canonical_form(stored[form_index])
+            if not form and form_index == 2:
+                # En algunos registros -TTRE falta la tercera persona singular,
+                # aunque la primera persona está disponible (je bats -> il bat).
+                first_person_form = canonical_form(stored[0]) if stored else ""
+                if first_person_form.endswith("s"):
+                    form = first_person_form[:-1]
             if not form:
                 raise HTTPException(422, "El catálogo contiene una forma vacía para este verbo y tiempo verbal.")
             rows.append({
