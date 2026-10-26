@@ -1349,7 +1349,7 @@ def third_group_ir_forms(verb: str, tense: str, auxiliary: str = "") -> list[dic
 
 
 def third_group_aitre_forms(verb: str, tense: str, auxiliary: str = "") -> list[dict[str, str]]:
-    """Build practice forms for a validated third-group -IR verb from canonical data."""
+    """Build practice forms for a validated third-group -AÎTRE / -OÎTRE verb from canonical data."""
     display_lemma = normalize(verb)
     record = third_group_aitre_catalog().get(display_lemma)
     if record is None:
@@ -1754,7 +1754,7 @@ def generate_practice(request: GenerateRequest) -> dict:
     family = request.family
     selected_verb = normalize(request.verb)
     # Compatibilidad con perfiles individuales que envían la familia genérica del tercer grupo.
-    # Para verbos de esta familia, el perfil genérico se traduce a la familia específica -IR.
+    # Para verbos de esta familia, el perfil genérico se traduce a la familia específica -IR o -AÎTRE / -OÎTRE.
     if family == "troisieme-groupe" and selected_verb and is_third_group_aitre_verb(selected_verb):
         family = "aitre"
     if family == "troisieme-groupe" and selected_verb and is_third_group_ir_verb(selected_verb):
