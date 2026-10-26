@@ -118,15 +118,18 @@ class ThirdGroupIRIntegrationTests(unittest.TestCase):
 
 
 class ThirdGroupDreIntegrationTests(unittest.TestCase):
-    def test_inventory_includes_dre_verbs_and_pronominal_variants_but_excludes_oudre(self):
+    def test_inventory_includes_dre_subfamilies_and_pronominal_variants(self):
         from backend.main import third_group_dre_verbs, third_group_dre_pronominal_verbs
 
         verbs = set(third_group_dre_verbs())
         pronominal = set(third_group_dre_pronominal_verbs())
-        self.assertTrue({"prendre", "vendre", "attendre", "répondre", "rendre"}.issubset(verbs))
+        self.assertTrue({
+            "prendre", "vendre", "attendre", "répondre", "rendre",
+            "craindre", "joindre", "peindre", "coudre", "moudre", "résoudre",
+        }.issubset(verbs))
         self.assertIn("s'attendre", pronominal)
         self.assertNotIn("attendre", pronominal)
-        self.assertTrue(all(verb.endswith("dre") and not verb.endswith("oudre") for verb in verbs))
+        self.assertTrue(all(verb.endswith("dre") for verb in verbs))
 
     def test_individual_verbs_accept_generic_and_specific_family_profiles(self):
         from backend.main import SESSIONS
@@ -142,12 +145,13 @@ class ThirdGroupDreIntegrationTests(unittest.TestCase):
     def test_all_tenses_are_generated_from_canonical_forms(self):
         from backend.main import TENSE_LABELS, third_group_dre_forms
 
-        for tense in TENSE_LABELS:
-            with self.subTest(tense=tense):
-                forms = third_group_dre_forms("prendre", tense)
-                self.assertTrue(forms)
-                self.assertTrue(all(row["form"].strip() for row in forms))
-                self.assertTrue(all(row["tense"] == tense for row in forms))
+        for verb in ("prendre", "craindre", "joindre", "peindre", "coudre", "moudre", "résoudre"):
+            for tense in TENSE_LABELS:
+                with self.subTest(verb=verb, tense=tense):
+                    forms = third_group_dre_forms(verb, tense)
+                    self.assertTrue(forms)
+                    self.assertTrue(all(row["form"].strip() for row in forms))
+                    self.assertTrue(all(row["tense"] == tense for row in forms))
 
     def test_category_practice_has_twenty_questions_and_60_40_mix(self):
         from backend.main import SESSIONS, third_group_dre_pronominal_verbs
