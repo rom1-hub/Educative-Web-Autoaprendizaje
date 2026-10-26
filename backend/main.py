@@ -1130,6 +1130,26 @@ def third_group_ire_uire_catalog() -> dict[str, dict]:
             "base": base,
             "pronominal_record": record,
         }
+
+    # «Se plaire» no figura actualmente en el catálogo pronominal general.
+    # Añadirlo como variante pronominal explícita de plaire: el participio
+    # «plu» no concuerda con el sujeto en esta construcción indirecta.
+    plaire_record = bases.get("plaire")
+    if plaire_record is not None and "se plaire" not in bases:
+        entry = plaire_record["entry"]
+        bases["se plaire"] = {
+            "entry": entry,
+            "base": "plaire",
+            "pronominal_record": {
+                "infinitif": "se plaire",
+                "infinitifBase": "plaire",
+                "formeNonPronominale": "plaire",
+                "participePasse": entry.get("participePasse", "plu"),
+                "auxiliaire": "être",
+                "accordParticipePasse": "aucun",
+                "actif": True,
+            },
+        }
     return bases
 
 
