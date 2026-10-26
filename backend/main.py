@@ -2534,10 +2534,14 @@ def third_group_ttre_forms(verb: str, tense: str, auxiliary: str = "") -> list[d
     }
 
     def canonical_form(value) -> str:
+        # Algunos registros contienen variantes y una última entrada vacía.
+        # Elegir la última forma no vacía evita descartar una forma canónica válida.
         if isinstance(value, (list, tuple)):
-            if not value:
-                return ""
-            value = value[-1]
+            for candidate in reversed(value):
+                text_value = str(candidate or "").strip()
+                if text_value:
+                    return text_value
+            return ""
         return str(value or "").strip()
 
     def reflexive_prefix(form: str, index: int) -> str:
