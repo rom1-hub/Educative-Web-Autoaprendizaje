@@ -117,6 +117,60 @@ class ThirdGroupIRIntegrationTests(unittest.TestCase):
 
 
 
+class ThirdGroupDreIntegrationTests(unittest.TestCase):
+    def test_inventory_includes_dre_verbs_and_pronominal_variants_but_excludes_oudre(self):
+        from backend.main import third_group_dre_verbs, third_group_dre_pronominal_verbs
+
+        verbs = set(third_group_dre_verbs())
+        pronominal = set(third_group_dre_pronominal_verbs())
+        self.assertTrue({"prendre", "vendre", "attendre", "répondre", "rendre"}.issubset(verbs))
+        self.assertIn("s'attendre", pronominal)
+        self.assertNotIn("attendre", pronominal)
+        self.assertTrue(all(verb.endswith("dre") and not verb.endswith("oudre") for verb in verbs))
+
+    def test_individual_verbs_accept_generic_and_specific_family_profiles(self):
+        from backend.main import SESSIONS
+
+        for verb in ("prendre", "vendre"):
+            for family in ("troisieme-groupe", "dre"):
+                with self.subTest(verb=verb, family=family):
+                    result = generate_practice(GenerateRequest(verb=verb, family=family, tense="present"))
+                    self.assertEqual(result["total"], 20)
+                    self.assertTrue(all(question["verb"] == verb for question in result["questions"]))
+                    self.assertIn(result["session_id"], SESSIONS)
+
+    def test_all_tenses_are_generated_from_canonical_forms(self):
+        from backend.main import TENSE_LABELS, third_group_dre_forms
+
+        for tense in TENSE_LABELS:
+            with self.subTest(tense=tense):
+                forms = third_group_dre_forms("prendre", tense)
+                self.assertTrue(forms)
+                self.assertTrue(all(row["form"].strip() for row in forms))
+                self.assertTrue(all(row["tense"] == tense for row in forms))
+
+    def test_category_practice_has_twenty_questions_and_60_40_mix(self):
+        from backend.main import SESSIONS, third_group_dre_pronominal_verbs
+
+        result = generate_practice(GenerateRequest(family="dre", tense="present"))
+        self.assertEqual(result["total"], 20)
+        self.assertEqual(len(result["questions"]), 20)
+        stored = SESSIONS[result["session_id"]]
+        pronominal = set(third_group_dre_pronominal_verbs())
+        self.assertEqual(sum(row["verb"] in pronominal for row in stored), 8)
+        self.assertEqual(sum(row["verb"] not in pronominal for row in stored), 12)
+
+    def test_auxiliary_filters_respect_canonical_metadata(self):
+        from backend.main import third_group_dre_auxiliaries, third_group_dre_forms
+
+        self.assertIn("avoir", third_group_dre_auxiliaries("prendre"))
+        self.assertEqual(third_group_dre_auxiliaries("s'attendre"), ("etre",))
+        forms = third_group_dre_forms("s'attendre", "passe-compose", "etre")
+        self.assertTrue(forms)
+        with self.assertRaises(HTTPException):
+            third_group_dre_forms("prendre", "passe-compose", "etre")
+
+
 class ThirdGroupAitreIntegrationTests(unittest.TestCase):
     def test_inventory_includes_both_aitre_and_oitre_endings_and_pronominal_variants(self):
         from backend.main import third_group_aitre_verbs, third_group_aitre_pronominal_verbs
