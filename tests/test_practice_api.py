@@ -11,6 +11,87 @@ from backend.main import (
 )
 
 
+
+
+class ThirdGroupIRIntegrationTests(unittest.TestCase):
+    def test_inventory_includes_required_pronominal_ir_verbs_and_excludes_second_group(self):
+        from backend.main import third_group_ir_verbs, third_group_ir_pronominal_verbs
+
+        verbs = set(third_group_ir_verbs())
+        pronominal = set(third_group_ir_pronominal_verbs())
+        self.assertTrue({"s'endormir", "s'enfuir", "se sentir", "se servir", "se souvenir"}.issubset(pronominal))
+        self.assertTrue({"dormir", "fuir", "partir", "sortir", "venir", "mourir"}.issubset(verbs))
+        self.assertNotIn("fleurir", verbs)
+        self.assertNotIn("amuïr", verbs)
+        self.assertFalse(any(verb.endswith("oir") for verb in verbs))
+
+    def test_s_endormir_uses_base_forms_and_correct_pronominal_prefixes(self):
+        from backend.main import third_group_ir_forms
+
+        expected = {
+            "present": ("m'endors", "s'endort", "nous endormons"),
+            "imparfait": ("m'endormais", "s'endormait", "nous endormions"),
+            "passe-simple": ("m'endormis", "s'endormit", "nous endormîmes"),
+            "futur-simple": ("m'endormirai", "s'endormira", "nous endormirons"),
+            "passe-compose": ("me suis endormi", "s'est endormi", "nous sommes endormis"),
+        }
+        for tense, forms_expected in expected.items():
+            with self.subTest(tense=tense):
+                forms = third_group_ir_forms("s'endormir", tense)
+                self.assertEqual(forms[0]["form"], forms_expected[0])
+                self.assertEqual(forms[2]["form"], forms_expected[1])
+                self.assertEqual(forms[5]["form"], forms_expected[2])
+
+    def test_all_sixteen_tenses_are_generated_only_when_canonical_forms_exist(self):
+        from backend.main import TENSE_LABELS, third_group_ir_forms
+
+        for tense in TENSE_LABELS:
+            with self.subTest(tense=tense):
+                forms = third_group_ir_forms("dormir", tense)
+                self.assertTrue(forms)
+                self.assertTrue(all(form["form"].strip() for form in forms))
+                self.assertTrue(all(form["tense"] == tense for form in forms))
+
+    def test_family_practice_returns_twenty_questions_with_twelve_nonpronominal_and_eight_pronominal(self):
+        from backend.main import SESSIONS, third_group_ir_pronominal_verbs
+
+        result = generate_practice(GenerateRequest(family="ir", tense="present"))
+        self.assertEqual(result["total"], 20)
+        self.assertEqual(len(result["questions"]), 20)
+        answers = SESSIONS[result["session_id"]]
+        pronominal_set = set(third_group_ir_pronominal_verbs())
+        self.assertEqual(sum(item["verb"] in pronominal_set for item in answers), 8)
+        self.assertEqual(sum(item["verb"] not in pronominal_set for item in answers), 12)
+
+    def test_pronominal_and_auxiliary_filters_are_respected(self):
+        from backend.main import third_group_ir_pronominal_verbs
+
+        pronominal = generate_practice(GenerateRequest(
+            family="ir", construction="pronominal", tense="passe-compose", auxiliary="etre"
+        ))
+        self.assertEqual(pronominal["total"], 20)
+        self.assertTrue(all(q["verb"] in third_group_ir_pronominal_verbs() for q in pronominal["questions"]))
+
+        nonpronominal_etre = generate_practice(GenerateRequest(
+            verb="mourir", family="ir", tense="passe-compose", auxiliary="etre"
+        ))
+        self.assertEqual(nonpronominal_etre["total"], 20)
+        self.assertTrue(all(q["verb"] == "mourir" for q in nonpronominal_etre["questions"]))
+
+        with self.assertRaises(HTTPException):
+            generate_practice(GenerateRequest(
+                verb="s'endormir", family="ir", tense="passe-compose", auxiliary="avoir"
+            ))
+
+    def test_defective_verbs_are_excluded_from_compound_category_when_participle_is_missing(self):
+        from backend.main import third_group_ir_available_verbs
+
+        compound_candidates = set(third_group_ir_available_verbs("passe-compose"))
+        self.assertNotIn("gésir", compound_candidates)
+        self.assertNotIn("fuir", compound_candidates)
+        self.assertIn("fuir", set(third_group_ir_available_verbs("present")))
+
+
 class EvanouirIndividualPracticeTests(unittest.TestCase):
     def test_s_evanouir_uses_canonical_second_group_forms_in_all_sixteen_tenses(self):
         from backend.main import (
