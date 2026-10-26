@@ -2987,7 +2987,7 @@ def generate_practice(request: GenerateRequest) -> dict:
     if request.tense in COMPOUND_TENSES and request.auxiliary == "etre":
         selected_verb = normalize(request.verb)
         is_pronominal_verb = selected_verb.startswith(("se ", "s'"))
-        is_third_group_ir = family in ("ir", "aitre", "dre", "ire-uire") or (not family and selected_verb and (is_third_group_ir_verb(selected_verb) or is_third_group_aitre_verb(selected_verb) or is_third_group_dre_verb(selected_verb) or is_third_group_ire_uire_verb(selected_verb) or is_third_group_oir_oire_verb(selected_verb) or is_third_group_ttre_verb(selected_verb)))
+        is_third_group_ir = family in ("ir", "aitre", "dre", "ire-uire", "ttre") or (not family and selected_verb and (is_third_group_ir_verb(selected_verb) or is_third_group_aitre_verb(selected_verb) or is_third_group_dre_verb(selected_verb) or is_third_group_ire_uire_verb(selected_verb) or is_third_group_oir_oire_verb(selected_verb) or is_third_group_ttre_verb(selected_verb)))
         if selected_verb and selected_verb not in ETRE_PRIORITY_PARTICIPLES and not is_pronominal_verb and not is_third_group_ir:
             raise HTTPException(422, "Être solo está disponible para los verbos pronominales y los verbos configurados con prioridad de este auxiliar.")
         if not selected_verb and not category_mode:
