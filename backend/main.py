@@ -1466,6 +1466,10 @@ def generate_practice(request: GenerateRequest) -> dict:
         raise HTTPException(422, "Selecciona un tiempo verbal válido.")
     family = request.family
     selected_verb = normalize(request.verb)
+    # Compatibilidad con perfiles individuales que envían la familia genérica del tercer grupo.
+    # Para verbos de esta familia, el perfil genérico se traduce a la familia específica -IR.
+    if family == "troisieme-groupe" and selected_verb and is_third_group_ir_verb(selected_verb):
+        family = "ir"
     # Compatibilidad con clientes que aún clasifican estos infinitivos -ER como grupo 3.
     # Solo se normalizan alias de grupo; una familia ortográfica incompatible sigue rechazándose.
     if selected_verb in ETRE_PRIORITY_PARTICIPLES and family in ("premier-groupe", "premier-groupe-reguliers", "troisieme-groupe"):

@@ -25,6 +25,30 @@ class ThirdGroupIRIntegrationTests(unittest.TestCase):
         self.assertNotIn("amuïr", verbs)
         self.assertFalse(any(verb.endswith("oir") for verb in verbs))
 
+
+
+    def test_individual_third_group_ir_verbs_accept_generic_third_group_profile(self):
+        from backend.main import SESSIONS
+
+        for verb in ("dormir", "partir"):
+            with self.subTest(verb=verb):
+                result = generate_practice(GenerateRequest(
+                    verb=verb, family="troisieme-groupe", tense="present"
+                ))
+                self.assertEqual(result["total"], 20)
+                self.assertEqual(len(result["questions"]), 20)
+                self.assertTrue(all(question["verb"] == verb for question in result["questions"]))
+                self.assertIn(result["session_id"], SESSIONS)
+
+    def test_individual_third_group_ir_verbs_work_with_specific_family(self):
+        for verb in ("dormir", "partir"):
+            with self.subTest(verb=verb):
+                result = generate_practice(GenerateRequest(
+                    verb=verb, family="ir", tense="present"
+                ))
+                self.assertEqual(result["total"], 20)
+                self.assertTrue(all(question["verb"] == verb for question in result["questions"]))
+
     def test_s_endormir_uses_base_forms_and_correct_pronominal_prefixes(self):
         from backend.main import third_group_ir_forms
 
