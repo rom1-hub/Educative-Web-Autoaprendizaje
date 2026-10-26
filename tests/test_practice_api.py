@@ -1303,5 +1303,68 @@ class ThirdGroupIreUireIntegrationTests(unittest.TestCase):
         self.assertTrue(third_group_ire_uire_forms("se plaire", "passe-compose", "etre"))
 
 
+
+class ThirdGroupOirOireIntegrationTests(unittest.TestCase):
+    def test_inventory_includes_oir_oire_and_registered_pronominal_variants(self):
+        from backend.main import (
+            third_group_oir_oire_verbs, third_group_oir_oire_pronominal_verbs,
+        )
+        verbs = set(third_group_oir_oire_verbs())
+        pronominal = set(third_group_oir_oire_pronominal_verbs())
+        self.assertTrue({
+            "voir", "boire", "croire", "recevoir",
+            "pouvoir", "vouloir", "devoir", "savoir",
+        }.issubset(verbs))
+        self.assertTrue({"s'apercevoir", "s'asseoir"}.issubset(pronominal))
+        self.assertNotIn("lire", verbs)
+        self.assertNotIn("dire", verbs)
+        self.assertNotIn("conduire", verbs)
+
+    def test_individual_verbs_accept_generic_and_specific_family_profiles(self):
+        from backend.main import SESSIONS
+        for verb in ("voir", "s'asseoir"):
+            for family in ("troisieme-groupe", "oir-oire"):
+                with self.subTest(verb=verb, family=family):
+                    result = generate_practice(GenerateRequest(
+                        verb=verb, family=family, tense="present"
+                    ))
+                    self.assertEqual(result["total"], 20)
+                    self.assertTrue(all(q["verb"] == verb for q in result["questions"]))
+                    self.assertIn(result["session_id"], SESSIONS)
+
+    def test_canonical_forms_cover_all_tenses_for_voir_and_sasseoir(self):
+        from backend.main import TENSE_LABELS, third_group_oir_oire_forms
+        for verb in ("voir", "s'asseoir"):
+            for tense in TENSE_LABELS:
+                with self.subTest(verb=verb, tense=tense):
+                    forms = third_group_oir_oire_forms(verb, tense)
+                    self.assertTrue(forms)
+                    self.assertTrue(all(row["form"].strip() for row in forms))
+                    self.assertTrue(all(row["tense"] == tense for row in forms))
+
+    def test_category_practice_has_twenty_questions_and_60_40_mix(self):
+        from backend.main import SESSIONS, third_group_oir_oire_pronominal_verbs
+        result = generate_practice(GenerateRequest(family="oir-oire", tense="present"))
+        self.assertEqual(result["total"], 20)
+        stored = SESSIONS[result["session_id"]]
+        pronominal = set(third_group_oir_oire_pronominal_verbs())
+        self.assertEqual(sum(row["verb"] in pronominal for row in stored), 8)
+        self.assertEqual(sum(row["verb"] not in pronominal for row in stored), 12)
+
+    def test_auxiliary_filters_respect_canonical_metadata(self):
+        from backend.main import third_group_oir_oire_auxiliaries, third_group_oir_oire_forms
+        self.assertIn("avoir", third_group_oir_oire_auxiliaries("voir"))
+        self.assertEqual(third_group_oir_oire_auxiliaries("s'asseoir"), ("etre",))
+        with self.assertRaises(HTTPException):
+            third_group_oir_oire_forms("voir", "passe-compose", "etre")
+        self.assertTrue(third_group_oir_oire_forms("s'asseoir", "passe-compose", "etre"))
+
+    def test_family_rejects_verbs_outside_oir_oire(self):
+        from backend.main import third_group_oir_oire_forms
+        for verb in ("lire", "dire", "conduire"):
+            with self.subTest(verb=verb), self.assertRaises(HTTPException):
+                third_group_oir_oire_forms(verb, "present")
+
+
 if __name__ == "__main__":
     unittest.main()
