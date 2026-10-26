@@ -1402,6 +1402,9 @@ class ThirdGroupTtreIntegrationTests(unittest.TestCase):
                     self.assertTrue(forms)
                     self.assertTrue(all(row["form"].strip() for row in forms))
                     self.assertTrue(all(row["tense"] == tense for row in forms))
+                    if verb == "se battre" and tense == "present":
+                        third_person = next(row["form"] for row in forms if row["person"] == "il")
+                        self.assertEqual(third_person, "se bat")
 
     def test_category_practice_has_twenty_questions_and_60_40_mix(self):
         from backend.main import SESSIONS, third_group_ttre_pronominal_verbs
