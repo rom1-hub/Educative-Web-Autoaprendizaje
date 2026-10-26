@@ -1366,5 +1366,66 @@ class ThirdGroupOirOireIntegrationTests(unittest.TestCase):
                 third_group_oir_oire_forms(verb, "present")
 
 
+
+class ThirdGroupTtreIntegrationTests(unittest.TestCase):
+    def test_inventory_includes_ttre_verbs_and_pronominal_variants(self):
+        from backend.main import third_group_ttre_verbs, third_group_ttre_pronominal_verbs
+        verbs = set(third_group_ttre_verbs())
+        pronominal = set(third_group_ttre_pronominal_verbs())
+        self.assertTrue({
+            "mettre", "battre", "permettre", "promettre", "remettre",
+            "transmettre", "combattre", "admettre", "soumettre",
+        }.issubset(verbs))
+        self.assertTrue({"se battre", "se remettre"}.issubset(pronominal))
+        self.assertNotIn("vendre", verbs)
+        self.assertNotIn("lire", verbs)
+        self.assertTrue(all(verb.endswith("ttre") for verb in verbs))
+
+    def test_individual_verbs_accept_generic_and_specific_family_profiles(self):
+        from backend.main import SESSIONS
+        for verb in ("mettre", "se battre"):
+            for family in ("troisieme-groupe", "ttre"):
+                with self.subTest(verb=verb, family=family):
+                    result = generate_practice(GenerateRequest(
+                        verb=verb, family=family, tense="present"
+                    ))
+                    self.assertEqual(result["total"], 20)
+                    self.assertTrue(all(q["verb"] == verb for q in result["questions"]))
+                    self.assertIn(result["session_id"], SESSIONS)
+
+    def test_canonical_forms_cover_all_tenses_for_mettre_and_se_battre(self):
+        from backend.main import TENSE_LABELS, third_group_ttre_forms
+        for verb in ("mettre", "se battre"):
+            for tense in TENSE_LABELS:
+                with self.subTest(verb=verb, tense=tense):
+                    forms = third_group_ttre_forms(verb, tense)
+                    self.assertTrue(forms)
+                    self.assertTrue(all(row["form"].strip() for row in forms))
+                    self.assertTrue(all(row["tense"] == tense for row in forms))
+
+    def test_category_practice_has_twenty_questions_and_60_40_mix(self):
+        from backend.main import SESSIONS, third_group_ttre_pronominal_verbs
+        result = generate_practice(GenerateRequest(family="ttre", tense="present"))
+        self.assertEqual(result["total"], 20)
+        stored = SESSIONS[result["session_id"]]
+        pronominal = set(third_group_ttre_pronominal_verbs())
+        self.assertEqual(sum(row["verb"] in pronominal for row in stored), 8)
+        self.assertEqual(sum(row["verb"] not in pronominal for row in stored), 12)
+
+    def test_auxiliary_filters_respect_canonical_metadata(self):
+        from backend.main import third_group_ttre_auxiliaries, third_group_ttre_forms
+        self.assertIn("avoir", third_group_ttre_auxiliaries("mettre"))
+        self.assertEqual(third_group_ttre_auxiliaries("se battre"), ("etre",))
+        with self.assertRaises(HTTPException):
+            third_group_ttre_forms("mettre", "passe-compose", "etre")
+        self.assertTrue(third_group_ttre_forms("se battre", "passe-compose", "etre"))
+
+    def test_family_rejects_verbs_outside_ttre(self):
+        from backend.main import third_group_ttre_forms
+        for verb in ("vendre", "lire", "voir"):
+            with self.subTest(verb=verb), self.assertRaises(HTTPException):
+                third_group_ttre_forms(verb, "present")
+
+
 if __name__ == "__main__":
     unittest.main()
