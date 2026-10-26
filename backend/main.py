@@ -1031,6 +1031,96 @@ def third_group_ir_catalog() -> dict[str, dict]:
     return bases
 
 
+
+@functools.lru_cache(maxsize=1)
+def third_group_aitre_catalog() -> dict[str, dict]:
+    """Return validated third-group -AÎTRE / -OÎTRE verbs and registered pronominal variants."""
+    catalog = _load_js_object("data/verbs/local-database.js", "COQ_VERBS")
+    pronominal_records = _load_js_object("data/verbs/pronominal-database.js", "COQ_PRONOMINAL_VERBS")
+    second_group_bases = set(second_group_catalog())
+    excluded_bases = {"fleurir", "amuïr"}
+    bases: dict[str, dict] = {}
+
+    for key, entry in catalog.items():
+        if not isinstance(entry, dict):
+            continue
+        lemma = normalize(entry.get("infinitif") or key)
+        base = normalize(entry.get("infinitif_base") or lemma)
+        group = entry.get("groupe", entry.get("group"))
+        if str(group) != "3" or entry.get("pronominal") is True:
+            continue
+        if entry.get("construction") not in ("non-pronomiale", "non-pronominale"):
+            continue
+        if not base.endswith(("aître", "oître")):
+            continue
+        if base in second_group_bases or lemma in second_group_bases:
+            continue
+        if not isinstance(entry.get("formes"), dict):
+            continue
+        bases[lemma] = {"entry": entry, "base": base, "pronominal_record": None}
+
+    by_base = {record["base"]: record for record in bases.values()}
+    for record in pronominal_records.values():
+        if not isinstance(record, dict) or record.get("actif") is False:
+            continue
+        lemma = normalize(record.get("infinitif") or "")
+        base = normalize(record.get("formeNonPronominale") or record.get("infinitifBase") or "")
+        if not lemma.endswith(("aître", "oître")) or not base:
+            continue
+        base_record = by_base.get(base)
+        if base_record is None:
+            continue
+        bases[lemma] = {
+            "entry": base_record["entry"],
+            "base": base,
+            "pronominal_record": record,
+        }
+    return bases
+
+
+
+
+def third_group_aitre_verbs() -> tuple[str, ...]:
+    return tuple(sorted(third_group_aitre_catalog()))
+
+
+def third_group_aitre_pronominal_verbs() -> tuple[str, ...]:
+    return tuple(sorted(verb for verb, record in third_group_aitre_catalog().items()
+                        if record.get("pronominal_record") is not None))
+
+
+def is_third_group_aitre_verb(verb: str) -> bool:
+    return normalize(verb) in third_group_aitre_catalog()
+
+
+def third_group_aitre_auxiliaries(verb: str) -> tuple[str, ...]:
+    record = third_group_aitre_catalog().get(normalize(verb))
+    if record is None:
+        return ()
+    if record.get("pronominal_record") is not None:
+        return ("etre",)
+    entry = record["entry"]
+    values = []
+    raw_many = entry.get("auxiliaires", [])
+    if isinstance(raw_many, str):
+        raw_many = re.split(r"[,;/|]", raw_many)
+    if isinstance(raw_many, (list, tuple, set)):
+        values.extend(raw_many)
+    if entry.get("auxiliaire"):
+        values.append(entry["auxiliaire"])
+    normalized = []
+    for value in values:
+        item = normalize(str(value)).replace("être", "etre")
+        if item in ("avoir", "etre") and item not in normalized:
+            normalized.append(item)
+        elif "avoir" in item and "etre" in item:
+            for aux in ("avoir", "etre"):
+                if aux not in normalized:
+                    normalized.append(aux)
+    return tuple(normalized or ["avoir"])
+
+
+
 def third_group_ir_verbs() -> tuple[str, ...]:
     return tuple(sorted(third_group_ir_catalog()))
 
@@ -1257,6 +1347,203 @@ def third_group_ir_forms(verb: str, tense: str, auxiliary: str = "") -> list[dic
     return rows
 
 
+
+def third_group_aitre_forms(verb: str, tense: str, auxiliary: str = "") -> list[dict[str, str]]:
+    """Build practice forms for a validated third-group -IR verb from canonical data."""
+    display_lemma = normalize(verb)
+    record = third_group_aitre_catalog().get(display_lemma)
+    if record is None:
+        raise HTTPException(422, "El verbo no pertenece a la familia compatible del tercer grupo en -AÎTRE / -OÎTRE.")
+    if tense not in TENSE_LABELS:
+        raise HTTPException(422, "Selecciona un tiempo verbal válido.")
+
+    entry = record["entry"]
+    pronominal_record = record.get("pronominal_record")
+    is_pronominal = pronominal_record is not None
+    forms_data = entry.get("formes", {})
+    person_indexes = [0, 1, 2, 2, 2, 3, 4, 5, 5]
+    subjunctive_labels = {
+        "je": "que je", "tu": "que tu", "il": "qu'il",
+        "elle": "qu'elle", "on": "qu'on", "nous": "que nous",
+        "vous": "que vous", "ils": "qu'ils", "elles": "qu'elles",
+    }
+
+    def canonical_form(value) -> str:
+        if isinstance(value, (list, tuple)):
+            if not value:
+                return ""
+            value = value[-1]
+        return str(value or "").strip()
+
+    def reflexive_prefix(form: str, index: int) -> str:
+        if not is_pronominal:
+            return form
+        pronoun = ("me", "te", "se", "se", "se", "nous", "vous", "se", "se")[index]
+        if pronoun in ("me", "te", "se") and form[:1] in "aeiouyàâéèêëîïôùûüœæh":
+            return {"me": "m'", "te": "t'", "se": "s'"}[pronoun] + form
+        return pronoun + " " + form
+
+    def person_label(person: str, tense_name: str) -> str:
+        return subjunctive_labels[person] if tense_name.startswith("subjonctif-") else person
+
+    simple_keys = {
+        "present": "présent de l'indicatif",
+        "imparfait": "imparfait",
+        "passe-simple": "passé simple",
+        "futur-simple": "futur simple",
+        "conditionnel-present": "conditionnel présent",
+        "subjonctif-present": "subjonctif présent",
+        "subjonctif-imparfait": "subjonctif imparfait",
+    }
+
+    if tense in simple_keys:
+        stored = forms_data.get(simple_keys[tense])
+        if not isinstance(stored, list):
+            raise HTTPException(422, "No hay formas canónicas disponibles para este verbo y tiempo verbal.")
+        rows = []
+        for index, (person, _) in enumerate(PERSONS):
+            form_index = person_indexes[index]
+            if form_index >= len(stored):
+                raise HTTPException(422, "El catálogo no contiene todas las formas necesarias para este tiempo verbal.")
+            form = canonical_form(stored[form_index])
+            if not form:
+                raise HTTPException(422, "El catálogo contiene una forma vacía para este verbo y tiempo verbal.")
+            rows.append({
+                "person": person_label(person, tense),
+                "form": reflexive_prefix(form, index),
+                "verb": display_lemma,
+                "tense": tense,
+            })
+        return rows
+
+    if tense == "imperatif-present":
+        stored = forms_data.get("impératif présent")
+        if not isinstance(stored, list) or len(stored) < 3:
+            raise HTTPException(422, "El catálogo no contiene el imperativo presente de este verbo.")
+        rows = []
+        for (person, _), raw_form in zip(IMPERATIVE_PERSONS, stored):
+            form = canonical_form(raw_form)
+            if not form:
+                raise HTTPException(422, "El catálogo contiene una forma vacía de imperativo.")
+            if is_pronominal:
+                form += {"tu*": "-toi", "nous*": "-nous", "vous*": "-vous"}[person]
+            rows.append({"person": person, "form": form, "verb": display_lemma, "tense": tense})
+        return rows
+
+    if tense not in COMPOUND_TENSES:
+        raise HTTPException(422, "Este tiempo verbal no está implementado para la familia -AÎTRE / -OÎTRE.")
+
+    participle = str(
+        (pronominal_record or {}).get("participePasse")
+        or entry.get("participePasse")
+        or ""
+    ).strip()
+    if not participle:
+        raise HTTPException(422, "Falta el participio pasado canónico para este verbo y no se puede generar el tiempo compuesto.")
+
+    allowed_auxiliaries = third_group_aitre_auxiliaries(display_lemma)
+    requested_auxiliary = normalize(auxiliary).replace("être", "etre")
+    if is_pronominal:
+        selected_auxiliary = "etre"
+        if requested_auxiliary and requested_auxiliary != "etre":
+            raise HTTPException(422, "Los verbos pronominales de esta familia utilizan être.")
+    elif requested_auxiliary:
+        if requested_auxiliary not in allowed_auxiliaries:
+            raise HTTPException(422, "El auxiliar seleccionado no corresponde a este verbo.")
+        selected_auxiliary = requested_auxiliary
+    else:
+        raw_default = normalize(str(entry.get("auxiliaire") or "")).replace("être", "etre")
+        selected_auxiliary = raw_default if raw_default in allowed_auxiliaries else allowed_auxiliaries[0]
+
+    aux_tense = {
+        "passe-compose": "present",
+        "plus-que-parfait": "imparfait",
+        "passe-anterieur": "passe-simple",
+        "futur-anterieur": "futur-simple",
+        "conditionnel-passe": "conditionnel-present",
+        "subjonctif-passe": "subjonctif-present",
+        "subjonctif-plus-que-parfait": "subjonctif-imparfait",
+    }
+    avoir_forms = {
+        "present": ["ai", "as", "a", "a", "a", "avons", "avez", "ont", "ont"],
+        "imparfait": ["avais", "avais", "avait", "avait", "avait", "avions", "aviez", "avaient", "avaient"],
+        "passe-simple": ["eus", "eus", "eut", "eut", "eut", "eûmes", "eûtes", "eurent", "eurent"],
+        "futur-simple": ["aurai", "auras", "aura", "aura", "aura", "aurons", "aurez", "auront", "auront"],
+        "conditionnel-present": ["aurais", "aurais", "aurait", "aurait", "aurait", "aurions", "auriez", "auraient", "auraient"],
+        "subjonctif-present": ["aie", "aies", "ait", "ait", "ait", "ayons", "ayez", "aient", "aient"],
+        "subjonctif-imparfait": ["eusse", "eusses", "eût", "eût", "eût", "eussions", "eussiez", "eussent", "eussent"],
+    }
+    etre_forms = {
+        "present": ["suis", "es", "est", "est", "est", "sommes", "êtes", "sont", "sont"],
+        "imparfait": ["étais", "étais", "était", "était", "était", "étions", "étiez", "étaient", "étaient"],
+        "passe-simple": ["fus", "fus", "fut", "fut", "fut", "fûmes", "fûtes", "furent", "furent"],
+        "futur-simple": ["serai", "seras", "sera", "sera", "sera", "serons", "serez", "seront", "seront"],
+        "conditionnel-present": ["serais", "serais", "serait", "serait", "serait", "serions", "seriez", "seraient", "seraient"],
+        "subjonctif-present": ["sois", "sois", "soit", "soit", "soit", "soyons", "soyez", "soient", "soient"],
+        "subjonctif-imparfait": ["fusse", "fusses", "fût", "fût", "fût", "fussions", "fussiez", "fussent", "fussent"],
+    }
+    if tense == "imperatif-passe":
+        aux_forms = ("sois-toi", "soyons-nous", "soyez-vous") if is_pronominal else (
+            ("sois", "soyons", "soyez") if selected_auxiliary == "etre" else ("aie", "ayons", "ayez")
+        )
+        agreement = (
+            (is_pronominal and (pronominal_record or {}).get("accordParticipePasse", "sujet") == "sujet")
+            or (not is_pronominal and selected_auxiliary == "etre")
+        )
+        rows = []
+        for (person, _), aux_form in zip(IMPERATIVE_PERSONS, aux_forms):
+            pp = participle + "s" if agreement and person in ("nous*", "vous*") else participle
+            rows.append({
+                "person": person, "form": aux_form + " " + pp, "verb": display_lemma,
+                "tense": tense, "auxiliary": "être" if selected_auxiliary == "etre" else "avoir",
+            })
+        return rows
+
+    aux_key = aux_tense.get(tense)
+    if aux_key is None:
+        raise HTTPException(422, "No se ha definido el auxiliar para este tiempo compuesto.")
+    aux_forms = etre_forms[aux_key] if selected_auxiliary == "etre" else avoir_forms[aux_key]
+    agreement = is_pronominal and (pronominal_record or {}).get("accordParticipePasse", "sujet") == "sujet"
+    agreement = agreement or (not is_pronominal and selected_auxiliary == "etre")
+
+    def agreed_participle(person: str) -> str:
+        if not agreement:
+            return participle
+        if person == "elle":
+            return participle + "e"
+        if person == "elles":
+            return participle + "es"
+        if person in ("nous", "vous", "ils"):
+            return participle + "s"
+        return participle
+
+    rows = []
+    for index, (person, _) in enumerate(PERSONS):
+        auxiliary_form = reflexive_prefix(aux_forms[index], index) if is_pronominal else aux_forms[index]
+        rows.append({
+            "person": person_label(person, tense),
+            "form": auxiliary_form + " " + agreed_participle(person),
+            "verb": display_lemma,
+            "tense": tense,
+            "auxiliary": "être" if selected_auxiliary == "etre" else "avoir",
+        })
+    return rows
+
+
+
+
+def third_group_aitre_available_verbs(tense: str, auxiliary: str = "") -> tuple[str, ...]:
+    available = []
+    for verb in third_group_aitre_verbs():
+        try:
+            third_group_aitre_forms(verb, tense, auxiliary)
+        except HTTPException:
+            continue
+        available.append(verb)
+    return tuple(available)
+
+
+
 def third_group_ir_available_verbs(tense: str, auxiliary: str = "") -> tuple[str, ...]:
     """Return only verbs with enough canonical data for the requested practice tense."""
     available = []
@@ -1468,13 +1755,15 @@ def generate_practice(request: GenerateRequest) -> dict:
     selected_verb = normalize(request.verb)
     # Compatibilidad con perfiles individuales que envían la familia genérica del tercer grupo.
     # Para verbos de esta familia, el perfil genérico se traduce a la familia específica -IR.
+    if family == "troisieme-groupe" and selected_verb and is_third_group_aitre_verb(selected_verb):
+        family = "aitre"
     if family == "troisieme-groupe" and selected_verb and is_third_group_ir_verb(selected_verb):
         family = "ir"
     # Compatibilidad con clientes que aún clasifican estos infinitivos -ER como grupo 3.
     # Solo se normalizan alias de grupo; una familia ortográfica incompatible sigue rechazándose.
     if selected_verb in ETRE_PRIORITY_PARTICIPLES and family in ("premier-groupe", "premier-groupe-reguliers", "troisieme-groupe"):
         family = ""
-    if family not in ("", "premier-groupe", "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe", "ir"):
+    if family not in ("", "premier-groupe", "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe", "ir", "aitre"):
         raise HTTPException(422, "Selecciona una familia de verbos válida.")
     # Aceptar la variante histórica usada por algunos clientes además del
     # valor canónico «non-pronominal».
@@ -1482,7 +1771,7 @@ def generate_practice(request: GenerateRequest) -> dict:
         raise HTTPException(422, "Selecciona una construcción verbal válida.")
     if request.auxiliary not in ("", "avoir", "etre"):
         raise HTTPException(422, "Selecciona un auxiliar válido.")
-    category_mode = family in ("premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe", "ir") and not request.verb.strip()
+    category_mode = family in ("premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe", "ir", "aitre") and not request.verb.strip()
     if selected_verb == "neiger" and not category_mode:
         raise HTTPException(
             422,
@@ -1496,7 +1785,7 @@ def generate_practice(request: GenerateRequest) -> dict:
     if request.tense in COMPOUND_TENSES and request.auxiliary == "etre":
         selected_verb = normalize(request.verb)
         is_pronominal_verb = selected_verb.startswith(("se ", "s'"))
-        is_third_group_ir = family == "ir" or (not family and selected_verb and is_third_group_ir_verb(selected_verb))
+        is_third_group_ir = family in ("ir", "aitre") or (not family and selected_verb and (is_third_group_ir_verb(selected_verb) or is_third_group_aitre_verb(selected_verb)))
         if selected_verb and selected_verb not in ETRE_PRIORITY_PARTICIPLES and not is_pronominal_verb and not is_third_group_ir:
             raise HTTPException(422, "Être solo está disponible para los verbos pronominales y los verbos configurados con prioridad de este auxiliar.")
         if not selected_verb and not category_mode:
@@ -1504,7 +1793,7 @@ def generate_practice(request: GenerateRequest) -> dict:
     if category_mode:
         # Una pregunta por verbo: 20 infinitivos distintos elegidos al azar.
         # Cada categoría usa exclusivamente los verbos admitidos por el catálogo.
-        available_verbs = list({"ger": ger_family_verbs, "cer": cer_family_verbs, "eler": eler_family_verbs, "eter": eter_family_verbs, "yer": yer_family_verbs, "e-accent": lambda: tuple(sorted(e_accent_family_patterns())), "deuxieme-groupe": lambda: second_group_verbs() + second_group_pronominal_verbs(), "ir": lambda: third_group_ir_available_verbs(request.tense, request.auxiliary)}.get(family, lambda: regular_first_group_verbs())())
+        available_verbs = list({"ger": ger_family_verbs, "cer": cer_family_verbs, "eler": eler_family_verbs, "eter": eter_family_verbs, "yer": yer_family_verbs, "e-accent": lambda: tuple(sorted(e_accent_family_patterns())), "deuxieme-groupe": lambda: second_group_verbs() + second_group_pronominal_verbs(), "ir": lambda: third_group_ir_available_verbs(request.tense, request.auxiliary), "aitre": lambda: third_group_aitre_available_verbs(request.tense, request.auxiliary)}.get(family, lambda: regular_first_group_verbs())())
         # Keep the non-pronominal lemma out of category practice while retaining
         # its catalog entry so the registered pronominal variant remains resolvable.
         if family == "deuxieme-groupe":
@@ -1512,6 +1801,8 @@ def generate_practice(request: GenerateRequest) -> dict:
         pronomial_verbs = (
             set(second_group_pronominal_verbs())
             if family == "deuxieme-groupe"
+            else set(third_group_aitre_pronominal_verbs())
+            if family == "aitre"
             else set(third_group_ir_pronominal_verbs())
             if family == "ir"
             else set(pronominal_first_group_verbs())
@@ -1523,6 +1814,8 @@ def generate_practice(request: GenerateRequest) -> dict:
         if request.tense in COMPOUND_TENSES and request.auxiliary == "etre":
             if family == "ir":
                 available_verbs = [verb for verb in available_verbs if "etre" in third_group_ir_auxiliaries(verb)]
+            elif family == "aitre":
+                available_verbs = [verb for verb in available_verbs if "etre" in third_group_aitre_auxiliaries(verb)]
             else:
                 available_verbs = [
                     verb for verb in available_verbs
@@ -1534,6 +1827,8 @@ def generate_practice(request: GenerateRequest) -> dict:
             available_verbs = [verb for verb in available_verbs if verb not in second_group_pronominal_verbs()]
         elif family == "ir" and request.tense in COMPOUND_TENSES and request.auxiliary == "avoir":
             available_verbs = [verb for verb in available_verbs if "avoir" in third_group_ir_auxiliaries(verb)]
+        elif family == "aitre" and request.tense in COMPOUND_TENSES and request.auxiliary == "avoir":
+            available_verbs = [verb for verb in available_verbs if "avoir" in third_group_aitre_auxiliaries(verb)]
         # Los verbos impersonales no admiten imperativo. Filtrarlos antes del
         # muestreo evita que un único candidato incompatible rompa la sesión.
         if family == "deuxieme-groupe" and request.tense in ("imperatif-present", "imperatif-passe"):
@@ -1553,8 +1848,8 @@ def generate_practice(request: GenerateRequest) -> dict:
         # En el segundo grupo, la opción mixta conserva la proporción acordada:
         # 12 preguntas no pronominales (60 %) y 8 pronominales (40 %).
         selected_verbs = None
-        if family == "ir" and not request.construction and not request.auxiliary:
-            pronominal_set = set(third_group_ir_pronominal_verbs())
+        if family in ("ir", "aitre") and not request.construction and not request.auxiliary:
+            pronominal_set = set(third_group_aitre_pronominal_verbs() if family == "aitre" else third_group_ir_pronominal_verbs())
             pronominal_pool = [verb for verb in available_verbs if verb in pronominal_set]
             non_pronominal_pool = [verb for verb in available_verbs if verb not in pronominal_set]
             recent = set(RECENT_CATEGORY_VERBS)
@@ -1615,6 +1910,8 @@ def generate_practice(request: GenerateRequest) -> dict:
                 forms = second_group_forms(verb, request.tense)
             elif family == "ir":
                 forms = third_group_ir_forms(verb, request.tense, request.auxiliary)
+            elif family == "aitre":
+                forms = third_group_aitre_forms(verb, request.tense, request.auxiliary)
             elif impersonal_verb_catalog().get(verb, {}).get("impersonal"):
                 forms = impersonal_er_forms(verb, request.tense)
             else:
@@ -1649,13 +1946,20 @@ def generate_practice(request: GenerateRequest) -> dict:
             raise HTTPException(422, "El verbo escrito no pertenece a la familia -YER compatible.")
         if family == "e-accent" and normalize(request.verb) not in e_accent_family_patterns():
             raise HTTPException(422, "El verbo escrito no pertenece a la familia E (È) + CONSONANTE + ER compatible.")
+        use_third_group_aitre = family == "aitre" or (not family and is_third_group_aitre_verb(selected_verb))
         use_third_group_ir = family == "ir" or (not family and is_third_group_ir_verb(selected_verb))
+        if family == "aitre" and not is_third_group_aitre_verb(selected_verb):
+            raise HTTPException(422, "El verbo escrito no pertenece a la familia del tercer grupo en -AÎTRE / -OÎTRE.")
         if family == "ir" and not is_third_group_ir_verb(selected_verb):
             raise HTTPException(422, "El verbo escrito no pertenece a la familia del tercer grupo en -IR.")
         use_second_group = family == "deuxieme-groupe" or (not family and is_second_group_verb(selected_verb))
         if family == "deuxieme-groupe" and not is_second_group_verb(selected_verb):
             raise HTTPException(422, "El verbo escrito no pertenece al segundo grupo compatible.")
-        if use_third_group_ir:
+        if use_third_group_aitre:
+            if family not in ("", "aitre"):
+                raise HTTPException(422, "El verbo del tercer grupo en -AÎTRE / -OÎTRE no pertenece a la familia seleccionada.")
+            forms = third_group_aitre_forms(request.verb, request.tense, request.auxiliary)
+        elif use_third_group_ir:
             if family not in ("", "ir"):
                 raise HTTPException(422, "El verbo del tercer grupo en -IR no pertenece a la familia seleccionada.")
             forms = third_group_ir_forms(request.verb, request.tense, request.auxiliary)
