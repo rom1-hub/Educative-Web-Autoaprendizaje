@@ -116,6 +116,60 @@ class ThirdGroupIRIntegrationTests(unittest.TestCase):
         self.assertIn("fuir", set(third_group_ir_available_verbs("present")))
 
 
+
+class ThirdGroupAitreIntegrationTests(unittest.TestCase):
+    def test_inventory_includes_both_aitre_and_oitre_endings_and_pronominal_variants(self):
+        from backend.main import third_group_aitre_verbs, third_group_aitre_pronominal_verbs
+        verbs = set(third_group_aitre_verbs())
+        pronominal = set(third_group_aitre_pronominal_verbs())
+        self.assertTrue({"connaître", "paraître", "apparaître", "naître", "croître"}.issubset(verbs))
+        self.assertTrue(all(verb.endswith(("aître", "oître")) for verb in verbs))
+        self.assertIn("se connaître", pronominal)
+        self.assertNotIn("connaître", pronominal)
+
+    def test_individual_verbs_accept_generic_and_specific_family_profiles(self):
+        from backend.main import SESSIONS
+        for verb in ("connaître", "naître"):
+            for family in ("troisieme-groupe", "aitre"):
+                with self.subTest(verb=verb, family=family):
+                    result = generate_practice(GenerateRequest(verb=verb, family=family, tense="present"))
+                    self.assertEqual(result["total"], 20)
+                    self.assertTrue(all(q["verb"] == verb for q in result["questions"]))
+                    self.assertIn(result["session_id"], SESSIONS)
+
+    def test_all_tenses_are_generated_from_canonical_forms(self):
+        from backend.main import TENSE_LABELS, third_group_aitre_forms
+        for tense in TENSE_LABELS:
+            with self.subTest(tense=tense):
+                forms = third_group_aitre_forms("connaître", tense)
+                self.assertTrue(forms)
+                self.assertTrue(all(row["form"].strip() for row in forms))
+                self.assertTrue(all(row["tense"] == tense for row in forms))
+
+    def test_category_practice_has_twenty_questions_and_60_40_mix(self):
+        from backend.main import SESSIONS, third_group_aitre_pronominal_verbs
+        result = generate_practice(GenerateRequest(family="aitre", tense="present"))
+        self.assertEqual(result["total"], 20)
+        self.assertEqual(len(result["questions"]), 20)
+        stored = SESSIONS[result["session_id"]]
+        pronominal = set(third_group_aitre_pronominal_verbs())
+        self.assertEqual(sum(row["verb"] in pronominal for row in stored), 8)
+        self.assertEqual(sum(row["verb"] not in pronominal for row in stored), 12)
+
+    def test_auxiliary_filters_respect_canonical_metadata(self):
+        from backend.main import third_group_aitre_auxiliaries
+        self.assertIn("avoir", third_group_aitre_auxiliaries("connaître"))
+        self.assertIn("etre", third_group_aitre_auxiliaries("naître"))
+        result = generate_practice(GenerateRequest(
+            verb="naître", family="aitre", tense="passe-compose", auxiliary="etre"
+        ))
+        self.assertEqual(result["total"], 20)
+        with self.assertRaises(HTTPException):
+            generate_practice(GenerateRequest(
+                verb="connaître", family="aitre", tense="passe-compose", auxiliary="etre"
+            ))
+
+
 class EvanouirIndividualPracticeTests(unittest.TestCase):
     def test_s_evanouir_uses_canonical_second_group_forms_in_all_sixteen_tenses(self):
         from backend.main import (
