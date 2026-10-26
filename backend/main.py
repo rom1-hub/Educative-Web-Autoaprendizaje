@@ -1083,7 +1083,7 @@ def third_group_aitre_catalog() -> dict[str, dict]:
 
 @functools.lru_cache(maxsize=1)
 def third_group_dre_catalog() -> dict[str, dict]:
-    """Return validated third-group -DRE verbs and registered pronominal variants."""
+    """Return validated third-group verbs ending in -DRE, including -AINDRE/-OINDRE/-EINDRE/-OUDRE, and registered pronominal variants."""
     catalog = _load_js_object("data/verbs/local-database.js", "COQ_VERBS")
     pronominal_records = _load_js_object("data/verbs/pronominal-database.js", "COQ_PRONOMINAL_VERBS")
     second_group_bases = set(second_group_catalog())
@@ -1100,7 +1100,7 @@ def third_group_dre_catalog() -> dict[str, dict]:
             continue
         if entry.get("construction") not in ("non-pronomiale", "non-pronominale"):
             continue
-        if not base.endswith("dre") or base.endswith("oudre"):
+        if not base.endswith("dre"):
             continue
         if base in second_group_bases or lemma in second_group_bases:
             continue
@@ -1114,7 +1114,7 @@ def third_group_dre_catalog() -> dict[str, dict]:
             continue
         lemma = normalize(record.get("infinitif") or "")
         base = normalize(record.get("formeNonPronominale") or record.get("infinitifBase") or "")
-        if not lemma.endswith("dre") or lemma.endswith("oudre") or not base:
+        if not lemma.endswith("dre") or not base:
             continue
         base_record = by_base.get(base)
         if base_record is None:
