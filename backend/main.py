@@ -1738,6 +1738,194 @@ def third_group_aitre_forms(verb: str, tense: str, auxiliary: str = "") -> list[
 
 
 
+def third_group_dre_forms(verb: str, tense: str, auxiliary: str = "") -> list[dict[str, str]]:
+    """Build practice forms for a validated third-group -DRE verb from canonical data."""
+    display_lemma = normalize(verb)
+    record = third_group_dre_catalog().get(display_lemma)
+    if record is None:
+        raise HTTPException(422, "El verbo no pertenece a la familia compatible del tercer grupo en -DRE.")
+    if tense not in TENSE_LABELS:
+        raise HTTPException(422, "Selecciona un tiempo verbal válido.")
+
+    entry = record["entry"]
+    pronominal_record = record.get("pronominal_record")
+    is_pronominal = pronominal_record is not None
+    forms_data = entry.get("formes", {})
+    person_indexes = [0, 1, 2, 2, 2, 3, 4, 5, 5]
+    subjunctive_labels = {
+        "je": "que je", "tu": "que tu", "il": "qu'il",
+        "elle": "qu'elle", "on": "qu'on", "nous": "que nous",
+        "vous": "que vous", "ils": "qu'ils", "elles": "qu'elles",
+    }
+
+    def canonical_form(value) -> str:
+        if isinstance(value, (list, tuple)):
+            if not value:
+                return ""
+            value = value[-1]
+        return str(value or "").strip()
+
+    def reflexive_prefix(form: str, index: int) -> str:
+        if not is_pronominal:
+            return form
+        pronoun = ("me", "te", "se", "se", "se", "nous", "vous", "se", "se")[index]
+        if pronoun in ("me", "te", "se") and form[:1] in "aeiouyàâéèêëîïôùûüœæh":
+            return {"me": "m'", "te": "t'", "se": "s'"}[pronoun] + form
+        return pronoun + " " + form
+
+    def person_label(person: str, tense_name: str) -> str:
+        return subjunctive_labels[person] if tense_name.startswith("subjonctif-") else person
+
+    simple_keys = {
+        "present": "présent de l'indicatif",
+        "imparfait": "imparfait",
+        "passe-simple": "passé simple",
+        "futur-simple": "futur simple",
+        "conditionnel-present": "conditionnel présent",
+        "subjonctif-present": "subjonctif présent",
+        "subjonctif-imparfait": "subjonctif imparfait",
+    }
+
+    if tense in simple_keys:
+        stored = forms_data.get(simple_keys[tense])
+        if not isinstance(stored, list):
+            raise HTTPException(422, "No hay formas canónicas disponibles para este verbo y tiempo verbal.")
+        rows = []
+        for index, (person, _) in enumerate(PERSONS):
+            form_index = person_indexes[index]
+            if form_index >= len(stored):
+                raise HTTPException(422, "El catálogo no contiene todas las formas necesarias para este tiempo verbal.")
+            form = canonical_form(stored[form_index])
+            if not form:
+                raise HTTPException(422, "El catálogo contiene una forma vacía para este verbo y tiempo verbal.")
+            rows.append({
+                "person": person_label(person, tense),
+                "form": reflexive_prefix(form, index),
+                "verb": display_lemma,
+                "tense": tense,
+            })
+        return rows
+
+    if tense == "imperatif-present":
+        stored = forms_data.get("impératif présent")
+        if not isinstance(stored, list) or len(stored) < 3:
+            raise HTTPException(422, "El catálogo no contiene el imperativo presente de este verbo.")
+        rows = []
+        for (person, _), raw_form in zip(IMPERATIVE_PERSONS, stored):
+            form = canonical_form(raw_form)
+            if not form:
+                raise HTTPException(422, "El catálogo contiene una forma vacía de imperativo.")
+            if is_pronominal:
+                form += {"tu*": "-toi", "nous*": "-nous", "vous*": "-vous"}[person]
+            rows.append({"person": person, "form": form, "verb": display_lemma, "tense": tense})
+        return rows
+
+    if tense not in COMPOUND_TENSES:
+        raise HTTPException(422, "Este tiempo verbal no está implementado para la familia -DRE.")
+
+    participle = str(
+        (pronominal_record or {}).get("participePasse")
+        or entry.get("participePasse")
+        or ""
+    ).strip()
+    if not participle:
+        raise HTTPException(422, "Falta el participio pasado canónico para este verbo y no se puede generar el tiempo compuesto.")
+
+    allowed_auxiliaries = third_group_dre_auxiliaries(display_lemma)
+    requested_auxiliary = normalize(auxiliary).replace("être", "etre")
+    if is_pronominal:
+        selected_auxiliary = "etre"
+        if requested_auxiliary and requested_auxiliary != "etre":
+            raise HTTPException(422, "Los verbos pronominales de esta familia utilizan être.")
+    elif requested_auxiliary:
+        if requested_auxiliary not in allowed_auxiliaries:
+            raise HTTPException(422, "El auxiliar seleccionado no corresponde a este verbo.")
+        selected_auxiliary = requested_auxiliary
+    else:
+        raw_default = normalize(str(entry.get("auxiliaire") or "")).replace("être", "etre")
+        selected_auxiliary = raw_default if raw_default in allowed_auxiliaries else allowed_auxiliaries[0]
+
+    aux_tense = {
+        "passe-compose": "present",
+        "plus-que-parfait": "imparfait",
+        "passe-anterieur": "passe-simple",
+        "futur-anterieur": "futur-simple",
+        "conditionnel-passe": "conditionnel-present",
+        "subjonctif-passe": "subjonctif-present",
+        "subjonctif-plus-que-parfait": "subjonctif-imparfait",
+    }
+    avoir_forms = {
+        "present": ["ai", "as", "a", "a", "a", "avons", "avez", "ont", "ont"],
+        "imparfait": ["avais", "avais", "avait", "avait", "avait", "avions", "aviez", "avaient", "avaient"],
+        "passe-simple": ["eus", "eus", "eut", "eut", "eut", "eûmes", "eûtes", "eurent", "eurent"],
+        "futur-simple": ["aurai", "auras", "aura", "aura", "aura", "aurons", "aurez", "auront", "auront"],
+        "conditionnel-present": ["aurais", "aurais", "aurait", "aurait", "aurait", "aurions", "auriez", "auraient", "auraient"],
+        "subjonctif-present": ["aie", "aies", "ait", "ait", "ait", "ayons", "ayez", "aient", "aient"],
+        "subjonctif-imparfait": ["eusse", "eusses", "eût", "eût", "eût", "eussions", "eussiez", "eussent", "eussent"],
+    }
+    etre_forms = {
+        "present": ["suis", "es", "est", "est", "est", "sommes", "êtes", "sont", "sont"],
+        "imparfait": ["étais", "étais", "était", "était", "était", "étions", "étiez", "étaient", "étaient"],
+        "passe-simple": ["fus", "fus", "fut", "fut", "fut", "fûmes", "fûtes", "furent", "furent"],
+        "futur-simple": ["serai", "seras", "sera", "sera", "sera", "serons", "serez", "seront", "seront"],
+        "conditionnel-present": ["serais", "serais", "serait", "serait", "serait", "serions", "seriez", "seraient", "seraient"],
+        "subjonctif-present": ["sois", "sois", "soit", "soit", "soit", "soyons", "soyez", "soient", "soient"],
+        "subjonctif-imparfait": ["fusse", "fusses", "fût", "fût", "fût", "fussions", "fussiez", "fussent", "fussent"],
+    }
+    if tense == "imperatif-passe":
+        aux_forms = ("sois-toi", "soyons-nous", "soyez-vous") if is_pronominal else (
+            ("sois", "soyons", "soyez") if selected_auxiliary == "etre" else ("aie", "ayons", "ayez")
+        )
+        agreement = (
+            (is_pronominal and (pronominal_record or {}).get("accordParticipePasse", "sujet") == "sujet")
+            or (not is_pronominal and selected_auxiliary == "etre")
+        )
+        rows = []
+        for (person, _), aux_form in zip(IMPERATIVE_PERSONS, aux_forms):
+            pp = participle + "s" if agreement and person in ("nous*", "vous*") else participle
+            rows.append({
+                "person": person, "form": aux_form + " " + pp, "verb": display_lemma,
+                "tense": tense, "auxiliary": "être" if selected_auxiliary == "etre" else "avoir",
+            })
+        return rows
+
+    aux_key = aux_tense.get(tense)
+    if aux_key is None:
+        raise HTTPException(422, "No se ha definido el auxiliar para este tiempo compuesto.")
+    aux_forms = etre_forms[aux_key] if selected_auxiliary == "etre" else avoir_forms[aux_key]
+    agreement = is_pronominal and (pronominal_record or {}).get("accordParticipePasse", "sujet") == "sujet"
+    agreement = agreement or (not is_pronominal and selected_auxiliary == "etre")
+
+    def agreed_participle(person: str) -> str:
+        if not agreement:
+            return participle
+        if person == "elle":
+            return participle + "e"
+        if person == "elles":
+            return participle + "es"
+        if person in ("nous", "vous", "ils"):
+            return participle + "s"
+        return participle
+
+    rows = []
+    for index, (person, _) in enumerate(PERSONS):
+        auxiliary_form = reflexive_prefix(aux_forms[index], index) if is_pronominal else aux_forms[index]
+        rows.append({
+            "person": person_label(person, tense),
+            "form": auxiliary_form + " " + agreed_participle(person),
+            "verb": display_lemma,
+            "tense": tense,
+            "auxiliary": "être" if selected_auxiliary == "etre" else "avoir",
+        })
+    return rows
+
+
+
+
+
+
+
+
 def third_group_ire_uire_forms(verb: str, tense: str, auxiliary: str = "") -> list[dict[str, str]]:
     """Build practice forms for a validated third-group -IRE / -UIRE verb from canonical data."""
     display_lemma = normalize(verb)
