@@ -1462,3 +1462,53 @@ class ExpandedPronominalCatalogTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+
+class FirstGroupAggregateCategoryTests(unittest.TestCase):
+    def test_all_first_group_category_has_exact_mix_and_balanced_families(self):
+        import random
+        from backend.main import SESSIONS, first_group_family_catalog, pronominal_first_group_verbs
+
+        family_catalog = first_group_family_catalog()
+        family_by_verb = {
+            verb: family
+            for family, verbs in family_catalog.items()
+            for verb in verbs
+        }
+        pronominal = set(pronominal_first_group_verbs())
+
+        for seed in range(5):
+            random.seed(seed)
+            result = generate_practice(GenerateRequest(family="premier-groupe", tense="present"))
+            self.assertEqual(result["total"], 20)
+            questions = SESSIONS[result["session_id"]]
+            self.assertEqual(len(questions), 20)
+            verbs = [question["verb"] for question in questions]
+            self.assertEqual(sum(verb in pronominal for verb in verbs), 8)
+            self.assertEqual(sum(verb not in pronominal for verb in verbs), 12)
+            self.assertTrue(set(verbs).issubset(family_by_verb))
+            counts = {}
+            for verb in verbs:
+                family = family_by_verb[verb]
+                counts[family] = counts.get(family, 0) + 1
+            self.assertEqual(sorted(counts.values()), [2, 3, 3, 3, 3, 3, 3])
+
+    def test_short_family_can_change_between_sessions(self):
+        import random
+        from backend.main import first_group_family_catalog, select_balanced_first_group_verbs, pronominal_first_group_verbs
+
+        catalog = first_group_family_catalog()
+        available = sorted(set().union(*catalog.values()))
+        pronominal = set(pronominal_first_group_verbs())
+        short_families = set()
+        for seed in range(30):
+            random.seed(seed)
+            selected = select_balanced_first_group_verbs(available, pronominal, mixed_construction=True)
+            counts = {
+                family: sum(verb in set(verbs) for verb in selected)
+                for family, verbs in catalog.items()
+            }
+            self.assertEqual(sorted(counts.values()), [2, 3, 3, 3, 3, 3, 3])
+            short_families.update(family for family, count in counts.items() if count == 2)
+        self.assertGreater(len(short_families), 1)
