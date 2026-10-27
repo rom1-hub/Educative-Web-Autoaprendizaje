@@ -3515,7 +3515,7 @@ def generate_practice(request: GenerateRequest) -> dict:
     # Solo se normalizan alias de grupo; una familia ortográfica incompatible sigue rechazándose.
     if selected_verb in ETRE_PRIORITY_PARTICIPLES and family in ("premier-groupe", "premier-groupe-reguliers", "troisieme-groupe"):
         family = ""
-    if family not in ("", "premier-groupe", "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe", "troisieme-groupe", "ir", "aitre", "dre", "ire-uire", "oir-oire", "ttre", "top-100"):
+    if family not in ("", "tous-groupes-familles", "premier-groupe", "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe", "troisieme-groupe", "ir", "aitre", "dre", "ire-uire", "oir-oire", "ttre", "top-100"):
         raise HTTPException(422, "Selecciona una familia de verbos válida.")
     # Aceptar la variante histórica usada por algunos clientes además del
     # valor canónico «non-pronominal».
@@ -3523,7 +3523,7 @@ def generate_practice(request: GenerateRequest) -> dict:
         raise HTTPException(422, "Selecciona una construcción verbal válida.")
     if request.auxiliary not in ("", "avoir", "etre"):
         raise HTTPException(422, "Selecciona un auxiliar válido.")
-    category_mode = family in ("premier-groupe", "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe", "troisieme-groupe", "ir", "aitre", "dre", "ire-uire", "oir-oire", "ttre", "top-100") and not request.verb.strip()
+    category_mode = family in ("tous-groupes-familles", "premier-groupe", "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe", "troisieme-groupe", "ir", "aitre", "dre", "ire-uire", "oir-oire", "ttre", "top-100") and not request.verb.strip()
     if selected_verb == "neiger" and not category_mode:
         raise HTTPException(
             422,
@@ -3542,7 +3542,206 @@ def generate_practice(request: GenerateRequest) -> dict:
             raise HTTPException(422, "Être solo está disponible para los verbos pronominales y los verbos configurados con prioridad de este auxiliar.")
         if not selected_verb and not category_mode:
             raise HTTPException(422, "Selecciona un verbo compatible con el auxiliar Être.")
-    if category_mode and family == "top-100":
+    if category_mode and family == "tous-groupes-familles":
+        # Catálogo agregado por familia: reutiliza los pools canónicos y sus cachés.
+        # Cada infinitivo pertenece a un único bucket para que el equilibrio sea real.
+        first_group = first_group_family_catalog()
+        third_group = {
+            "ir": third_group_ir_available_verbs(request.tense, request.auxiliary),
+            "aitre": third_group_aitre_available_verbs(request.tense, request.auxiliary),
+            "dre": third_group_dre_available_verbs(request.tense, request.auxiliary),
+            "ire-uire": third_group_ire_uire_available_verbs(request.tense, request.auxiliary),
+            "oir-oire": third_group_oir_oire_available_verbs(request.tense, request.auxiliary),
+            "ttre": third_group_ttre_available_verbs(request.tense, request.auxiliary),
+        }
+        family_pools = {
+            **first_group,
+            "deuxieme-groupe": tuple(sorted(set(second_group_verbs()) | set(second_group_pronominal_verbs()))),
+            **third_group,
+        }
+        pronominal_by_family = {
+            **{key: set(pronominal_first_group_verbs()) & set(values) for key, values in first_group.items()},
+            "deuxieme-groupe": set(second_group_pronominal_verbs()),
+            "ir": set(third_group_ir_pronominal_verbs()),
+            "aitre": set(third_group_aitre_pronominal_verbs()),
+            "dre": set(third_group_dre_pronominal_verbs()),
+            "ire-uire": set(third_group_ire_uire_pronominal_verbs()),
+            "oir-oire": set(third_group_oir_oire_pronominal_verbs()),
+            "ttre": set(third_group_ttre_pronominal_verbs()),
+        }
+        # Los catálogos de tercer grupo ya aplican el auxiliar solicitado.
+        # Para los dos primeros grupos, aplicar aquí la compatibilidad canónica.
+        for bucket in first_group:
+            values = set(family_pools[bucket])
+            if request.tense in COMPOUND_TENSES and request.auxiliary == "etre":
+                values &= pronominal_by_family[bucket]
+            elif request.tense in COMPOUND_TENSES and request.auxiliary == "avoir":
+                values -= pronominal_by_family[bucket]
+            family_pools[bucket] = tuple(sorted(values))
+        second_values = set(family_pools["deuxieme-groupe"])
+        second_pronominal = pronominal_by_family["deuxieme-groupe"]
+        if request.tense in COMPOUND_TENSES and request.auxiliary == "etre":
+            second_values &= second_pronominal
+        elif request.tense in COMPOUND_TENSES and request.auxiliary == "avoir":
+            second_values -= second_pronominal
+        family_pools["deuxieme-groupe"] = tuple(sorted(second_values))
+
+        # No ofrecer verbos impersonales/defectivos en imperativo.
+        if request.tense in ("imperatif-present", "imperatif-passe"):
+            impersonal_catalog = impersonal_verb_catalog()
+            second_pronominal_catalog = second_group_pronominal_catalog()
+            for bucket, values in family_pools.items():
+                family_pools[bucket] = tuple(
+                    verb for verb in values
+                    if not impersonal_catalog.get(verb, {}).get("impersonal")
+                    and not second_pronominal_catalog.get(verb, {}).get("impersonal")
+                )
+
+        # Resolver solapamientos antes de seleccionar para no dar doble peso a un verbo.
+        seen_verbs = set()
+        for bucket in (
+            "ger", "cer", "eler", "eter", "yer", "e-accent",
+            "premier-groupe-reguliers", "deuxieme-groupe",
+            "ir", "aitre", "dre", "ire-uire", "oir-oire", "ttre",
+        ):
+            unique = tuple(verb for verb in family_pools[bucket] if verb not in seen_verbs)
+            family_pools[bucket] = unique
+            seen_verbs.update(unique)
+
+        all_pronominal = set().union(*pronominal_by_family.values())
+        recent = set(RECENT_CATEGORY_VERBS)
+        eligible_by_construction = {"pronominal": {}, "non-pronominal": {}}
+        for bucket, values in family_pools.items():
+            p_values = [verb for verb in values if verb in all_pronominal]
+            n_values = [verb for verb in values if verb not in all_pronominal]
+            # Evitar infinitivos de sesiones recientes si el bucket conserva alternativas.
+            fresh_p = [verb for verb in p_values if verb not in recent]
+            fresh_n = [verb for verb in n_values if verb not in recent]
+            if fresh_p:
+                p_values = fresh_p
+            if fresh_n:
+                n_values = fresh_n
+            eligible_by_construction["pronominal"][bucket] = p_values
+            eligible_by_construction["non-pronominal"][bucket] = n_values
+
+        if request.construction == "pronominal":
+            target_p, target_n = 20, 0
+        elif request.construction in ("non-pronomial", "non-pronominal"):
+            target_p, target_n = 0, 20
+        else:
+            target_p, target_n = 8, 12
+
+        p_total = sum(len(set(pool)) for pool in eligible_by_construction["pronominal"].values())
+        n_total = sum(len(set(pool)) for pool in eligible_by_construction["non-pronominal"].values())
+        # Si los filtros impiden el reparto habitual, redistribuir sin violar los filtros.
+        if target_p and target_n:
+            if p_total < target_p:
+                target_n = min(20, target_n + target_p - p_total)
+                target_p = min(target_p, p_total)
+            if n_total < target_n:
+                target_p = min(20 - min(target_n, n_total), target_p + target_n - n_total)
+                target_n = min(target_n, n_total)
+            target_p = min(target_p, 20)
+            target_n = min(target_n, 20 - target_p)
+
+        def pick_balanced_family_pool(pools, count, excluded=None):
+            excluded = excluded or set()
+            buckets = list(pools)
+            random.shuffle(buckets)
+            mutable = {
+                bucket: [verb for verb in pools[bucket] if verb not in excluded]
+                for bucket in buckets
+            }
+            for values in mutable.values():
+                random.shuffle(values)
+            chosen = []
+            while len(chosen) < count:
+                progressed = False
+                for bucket in buckets:
+                    if mutable[bucket]:
+                        chosen.append(mutable[bucket].pop())
+                        progressed = True
+                        if len(chosen) == count:
+                            break
+                if not progressed:
+                    break
+            return chosen
+
+        selected_pronominal = pick_balanced_family_pool(
+            eligible_by_construction["pronominal"], target_p
+        )
+        selected_non_pronominal = pick_balanced_family_pool(
+            eligible_by_construction["non-pronominal"], target_n,
+            set(selected_pronominal),
+        )
+        selected_verbs = selected_non_pronominal + selected_pronominal
+        selected_set = set(selected_verbs)
+        # Si un filtro deja menos de 20 infinitivos distintos, reutilizar solo al final.
+        remaining = 20 - len(selected_verbs)
+        if remaining:
+            fallback = [
+                verb for pools in eligible_by_construction.values()
+                for values in pools.values() for verb in values
+                if verb not in selected_set
+            ]
+            fallback = list(dict.fromkeys(fallback))
+            random.shuffle(fallback)
+            extra = fallback[:remaining]
+            selected_verbs.extend(extra)
+            selected_set.update(extra)
+            remaining = 20 - len(selected_verbs)
+        if remaining:
+            fallback = [
+                verb for pools in eligible_by_construction.values()
+                for values in pools.values() for verb in values
+            ]
+            fallback = list(dict.fromkeys(fallback))
+            if not fallback:
+                raise HTTPException(422, "No hay verbos compatibles con los filtros seleccionados.")
+            selected_verbs.extend(random.choices(fallback, k=remaining))
+        random.shuffle(selected_verbs)
+
+        bucket_by_verb = {
+            verb: bucket for bucket, values in family_pools.items() for verb in values
+        }
+        RECENT_CATEGORY_VERBS.extend(selected_verbs)
+        del RECENT_CATEGORY_VERBS[:-RECENT_CATEGORY_VERBS_LIMIT]
+        questions = []
+        for verb in selected_verbs:
+            bucket = bucket_by_verb.get(verb)
+            if bucket in FIRST_GROUP_FAMILY_IDS:
+                forms = (
+                    impersonal_er_forms(verb, request.tense)
+                    if impersonal_verb_catalog().get(verb, {}).get("impersonal")
+                    else regular_er_forms(verb, request.tense, bucket)
+                )
+            elif bucket == "deuxieme-groupe":
+                forms = second_group_forms(verb, request.tense)
+            elif bucket == "ir":
+                forms = third_group_ir_forms(verb, request.tense, request.auxiliary)
+            elif bucket == "aitre":
+                forms = third_group_aitre_forms(verb, request.tense, request.auxiliary)
+            elif bucket == "dre":
+                forms = third_group_dre_forms(verb, request.tense, request.auxiliary)
+            elif bucket == "ire-uire":
+                forms = third_group_ire_uire_forms(verb, request.tense, request.auxiliary)
+            elif bucket == "oir-oire":
+                forms = third_group_oir_oire_forms(verb, request.tense, request.auxiliary)
+            elif bucket == "ttre":
+                forms = third_group_ttre_forms(verb, request.tense, request.auxiliary)
+            else:
+                raise HTTPException(422, f"No se pudo resolver el grupo/familia del verbo «{verb}».")
+            forms = expand_practice_etre_subject_variants(forms, verb, request.tense)
+            form = random.choice(forms)
+            questions.append({
+                "person": form["person"],
+                "person_key": form.get("person_key", form["person"]),
+                "verb": verb,
+                "tense": form["tense"],
+                "answer": form["form"],
+                **{key: form[key] for key in ("subject_gender", "subject_number", "subject_variant") if key in form},
+            })
+    elif category_mode and family == "top-100":
         available_verbs = top_100_candidates(request.tense)
         recent = set(RECENT_CATEGORY_VERBS)
         pronominal_pool = [verb for verb in available_verbs if verb.startswith(("se ", "s'"))]
