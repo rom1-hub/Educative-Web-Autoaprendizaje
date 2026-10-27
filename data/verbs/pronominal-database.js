@@ -767,6 +767,15 @@ window.COQ_PRONOMINAL_VERBS = {
     "accordParticipePasse": "sujet",
     "actif": true
   },
+  "se-permettre": {
+    "infinitif": "se permettre",
+    "infinitifBase": "permettre",
+    "formeNonPronominale": "permettre",
+    "participePasse": "permis",
+    "auxiliaire": "être",
+    "accordParticipePasse": "aucun",
+    "actif": true
+  },
   "se-perdre": {
     "infinitif": "se perdre",
     "infinitifBase": "perdre",
