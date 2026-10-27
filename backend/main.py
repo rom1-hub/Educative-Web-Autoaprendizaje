@@ -3183,6 +3183,12 @@ def generate_practice(request: GenerateRequest) -> dict:
         # En el segundo grupo, la opción mixta conserva la proporción acordada:
         # 12 preguntas no pronominales (60 %) y 8 pronominales (40 %).
         selected_verbs = None
+        if family == "premier-groupe" and not request.construction and not request.auxiliary:
+            selected_verbs = select_balanced_first_group_verbs(
+                available_verbs,
+                set(pronominal_first_group_verbs()),
+                mixed_construction=True,
+            )
         if family in ("ir", "aitre", "dre", "ire-uire", "oir-oire", "ttre") and not request.construction and not request.auxiliary:
             pronominal_set = set(
                 third_group_dre_pronominal_verbs() if family == "dre"
