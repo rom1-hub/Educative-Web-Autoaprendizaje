@@ -107,12 +107,33 @@ def is_supported_first_group_entry(entry: dict, catalog: dict) -> bool:
 @functools.lru_cache(maxsize=1)
 def canonical_verb_catalog() -> dict:
     """Load the canonical verb catalog once and share it across catalog builders."""
-    catalog = canonical_verb_catalog()
+    catalog_path = ROOT / "data" / "verbs" / "local-database.js"
+    try:
+        source = catalog_path.read_text(encoding="utf-8")
+        prefix = "window.COQ_VERBS="
+        prefix_index = source.find(prefix)
+        if prefix_index < 0:
+            raise ValueError("No se reconoce el formato del catálogo de verbos.")
+        payload = source[prefix_index + len(prefix):].strip()
+        payload = payload.split(";\\nwindow.", 1)[0].strip()
+        if payload.endswith(";"):
+            payload = payload[:-1]
+        catalog = json.loads(payload)
+        if not isinstance(catalog, dict):
+            raise ValueError("El catálogo canónico debe ser un objeto JSON.")
+        return catalog
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        raise HTTPException(
+            500,
+            "No se pudo cargar el catálogo canónico de verbos para generar la práctica."
+        ) from exc
+
 
 @functools.lru_cache(maxsize=1)
 def ger_family_verbs() -> tuple[str, ...]:
     """Return canonical non-pronominal verbs in the orthographic -GER families."""
-    catalog = canonical_verb_catalog()    candidates = []
+    catalog = canonical_verb_catalog()
+    candidates = []
     for entry in catalog.values():
         if not isinstance(entry, dict):
             continue
@@ -126,7 +147,8 @@ def ger_family_verbs() -> tuple[str, ...]:
 @functools.lru_cache(maxsize=1)
 def cer_family_verbs() -> tuple[str, ...]:
     """Return canonical non-pronominal verbs in the orthographic -CER families."""
-    catalog = canonical_verb_catalog()    candidates = []
+    catalog = canonical_verb_catalog()
+    candidates = []
     for entry in catalog.values():
         if not isinstance(entry, dict):
             continue
