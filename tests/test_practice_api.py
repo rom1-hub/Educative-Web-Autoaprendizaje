@@ -1714,3 +1714,78 @@ class ThirdGroupAggregateCategoryIntegrationTests(unittest.TestCase):
             family_name = third_group_family_for_verb(verb)
             self.assertTrue(verb in pronominal or "etre" in auxiliary_lookup[family_name](verb))
 
+
+
+class AllGroupsAndFamiliesIntegrationTests(unittest.TestCase):
+    def test_global_category_generates_twenty_questions_with_sixty_forty_mix(self):
+        from backend.main import SESSIONS
+        response = generate_practice(GenerateRequest(family="tous-groupes-familles", tense="present"))
+        questions = SESSIONS[response["session_id"]]
+        self.assertEqual(response["total"], 20)
+        self.assertEqual(len(questions), 20)
+        pronominal = [row["verb"] for row in questions if row["verb"].startswith(("se ", "s'"))]
+        self.assertEqual(len(pronominal), 8)
+        self.assertEqual(len(questions) - len(pronominal), 12)
+
+    def test_global_category_represents_all_three_groups_and_multiple_families(self):
+        from backend.main import SESSIONS, third_group_family_for_verb, second_group_pronominal_verbs
+        response = generate_practice(GenerateRequest(family="tous-groupes-familles", tense="present"))
+        verbs = [row["verb"] for row in SESSIONS[response["session_id"]]]
+        third = {verb for verb in verbs if third_group_family_for_verb(verb)}
+        second = {verb for verb in verbs if verb in set(second_group_verbs()) | set(second_group_pronominal_verbs())}
+        first = set(verbs) - third - second
+        self.assertTrue(first)
+        self.assertTrue(second)
+        self.assertTrue(third)
+        self.assertGreaterEqual(len({third_group_family_for_verb(verb) for verb in third}), 2)
+
+    def test_global_category_construction_filters_are_respected(self):
+        from backend.main import SESSIONS
+        for construction, should_be_pronominal in (("pronominal", True), ("non-pronominal", False)):
+            with self.subTest(construction=construction):
+                response = generate_practice(GenerateRequest(
+                    family="tous-groupes-familles", tense="present", construction=construction
+                ))
+                verbs = [row["verb"] for row in SESSIONS[response["session_id"]]]
+                self.assertEqual(len(verbs), 20)
+                self.assertTrue(all(verb.startswith(("se ", "s'")) == should_be_pronominal for verb in verbs))
+
+    def test_global_category_respects_compound_auxiliary_etre(self):
+        from backend.main import (
+            SESSIONS, ETRE_PRIORITY_PARTICIPLES,
+            third_group_family_for_verb, third_group_dre_auxiliaries,
+            third_group_aitre_auxiliaries, third_group_ir_auxiliaries,
+            third_group_ire_uire_auxiliaries, third_group_oir_oire_auxiliaries,
+            third_group_ttre_auxiliaries, second_group_pronominal_verbs,
+        )
+        response = generate_practice(GenerateRequest(
+            family="tous-groupes-familles", tense="passe-compose", auxiliary="etre"
+        ))
+        questions = SESSIONS[response["session_id"]]
+        self.assertEqual(len(questions), 20)
+        pronominal = set(second_group_pronominal_verbs())
+        aux_lookup = {
+            "ir": third_group_ir_auxiliaries, "aitre": third_group_aitre_auxiliaries,
+            "dre": third_group_dre_auxiliaries, "ire-uire": third_group_ire_uire_auxiliaries,
+            "oir-oire": third_group_oir_oire_auxiliaries, "ttre": third_group_ttre_auxiliaries,
+        }
+        for question in questions:
+            verb = question["verb"]
+            if verb.startswith(("se ", "s'")):
+                continue
+            family_name = third_group_family_for_verb(verb)
+            if family_name:
+                self.assertIn("etre", aux_lookup[family_name](verb))
+            elif verb not in ETRE_PRIORITY_PARTICIPLES:
+                self.fail(f"Verbo no compatible con être: {verb}")
+
+    def test_global_category_excludes_impersonal_verbs_from_imperative(self):
+        from backend.main import SESSIONS, impersonal_verb_catalog, second_group_pronominal_catalog
+        response = generate_practice(GenerateRequest(
+            family="tous-groupes-familles", tense="imperatif-present"
+        ))
+        verbs = [row["verb"] for row in SESSIONS[response["session_id"]]]
+        self.assertEqual(len(verbs), 20)
+        for verb in verbs:
+            self.assertFalse(impersonal_verb_catalog().get(verb, {}).get("impersonal"))
+            self.assertFalse(second_group_pronominal_catalog().get(verb, {}).get("impersonal"))
