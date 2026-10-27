@@ -58,8 +58,11 @@ function conjugatePronominal(infinitive, tense) {
   return engine.conjugate({ ...base, ...specific, pronominal: true }, tense);
 }
 
-test("la base pronominal contiene 217 registros y las excepciones definidas", () => {
-  assert.equal(Object.keys(pronominalVerbs).length, 217);
+test("la base pronominal contiene 218 registros y las excepciones definidas", () => {
+  assert.equal(Object.keys(pronominalVerbs).length, 218);
+  assert.ok(findPronominal("se mettre"), "Debe existir el registro de se mettre.");
+  assert.equal(findPronominal("se mettre").participePasse, "mis");
+  assert.equal(findPronominal("se mettre").accordParticipePasse, "sujet");
   assert.equal(findPronominal("se parler").accordParticipePasse, "aucun");
   assert.equal(findPronominal("se téléphoner").accordParticipePasse, "aucun");
   assert.equal(findPronominal("s'enfuir").participePasse, "enfui");
@@ -102,6 +105,16 @@ test("se laver aplica la concordancia en los siete tiempos compuestos", () => {
       assert.equal(byPerson.elles, "se sont lavées");
     }
   }
+});
+
+test("se mettre se consulta y conjuga con concordancia pronominal", () => {
+  const present = Object.fromEntries(conjugatePronominal("se mettre", "present").map(row => [row.person, row.form]));
+  assert.equal(present.je, "me mets");
+  assert.equal(present.il, "se met");
+
+  const compound = Object.fromEntries(conjugatePronominal("se mettre", "passe-compose").map(row => [row.person, row.form]));
+  assert.equal(compound.elle, "s'est mise");
+  assert.equal(compound.ils, "se sont mis");
 });
 
 test("se parler y se téléphoner mantienen el participio invariable en todos los tiempos compuestos", () => {
