@@ -722,6 +722,15 @@ window.COQ_PRONOMINAL_VERBS = {
     "accordParticipePasse": "sujet",
     "actif": true
   },
+  "se-mettre": {
+    "infinitif": "se mettre",
+    "infinitifBase": "mettre",
+    "formeNonPronominale": "mettre",
+    "participePasse": "mis",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
   "se-moquer": {
     "infinitif": "se moquer",
     "infinitifBase": "moquer",
