@@ -33,6 +33,22 @@
     resultPanels.forEach(panel => { panel.hidden = panel.dataset.resultsFor !== name; });
   }
 
+  // Patrón de pestañas accesible: flechas, Inicio y Fin cambian el foco y el panel.
+  tabs.forEach((tab, index) => {
+    tab.addEventListener("keydown", event => {
+      let nextIndex = index;
+      if (event.key === "ArrowRight") nextIndex = (index + 1) % tabs.length;
+      else if (event.key === "ArrowLeft") nextIndex = (index - 1 + tabs.length) % tabs.length;
+      else if (event.key === "Home") nextIndex = 0;
+      else if (event.key === "End") nextIndex = tabs.length - 1;
+      else return;
+      event.preventDefault();
+      const nextTab = tabs[nextIndex];
+      setTab(nextTab.dataset.tab);
+      nextTab.focus();
+    });
+  });
+
   function showMessage(message, isError = false, target = (activeTab === "lookup" ? lookupResults : practiceResults)) {
     target.innerHTML = '<p class="results-message' + (isError ? ' is-error' : '') + '" role="status">' + esc(message) + '</p>';
   }
@@ -857,6 +873,29 @@
       document.body.appendChild(modal);
       const dialog = modal.querySelector(".practice-results-dialog");
       dialog.focus();
+
+      // Mantener el foco dentro del diálogo mientras sea modal.
+      modal.addEventListener("keydown", event => {
+        if (event.key !== "Tab") return;
+        const focusable = [...dialog.querySelectorAll(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"])'
+        )].filter(element => !element.hidden);
+        if (!focusable.length) {
+          event.preventDefault();
+          dialog.focus();
+          return;
+        }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog)) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      });
+
       modal.querySelector("[data-practice-continue]")?.addEventListener("click", () => {
         modal.remove();
         practiceForm.reset();
