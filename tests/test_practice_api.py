@@ -1453,11 +1453,35 @@ class ExpandedPronominalCatalogTests(unittest.TestCase):
         for key in ("se-abstenir", "se-dérouler", "se-entretenir", "se-plaire", "se-succéder"):
             with self.subTest(verb=key):
                 self.assertIn(key, records)
-        for verb in ("se plaire", "se déplaire", "se complaire", "se répondre",
+        for verb in ("se parler", "se téléphoner", "s'écrire", "se donner",
+                     "se plaire", "se déplaire", "se complaire", "se répondre",
                      "se mentir", "se sourire", "se nuire", "se ressembler",
                      "se succéder", "se suffire"):
             with self.subTest(no_agreement=verb):
                 self.assertIn(verb, PRONOMINAL_NO_SUBJECT_AGREEMENT)
+                record = records.get(verb.replace(" ", "-").replace("'", "-"))
+                self.assertIsNotNone(record, f"Falta el registro canónico de {verb}")
+                self.assertEqual(record["accordParticipePasse"], "aucun")
+
+    def test_s_ecrire_and_se_donner_do_not_expand_subject_agreement_in_practice(self):
+        from backend.main import expand_practice_etre_subject_variants
+
+        examples = {
+            "s'écrire": [
+                {"person": "elle", "form": "s'est écrit", "auxiliary": "être"},
+                {"person": "elles", "form": "se sont écrit", "auxiliary": "être"},
+            ],
+            "se donner": [
+                {"person": "elle", "form": "s'est donné", "auxiliary": "être"},
+                {"person": "elles", "form": "se sont donné", "auxiliary": "être"},
+            ],
+        }
+        for verb, forms in examples.items():
+            with self.subTest(verb=verb):
+                expanded = expand_practice_etre_subject_variants(
+                    forms, verb, "passe-compose"
+                )
+                self.assertEqual(expanded, forms)
 
 
 if __name__ == "__main__":
