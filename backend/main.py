@@ -3,6 +3,7 @@ from __future__ import annotations
 import functools
 import json
 import random
+import time
 import re
 import uuid
 import unicodedata
@@ -29,6 +30,22 @@ PERSONS = [
 ]
 IMPERATIVE_PERSONS = [("tu*", 0), ("nous*", 1), ("vous*", 2)]
 SESSIONS: dict[str, list[dict[str, str]]] = {}
+SESSION_CREATED_AT: dict[str, float] = {}
+SESSION_TTL_SECONDS = 2 * 60 * 60
+
+
+def cleanup_expired_sessions(now: float | None = None) -> int:
+    """Remove expired sessions; sessions without timestamps remain for compatibility."""
+    current_time = time.monotonic() if now is None else now
+    expired_ids = [
+        session_id
+        for session_id, created_at in SESSION_CREATED_AT.items()
+        if current_time - created_at >= SESSION_TTL_SECONDS
+    ]
+    for session_id in expired_ids:
+        SESSION_CREATED_AT.pop(session_id, None)
+        SESSIONS.pop(session_id, None)
+    return len(expired_ids)
 # Evita repetir los infinitivos de las últimas prácticas de categoría en este proceso.
 RECENT_CATEGORY_VERBS: list[str] = []
 RECENT_CATEGORY_VERBS_LIMIT = 60
@@ -4129,8 +4146,10 @@ def generate_practice(request: GenerateRequest) -> dict:
                 if len(questions) == 20:
                     break
 
+    cleanup_expired_sessions()
     session_id = uuid.uuid4().hex
     SESSIONS[session_id] = questions
+    SESSION_CREATED_AT[session_id] = time.monotonic()
     return {
         "session_id": session_id,
         "total": len(questions),
@@ -4143,6 +4162,7 @@ def generate_practice(request: GenerateRequest) -> dict:
 
 @app.post("/api/practice/check")
 def check_answer(request: CheckRequest) -> dict:
+    cleanup_expired_sessions()
     questions = SESSIONS.get(request.session_id)
     if questions is None:
         raise HTTPException(404, "La sesión ha caducado. Genera una nueva práctica.")
