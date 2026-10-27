@@ -1494,6 +1494,81 @@ class FirstGroupAggregateCategoryTests(unittest.TestCase):
                 counts[family] = counts.get(family, 0) + 1
             self.assertEqual(sorted(counts.values()), [2, 3, 3, 3, 3, 3, 3])
 
+    def test_pronominal_only_first_group_category_balances_available_families(self):
+        import random
+        from backend.main import SESSIONS, first_group_family_catalog, pronominal_first_group_verbs
+
+        catalog = first_group_family_catalog()
+        family_by_verb = {
+            verb: family for family, verbs in catalog.items() for verb in verbs
+        }
+        pronominal = set(pronominal_first_group_verbs())
+        random.seed(31)
+        result = generate_practice(GenerateRequest(
+            family="premier-groupe", tense="present", construction="pronominal"
+        ))
+        verbs = [row["verb"] for row in SESSIONS[result["session_id"]]]
+        self.assertEqual(len(verbs), 20)
+        self.assertTrue(all(verb in pronominal for verb in verbs))
+        self.assertTrue(set(verbs).issubset(family_by_verb))
+        counts = {}
+        for verb in verbs:
+            family = family_by_verb[verb]
+            counts[family] = counts.get(family, 0) + 1
+        self.assertLessEqual(max(counts.values()) - min(counts.values()), 1)
+
+    def test_non_pronominal_first_group_category_balances_all_seven_families(self):
+        import random
+        from backend.main import SESSIONS, first_group_family_catalog, pronominal_first_group_verbs
+
+        catalog = first_group_family_catalog()
+        family_by_verb = {
+            verb: family for family, verbs in catalog.items() for verb in verbs
+        }
+        pronominal = set(pronominal_first_group_verbs())
+        random.seed(32)
+        result = generate_practice(GenerateRequest(
+            family="premier-groupe", tense="present", construction="non-pronominal"
+        ))
+        verbs = [row["verb"] for row in SESSIONS[result["session_id"]]]
+        self.assertEqual(len(verbs), 20)
+        self.assertTrue(all(verb not in pronominal for verb in verbs))
+        counts = {}
+        for verb in verbs:
+            family = family_by_verb[verb]
+            counts[family] = counts.get(family, 0) + 1
+        self.assertEqual(sorted(counts.values()), [2, 3, 3, 3, 3, 3, 3])
+
+    def test_compound_auxiliary_filters_override_mixed_construction_ratio(self):
+        from backend.main import SESSIONS, pronominal_first_group_verbs
+
+        pronominal = set(pronominal_first_group_verbs())
+        for tense in ("passe-compose", "plus-que-parfait"):
+            with self.subTest(tense=tense):
+                result_avoir = generate_practice(GenerateRequest(
+                    family="premier-groupe", tense=tense, auxiliary="avoir"
+                ))
+                verbs_avoir = [
+                    row["verb"] for row in SESSIONS[result_avoir["session_id"]]
+                ]
+                self.assertEqual(len(verbs_avoir), 20)
+                self.assertTrue(all(verb not in pronominal for verb in verbs_avoir))
+
+                result_etre = generate_practice(GenerateRequest(
+                    family="premier-groupe", tense=tense, auxiliary="etre"
+                ))
+                verbs_etre = [
+                    row["verb"] for row in SESSIONS[result_etre["session_id"]]
+                ]
+                self.assertEqual(len(verbs_etre), 20)
+                self.assertTrue(all(verb in pronominal for verb in verbs_etre))
+
+        with self.assertRaises(HTTPException):
+            generate_practice(GenerateRequest(
+                family="premier-groupe", tense="passe-compose",
+                construction="pronominal", auxiliary="avoir",
+            ))
+
     def test_short_family_can_change_between_sessions(self):
         import random
         from backend.main import first_group_family_catalog, select_balanced_first_group_verbs, pronominal_first_group_verbs
