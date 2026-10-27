@@ -1923,3 +1923,43 @@ class SessionExpirationTests(unittest.TestCase):
             SESSION_CREATED_AT.pop(expired_id, None)
             SESSION_CREATED_AT.pop(active_id, None)
 
+
+class CanonicalCatalogCacheTests(unittest.TestCase):
+    def test_family_builders_read_and_parse_the_canonical_catalog_once(self):
+        from backend.main import (
+            canonical_verb_catalog,
+            ger_family_verbs, cer_family_verbs, regular_first_group_verbs,
+            pronominal_first_group_verbs, eler_family_patterns,
+            eter_family_patterns, e_accent_family_patterns, yer_family_patterns,
+        )
+        from pathlib import Path
+        from unittest.mock import patch
+
+        builders = (
+            ger_family_verbs, cer_family_verbs, regular_first_group_verbs,
+            pronominal_first_group_verbs, eler_family_patterns,
+            eter_family_patterns, e_accent_family_patterns, yer_family_patterns,
+        )
+        canonical_verb_catalog.cache_clear()
+        for builder in builders:
+            builder.cache_clear()
+
+        original_read_text = Path.read_text
+        catalog_reads = []
+
+        def counted_read_text(path, *args, **kwargs):
+            if path.name == "local-database.js":
+                catalog_reads.append(path)
+            return original_read_text(path, *args, **kwargs)
+
+        try:
+            with patch("backend.main.Path.read_text", new=counted_read_text):
+                for builder in builders:
+                    builder()
+            self.assertEqual(len(catalog_reads), 1)
+            self.assertIs(canonical_verb_catalog(), canonical_verb_catalog())
+        finally:
+            canonical_verb_catalog.cache_clear()
+            for builder in builders:
+                builder.cache_clear()
+
