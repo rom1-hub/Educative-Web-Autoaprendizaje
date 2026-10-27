@@ -921,7 +921,12 @@
     sessionSection.addEventListener("keydown", event => {
       if (event.key !== "Tab") return;
       const focusable = [input, button].filter(element => !element.disabled);
-      if (!focusable.length) return;
+      if (!focusable.length) {
+        event.preventDefault();
+        sessionSection.setAttribute("tabindex", "-1");
+        sessionSection.focus();
+        return;
+      }
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
       if (event.shiftKey && document.activeElement === first) {
