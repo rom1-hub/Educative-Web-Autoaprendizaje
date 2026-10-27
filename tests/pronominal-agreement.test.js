@@ -58,11 +58,17 @@ function conjugatePronominal(infinitive, tense) {
   return engine.conjugate({ ...base, ...specific, pronominal: true }, tense);
 }
 
-test("la base pronominal contiene 218 registros y las excepciones definidas", () => {
-  assert.equal(Object.keys(pronominalVerbs).length, 218);
+test("la base pronominal contiene 219 registros y las excepciones definidas", () => {
+  assert.equal(Object.keys(pronominalVerbs).length, 219);
   assert.ok(findPronominal("se mettre"), "Debe existir el registro de se mettre.");
   assert.equal(findPronominal("se mettre").participePasse, "mis");
   assert.equal(findPronominal("se mettre").accordParticipePasse, "sujet");
+  assert.ok(findPronominal("se permettre"), "Debe existir el registro de se permettre.");
+  assert.equal(findPronominal("se permettre").participePasse, "permis");
+  assert.equal(findPronominal("se permettre").accordParticipePasse, "aucun");
+  assert.ok(findPronominal("se soumettre"), "Debe existir el registro de se soumettre.");
+  assert.equal(findPronominal("se soumettre").participePasse, "soumis");
+  assert.equal(findPronominal("se soumettre").accordParticipePasse, "sujet");
   assert.equal(findPronominal("se parler").accordParticipePasse, "aucun");
   assert.equal(findPronominal("se téléphoner").accordParticipePasse, "aucun");
   assert.equal(findPronominal("s'enfuir").participePasse, "enfui");
@@ -115,6 +121,32 @@ test("se mettre se consulta y conjuga con concordancia pronominal", () => {
   const compound = Object.fromEntries(conjugatePronominal("se mettre", "passe-compose").map(row => [row.person, row.form]));
   assert.equal(compound.elle, "s'est mise");
   assert.equal(compound.ils, "se sont mis");
+});
+
+test("se permettre mantiene permis invariable y se soumettre concuerda en los tiempos compuestos", () => {
+  const permettrePresent = Object.fromEntries(
+    conjugatePronominal("se permettre", "present").map(row => [row.person, row.form])
+  );
+  assert.equal(permettrePresent.je, "me permets");
+  assert.equal(permettrePresent.il, "se permet");
+
+  const permettreCompound = Object.fromEntries(
+    conjugatePronominal("se permettre", "passe-compose").map(row => [row.person, row.form])
+  );
+  assert.equal(permettreCompound.elle, "s'est permis");
+  assert.equal(permettreCompound.ils, "se sont permis");
+
+  const soumettrePresent = Object.fromEntries(
+    conjugatePronominal("se soumettre", "present").map(row => [row.person, row.form])
+  );
+  assert.equal(soumettrePresent.je, "me soumets");
+  assert.equal(soumettrePresent.il, "se soumet");
+
+  const soumettreCompound = Object.fromEntries(
+    conjugatePronominal("se soumettre", "passe-compose").map(row => [row.person, row.form])
+  );
+  assert.equal(soumettreCompound.elle, "s'est soumise");
+  assert.equal(soumettreCompound.ils, "se sont soumis");
 });
 
 test("se parler y se téléphoner mantienen el participio invariable en todos los tiempos compuestos", () => {
