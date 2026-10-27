@@ -1459,7 +1459,7 @@ class ExpandedPronominalCatalogTests(unittest.TestCase):
                      "se succéder", "se suffire"):
             with self.subTest(no_agreement=verb):
                 self.assertIn(verb, PRONOMINAL_NO_SUBJECT_AGREEMENT)
-                record = records.get(verb.replace(" ", "-").replace("'", "-"))
+                record = next((item for item in records.values() if item.get("infinitif") == verb), None)
                 self.assertIsNotNone(record, f"Falta el registro canónico de {verb}")
                 self.assertEqual(record["accordParticipePasse"], "aucun")
 
