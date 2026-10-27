@@ -1376,14 +1376,14 @@ class ThirdGroupTtreIntegrationTests(unittest.TestCase):
             "mettre", "battre", "permettre", "promettre", "remettre",
             "transmettre", "combattre", "admettre", "soumettre",
         }.issubset(verbs))
-        self.assertTrue({"se battre", "se remettre"}.issubset(pronominal))
+        self.assertTrue({"se battre", "se remettre", "se mettre"}.issubset(pronominal))
         self.assertNotIn("vendre", verbs)
         self.assertNotIn("lire", verbs)
         self.assertTrue(all(verb.endswith("ttre") for verb in verbs))
 
     def test_individual_verbs_accept_generic_and_specific_family_profiles(self):
         from backend.main import SESSIONS
-        for verb in ("mettre", "se battre"):
+        for verb in ("mettre", "se battre", "se mettre"):
             for family in ("troisieme-groupe", "ttre"):
                 with self.subTest(verb=verb, family=family):
                     result = generate_practice(GenerateRequest(
@@ -1395,7 +1395,7 @@ class ThirdGroupTtreIntegrationTests(unittest.TestCase):
 
     def test_canonical_forms_cover_all_tenses_for_mettre_and_se_battre(self):
         from backend.main import TENSE_LABELS, third_group_ttre_forms
-        for verb in ("mettre", "se battre"):
+        for verb in ("mettre", "se battre", "se mettre"):
             for tense in TENSE_LABELS:
                 with self.subTest(verb=verb, tense=tense):
                     forms = third_group_ttre_forms(verb, tense)
@@ -1405,6 +1405,9 @@ class ThirdGroupTtreIntegrationTests(unittest.TestCase):
                     if verb == "se battre" and tense == "present":
                         third_person = next(row["form"] for row in forms if row["person"] == "il")
                         self.assertEqual(third_person, "se bat")
+                    if verb == "se mettre" and tense == "passe-compose":
+                        feminine = next(row["form"] for row in forms if row["person"] == "elle")
+                        self.assertEqual(feminine, "s'est mise")
 
     def test_category_practice_has_twenty_questions_and_60_40_mix(self):
         from backend.main import SESSIONS, third_group_ttre_pronominal_verbs
