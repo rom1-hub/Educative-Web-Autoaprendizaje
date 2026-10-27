@@ -689,19 +689,29 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
                 generate_practice(GenerateRequest(verb=verb, family="eler", tense="present"))
 
     def test_answer_check_accepts_missing_accents_and_case(self):
-        session = generate_practice(GenerateRequest(verb="parler", tense="present"))
-        first = session["questions"][0]
-        answer_by_person = {
-            "je": "parle", "tu": "parles", "il": "parle", "elle": "parle",
-            "on": "parle", "nous": "parlons", "vous": "parlez",
-            "ils": "parlent", "elles": "parlent",
+        session = generate_practice(GenerateRequest(verb="lever", tense="present"))
+        expected_by_person = {
+            "je": "lève", "tu": "lèves", "il": "lève", "elle": "lève",
+            "on": "lève", "nous": "levons", "vous": "levez",
+            "ils": "lèvent", "elles": "lèvent",
         }
+        unaccented_by_person = {
+            "je": "leve", "tu": "leves", "il": "leve", "elle": "leve",
+            "on": "leve", "nous": "levons", "vous": "levez",
+            "ils": "levent", "elles": "levent",
+        }
+        question = next(
+            item for item in session["questions"]
+            if item["person"] in ("je", "tu", "il", "elle", "on", "ils", "elles")
+        )
+        person = question["person"]
         result = check_answer(CheckRequest(
             session_id=session["session_id"],
-            index=first["index"],
-            answer=answer_by_person[first["person"]].upper(),
+            index=question["index"],
+            answer=unaccented_by_person[person].upper(),
         ))
         self.assertTrue(result["correct"])
+        self.assertEqual(result["expected"], expected_by_person[person])
 
     def test_generates_practice_for_all_tenses(self):
         tenses = [
