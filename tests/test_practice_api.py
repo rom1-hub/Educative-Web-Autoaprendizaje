@@ -1885,3 +1885,31 @@ class FirstGroupIndividualFamilyMixAndAuxiliaryTests(unittest.TestCase):
                     else:
                         self.assertTrue(all(verb in pronominal for verb in verbs))
 
+
+class SessionExpirationTests(unittest.TestCase):
+    def test_cleanup_removes_expired_sessions_and_preserves_active_sessions(self):
+        from backend.main import (
+            SESSIONS, SESSION_CREATED_AT, SESSION_TTL_SECONDS,
+            cleanup_expired_sessions,
+        )
+
+        expired_id = "test-expired-session"
+        active_id = "test-active-session"
+        SESSIONS[expired_id] = [{"answer": "parle"}]
+        SESSION_CREATED_AT[expired_id] = 10.0
+        SESSIONS[active_id] = [{"answer": "parle"}]
+        SESSION_CREATED_AT[active_id] = 100.0
+
+        try:
+            removed = cleanup_expired_sessions(now=10.0 + SESSION_TTL_SECONDS)
+            self.assertEqual(removed, 1)
+            self.assertNotIn(expired_id, SESSIONS)
+            self.assertNotIn(expired_id, SESSION_CREATED_AT)
+            self.assertIn(active_id, SESSIONS)
+            self.assertIn(active_id, SESSION_CREATED_AT)
+        finally:
+            SESSIONS.pop(expired_id, None)
+            SESSIONS.pop(active_id, None)
+            SESSION_CREATED_AT.pop(expired_id, None)
+            SESSION_CREATED_AT.pop(active_id, None)
+
