@@ -1429,6 +1429,33 @@ class ThirdGroupTtreIntegrationTests(unittest.TestCase):
             with self.subTest(verb=verb), self.assertRaises(HTTPException):
                 third_group_ttre_forms(verb, "present")
 
+class ExpandedPronominalCatalogTests(unittest.TestCase):
+    def test_catalog_has_expanded_records_with_valid_metadata(self):
+        from backend.main import _load_js_object
+        records = _load_js_object("data/verbs/pronominal-database.js", "COQ_PRONOMINAL_VERBS")
+        self.assertGreaterEqual(len(records), 200)
+        for key, record in records.items():
+            with self.subTest(verb=key):
+                self.assertTrue(record.get("infinitif"))
+                self.assertTrue(record.get("infinitifBase"))
+                self.assertTrue(record.get("formeNonPronominale"))
+                self.assertTrue(record.get("participePasse"))
+                self.assertEqual(record.get("auxiliaire"), "être")
+                self.assertIn(record.get("accordParticipePasse"), {"sujet", "aucun"})
+                self.assertIsNot(record.get("actif"), False)
+
+    def test_common_pronominal_verbs_and_participle_agreement_exceptions_are_registered(self):
+        from backend.main import _load_js_object, PRONOMINAL_NO_SUBJECT_AGREEMENT
+        records = _load_js_object("data/verbs/pronominal-database.js", "COQ_PRONOMINAL_VERBS")
+        for key in ("se-abstenir", "se-dérouler", "se-entretenir", "se-plaire", "se-succéder"):
+            with self.subTest(verb=key):
+                self.assertIn(key, records)
+        for verb in ("se plaire", "se déplaire", "se complaire", "se répondre",
+                     "se mentir", "se sourire", "se nuire", "se ressembler",
+                     "se succéder", "se suffire"):
+            with self.subTest(no_agreement=verb):
+                self.assertIn(verb, PRONOMINAL_NO_SUBJECT_AGREEMENT)
+
 
 if __name__ == "__main__":
     unittest.main()
