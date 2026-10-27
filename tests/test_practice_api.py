@@ -1728,7 +1728,7 @@ class AllGroupsAndFamiliesIntegrationTests(unittest.TestCase):
         self.assertEqual(len(questions) - len(pronominal), 12)
 
     def test_global_category_represents_all_three_groups_and_multiple_families(self):
-        from backend.main import SESSIONS, third_group_family_for_verb, second_group_pronominal_verbs
+        from backend.main import SESSIONS, third_group_family_for_verb, second_group_verbs, second_group_pronominal_verbs
         response = generate_practice(GenerateRequest(family="tous-groupes-familles", tense="present"))
         verbs = [row["verb"] for row in SESSIONS[response["session_id"]]]
         third = {verb for verb in verbs if third_group_family_for_verb(verb)}
