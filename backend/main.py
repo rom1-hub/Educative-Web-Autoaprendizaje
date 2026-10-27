@@ -3390,8 +3390,13 @@ def third_group_family_for_verb(verb: str) -> str | None:
     return None
 
 
-@functools.lru_cache(maxsize=64)
 def third_group_all_available_verbs(tense: str, auxiliary: str = "") -> tuple[str, ...]:
+    """Return a cached pool with canonical cache keys for omitted/default auxiliaries."""
+    return _third_group_all_available_verbs_cached(tense, auxiliary or "")
+
+
+@functools.lru_cache(maxsize=64)
+def _third_group_all_available_verbs_cached(tense: str, auxiliary: str) -> tuple[str, ...]:
     """Build a cached, deduplicated pool by validating randomized candidates lazily."""
     sources = (
         third_group_ir_verbs(),
@@ -3442,6 +3447,11 @@ def third_group_all_available_verbs(tense: str, auxiliary: str = "") -> tuple[st
             break
 
     return tuple(valid)
+
+
+# Preserve cache introspection used by integration tests and diagnostics.
+third_group_all_available_verbs.cache_info = _third_group_all_available_verbs_cached.cache_info
+third_group_all_available_verbs.cache_clear = _third_group_all_available_verbs_cached.cache_clear
 
 
 def select_balanced_third_group_verbs(pool: list[str], count: int, recent: set[str] | None = None) -> list[str]:
