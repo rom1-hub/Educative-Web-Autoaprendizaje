@@ -897,7 +897,8 @@
 
     const question = questions[index];
     const orthography = window.COQ_FRENCH_ORTHOGRAPHY;
-    const displayedPerson = question.person === "je" &&
+    const isPronominalVerb = /^(?:se\s+|s')/i.test(question.verb);
+    const displayedPerson = question.person === "je" && !isPronominalVerb &&
       orthography?.startsWithElidableVowel(question.verb, question.verb)
         ? "j'"
         : question.person;
