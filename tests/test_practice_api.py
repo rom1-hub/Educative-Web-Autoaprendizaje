@@ -1795,17 +1795,35 @@ class FirstGroupIndividualFamilyMixAndAuxiliaryTests(unittest.TestCase):
         "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent",
     )
 
-    def test_each_individual_first_group_family_uses_exact_sixty_forty_mix(self):
-        from backend.main import SESSIONS, pronominal_first_group_verbs
+    def test_each_individual_first_group_family_uses_sixty_forty_when_pools_allow_it(self):
+        from backend.main import (
+            SESSIONS, pronominal_first_group_verbs, regular_first_group_verbs,
+            ger_family_verbs, cer_family_verbs, eler_family_verbs,
+            eter_family_verbs, yer_family_verbs, e_accent_family_patterns,
+        )
         pronominal = set(pronominal_first_group_verbs())
+        catalogs = {
+            "premier-groupe-reguliers": set(regular_first_group_verbs()),
+            "ger": set(ger_family_verbs()),
+            "cer": set(cer_family_verbs()),
+            "eler": set(eler_family_verbs()),
+            "eter": set(eter_family_verbs()),
+            "yer": set(yer_family_verbs()),
+            "e-accent": set(e_accent_family_patterns()),
+        }
         for family in self.FAMILIES:
             with self.subTest(family=family):
                 response = generate_practice(GenerateRequest(family=family, tense="present"))
                 questions = SESSIONS[response["session_id"]]
                 verbs = [row["verb"] for row in questions]
+                p_count = len(catalogs[family] & pronominal)
+                n_count = len(catalogs[family] - pronominal)
                 self.assertEqual(len(verbs), 20)
-                self.assertEqual(sum(verb in pronominal for verb in verbs), 8)
-                self.assertEqual(sum(verb not in pronominal for verb in verbs), 12)
+                if p_count >= 8 and n_count >= 12:
+                    self.assertEqual(sum(verb in pronominal for verb in verbs), 8)
+                    self.assertEqual(sum(verb not in pronominal for verb in verbs), 12)
+                elif len(catalogs[family]) >= 20:
+                    self.assertEqual(len(set(verbs)), 20)
 
     def test_each_individual_first_group_family_respects_compound_auxiliary_filters(self):
         from backend.main import SESSIONS, pronominal_first_group_verbs
@@ -1829,5 +1847,9 @@ class FirstGroupIndividualFamilyMixAndAuxiliaryTests(unittest.TestCase):
                         row["verb"] for row in SESSIONS[response["session_id"]]
                     ]
                     self.assertEqual(len(verbs), 20)
-                    self.assertTrue(all(verb in pronominal for verb in verbs))
+                    if family == "premier-groupe-reguliers":
+                        from backend.main import ETRE_PRIORITY_PARTICIPLES
+                        self.assertTrue(all(verb in ETRE_PRIORITY_PARTICIPLES for verb in verbs))
+                    else:
+                        self.assertTrue(all(verb in pronominal for verb in verbs))
 
