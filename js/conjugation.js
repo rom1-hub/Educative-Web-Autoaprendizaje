@@ -1016,8 +1016,16 @@
     applyLockedProfile();
   });
 
+  let practiceGenerationInFlight = false;
+  let practiceGenerationRequestId = 0;
+
   practiceForm.addEventListener("submit", async event => {
     event.preventDefault();
+    if (practiceGenerationInFlight) return;
+    practiceGenerationInFlight = true;
+    const requestId = ++practiceGenerationRequestId;
+    const submitButton = practiceForm.querySelector('button[type="submit"]');
+    if (submitButton) submitButton.disabled = true;
     const practiceVerbInput = document.getElementById("practice-verb");
     const rawPracticeVerb = practiceVerbInput.value.trim();
     const canonicalPracticeVerb = findCanonicalSuggestion(rawPracticeVerb);
@@ -1038,17 +1046,32 @@
     showPracticeMessage("Generando ejercicios con Python…");
     try {
       const data = await requestPractice("/api/practice/generate", filters);
+      if (requestId !== practiceGenerationRequestId) return;
+      if (!Array.isArray(data.questions) || data.questions.length !== 20 || !data.session_id) {
+        throw new Error("Python no devolvió una sesión válida de 20 preguntas. Inténtalo de nuevo.");
+      }
       activePractice = { sessionId: data.session_id, questions: data.questions, index: 0, score: 0, answers: [] };
       renderPracticeQuestion();
     } catch (error) {
+      if (requestId !== practiceGenerationRequestId) return;
       showPracticeMessage(error.message, true);
+    } finally {
+      if (requestId === practiceGenerationRequestId) {
+        practiceGenerationInFlight = false;
+        if (submitButton) submitButton.disabled = false;
+      }
     }
   });
 
   practiceForm.addEventListener("reset", () => {
+    // Invalida cualquier respuesta pendiente para que no sustituya el estado del formulario reiniciado.
+    practiceGenerationRequestId += 1;
+    practiceGenerationInFlight = false;
     lockedVerbProfile = null;
     activePractice = null;
     window.setTimeout(() => {
+      const submitButton = practiceForm.querySelector('button[type="submit"]');
+      if (submitButton) submitButton.disabled = false;
       applyLockedProfile();
       practiceResults.innerHTML = '<div class="results-empty"><div class="results-symbol" aria-hidden="true">Aa</div><h2>Tu espacio de práctica</h2><p>Configura los filtros y genera una sesión de ejercicios. Los resultados de conjugación no se muestran en esta pestaña.</p></div>';
     }, 0);

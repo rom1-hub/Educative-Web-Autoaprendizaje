@@ -1635,6 +1635,16 @@ class Top100CategoryIntegrationTests(unittest.TestCase):
         self.assertEqual(top_100_forms("s'en aller", "present")[0]["form"], "m'en vais")
 
 class ThirdGroupAggregateCategoryIntegrationTests(unittest.TestCase):
+    def test_global_third_group_pool_is_cached_and_uses_lazy_validated_candidates(self):
+        from backend.main import third_group_all_available_verbs
+        first = third_group_all_available_verbs("present", "")
+        info_after_first = third_group_all_available_verbs.cache_info()
+        second = third_group_all_available_verbs("present", "")
+        info_after_second = third_group_all_available_verbs.cache_info()
+        self.assertTrue(first)
+        self.assertEqual(first, second)
+        self.assertGreater(info_after_second.hits, info_after_first.hits)
+
     def test_global_third_group_category_generates_twenty_balanced_questions_across_catalogs(self):
         from backend.main import (
             SESSIONS, third_group_all_available_verbs, third_group_family_for_verb,

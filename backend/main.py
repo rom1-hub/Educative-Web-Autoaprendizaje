@@ -3390,17 +3390,58 @@ def third_group_family_for_verb(verb: str) -> str | None:
     return None
 
 
+@functools.lru_cache(maxsize=64)
 def third_group_all_available_verbs(tense: str, auxiliary: str = "") -> tuple[str, ...]:
-    """Union the six canonical third-group catalogs without duplicating infinitives."""
+    """Build a cached, deduplicated pool by validating randomized candidates lazily."""
     sources = (
-        third_group_ir_available_verbs(tense, auxiliary),
-        third_group_aitre_available_verbs(tense, auxiliary),
-        third_group_dre_available_verbs(tense, auxiliary),
-        third_group_ire_uire_available_verbs(tense, auxiliary),
-        third_group_oir_oire_available_verbs(tense, auxiliary),
-        third_group_ttre_available_verbs(tense, auxiliary),
+        third_group_ir_verbs(),
+        third_group_aitre_verbs(),
+        third_group_dre_verbs(),
+        third_group_ire_uire_verbs(),
+        third_group_oir_oire_verbs(),
+        third_group_ttre_verbs(),
     )
-    return tuple(sorted({verb for source in sources for verb in source}))
+    candidates = list({verb for source in sources for verb in source})
+    random.shuffle(candidates)
+
+    pronominal_verbs = set().union(
+        set(third_group_dre_pronominal_verbs()),
+        set(third_group_aitre_pronominal_verbs()),
+        set(third_group_ir_pronominal_verbs()),
+        set(third_group_ire_uire_pronominal_verbs()),
+        set(third_group_oir_oire_pronominal_verbs()),
+        set(third_group_ttre_pronominal_verbs()),
+    )
+    valid = []
+    counts = {"pronominal": 0, "non-pronominal": 0}
+    target_per_construction = 24
+    generators = {
+        "ir": third_group_ir_forms,
+        "aitre": third_group_aitre_forms,
+        "dre": third_group_dre_forms,
+        "ire-uire": third_group_ire_uire_forms,
+        "oir-oire": third_group_oir_oire_forms,
+        "ttre": third_group_ttre_forms,
+    }
+
+    for verb in candidates:
+        construction = "pronominal" if verb in pronominal_verbs else "non-pronominal"
+        if counts[construction] >= target_per_construction:
+            continue
+        family_name = third_group_family_for_verb(verb)
+        generator = generators.get(family_name)
+        if generator is None:
+            continue
+        try:
+            generator(verb, tense, auxiliary)
+        except HTTPException:
+            continue
+        valid.append(verb)
+        counts[construction] += 1
+        if all(count >= target_per_construction for count in counts.values()):
+            break
+
+    return tuple(valid)
 
 
 def select_balanced_third_group_verbs(pool: list[str], count: int, recent: set[str] | None = None) -> list[str]:
