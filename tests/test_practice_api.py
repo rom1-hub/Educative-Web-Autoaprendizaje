@@ -688,30 +688,32 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
             with self.subTest(verb=verb), self.assertRaises(HTTPException):
                 generate_practice(GenerateRequest(verb=verb, family="eler", tense="present"))
 
-    def test_answer_check_accepts_missing_accents_and_case(self):
-        session = generate_practice(GenerateRequest(verb="lever", tense="present"))
-        expected_by_person = {
-            "je": "lève", "tu": "lèves", "il": "lève", "elle": "lève",
-            "on": "lève", "nous": "levons", "vous": "levez",
-            "ils": "lèvent", "elles": "lèvent",
-        }
-        unaccented_by_person = {
-            "je": "leve", "tu": "leves", "il": "leve", "elle": "leve",
-            "on": "leve", "nous": "levons", "vous": "levez",
-            "ils": "levent", "elles": "levent",
-        }
-        question = next(
-            item for item in session["questions"]
-            if item["person"] in ("je", "tu", "il", "elle", "on", "ils", "elles")
+    def test_answer_check_requires_french_accents_but_ignores_case(self):
+        cases = (
+            ("lever", "present", "il", "lève", "leve"),
+            ("hésiter", "present", "je", "hésite", "hesite"),
+            ("se lever", "present", "il", "se lève", "se leve"),
         )
-        person = question["person"]
-        result = check_answer(CheckRequest(
-            session_id=session["session_id"],
-            index=question["index"],
-            answer=unaccented_by_person[person].upper(),
-        ))
-        self.assertTrue(result["correct"])
-        self.assertEqual(result["expected"], expected_by_person[person])
+        for verb, tense, person, expected, missing_accent in cases:
+            with self.subTest(verb=verb, expected=expected):
+                session = generate_practice(GenerateRequest(verb=verb, tense=tense))
+                question = next(
+                    item for item in session["questions"]
+                    if item["person"] == person and item["answer"] == expected
+                )
+                missing_result = check_answer(CheckRequest(
+                    session_id=session["session_id"],
+                    index=question["index"],
+                    answer=missing_accent,
+                ))
+                self.assertFalse(missing_result["correct"])
+                self.assertEqual(missing_result["expected"], expected)
+                accented_uppercase_result = check_answer(CheckRequest(
+                    session_id=session["session_id"],
+                    index=question["index"],
+                    answer=expected.upper(),
+                ))
+                self.assertTrue(accented_uppercase_result["correct"])
 
     def test_generates_practice_for_all_tenses(self):
         tenses = [
