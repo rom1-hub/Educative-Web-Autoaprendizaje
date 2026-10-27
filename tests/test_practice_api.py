@@ -8,6 +8,7 @@ from backend.main import (
     check_answer,
     generate_practice,
     regular_er_present,
+    SESSIONS,
 )
 
 
@@ -699,7 +700,8 @@ class RegularFirstGroupPresentTests(unittest.TestCase):
                 session = generate_practice(GenerateRequest(verb=verb, tense=tense))
                 question = next(
                     item for item in session["questions"]
-                    if item["person"] == person and item["answer"] == expected
+                    if item["person"] == person
+                    and SESSIONS[session["session_id"]][item["index"]]["answer"] == expected
                 )
                 missing_result = check_answer(CheckRequest(
                     session_id=session["session_id"],
