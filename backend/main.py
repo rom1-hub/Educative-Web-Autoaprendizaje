@@ -3895,13 +3895,18 @@ def generate_practice(request: GenerateRequest) -> dict:
             elif family == "ttre":
                 available_verbs = [verb for verb in available_verbs if "etre" in third_group_ttre_auxiliaries(verb)]
             else:
-                available_verbs = [
-                    verb for verb in available_verbs
-                    if (family == "deuxieme-groupe" and verb in second_group_pronominal_verbs())
-                    or (family in ("premier-groupe", *FIRST_GROUP_FAMILY_IDS) and verb in pronominal_first_group_verbs())
-                    or verb in ETRE_PRIORITY_PARTICIPLES
-                    or (request.construction == "pronominal" and verb.startswith(("se ", "s'")))
-                ]
+                if family == "premier-groupe-reguliers":
+                    # Compatibilidad histórica: esta categoría expone los verbos
+                    # canónicos con prioridad de être, no variantes pronominales.
+                    available_verbs = [verb for verb in available_verbs if verb in ETRE_PRIORITY_PARTICIPLES]
+                else:
+                    available_verbs = [
+                        verb for verb in available_verbs
+                        if (family == "deuxieme-groupe" and verb in second_group_pronominal_verbs())
+                        or (family in ("premier-groupe", *FIRST_GROUP_FAMILY_IDS) and verb in pronominal_first_group_verbs())
+                        or (family == "premier-groupe" and verb in ETRE_PRIORITY_PARTICIPLES)
+                        or (request.construction == "pronominal" and verb.startswith(("se ", "s'")))
+                    ]
         elif family == "troisieme-groupe" and request.tense in COMPOUND_TENSES and request.auxiliary == "avoir":
             # Los catálogos específicos ya han filtrado las formas compatibles con avoir.
             pass
@@ -3948,14 +3953,19 @@ def generate_practice(request: GenerateRequest) -> dict:
                 mixed_construction=not request.construction and not request.auxiliary,
             )
         elif family in FIRST_GROUP_FAMILY_IDS and not request.construction and not request.auxiliary:
-            # Las familias individuales también garantizan 12 no pronominales y 8 pronominales.
+            # Garantizar 60/40 solo cuando ambas construcciones tienen suficientes
+            # infinitivos distintos; de lo contrario preservar la variedad del catálogo.
             pronominal_set = set(pronominal_first_group_verbs())
             pronominal_pool = [verb for verb in available_verbs if verb in pronominal_set]
             non_pronominal_pool = [verb for verb in available_verbs if verb not in pronominal_set]
-            if not pronominal_pool or not non_pronominal_pool:
-                raise HTTPException(422, "Esta familia no dispone de candidatos para ambas construcciones y no puede cumplir el reparto 60/40.")
-            choose = lambda pool, count: random.sample(pool, count) if len(pool) >= count else random.choices(pool, k=count)
-            selected_verbs = choose(non_pronominal_pool, 12) + choose(pronominal_pool, 8)
+            if len(pronominal_pool) >= 8 and len(non_pronominal_pool) >= 12:
+                selected_verbs = random.sample(non_pronominal_pool, 12) + random.sample(pronominal_pool, 8)
+            else:
+                # No repetir verbos solo para forzar un porcentaje que el catálogo no permite.
+                recent = set(RECENT_CATEGORY_VERBS)
+                fresh = [verb for verb in available_verbs if verb not in recent]
+                pool = fresh if len(fresh) >= min(20, len(available_verbs)) else available_verbs
+                selected_verbs = random.sample(pool, 20) if len(pool) >= 20 else random.choices(pool, k=20)
             random.shuffle(selected_verbs)
         if family in ("ir", "aitre", "dre", "ire-uire", "oir-oire", "ttre") and not request.construction and not request.auxiliary:
             pronominal_set = set(
