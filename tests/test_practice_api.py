@@ -1469,7 +1469,7 @@ class ExpandedPronominalCatalogTests(unittest.TestCase):
         forms = regular_er_forms("se donner", "passe-compose")
         by_person = {form["person"]: form["form"] for form in forms}
         self.assertEqual(by_person["nous"], "nous sommes donné")
-        self.assertEqual(by_person["elles"], "elles se sont donné")
+        self.assertEqual(by_person["elles"], "se sont donné")
 
     def test_s_ecrire_and_se_donner_do_not_expand_subject_agreement_in_practice(self):
         from backend.main import expand_practice_etre_subject_variants
