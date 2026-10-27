@@ -3574,9 +3574,9 @@ def generate_practice(request: GenerateRequest) -> dict:
         for bucket in first_group:
             values = set(family_pools[bucket])
             if request.tense in COMPOUND_TENSES and request.auxiliary == "etre":
-                values &= pronominal_by_family[bucket]
+                values &= pronominal_by_family[bucket] | (values & set(ETRE_PRIORITY_PARTICIPLES))
             elif request.tense in COMPOUND_TENSES and request.auxiliary == "avoir":
-                values -= pronominal_by_family[bucket]
+                values -= pronominal_by_family[bucket] | set(ETRE_PRIORITY_PARTICIPLES)
             family_pools[bucket] = tuple(sorted(values))
         second_values = set(family_pools["deuxieme-groupe"])
         second_pronominal = pronominal_by_family["deuxieme-groupe"]
@@ -3679,8 +3679,14 @@ def generate_practice(request: GenerateRequest) -> dict:
         # Si un filtro deja menos de 20 infinitivos distintos, reutilizar solo al final.
         remaining = 20 - len(selected_verbs)
         if remaining:
+            if request.construction == "pronominal":
+                fallback_pools = (eligible_by_construction["pronominal"],)
+            elif request.construction in ("non-pronomial", "non-pronominal"):
+                fallback_pools = (eligible_by_construction["non-pronominal"],)
+            else:
+                fallback_pools = tuple(eligible_by_construction.values())
             fallback = [
-                verb for pools in eligible_by_construction.values()
+                verb for pools in fallback_pools
                 for values in pools.values() for verb in values
                 if verb not in selected_set
             ]
@@ -3691,11 +3697,15 @@ def generate_practice(request: GenerateRequest) -> dict:
             selected_set.update(extra)
             remaining = 20 - len(selected_verbs)
         if remaining:
-            fallback = [
-                verb for pools in eligible_by_construction.values()
-                for values in pools.values() for verb in values
-            ]
-            fallback = list(dict.fromkeys(fallback))
+            if request.construction == "pronominal":
+                fallback_pools = (eligible_by_construction["pronominal"],)
+            elif request.construction in ("non-pronomial", "non-pronominal"):
+                fallback_pools = (eligible_by_construction["non-pronominal"],)
+            else:
+                fallback_pools = tuple(eligible_by_construction.values())
+            fallback = list(dict.fromkeys(
+                verb for pools in fallback_pools for values in pools.values() for verb in values
+            ))
             if not fallback:
                 raise HTTPException(422, "No hay verbos compatibles con los filtros seleccionados.")
             selected_verbs.extend(random.choices(fallback, k=remaining))
