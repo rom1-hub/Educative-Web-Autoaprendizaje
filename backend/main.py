@@ -3546,6 +3546,13 @@ def generate_practice(request: GenerateRequest) -> dict:
         # Catálogo agregado por familia: reutiliza los pools canónicos y sus cachés.
         # Cada infinitivo pertenece a un único bucket para que el equilibrio sea real.
         first_group = first_group_family_catalog()
+        # Completar la familia regular con variantes pronominales del primer grupo
+        # que no hayan quedado asignadas a una familia ortográfica especializada.
+        already_classified_first_group = set().union(*first_group.values())
+        first_group["premier-groupe-reguliers"] = tuple(sorted(
+            set(first_group["premier-groupe-reguliers"])
+            | (set(pronominal_first_group_verbs()) - already_classified_first_group)
+        ))
         third_group = {
             "ir": third_group_ir_available_verbs(request.tense, request.auxiliary),
             "aitre": third_group_aitre_available_verbs(request.tense, request.auxiliary),
@@ -3739,7 +3746,11 @@ def generate_practice(request: GenerateRequest) -> dict:
                 candidates = [
                     verb
                     for bucket, values in eligible_by_construction[construction_name].items()
-                    if group_for_verb(next(iter(values), "")) == missing_group
+                    if (
+                        (bucket in FIRST_GROUP_FAMILY_IDS and missing_group == "first")
+                        or (bucket == "deuxieme-groupe" and missing_group == "second")
+                        or (bucket not in FIRST_GROUP_FAMILY_IDS and bucket != "deuxieme-groupe" and missing_group == "third")
+                    )
                     for verb in values
                     if verb not in selected_verbs
                 ]
