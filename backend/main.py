@@ -318,6 +318,102 @@ def pronominal_first_group_verbs() -> tuple[str, ...]:
     return tuple(sorted(set(candidates)))
 
 
+
+FIRST_GROUP_FAMILY_IDS = (
+    "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent",
+)
+
+
+def first_group_family_catalog() -> dict[str, tuple[str, ...]]:
+    """Return disjoint, supported verb pools for the seven first-group families."""
+    family_pools = {
+        "ger": set(ger_family_verbs()),
+        "cer": set(cer_family_verbs()),
+        "eler": set(eler_family_verbs()),
+        "eter": set(eter_family_verbs()),
+        "yer": set(yer_family_verbs()),
+        "e-accent": set(e_accent_family_patterns()),
+    }
+    specialized = set().union(*family_pools.values())
+    family_pools["premier-groupe-reguliers"] = set(regular_first_group_verbs()) - specialized
+    claimed: set[str] = set()
+    disjoint: dict[str, tuple[str, ...]] = {}
+    for family in ("ger", "cer", "eler", "eter", "yer", "e-accent", "premier-groupe-reguliers"):
+        unique = family_pools[family] - claimed
+        disjoint[family] = tuple(sorted(unique))
+        claimed.update(unique)
+    return disjoint
+
+
+def select_balanced_first_group_verbs(
+    available_verbs: list[str], pronominal_verbs: set[str], mixed_construction: bool,
+) -> list[str]:
+    """Select 20 verbs across seven families with a randomized 3/3/3/3/3/3/2 split."""
+    available = set(available_verbs)
+    catalog = first_group_family_catalog()
+    family_order = list(FIRST_GROUP_FAMILY_IDS)
+    random.shuffle(family_order)
+    short_family = family_order[0]
+    quotas = {family: (2 if family == short_family else 3) for family in FIRST_GROUP_FAMILY_IDS}
+    pools = {
+        family: [verb for verb in catalog[family] if verb in available]
+        for family in FIRST_GROUP_FAMILY_IDS
+    }
+
+    if not mixed_construction:
+        if any(not pools[family] for family in FIRST_GROUP_FAMILY_IDS):
+            raise HTTPException(422, "No hay candidatos compatibles en las siete familias para mantener el reparto equilibrado con estos filtros.")
+        selected = []
+        for family in family_order:
+            pool = pools[family]
+            count = quotas[family]
+            selected.extend(random.sample(pool, count) if len(pool) >= count else random.choices(pool, k=count))
+        random.shuffle(selected)
+        return selected
+
+    pronominal_pools = {family: [v for v in pools[family] if v in pronominal_verbs] for family in FIRST_GROUP_FAMILY_IDS}
+    non_pronominal_pools = {family: [v for v in pools[family] if v not in pronominal_verbs] for family in FIRST_GROUP_FAMILY_IDS}
+    allocation_order = list(family_order)
+
+    def allocate(index: int, remaining: int, allocation: dict[str, int]) -> dict[str, int] | None:
+        if index == len(allocation_order):
+            return allocation if remaining == 0 else None
+        family = allocation_order[index]
+        quota = quotas[family]
+        has_p = bool(pronominal_pools[family])
+        has_n = bool(non_pronominal_pools[family])
+        if not has_p and not has_n:
+            return None
+        low = quota if not has_n else 0
+        high = 0 if not has_p else quota
+        choices = list(range(low, high + 1))
+        random.shuffle(choices)
+        for count_p in choices:
+            if count_p > remaining or remaining - count_p > sum(quotas[f] for f in allocation_order[index + 1:]):
+                continue
+            allocation[family] = count_p
+            result = allocate(index + 1, remaining - count_p, allocation)
+            if result is not None:
+                return result
+        allocation.pop(family, None)
+        return None
+
+    allocation = allocate(0, 8, {})
+    if allocation is None:
+        raise HTTPException(422, "No se puede cumplir el reparto 60/40 y equilibrar las siete familias con los verbos compatibles disponibles.")
+    selected: list[str] = []
+    for family in family_order:
+        count_p = allocation[family]
+        count_n = quotas[family] - count_p
+        p_pool, n_pool = pronominal_pools[family], non_pronominal_pools[family]
+        if count_p:
+            selected.extend(random.sample(p_pool, count_p) if len(p_pool) >= count_p else random.choices(p_pool, k=count_p))
+        if count_n:
+            selected.extend(random.sample(n_pool, count_n) if len(n_pool) >= count_n else random.choices(n_pool, k=count_n))
+    random.shuffle(selected)
+    return selected
+
+
 @functools.lru_cache(maxsize=1)
 def eler_family_patterns() -> dict[str, str]:
     """Return canonical non-pronominal -ELER verbs with a supported spelling pattern."""
@@ -2983,7 +3079,7 @@ def generate_practice(request: GenerateRequest) -> dict:
         raise HTTPException(422, "Selecciona una construcción verbal válida.")
     if request.auxiliary not in ("", "avoir", "etre"):
         raise HTTPException(422, "Selecciona un auxiliar válido.")
-    category_mode = family in ("premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe", "ir", "aitre", "dre", "ire-uire", "oir-oire", "ttre") and not request.verb.strip()
+    category_mode = family in ("premier-groupe", "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe", "ir", "aitre", "dre", "ire-uire", "oir-oire", "ttre") and not request.verb.strip()
     if selected_verb == "neiger" and not category_mode:
         raise HTTPException(
             422,
@@ -3005,7 +3101,7 @@ def generate_practice(request: GenerateRequest) -> dict:
     if category_mode:
         # Una pregunta por verbo: 20 infinitivos distintos elegidos al azar.
         # Cada categoría usa exclusivamente los verbos admitidos por el catálogo.
-        available_verbs = list({"ger": ger_family_verbs, "cer": cer_family_verbs, "eler": eler_family_verbs, "eter": eter_family_verbs, "yer": yer_family_verbs, "e-accent": lambda: tuple(sorted(e_accent_family_patterns())), "deuxieme-groupe": lambda: second_group_verbs() + second_group_pronominal_verbs(), "ir": lambda: third_group_ir_available_verbs(request.tense, request.auxiliary), "aitre": lambda: third_group_aitre_available_verbs(request.tense, request.auxiliary), "dre": lambda: third_group_dre_available_verbs(request.tense, request.auxiliary), "ire-uire": lambda: third_group_ire_uire_available_verbs(request.tense, request.auxiliary), "oir-oire": lambda: third_group_oir_oire_available_verbs(request.tense, request.auxiliary), "ttre": lambda: third_group_ttre_available_verbs(request.tense, request.auxiliary)}.get(family, lambda: regular_first_group_verbs())())
+        available_verbs = list({"premier-groupe": lambda: tuple(sorted(set().union(*first_group_family_catalog().values()))), "premier-groupe-reguliers": lambda: first_group_family_catalog()["premier-groupe-reguliers"], "ger": ger_family_verbs, "cer": cer_family_verbs, "eler": eler_family_verbs, "eter": eter_family_verbs, "yer": yer_family_verbs, "e-accent": lambda: tuple(sorted(e_accent_family_patterns())), "deuxieme-groupe": lambda: second_group_verbs() + second_group_pronominal_verbs(), "ir": lambda: third_group_ir_available_verbs(request.tense, request.auxiliary), "aitre": lambda: third_group_aitre_available_verbs(request.tense, request.auxiliary), "dre": lambda: third_group_dre_available_verbs(request.tense, request.auxiliary), "ire-uire": lambda: third_group_ire_uire_available_verbs(request.tense, request.auxiliary), "oir-oire": lambda: third_group_oir_oire_available_verbs(request.tense, request.auxiliary), "ttre": lambda: third_group_ttre_available_verbs(request.tense, request.auxiliary)}.get(family, lambda: regular_first_group_verbs())())
         # Keep the non-pronominal lemma out of category practice while retaining
         # its catalog entry so the registered pronominal variant remains resolvable.
         if family == "deuxieme-groupe":
