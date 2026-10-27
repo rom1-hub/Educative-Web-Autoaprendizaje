@@ -361,13 +361,20 @@ def select_balanced_first_group_verbs(
     }
 
     if not mixed_construction:
-        if any(not pools[family] for family in FIRST_GROUP_FAMILY_IDS):
-            raise HTTPException(422, "No hay candidatos compatibles en las siete familias para mantener el reparto equilibrado con estos filtros.")
+        # Con filtros restrictivos, algunas familias pueden quedarse sin candidatos.
+        # Repartir las 20 preguntas entre las familias compatibles sin exigir familias vacías.
+        active_families = [family for family in family_order if pools[family]]
+        if not active_families:
+            raise HTTPException(422, "No hay verbos compatibles con los filtros seleccionados.")
+        base_quota, extra = divmod(20, len(active_families))
         selected = []
-        for family in family_order:
+        for index, family in enumerate(active_families):
             pool = pools[family]
-            count = quotas[family]
-            selected.extend(random.sample(pool, count) if len(pool) >= count else random.choices(pool, k=count))
+            count = base_quota + (1 if index < extra else 0)
+            selected.extend(
+                random.sample(pool, count) if len(pool) >= count
+                else random.choices(pool, k=count)
+            )
         random.shuffle(selected)
         return selected
 
@@ -3183,11 +3190,14 @@ def generate_practice(request: GenerateRequest) -> dict:
         # En el segundo grupo, la opción mixta conserva la proporción acordada:
         # 12 preguntas no pronominales (60 %) y 8 pronominales (40 %).
         selected_verbs = None
-        if family == "premier-groupe" and not request.construction and not request.auxiliary:
+        if family == "premier-groupe":
+            # Solo la configuración mixta sin filtro de auxiliar garantiza el 60/40.
+            # Si se restringe construcción o auxiliar, esos filtros prevalecen y se
+            # equilibra entre las familias que sigan teniendo candidatos compatibles.
             selected_verbs = select_balanced_first_group_verbs(
                 available_verbs,
                 set(pronominal_first_group_verbs()),
-                mixed_construction=True,
+                mixed_construction=not request.construction and not request.auxiliary,
             )
         if family in ("ir", "aitre", "dre", "ire-uire", "oir-oire", "ttre") and not request.construction and not request.auxiliary:
             pronominal_set = set(
