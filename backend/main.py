@@ -925,7 +925,8 @@ def regular_er_forms(verb: str, tense: str, family: str = "") -> list[dict[str, 
         for key, values in simple_forms.items():
             simple_forms[key] = [reflexive_prefix(form, index) for index, form in enumerate(values)]
 
-    no_participle_agreement = {"se parler", "se téléphoner", "se demander"}
+    # Usar la regla canónica compartida por el motor y la validación de respuestas.
+    no_participle_agreement = PRONOMINAL_NO_SUBJECT_AGREEMENT
 
     def participle_for_person(person: str) -> str:
         if not is_pronominal or display_lemma in no_participle_agreement:
