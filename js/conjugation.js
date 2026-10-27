@@ -879,6 +879,11 @@
 
       // Mantener el foco dentro del diálogo mientras sea modal.
       modal.addEventListener("keydown", event => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          modal.querySelector("[data-practice-continue]")?.click();
+          return;
+        }
         if (event.key !== "Tab") return;
         const focusable = [...dialog.querySelectorAll(
           'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"])'
