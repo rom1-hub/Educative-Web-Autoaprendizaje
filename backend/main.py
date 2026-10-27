@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import functools
 import json
 import random
@@ -46,6 +47,30 @@ def cleanup_expired_sessions(now: float | None = None) -> int:
         SESSION_CREATED_AT.pop(session_id, None)
         SESSIONS.pop(session_id, None)
     return len(expired_ids)
+
+
+SESSION_CLEANUP_INTERVAL_SECONDS = 5 * 60
+
+
+@app.on_event("startup")
+async def start_session_cleanup_task() -> None:
+    async def cleanup_loop() -> None:
+        while True:
+            await asyncio.sleep(SESSION_CLEANUP_INTERVAL_SECONDS)
+            cleanup_expired_sessions()
+
+    app.state.session_cleanup_task = asyncio.create_task(cleanup_loop())
+
+
+@app.on_event("shutdown")
+async def stop_session_cleanup_task() -> None:
+    task = getattr(app.state, "session_cleanup_task", None)
+    if task is not None:
+        task.cancel()
+        try:
+            await task
+        except asyncio.CancelledError:
+            pass
 # Evita repetir los infinitivos de las últimas prácticas de categoría en este proceso.
 RECENT_CATEGORY_VERBS: list[str] = []
 RECENT_CATEGORY_VERBS_LIMIT = 60
