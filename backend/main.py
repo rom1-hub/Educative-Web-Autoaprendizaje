@@ -105,23 +105,14 @@ def is_supported_first_group_entry(entry: dict, catalog: dict) -> bool:
 
 
 @functools.lru_cache(maxsize=1)
+def canonical_verb_catalog() -> dict:
+    """Load the canonical verb catalog once and share it across catalog builders."""
+    catalog = canonical_verb_catalog()
+
+@functools.lru_cache(maxsize=1)
 def ger_family_verbs() -> tuple[str, ...]:
     """Return canonical non-pronominal verbs in the orthographic -GER families."""
-    catalog_path = ROOT / "data" / "verbs" / "local-database.js"
-    try:
-        source = catalog_path.read_text(encoding="utf-8")
-        prefix = "window.COQ_VERBS="
-        prefix_index = source.find(prefix)
-        if prefix_index < 0:
-            raise ValueError("No se reconoce el formato del catálogo de verbos.")
-        payload = source[prefix_index + len(prefix):].strip()
-        payload = payload.split(";\nwindow.", 1)[0].strip()
-        if payload.endswith(";"):
-            payload = payload[:-1]
-        catalog = json.loads(payload)
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
-        raise HTTPException(500, "No se pudo cargar el catálogo canónico de verbos para generar la práctica.") from exc
-    candidates = []
+    catalog = canonical_verb_catalog()    candidates = []
     for entry in catalog.values():
         if not isinstance(entry, dict):
             continue
@@ -135,21 +126,7 @@ def ger_family_verbs() -> tuple[str, ...]:
 @functools.lru_cache(maxsize=1)
 def cer_family_verbs() -> tuple[str, ...]:
     """Return canonical non-pronominal verbs in the orthographic -CER families."""
-    catalog_path = ROOT / "data" / "verbs" / "local-database.js"
-    try:
-        source = catalog_path.read_text(encoding="utf-8")
-        prefix = "window.COQ_VERBS="
-        prefix_index = source.find(prefix)
-        if prefix_index < 0:
-            raise ValueError("No se reconoce el formato del catálogo de verbos.")
-        payload = source[prefix_index + len(prefix):].strip()
-        payload = payload.split(";\nwindow.", 1)[0].strip()
-        if payload.endswith(";"):
-            payload = payload[:-1]
-        catalog = json.loads(payload)
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
-        raise HTTPException(500, "No se pudo cargar el catálogo canónico de verbos para generar la práctica.") from exc
-    candidates = []
+    catalog = canonical_verb_catalog()    candidates = []
     for entry in catalog.values():
         if not isinstance(entry, dict):
             continue
@@ -246,26 +223,7 @@ def regular_first_group_verbs() -> tuple[str, ...]:
     non-pronominal regular first-group verbs supported by this conjugator.
     The catalog is cached for the lifetime of the backend process.
     """
-    catalog_path = ROOT / "data" / "verbs" / "local-database.js"
-    try:
-        source = catalog_path.read_text(encoding="utf-8")
-        prefix = "window.COQ_VERBS="
-        prefix_index = source.find(prefix)
-        if prefix_index < 0:
-            raise ValueError("No se reconoce el formato del catálogo de verbos.")
-        payload = source[prefix_index + len(prefix):].strip()
-        # El archivo define el catálogo y después declara la versión en otra
-        # instrucción JavaScript; solo el primer objeto es JSON.
-        payload = payload.split(";\nwindow.", 1)[0].strip()
-        if payload.endswith(";"):
-            payload = payload[:-1]
-        catalog = json.loads(payload)
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
-        raise HTTPException(
-            500,
-            "No se pudo cargar el catálogo canónico de verbos para generar la práctica."
-        ) from exc
-
+    catalog = canonical_verb_catalog()
     candidates = []
     for entry in catalog.values():
         if not isinstance(entry, dict):
@@ -290,20 +248,7 @@ def regular_first_group_verbs() -> tuple[str, ...]:
 @functools.lru_cache(maxsize=1)
 def pronominal_first_group_verbs() -> tuple[str, ...]:
     """Return supported canonical pronominal verbs in the regular first group."""
-    catalog_path = ROOT / "data" / "verbs" / "local-database.js"
-    try:
-        source = catalog_path.read_text(encoding="utf-8")
-        prefix = "window.COQ_VERBS="
-        prefix_index = source.find(prefix)
-        if prefix_index < 0:
-            raise ValueError("No se reconoce el formato del catálogo de verbos.")
-        payload = source[prefix_index + len(prefix):].strip().split(";\nwindow.", 1)[0].strip()
-        if payload.endswith(";"):
-            payload = payload[:-1]
-        catalog = json.loads(payload)
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
-        raise HTTPException(500, "No se pudo cargar el catálogo canónico de verbos para generar la práctica.") from exc
-
+    catalog = canonical_verb_catalog()
     candidates = []
     for entry in catalog.values():
         if not isinstance(entry, dict):
@@ -424,20 +369,7 @@ def select_balanced_first_group_verbs(
 @functools.lru_cache(maxsize=1)
 def eler_family_patterns() -> dict[str, str]:
     """Return canonical non-pronominal -ELER verbs with a supported spelling pattern."""
-    catalog_path = ROOT / "data" / "verbs" / "local-database.js"
-    try:
-        source = catalog_path.read_text(encoding="utf-8")
-        prefix = "window.COQ_VERBS="
-        prefix_index = source.find(prefix)
-        if prefix_index < 0:
-            raise ValueError("No se reconoce el formato del catálogo de verbos.")
-        payload = source[prefix_index + len(prefix):].strip().split(";\nwindow.", 1)[0].strip()
-        if payload.endswith(";"):
-            payload = payload[:-1]
-        catalog = json.loads(payload)
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
-        raise HTTPException(500, "No se pudo cargar el catálogo canónico de verbos para generar la práctica.") from exc
-
+    catalog = canonical_verb_catalog()
     patterns = {}
     supported = {"app:eler", "p:eler", "harc:eler", "rév:éler"}
     for entry in catalog.values():
@@ -462,20 +394,7 @@ def eler_family_verbs() -> tuple[str, ...]:
 @functools.lru_cache(maxsize=1)
 def eter_family_patterns() -> dict[str, str]:
     """Return canonical non-pronominal -ETER verbs with supported spelling patterns."""
-    catalog_path = ROOT / "data" / "verbs" / "local-database.js"
-    try:
-        source = catalog_path.read_text(encoding="utf-8")
-        prefix = "window.COQ_VERBS="
-        prefix_index = source.find(prefix)
-        if prefix_index < 0:
-            raise ValueError("No se reconoce el formato del catálogo de verbos.")
-        payload = source[prefix_index + len(prefix):].strip().split(";\nwindow.", 1)[0].strip()
-        if payload.endswith(";"):
-            payload = payload[:-1]
-        catalog = json.loads(payload)
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
-        raise HTTPException(500, "No se pudo cargar el catálogo canónico de verbos para generar la práctica.") from exc
-
+    catalog = canonical_verb_catalog()
     patterns = {}
     supported = {"ach:eter", "j:eter", "décr:éter", "héb:éter"}
     for entry in catalog.values():
@@ -501,20 +420,7 @@ def eter_family_verbs() -> tuple[str, ...]:
 @functools.lru_cache(maxsize=1)
 def e_accent_family_patterns() -> dict[str, str]:
     """Return canonical non-pronominal E/È + consonant + ER verbs, excluding specific suffix families."""
-    catalog_path = ROOT / "data" / "verbs" / "local-database.js"
-    try:
-        source = catalog_path.read_text(encoding="utf-8")
-        prefix = "window.COQ_VERBS="
-        prefix_index = source.find(prefix)
-        if prefix_index < 0:
-            raise ValueError("No se reconoce el formato del catálogo de verbos.")
-        payload = source[prefix_index + len(prefix):].strip().split(";\nwindow.", 1)[0].strip()
-        if payload.endswith(";"):
-            payload = payload[:-1]
-        catalog = json.loads(payload)
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
-        raise HTTPException(500, "No se pudo cargar el catálogo canónico de verbos para generar la práctica.") from exc
-
+    catalog = canonical_verb_catalog()
     # Lista blanca de patrones del catálogo. La terminación específica tiene
     # prioridad: -GER, -CER, -ELER y -ETER no entran en esta familia.
     supported = {
@@ -541,21 +447,7 @@ def e_accent_family_patterns() -> dict[str, str]:
 @functools.lru_cache(maxsize=1)
 def yer_family_patterns() -> dict[str, str]:
     """Return canonical non-pronominal -YER verbs with explicitly supported patterns."""
-    catalog_path = ROOT / "data" / "verbs" / "local-database.js"
-    try:
-        source = catalog_path.read_text(encoding="utf-8")
-        prefix = "window.COQ_VERBS="
-        prefix_index = source.find(prefix)
-        if prefix_index < 0:
-            raise ValueError("No se reconoce el formato del catálogo de verbos.")
-        payload = source[prefix_index + len(prefix):].strip()
-        payload = payload.split(";\nwindow.", 1)[0].strip()
-        if payload.endswith(";"):
-            payload = payload[:-1]
-        catalog = json.loads(payload)
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
-        raise HTTPException(500, "No se pudo cargar el catálogo canónico de verbos para generar la práctica.") from exc
-
+    catalog = canonical_verb_catalog()
     supported = {"netto:yer", "pa:yer", "env:oyer", "grasse:yer"}
     patterns = {}
     for entry in catalog.values():
