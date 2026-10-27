@@ -863,7 +863,7 @@
       modal.className = "practice-results-modal";
       modal.setAttribute("role", "presentation");
       modal.innerHTML =
-        '<div class="practice-results-dialog" role="dialog" aria-modal="true" aria-labelledby="practice-results-title" tabindex="-1">' +
+        '<div class="practice-results-dialog" role="dialog" aria-labelledby="practice-results-title" tabindex="-1">' +
           '<span class="eyebrow">Sesión completada</span><h2 id="practice-results-title">Resultados de tu práctica</h2>' +
           '<div class="practice-summary-score"><strong>' + score + ' / ' + questions.length + '</strong><span>' + percentage + ' % de respuestas correctas</span></div>' +
           '<div class="practice-progress" role="progressbar" aria-label="Resultado final" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + percentage + '"><span style="width:' + percentage + '%"></span></div>' +
@@ -877,30 +877,11 @@
       const dialog = modal.querySelector(".practice-results-dialog");
       dialog.focus();
 
-      // Mantener el foco dentro del diálogo mientras sea modal.
+      // El resultado no bloquea la navegación por teclado: Tab puede salir del panel.
       modal.addEventListener("keydown", event => {
         if (event.key === "Escape") {
           event.preventDefault();
           modal.querySelector("[data-practice-continue]")?.click();
-          return;
-        }
-        if (event.key !== "Tab") return;
-        const focusable = [...dialog.querySelectorAll(
-          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"])'
-        )].filter(element => !element.hidden);
-        if (!focusable.length) {
-          event.preventDefault();
-          dialog.focus();
-          return;
-        }
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog)) {
-          event.preventDefault();
-          last.focus();
-        } else if (!event.shiftKey && document.activeElement === last) {
-          event.preventDefault();
-          first.focus();
         }
       });
 
@@ -915,6 +896,11 @@
     }
 
     const question = questions[index];
+    const orthography = window.COQ_FRENCH_ORTHOGRAPHY;
+    const displayedPerson = question.person === "je" &&
+      orthography?.startsWithElidableVowel(question.verb, question.verb)
+        ? "j'"
+        : question.person;
     practiceResults.innerHTML =
       '<section class="practice-session" aria-label="Sesión de práctica">' +
         '<div class="practice-session-top"><div><span class="eyebrow">Pregunta ' + (index + 1) + ' de ' + questions.length + '</span><h2>Conjuga el verbo</h2></div><span class="practice-score">Puntuación: ' + score + ' / ' + index + '</span></div>' +
@@ -922,7 +908,7 @@
         '<div class="practice-prompt"><span class="practice-prompt-label">' + esc(PRACTICE_TENSE_LABELS[question.tense] || question.tense) + '</span><div class="practice-prompt-main"><span class="practice-verb">' + esc(question.verb) + '</span></div><p>'+ (question.subject_gender && question.subject_number
           ? 'Ten en cuenta el género y el número indicados; no repitas el sujeto.'
           : 'Escribe la forma conjugada sin repetir el sujeto.') + '</p>' + (question.tense === "imperatif-present" || question.tense === "imperatif-passe" ? '<small>* En el imperativo, los sujetos no se escriben y no se pronuncian.</small>' : '') + '</div>' +
-        '<form class="practice-answer-form" data-practice-answer-form><label class="practice-answer-label" for="practice-answer">Tu respuesta</label><div class="practice-answer-entry"><span class="practice-answer-person" aria-hidden="true">' + esc(question.person) + '</span><input id="practice-answer" name="answer" type="text" aria-label="Forma conjugada para ' + esc(question.person) + '" autocomplete="off" autocapitalize="off" spellcheck="false" required></div><small>Escribe únicamente la forma conjugada.</small><div class="practice-answer-actions"><button class="button button-primary" type="submit">Comprobar respuesta</button></div></form>' +
+        '<form class="practice-answer-form" data-practice-answer-form><label class="practice-answer-label" for="practice-answer">Tu respuesta</label><div class="practice-answer-entry"><span class="practice-answer-person" aria-hidden="true">' + esc(displayedPerson) + '</span><input id="practice-answer" name="answer" type="text" aria-label="Forma conjugada para ' + esc(displayedPerson) + '" autocomplete="off" autocapitalize="off" spellcheck="false" required></div><small>Escribe únicamente la forma conjugada.</small><div class="practice-answer-actions"><button class="button button-primary" type="submit">Comprobar respuesta</button></div></form>' +
         '<div class="practice-feedback" data-practice-feedback aria-live="polite" hidden></div>' +
       '</section>';
 
@@ -930,6 +916,21 @@
     const input = practiceResults.querySelector("#practice-answer");
     const feedback = practiceResults.querySelector("[data-practice-feedback]");
     const button = form.querySelector('button[type="submit"]');
+    const sessionSection = practiceResults.querySelector(".practice-session");
+    sessionSection.addEventListener("keydown", event => {
+      if (event.key !== "Tab") return;
+      const focusable = [input, button].filter(element => !element.disabled);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
     let attempts = 0;
     let solutionRequired = false;
     let firstAnswerRecorded = false;
