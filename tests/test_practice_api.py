@@ -1592,3 +1592,33 @@ class FirstGroupAggregateCategoryTests(unittest.TestCase):
             self.assertEqual(sorted(counts.values()), [2, 3, 3, 3, 3, 3, 3])
             short_families.update(family for family, count in counts.items() if count == 2)
         self.assertGreater(len(short_families), 1)
+
+
+
+class Top100CategoryIntegrationTests(unittest.TestCase):
+    def test_top_100_category_generates_twenty_questions(self):
+        response = generate_practice(GenerateRequest(family="top-100", tense="present"))
+        self.assertEqual(response["total"], 20)
+        self.assertEqual(len(response["questions"]), 20)
+        self.assertTrue(all(item["verb"] for item in response["questions"]))
+
+    def test_top_100_supports_canonical_irregular_forms(self):
+        from backend.main import top_100_forms
+        self.assertEqual(top_100_forms("être", "present")[0]["form"], "suis")
+        self.assertEqual(top_100_forms("faire", "present")[0]["form"], "fais")
+        self.assertEqual(top_100_forms("falloir", "present")[0]["form"], "faut")
+
+    def test_top_100_excludes_defective_imperatives(self):
+        from backend.main import top_100_candidates
+        candidates = top_100_candidates("imperatif-present")
+        self.assertNotIn("pouvoir", candidates)
+        self.assertNotIn("falloir", candidates)
+        self.assertNotIn("s'agir", candidates)
+
+    def test_top_100_pronominal_variants_are_available(self):
+        from backend.main import top_100_candidates, top_100_forms
+        candidates = top_100_candidates("present")
+        self.assertIn("se mettre", candidates)
+        self.assertIn("se servir", candidates)
+        self.assertIn("s'endormir", candidates)
+        self.assertEqual(top_100_forms("se mettre", "present")[0]["form"], "me mets")

@@ -398,13 +398,19 @@
 
   function applyLockedProfile() {
     const family = document.getElementById("practice-family");
+    const practiceVerb = document.getElementById("practice-verb");
+    const top100Mode = family.value === "top-100";
     const construction = document.getElementById("practice-construction");
     const auxiliary = document.getElementById("practice-auxiliary");
     const compoundTense = isCompoundTense(document.getElementById("practice-tense").value);
     const pronominalOnly = construction.value === "pronominal";
 
+    if (practiceVerb) {
+      practiceVerb.disabled = Boolean(lockedVerbProfile) || top100Mode;
+      practiceVerb.closest(".form-field")?.classList.toggle("is-locked", practiceVerb.disabled);
+    }
     [family, construction, auxiliary].forEach(select => {
-      const locked = Boolean(lockedVerbProfile) || (select === auxiliary && (!compoundTense || pronominalOnly));
+      const locked = Boolean(lockedVerbProfile) || (top100Mode && select !== family) || (select === auxiliary && (!compoundTense || pronominalOnly));
       select.disabled = locked;
       select.closest(".form-field")?.classList.toggle("is-locked", locked);
       select.parentElement.querySelector(".locked-note")?.remove();
@@ -413,7 +419,7 @@
     // En tiempos simples no se aplica ningún filtro de auxiliar.
     // Si hay un perfil de verbo fijado, conservamos su auxiliar para restaurarlo
     // al volver a seleccionar un tiempo compuesto.
-    if (!compoundTense && !lockedVerbProfile) auxiliary.value = "";
+    if (top100Mode && !lockedVerbProfile) {\n      practiceVerb.value = "";\n      construction.value = "";\n      auxiliary.value = "";\n    }\n    if (!compoundTense && !lockedVerbProfile) auxiliary.value = "";
     if (compoundTense && pronominalOnly && !lockedVerbProfile) auxiliary.value = "etre";
 
     if (!lockedVerbProfile) return;
@@ -996,6 +1002,15 @@
     });
   }
 
+  document.getElementById("practice-family").addEventListener("change", () => {
+    if (document.getElementById("practice-family").value === "top-100") {
+      document.getElementById("practice-verb").value = "";
+      document.getElementById("practice-construction").value = "";
+      document.getElementById("practice-auxiliary").value = "";
+    }
+    applyLockedProfile();
+  });
+
   practiceForm.addEventListener("submit", async event => {
     event.preventDefault();
     const practiceVerbInput = document.getElementById("practice-verb");
@@ -1011,7 +1026,7 @@
         ? document.getElementById("practice-auxiliary").value
         : ""
     };
-    if (!filters.verb && !["premier-groupe", "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe", "ir", "aitre", "dre", "ire-uire", "oir-oire", "ttre"].includes(filters.family)) {
+    if (!filters.verb && !["premier-groupe", "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe", "ir", "aitre", "dre", "ire-uire", "oir-oire", "ttre", "top-100"].includes(filters.family)) {
       showPracticeMessage("Escribe un verbo o selecciona una familia para generar una práctica automática.", true);
       return;
     }
