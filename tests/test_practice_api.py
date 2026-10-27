@@ -1789,3 +1789,45 @@ class AllGroupsAndFamiliesIntegrationTests(unittest.TestCase):
         for verb in verbs:
             self.assertFalse(impersonal_verb_catalog().get(verb, {}).get("impersonal"))
             self.assertFalse(second_group_pronominal_catalog().get(verb, {}).get("impersonal"))
+
+class FirstGroupIndividualFamilyMixAndAuxiliaryTests(unittest.TestCase):
+    FAMILIES = (
+        "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent",
+    )
+
+    def test_each_individual_first_group_family_uses_exact_sixty_forty_mix(self):
+        from backend.main import SESSIONS, pronominal_first_group_verbs
+        pronominal = set(pronominal_first_group_verbs())
+        for family in self.FAMILIES:
+            with self.subTest(family=family):
+                response = generate_practice(GenerateRequest(family=family, tense="present"))
+                questions = SESSIONS[response["session_id"]]
+                verbs = [row["verb"] for row in questions]
+                self.assertEqual(len(verbs), 20)
+                self.assertEqual(sum(verb in pronominal for verb in verbs), 8)
+                self.assertEqual(sum(verb not in pronominal for verb in verbs), 12)
+
+    def test_each_individual_first_group_family_respects_compound_auxiliary_filters(self):
+        from backend.main import SESSIONS, pronominal_first_group_verbs
+        pronominal = set(pronominal_first_group_verbs())
+        for family in self.FAMILIES:
+            for tense in ("passe-compose", "plus-que-parfait"):
+                with self.subTest(family=family, tense=tense, auxiliary="avoir"):
+                    response = generate_practice(GenerateRequest(
+                        family=family, tense=tense, auxiliary="avoir"
+                    ))
+                    verbs = [
+                        row["verb"] for row in SESSIONS[response["session_id"]]
+                    ]
+                    self.assertEqual(len(verbs), 20)
+                    self.assertTrue(all(verb not in pronominal for verb in verbs))
+                with self.subTest(family=family, tense=tense, auxiliary="etre"):
+                    response = generate_practice(GenerateRequest(
+                        family=family, tense=tense, auxiliary="etre"
+                    ))
+                    verbs = [
+                        row["verb"] for row in SESSIONS[response["session_id"]]
+                    ]
+                    self.assertEqual(len(verbs), 20)
+                    self.assertTrue(all(verb in pronominal for verb in verbs))
+
