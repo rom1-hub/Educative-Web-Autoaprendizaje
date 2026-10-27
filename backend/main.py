@@ -3895,9 +3895,9 @@ def generate_practice(request: GenerateRequest) -> dict:
             elif family == "ttre":
                 available_verbs = [verb for verb in available_verbs if "etre" in third_group_ttre_auxiliaries(verb)]
             else:
-                if family == "premier-groupe-reguliers":
-                    # Compatibilidad histórica: esta categoría expone los verbos
-                    # canónicos con prioridad de être, no variantes pronominales.
+                if family == "premier-groupe-reguliers" and request.construction != "pronominal":
+                    # En modo mixto/no pronominal se conserva el catálogo histórico
+                    # de verbos con prioridad de être; el filtro pronominal es explícito.
                     available_verbs = [verb for verb in available_verbs if verb in ETRE_PRIORITY_PARTICIPLES]
                 else:
                     available_verbs = [
