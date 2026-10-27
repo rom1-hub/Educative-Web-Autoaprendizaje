@@ -3189,10 +3189,14 @@ def top_100_base(verb: str, pronominal_records: dict[str, dict]) -> str:
     return normalize((record or {}).get("formeNonPronominale") or (record or {}).get("infinitifBase") or verb)
 
 
-def top_100_reflexive_prefix(person: str, form: str) -> str:
+def top_100_reflexive_prefix(person: str, form: str, verb: str = "") -> str:
     pronouns = {"je": "me", "tu": "te", "il": "se", "elle": "se", "on": "se",
                 "nous": "nous", "vous": "vous", "ils": "se", "elles": "se"}
     pronoun = pronouns.get(person, "")
+    if normalize(verb) == "s'en aller":
+        if pronoun in ("me", "te", "se"):
+            return {"me": "m'en ", "te": "t'en ", "se": "s'en "}[pronoun] + form
+        return f"{pronoun} en {form}" if pronoun else form
     if pronoun in ("me", "te", "se") and form[:1].lower() in "aeiouyhàâäéèêëîïôöùûüÿœæ":
         return {"me": "m'", "te": "t'", "se": "s'"}[pronoun] + form
     return f"{pronoun} {form}" if pronoun else form
@@ -3243,7 +3247,10 @@ def top_100_forms(verb: str, tense: str) -> list[dict[str, str]]:
             for (person, _), value in zip(IMPERATIVE_PERSONS, values[:3]):
                 form = str(value)
                 if is_pronominal:
-                    form += {"tu*": "-toi", "nous*": "-nous", "vous*": "-vous"}[person]
+                    suffixes = ({"tu*": "-t'en", "nous*": "-nous-en", "vous*": "-vous-en"}
+                                if display == "s'en aller"
+                                else {"tu*": "-toi", "nous*": "-nous", "vous*": "-vous"})
+                    form += suffixes[person]
                 rows.append({"person": person, "person_key": person, "form": form, "verb": display, "tense": tense})
             return rows
         if len(values) < 6:
@@ -3252,7 +3259,7 @@ def top_100_forms(verb: str, tense: str) -> list[dict[str, str]]:
         for (person, _), idx in zip(PERSONS, TOP_100_PERSON_INDEX):
             value = str(values[idx])
             if is_pronominal:
-                value = top_100_reflexive_prefix(person, value)
+                value = top_100_reflexive_prefix(person, value, display)
             display_person = TOP_100_SUBJUNCTIVE_LABELS[person] if tense.startswith("subjonctif-") else person
             if impersonal:
                 if person != "il":
@@ -3282,7 +3289,7 @@ def top_100_forms(verb: str, tense: str) -> list[dict[str, str]]:
     for (person, _), idx in zip(PERSONS, TOP_100_PERSON_INDEX):
         aux_form = aux_values[idx]
         if is_pronominal:
-            aux_form = top_100_reflexive_prefix(person, aux_form)
+            aux_form = top_100_reflexive_prefix(person, aux_form, display)
         agreed = participle
         if auxiliary == "etre" and not no_agreement:
             if person == "elle":
@@ -3407,9 +3414,23 @@ def generate_practice(request: GenerateRequest) -> dict:
     if category_mode and family == "top-100":
         available_verbs = top_100_candidates(request.tense)
         recent = set(RECENT_CATEGORY_VERBS)
-        fresh = [verb for verb in available_verbs if verb not in recent]
-        pool = fresh if len(fresh) >= min(20, len(available_verbs)) else available_verbs
-        selected_verbs = random.sample(pool, k=20) if len(pool) >= 20 else random.choices(pool, k=20)
+        pronominal_pool = [verb for verb in available_verbs if verb.startswith(("se ", "s'"))]
+        non_pronominal_pool = [verb for verb in available_verbs if not verb.startswith(("se ", "s'"))]
+        fresh_pronominal = [verb for verb in pronominal_pool if verb not in recent]
+        fresh_non_pronominal = [verb for verb in non_pronominal_pool if verb not in recent]
+        if len(fresh_pronominal) >= 8 and len(fresh_non_pronominal) >= 12:
+            selected_verbs = random.sample(fresh_non_pronominal, 12) + random.sample(fresh_pronominal, 8)
+        else:
+            non_pool = fresh_non_pronominal if len(fresh_non_pronominal) >= min(12, len(non_pronominal_pool)) else non_pronominal_pool
+            pro_pool = fresh_pronominal if len(fresh_pronominal) >= min(8, len(pronominal_pool)) else pronominal_pool
+            selected_verbs = random.sample(non_pool, min(12, len(non_pool))) + random.sample(pro_pool, min(8, len(pro_pool)))
+            remaining = 20 - len(selected_verbs)
+            unused = [verb for verb in available_verbs if verb not in selected_verbs]
+            if remaining > 0 and unused:
+                selected_verbs.extend(random.sample(unused, min(remaining, len(unused))))
+            while len(selected_verbs) < 20:
+                selected_verbs.append(random.choice(available_verbs))
+        random.shuffle(selected_verbs)
         RECENT_CATEGORY_VERBS.extend(selected_verbs)
         del RECENT_CATEGORY_VERBS[:-RECENT_CATEGORY_VERBS_LIMIT]
         questions = []

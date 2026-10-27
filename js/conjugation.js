@@ -419,7 +419,12 @@
     // En tiempos simples no se aplica ningún filtro de auxiliar.
     // Si hay un perfil de verbo fijado, conservamos su auxiliar para restaurarlo
     // al volver a seleccionar un tiempo compuesto.
-    if (top100Mode && !lockedVerbProfile) {\n      practiceVerb.value = "";\n      construction.value = "";\n      auxiliary.value = "";\n    }\n    if (!compoundTense && !lockedVerbProfile) auxiliary.value = "";
+    if (top100Mode && !lockedVerbProfile) {
+      practiceVerb.value = "";
+      construction.value = "";
+      auxiliary.value = "";
+    }
+    if (!compoundTense && !lockedVerbProfile) auxiliary.value = "";
     if (compoundTense && pronominalOnly && !lockedVerbProfile) auxiliary.value = "etre";
 
     if (!lockedVerbProfile) return;

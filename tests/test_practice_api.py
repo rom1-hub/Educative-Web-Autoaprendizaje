@@ -1622,3 +1622,14 @@ class Top100CategoryIntegrationTests(unittest.TestCase):
         self.assertIn("se servir", candidates)
         self.assertIn("s'endormir", candidates)
         self.assertEqual(top_100_forms("se mettre", "present")[0]["form"], "me mets")
+
+
+    def test_top_100_mixed_practice_uses_sixty_forty_ratio(self):
+        response = generate_practice(GenerateRequest(family="top-100", tense="present"))
+        pronominal = [item for item in response["questions"] if item["verb"].startswith(("se ", "s'"))]
+        self.assertEqual(len(pronominal), 8)
+        self.assertEqual(len(response["questions"]) - len(pronominal), 12)
+
+    def test_s_en_aller_keeps_its_particle(self):
+        from backend.main import top_100_forms
+        self.assertEqual(top_100_forms("s'en aller", "present")[0]["form"], "m'en vais")
