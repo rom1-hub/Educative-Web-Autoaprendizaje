@@ -1463,6 +1463,14 @@ class ExpandedPronominalCatalogTests(unittest.TestCase):
                 self.assertIsNotNone(record, f"Falta el registro canónico de {verb}")
                 self.assertEqual(record["accordParticipePasse"], "aucun")
 
+    def test_individual_se_donner_keeps_past_participle_invariable(self):
+        from backend.main import regular_er_forms
+
+        forms = regular_er_forms("se donner", "passe-compose")
+        by_person = {form["person"]: form["form"] for form in forms}
+        self.assertEqual(by_person["nous"], "nous sommes donné")
+        self.assertEqual(by_person["elles"], "elles se sont donné")
+
     def test_s_ecrire_and_se_donner_do_not_expand_subject_agreement_in_practice(self):
         from backend.main import expand_practice_etre_subject_variants
 
