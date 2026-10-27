@@ -1633,3 +1633,74 @@ class Top100CategoryIntegrationTests(unittest.TestCase):
     def test_s_en_aller_keeps_its_particle(self):
         from backend.main import top_100_forms
         self.assertEqual(top_100_forms("s'en aller", "present")[0]["form"], "m'en vais")
+
+class ThirdGroupAggregateCategoryIntegrationTests(unittest.TestCase):
+    def test_global_third_group_category_generates_twenty_balanced_questions_across_catalogs(self):
+        from backend.main import (
+            SESSIONS, third_group_all_available_verbs, third_group_family_for_verb,
+            third_group_dre_pronominal_verbs, third_group_aitre_pronominal_verbs,
+            third_group_ir_pronominal_verbs, third_group_ire_uire_pronominal_verbs,
+            third_group_oir_oire_pronominal_verbs, third_group_ttre_pronominal_verbs,
+        )
+        response = generate_practice(GenerateRequest(family="troisieme-groupe", tense="present"))
+        self.assertEqual(response["total"], 20)
+        self.assertEqual(len(response["questions"]), 20)
+        answers = SESSIONS[response["session_id"]]
+        pronominal = set().union(
+            set(third_group_dre_pronominal_verbs()), set(third_group_aitre_pronominal_verbs()),
+            set(third_group_ir_pronominal_verbs()), set(third_group_ire_uire_pronominal_verbs()),
+            set(third_group_oir_oire_pronominal_verbs()), set(third_group_ttre_pronominal_verbs()),
+        )
+        self.assertEqual(sum(item["verb"] in pronominal for item in answers), 8)
+        self.assertEqual(sum(item["verb"] not in pronominal for item in answers), 12)
+        self.assertTrue(all(third_group_family_for_verb(item["verb"]) for item in answers))
+        self.assertGreaterEqual(len({third_group_family_for_verb(item["verb"]) for item in answers}), 4)
+        self.assertTrue(set(item["verb"] for item in answers).issubset(set(third_group_all_available_verbs("present"))))
+
+    def test_global_third_group_construction_filter_keeps_only_pronominal_verbs(self):
+        from backend.main import (
+            SESSIONS, third_group_dre_pronominal_verbs, third_group_aitre_pronominal_verbs,
+            third_group_ir_pronominal_verbs, third_group_ire_uire_pronominal_verbs,
+            third_group_oir_oire_pronominal_verbs, third_group_ttre_pronominal_verbs,
+        )
+        result = generate_practice(GenerateRequest(
+            family="troisieme-groupe", construction="pronominal", tense="present"
+        ))
+        pronominal = set().union(
+            set(third_group_dre_pronominal_verbs()), set(third_group_aitre_pronominal_verbs()),
+            set(third_group_ir_pronominal_verbs()), set(third_group_ire_uire_pronominal_verbs()),
+            set(third_group_oir_oire_pronominal_verbs()), set(third_group_ttre_pronominal_verbs()),
+        )
+        self.assertEqual(result["total"], 20)
+        self.assertTrue(all(item["verb"] in pronominal for item in SESSIONS[result["session_id"]]))
+
+    def test_global_third_group_compound_etre_filter_uses_specific_catalogs(self):
+        from backend.main import (
+            SESSIONS, third_group_dre_auxiliaries, third_group_aitre_auxiliaries,
+            third_group_ir_auxiliaries, third_group_ire_uire_auxiliaries,
+            third_group_oir_oire_auxiliaries, third_group_ttre_auxiliaries,
+            third_group_dre_pronominal_verbs, third_group_aitre_pronominal_verbs,
+            third_group_ir_pronominal_verbs, third_group_ire_uire_pronominal_verbs,
+            third_group_oir_oire_pronominal_verbs, third_group_ttre_pronominal_verbs,
+            third_group_family_for_verb,
+        )
+        result = generate_practice(GenerateRequest(
+            family="troisieme-groupe", tense="passe-compose", auxiliary="etre"
+        ))
+        self.assertEqual(result["total"], 20)
+        answers = SESSIONS[result["session_id"]]
+        pronominal = set().union(
+            set(third_group_dre_pronominal_verbs()), set(third_group_aitre_pronominal_verbs()),
+            set(third_group_ir_pronominal_verbs()), set(third_group_ire_uire_pronominal_verbs()),
+            set(third_group_oir_oire_pronominal_verbs()), set(third_group_ttre_pronominal_verbs()),
+        )
+        auxiliary_lookup = {
+            "dre": third_group_dre_auxiliaries, "aitre": third_group_aitre_auxiliaries,
+            "ir": third_group_ir_auxiliaries, "ire-uire": third_group_ire_uire_auxiliaries,
+            "oir-oire": third_group_oir_oire_auxiliaries, "ttre": third_group_ttre_auxiliaries,
+        }
+        for item in answers:
+            verb = item["verb"]
+            family_name = third_group_family_for_verb(verb)
+            self.assertTrue(verb in pronominal or "etre" in auxiliary_lookup[family_name](verb))
+

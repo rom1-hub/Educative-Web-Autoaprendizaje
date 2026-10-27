@@ -3369,6 +3369,76 @@ def health() -> dict[str, str]:
     return {"status": "ok", "service": "coq-practice-python"}
 
 
+
+THIRD_GROUP_FAMILY_ORDER = ("ire-uire", "oir-oire", "ttre", "dre", "aitre", "ir")
+
+
+def third_group_family_for_verb(verb: str) -> str | None:
+    """Resolve a third-group infinitive to the same specific family as individual practice."""
+    normalized = normalize(verb)
+    predicates = (
+        ("ire-uire", is_third_group_ire_uire_verb),
+        ("oir-oire", is_third_group_oir_oire_verb),
+        ("ttre", is_third_group_ttre_verb),
+        ("dre", is_third_group_dre_verb),
+        ("aitre", is_third_group_aitre_verb),
+        ("ir", is_third_group_ir_verb),
+    )
+    for family_name, predicate in predicates:
+        if predicate(normalized):
+            return family_name
+    return None
+
+
+def third_group_all_available_verbs(tense: str, auxiliary: str = "") -> tuple[str, ...]:
+    """Union the six canonical third-group catalogs without duplicating infinitives."""
+    sources = (
+        third_group_ir_available_verbs(tense, auxiliary),
+        third_group_aitre_available_verbs(tense, auxiliary),
+        third_group_dre_available_verbs(tense, auxiliary),
+        third_group_ire_uire_available_verbs(tense, auxiliary),
+        third_group_oir_oire_available_verbs(tense, auxiliary),
+        third_group_ttre_available_verbs(tense, auxiliary),
+    )
+    return tuple(sorted({verb for source in sources for verb in source}))
+
+
+def select_balanced_third_group_verbs(pool: list[str], count: int, recent: set[str] | None = None) -> list[str]:
+    """Sample across the six families in round-robin order, repeating only if needed."""
+    candidates = list(dict.fromkeys(pool))
+    if not candidates or count <= 0:
+        return []
+    recent = recent or set()
+    fresh = [verb for verb in candidates if verb not in recent]
+    if len(fresh) >= count:
+        candidates = fresh
+
+    buckets = {family_name: [] for family_name in THIRD_GROUP_FAMILY_ORDER}
+    for verb in candidates:
+        family_name = third_group_family_for_verb(verb)
+        if family_name in buckets:
+            buckets[family_name].append(verb)
+    for bucket in buckets.values():
+        random.shuffle(bucket)
+
+    selected = []
+    while len(selected) < min(count, len(candidates)):
+        family_order = list(THIRD_GROUP_FAMILY_ORDER)
+        random.shuffle(family_order)
+        progressed = False
+        for family_name in family_order:
+            if buckets[family_name]:
+                selected.append(buckets[family_name].pop())
+                progressed = True
+                if len(selected) >= min(count, len(candidates)):
+                    break
+        if not progressed:
+            break
+    if len(selected) < count:
+        selected.extend(random.choices(candidates, k=count - len(selected)))
+    return selected
+
+
 @app.post("/api/practice/generate")
 def generate_practice(request: GenerateRequest) -> dict:
     if request.tense not in TENSE_LABELS:
@@ -3393,7 +3463,7 @@ def generate_practice(request: GenerateRequest) -> dict:
     # Solo se normalizan alias de grupo; una familia ortográfica incompatible sigue rechazándose.
     if selected_verb in ETRE_PRIORITY_PARTICIPLES and family in ("premier-groupe", "premier-groupe-reguliers", "troisieme-groupe"):
         family = ""
-    if family not in ("", "premier-groupe", "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe", "ir", "aitre", "dre", "ire-uire", "oir-oire", "ttre", "top-100"):
+    if family not in ("", "premier-groupe", "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe", "troisieme-groupe", "ir", "aitre", "dre", "ire-uire", "oir-oire", "ttre", "top-100"):
         raise HTTPException(422, "Selecciona una familia de verbos válida.")
     # Aceptar la variante histórica usada por algunos clientes además del
     # valor canónico «non-pronominal».
@@ -3401,7 +3471,7 @@ def generate_practice(request: GenerateRequest) -> dict:
         raise HTTPException(422, "Selecciona una construcción verbal válida.")
     if request.auxiliary not in ("", "avoir", "etre"):
         raise HTTPException(422, "Selecciona un auxiliar válido.")
-    category_mode = family in ("premier-groupe", "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe", "ir", "aitre", "dre", "ire-uire", "oir-oire", "ttre", "top-100") and not request.verb.strip()
+    category_mode = family in ("premier-groupe", "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe", "troisieme-groupe", "ir", "aitre", "dre", "ire-uire", "oir-oire", "ttre", "top-100") and not request.verb.strip()
     if selected_verb == "neiger" and not category_mode:
         raise HTTPException(
             422,
@@ -3460,7 +3530,7 @@ def generate_practice(request: GenerateRequest) -> dict:
     elif category_mode:
         # Una pregunta por verbo: 20 infinitivos distintos elegidos al azar.
         # Cada categoría usa exclusivamente los verbos admitidos por el catálogo.
-        available_verbs = list({"premier-groupe": lambda: tuple(sorted(set().union(*first_group_family_catalog().values()))), "premier-groupe-reguliers": regular_first_group_verbs, "ger": ger_family_verbs, "cer": cer_family_verbs, "eler": eler_family_verbs, "eter": eter_family_verbs, "yer": yer_family_verbs, "e-accent": lambda: tuple(sorted(e_accent_family_patterns())), "deuxieme-groupe": lambda: second_group_verbs() + second_group_pronominal_verbs(), "ir": lambda: third_group_ir_available_verbs(request.tense, request.auxiliary), "aitre": lambda: third_group_aitre_available_verbs(request.tense, request.auxiliary), "dre": lambda: third_group_dre_available_verbs(request.tense, request.auxiliary), "ire-uire": lambda: third_group_ire_uire_available_verbs(request.tense, request.auxiliary), "oir-oire": lambda: third_group_oir_oire_available_verbs(request.tense, request.auxiliary), "ttre": lambda: third_group_ttre_available_verbs(request.tense, request.auxiliary)}.get(family, lambda: regular_first_group_verbs())())
+        available_verbs = list({"premier-groupe": lambda: tuple(sorted(set().union(*first_group_family_catalog().values()))), "premier-groupe-reguliers": regular_first_group_verbs, "ger": ger_family_verbs, "cer": cer_family_verbs, "eler": eler_family_verbs, "eter": eter_family_verbs, "yer": yer_family_verbs, "e-accent": lambda: tuple(sorted(e_accent_family_patterns())), "deuxieme-groupe": lambda: second_group_verbs() + second_group_pronominal_verbs(), "troisieme-groupe": lambda: third_group_all_available_verbs(request.tense, request.auxiliary), "ir": lambda: third_group_ir_available_verbs(request.tense, request.auxiliary), "aitre": lambda: third_group_aitre_available_verbs(request.tense, request.auxiliary), "dre": lambda: third_group_dre_available_verbs(request.tense, request.auxiliary), "ire-uire": lambda: third_group_ire_uire_available_verbs(request.tense, request.auxiliary), "oir-oire": lambda: third_group_oir_oire_available_verbs(request.tense, request.auxiliary), "ttre": lambda: third_group_ttre_available_verbs(request.tense, request.auxiliary)}.get(family, lambda: regular_first_group_verbs())())
         # Keep the non-pronominal lemma out of category practice while retaining
         # its catalog entry so the registered pronominal variant remains resolvable.
         if family == "deuxieme-groupe":
@@ -3480,6 +3550,8 @@ def generate_practice(request: GenerateRequest) -> dict:
             if family == "ttre"
             else set(third_group_ir_pronominal_verbs())
             if family == "ir"
+            else set().union(set(third_group_dre_pronominal_verbs()), set(third_group_aitre_pronominal_verbs()), set(third_group_ir_pronominal_verbs()), set(third_group_ire_uire_pronominal_verbs()), set(third_group_oir_oire_pronominal_verbs()), set(third_group_ttre_pronominal_verbs()))
+            if family == "troisieme-groupe"
             else set(pronominal_first_group_verbs())
         )
         if request.construction == "pronominal":
@@ -3487,7 +3559,10 @@ def generate_practice(request: GenerateRequest) -> dict:
         elif request.construction in ("non-pronomial", "non-pronominal"):
             available_verbs = [verb for verb in available_verbs if verb not in pronomial_verbs]
         if request.tense in COMPOUND_TENSES and request.auxiliary == "etre":
-            if family == "dre":
+            if family == "troisieme-groupe":
+                # Cada catálogo específico ya ha validado el auxiliar al construir el agregado.
+                pass
+            elif family == "dre":
                 available_verbs = [verb for verb in available_verbs if "etre" in third_group_dre_auxiliaries(verb)]
             elif family == "ir":
                 available_verbs = [verb for verb in available_verbs if "etre" in third_group_ir_auxiliaries(verb)]
@@ -3507,6 +3582,9 @@ def generate_practice(request: GenerateRequest) -> dict:
                     or verb in ETRE_PRIORITY_PARTICIPLES
                     or (request.construction == "pronominal" and verb.startswith(("se ", "s'")))
                 ]
+        elif family == "troisieme-groupe" and request.tense in COMPOUND_TENSES and request.auxiliary == "avoir":
+            # Los catálogos específicos ya han filtrado las formas compatibles con avoir.
+            pass
         elif family == "premier-groupe" and request.tense in COMPOUND_TENSES and request.auxiliary == "avoir":
             available_verbs = [verb for verb in available_verbs if verb not in pronominal_first_group_verbs()]
         elif family == "deuxieme-groupe" and request.tense in COMPOUND_TENSES and request.auxiliary == "avoir":
@@ -3574,6 +3652,30 @@ def generate_practice(request: GenerateRequest) -> dict:
                 selected_verbs = choose(non_pronominal_pool, 12) + choose(pronominal_pool, 8)
                 random.shuffle(selected_verbs)
 
+
+        if family == "troisieme-groupe" and not request.construction and not request.auxiliary:
+            pronominal_pool = [verb for verb in available_verbs if verb in pronomial_verbs]
+            non_pronominal_pool = [verb for verb in available_verbs if verb not in pronomial_verbs]
+            recent = set(RECENT_CATEGORY_VERBS)
+            pronominal_count = min(8, len(pronominal_pool))
+            non_pronominal_count = min(20 - pronominal_count, len(non_pronominal_pool))
+            remaining = 20 - pronominal_count - non_pronominal_count
+            if remaining:
+                extra_pronominal = min(remaining, len(pronominal_pool) - pronominal_count)
+                pronominal_count += extra_pronominal
+                remaining -= extra_pronominal
+            if remaining:
+                extra_non_pronominal = min(remaining, len(non_pronominal_pool) - non_pronominal_count)
+                non_pronominal_count += extra_non_pronominal
+                remaining -= extra_non_pronominal
+            selected_verbs = (
+                select_balanced_third_group_verbs(non_pronominal_pool, non_pronominal_count, recent)
+                + select_balanced_third_group_verbs(pronominal_pool, pronominal_count, recent)
+            )
+            if remaining:
+                selected_verbs.extend(random.choices(available_verbs, k=remaining))
+            random.shuffle(selected_verbs)
+
         if family == "deuxieme-groupe" and not request.construction and not request.auxiliary:
             pronominal_set = set(second_group_pronominal_verbs())
             pronominal_pool = [verb for verb in available_verbs if verb in pronominal_set]
@@ -3616,7 +3718,23 @@ def generate_practice(request: GenerateRequest) -> dict:
         del RECENT_CATEGORY_VERBS[:-RECENT_CATEGORY_VERBS_LIMIT]
         questions = []
         for verb in selected_verbs:
-            if family == "deuxieme-groupe":
+            if family == "troisieme-groupe":
+                specific_family = third_group_family_for_verb(verb)
+                if specific_family == "ire-uire":
+                    forms = third_group_ire_uire_forms(verb, request.tense, request.auxiliary)
+                elif specific_family == "oir-oire":
+                    forms = third_group_oir_oire_forms(verb, request.tense, request.auxiliary)
+                elif specific_family == "ttre":
+                    forms = third_group_ttre_forms(verb, request.tense, request.auxiliary)
+                elif specific_family == "dre":
+                    forms = third_group_dre_forms(verb, request.tense, request.auxiliary)
+                elif specific_family == "aitre":
+                    forms = third_group_aitre_forms(verb, request.tense, request.auxiliary)
+                elif specific_family == "ir":
+                    forms = third_group_ir_forms(verb, request.tense, request.auxiliary)
+                else:
+                    raise HTTPException(422, f"No se pudo resolver la familia del verbo «{verb}».")
+            elif family == "deuxieme-groupe":
                 forms = second_group_forms(verb, request.tense)
             elif family == "ir":
                 forms = third_group_ir_forms(verb, request.tense, request.auxiliary)
