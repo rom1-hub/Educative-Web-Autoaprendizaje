@@ -620,7 +620,7 @@ PRACTICE_SUBJECT_VARIANTS = {
     "ils": [("masculin", "pluriel", None)],
     "elles": [("féminin", "pluriel", None)],
 }
-PRONOMINAL_NO_SUBJECT_AGREEMENT = {"se parler", "se téléphoner", "se demander", "s'agir", "se pouvoir", "se plaire", "se déplaire", "se complaire", "se répondre", "se mentir", "se sourire", "se nuire", "se ressembler", "se succéder", "se suffire"}
+PRONOMINAL_NO_SUBJECT_AGREEMENT = {"se parler", "se téléphoner", "s'écrire", "se donner", "se demander", "s'agir", "se pouvoir", "se plaire", "se déplaire", "se complaire", "se répondre", "se mentir", "se sourire", "se nuire", "se ressembler", "se succéder", "se suffire"}
 
 
 def canonical_practice_person(person: str) -> str:
