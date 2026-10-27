@@ -1483,6 +1483,7 @@ def third_group_ttre_auxiliaries(verb: str) -> tuple[str, ...]:
     return tuple(normalized or ["avoir"])
 
 
+@functools.lru_cache(maxsize=1)
 def third_group_dre_catalog() -> dict[str, dict]:
     """Return validated third-group verbs ending in -DRE, including -AINDRE/-OINDRE/-EINDRE/-OUDRE, and registered pronominal variants."""
     catalog = _load_js_object("data/verbs/local-database.js", "COQ_VERBS")
