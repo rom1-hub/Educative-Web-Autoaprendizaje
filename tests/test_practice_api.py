@@ -1540,9 +1540,14 @@ class FirstGroupAggregateCategoryTests(unittest.TestCase):
         self.assertEqual(sorted(counts.values()), [2, 3, 3, 3, 3, 3, 3])
 
     def test_compound_auxiliary_filters_override_mixed_construction_ratio(self):
-        from backend.main import SESSIONS, pronominal_first_group_verbs
+        from backend.main import (
+            ETRE_PRIORITY_PARTICIPLES,
+            SESSIONS,
+            pronominal_first_group_verbs,
+        )
 
         pronominal = set(pronominal_first_group_verbs())
+        etre_compatible = pronominal | set(ETRE_PRIORITY_PARTICIPLES)
         for tense in ("passe-compose", "plus-que-parfait"):
             with self.subTest(tense=tense):
                 result_avoir = generate_practice(GenerateRequest(
@@ -1561,7 +1566,7 @@ class FirstGroupAggregateCategoryTests(unittest.TestCase):
                     row["verb"] for row in SESSIONS[result_etre["session_id"]]
                 ]
                 self.assertEqual(len(verbs_etre), 20)
-                self.assertTrue(all(verb in pronominal for verb in verbs_etre))
+                self.assertTrue(all(verb in etre_compatible for verb in verbs_etre))
 
         with self.assertRaises(HTTPException):
             generate_practice(GenerateRequest(
