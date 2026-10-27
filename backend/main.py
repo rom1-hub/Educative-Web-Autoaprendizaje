@@ -3898,14 +3898,14 @@ def generate_practice(request: GenerateRequest) -> dict:
                 available_verbs = [
                     verb for verb in available_verbs
                     if (family == "deuxieme-groupe" and verb in second_group_pronominal_verbs())
-                    or (family == "premier-groupe" and verb in pronominal_first_group_verbs())
+                    or (family in ("premier-groupe", *FIRST_GROUP_FAMILY_IDS) and verb in pronominal_first_group_verbs())
                     or verb in ETRE_PRIORITY_PARTICIPLES
                     or (request.construction == "pronominal" and verb.startswith(("se ", "s'")))
                 ]
         elif family == "troisieme-groupe" and request.tense in COMPOUND_TENSES and request.auxiliary == "avoir":
             # Los catálogos específicos ya han filtrado las formas compatibles con avoir.
             pass
-        elif family == "premier-groupe" and request.tense in COMPOUND_TENSES and request.auxiliary == "avoir":
+        elif family in ("premier-groupe", *FIRST_GROUP_FAMILY_IDS) and request.tense in COMPOUND_TENSES and request.auxiliary == "avoir":
             available_verbs = [verb for verb in available_verbs if verb not in pronominal_first_group_verbs()]
         elif family == "deuxieme-groupe" and request.tense in COMPOUND_TENSES and request.auxiliary == "avoir":
             available_verbs = [verb for verb in available_verbs if verb not in second_group_pronominal_verbs()]
@@ -3941,14 +3941,22 @@ def generate_practice(request: GenerateRequest) -> dict:
         # 12 preguntas no pronominales (60 %) y 8 pronominales (40 %).
         selected_verbs = None
         if family == "premier-groupe":
-            # Solo la configuración mixta sin filtro de auxiliar garantiza el 60/40.
-            # Si se restringe construcción o auxiliar, esos filtros prevalecen y se
-            # equilibra entre las familias que sigan teniendo candidatos compatibles.
+            # Categoría agregada: balancear las siete familias y mantener 60/40 en modo mixto.
             selected_verbs = select_balanced_first_group_verbs(
                 available_verbs,
                 set(pronominal_first_group_verbs()),
                 mixed_construction=not request.construction and not request.auxiliary,
             )
+        elif family in FIRST_GROUP_FAMILY_IDS and not request.construction and not request.auxiliary:
+            # Las familias individuales también garantizan 12 no pronominales y 8 pronominales.
+            pronominal_set = set(pronominal_first_group_verbs())
+            pronominal_pool = [verb for verb in available_verbs if verb in pronominal_set]
+            non_pronominal_pool = [verb for verb in available_verbs if verb not in pronominal_set]
+            if not pronominal_pool or not non_pronominal_pool:
+                raise HTTPException(422, "Esta familia no dispone de candidatos para ambas construcciones y no puede cumplir el reparto 60/40.")
+            choose = lambda pool, count: random.sample(pool, count) if len(pool) >= count else random.choices(pool, k=count)
+            selected_verbs = choose(non_pronominal_pool, 12) + choose(pronominal_pool, 8)
+            random.shuffle(selected_verbs)
         if family in ("ir", "aitre", "dre", "ire-uire", "oir-oire", "ttre") and not request.construction and not request.auxiliary:
             pronominal_set = set(
                 third_group_dre_pronominal_verbs() if family == "dre"
