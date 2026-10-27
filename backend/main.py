@@ -3189,6 +3189,15 @@ def top_100_base(verb: str, pronominal_records: dict[str, dict]) -> str:
     return normalize((record or {}).get("formeNonPronominale") or (record or {}).get("infinitifBase") or verb)
 
 
+def top_100_form_value(value) -> str:
+    """Read either a plain conjugation string or a canonical [subject, form] pair."""
+    if isinstance(value, (list, tuple)):
+        if len(value) >= 2 and isinstance(value[-1], str):
+            return value[-1]
+        raise HTTPException(422, "El catálogo contiene una forma verbal con formato no válido.")
+    return str(value)
+
+
 def top_100_reflexive_prefix(person: str, form: str, verb: str = "") -> str:
     pronouns = {"je": "me", "tu": "te", "il": "se", "elle": "se", "on": "se",
                 "nous": "nous", "vous": "vous", "ils": "se", "elles": "se"}
@@ -3245,7 +3254,7 @@ def top_100_forms(verb: str, tense: str) -> list[dict[str, str]]:
                 raise HTTPException(422, "No hay formas de imperativo disponibles.")
             rows = []
             for (person, _), value in zip(IMPERATIVE_PERSONS, values[:3]):
-                form = str(value)
+                form = top_100_form_value(value)
                 if is_pronominal:
                     suffixes = ({"tu*": "-t'en", "nous*": "-nous-en", "vous*": "-vous-en"}
                                 if display == "s'en aller"
@@ -3257,7 +3266,7 @@ def top_100_forms(verb: str, tense: str) -> list[dict[str, str]]:
             raise HTTPException(422, "El catálogo no contiene todas las personas para este tiempo.")
         rows = []
         for (person, _), idx in zip(PERSONS, TOP_100_PERSON_INDEX):
-            value = str(values[idx])
+            value = top_100_form_value(values[idx])
             if is_pronominal:
                 value = top_100_reflexive_prefix(person, value, display)
             display_person = TOP_100_SUBJUNCTIVE_LABELS[person] if tense.startswith("subjonctif-") else person
