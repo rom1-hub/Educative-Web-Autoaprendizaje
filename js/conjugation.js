@@ -63,23 +63,6 @@
       .replace(/\s+/g, " ");
   }
 
-  // El h aspirado bloquea la elisión; esta lista es léxica, no una regla por letra.
-  const H_ASPIREE_VERBS = new Set([
-    "hacher", "hachurer", "haïr", "haler", "hâler", "haleter",
-    "hanter", "happer", "harceler", "haranguer", "harasser",
-    "hasarder", "hausser", "heurter", "hisser", "hocher",
-    "hâter", "hennir", "humer", "hurler", "houspiller"
-  ]);
-
-  function startsWithElidableVowel(form, verb) {
-    const text = String(form ?? "").trim();
-    if (/^[aeiouyàâäéèêëîïôöùûüÿœ]/i.test(text)) return true;
-    if (!/^h/i.test(text)) return false;
-    const lemma = normalizeInfinitive(getBaseInfinitive(verb))
-      .replace(/^(?:se\s+|s')/, "");
-    return !H_ASPIREE_VERBS.has(lemma);
-  }
-
   // Auxiliares con prioridad de être en el motor de práctica Python.
   // Estos verbos no deben clasificarse como regulares del primer grupo solo por terminar en -er.
   const PRACTICE_ETRE_PRIORITY_VERBS = new Set([
@@ -333,7 +316,10 @@
         // Mostrar «j'» cuando una forma no pronominal comienza por vocal:
         // «j'écoute», «j'ai parlé», «j'avais parlé». Las formas pronominales
         // empiezan por «me/m'», por lo que conservan «je».
-        const startsWithVowel = startsWithElidableVowel(displayedForm, verb);
+        const startsWithVowel = window.COQ_FRENCH_ORTHOGRAPHY.startsWithElidableVowel(
+          displayedForm,
+          getBaseInfinitive(verb)
+        );
         const normalizedPerson = String(person).toLocaleLowerCase("fr");
         const isSubjunctive = [
           "subjonctif-present",
