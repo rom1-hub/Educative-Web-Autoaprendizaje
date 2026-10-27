@@ -3798,7 +3798,7 @@ def generate_practice(request: GenerateRequest) -> dict:
             questions.append({
                 "person": form["person"],
                 "person_key": form.get("person_key", form["person"]),
-                "verb": form["verb"],
+                "verb": verb,
                 "tense": form["tense"],
                 "answer": form["form"],
                 **{key: form[key] for key in ("subject_gender", "subject_number", "subject_variant") if key in form},
