@@ -3709,11 +3709,59 @@ def generate_practice(request: GenerateRequest) -> dict:
             if not fallback:
                 raise HTTPException(422, "No hay verbos compatibles con los filtros seleccionados.")
             selected_verbs.extend(random.choices(fallback, k=remaining))
-        random.shuffle(selected_verbs)
-
         bucket_by_verb = {
             verb: bucket for bucket, values in family_pools.items() for verb in values
         }
+
+        def group_for_verb(verb):
+            bucket = bucket_by_verb.get(verb)
+            if bucket in FIRST_GROUP_FAMILY_IDS:
+                return "first"
+            if bucket == "deuxieme-groupe":
+                return "second"
+            return "third"
+
+        # En modo mixto, asegurar presencia de los tres grupos cuando los filtros
+        # dejan candidatos compatibles, sin alterar el reparto pronominal 60/40.
+        group_counts = {
+            group: sum(group_for_verb(verb) == group for verb in selected_verbs)
+            for group in ("first", "second", "third")
+        }
+        for missing_group in ("first", "second", "third"):
+            if group_counts[missing_group]:
+                continue
+            replacement_done = False
+            for construction_name in (
+                ("pronominal",) if request.construction == "pronominal"
+                else ("non-pronominal",) if request.construction in ("non-pronomial", "non-pronominal")
+                else ("non-pronominal", "pronominal")
+            ):
+                candidates = [
+                    verb
+                    for bucket, values in eligible_by_construction[construction_name].items()
+                    if group_for_verb(next(iter(values), "")) == missing_group
+                    for verb in values
+                    if verb not in selected_verbs
+                ]
+                if not candidates:
+                    continue
+                candidate = random.choice(candidates)
+                is_pronominal_candidate = candidate in all_pronominal
+                for index, current in enumerate(selected_verbs):
+                    current_is_pronominal = current in all_pronominal
+                    if current_is_pronominal != is_pronominal_candidate:
+                        continue
+                    current_group = group_for_verb(current)
+                    if current_group != missing_group and group_counts[current_group] > 1:
+                        selected_verbs[index] = candidate
+                        group_counts[current_group] -= 1
+                        group_counts[missing_group] += 1
+                        replacement_done = True
+                        break
+                if replacement_done:
+                    break
+
+        random.shuffle(selected_verbs)
         RECENT_CATEGORY_VERBS.extend(selected_verbs)
         del RECENT_CATEGORY_VERBS[:-RECENT_CATEGORY_VERBS_LIMIT]
         questions = []
