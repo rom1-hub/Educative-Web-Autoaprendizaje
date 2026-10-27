@@ -1029,6 +1029,952 @@ window.COQ_PRONOMINAL_VERBS = {
     "accordParticipePasse": "sujet",
     "actif": true
   }
+,
+  "se-abstenir": {
+    "infinitif": "s'abstenir",
+    "infinitifBase": "abstenir",
+    "formeNonPronominale": "abstenir",
+    "participePasse": "abstenu",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-acharner": {
+    "infinitif": "s'acharner",
+    "infinitifBase": "acharner",
+    "formeNonPronominale": "acharner",
+    "participePasse": "acharné",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-accrocher": {
+    "infinitif": "s'accrocher",
+    "infinitifBase": "accrocher",
+    "formeNonPronominale": "accrocher",
+    "participePasse": "accroché",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-agiter": {
+    "infinitif": "s'agiter",
+    "infinitifBase": "agiter",
+    "formeNonPronominale": "agiter",
+    "participePasse": "agité",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-agripper": {
+    "infinitif": "s'agripper",
+    "infinitifBase": "agripper",
+    "formeNonPronominale": "agripper",
+    "participePasse": "agrippé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-allier": {
+    "infinitif": "s'allier",
+    "infinitifBase": "allier",
+    "formeNonPronominale": "allier",
+    "participePasse": "allié",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-améliorer": {
+    "infinitif": "s'améliorer",
+    "infinitifBase": "améliorer",
+    "formeNonPronominale": "améliorer",
+    "participePasse": "amélioré",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-animer": {
+    "infinitif": "s'animer",
+    "infinitifBase": "animer",
+    "formeNonPronominale": "animer",
+    "participePasse": "animé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-apaiser": {
+    "infinitif": "s'apaiser",
+    "infinitifBase": "apaiser",
+    "formeNonPronominale": "apaiser",
+    "participePasse": "apaisé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-appliquer": {
+    "infinitif": "s'appliquer",
+    "infinitifBase": "appliquer",
+    "formeNonPronominale": "appliquer",
+    "participePasse": "appliqué",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-apprêter": {
+    "infinitif": "s'apprêter",
+    "infinitifBase": "apprêter",
+    "formeNonPronominale": "apprêter",
+    "participePasse": "apprêté",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-assoupir": {
+    "infinitif": "s'assoupir",
+    "infinitifBase": "assoupir",
+    "formeNonPronominale": "assoupir",
+    "participePasse": "assoupi",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-attacher": {
+    "infinitif": "s'attacher",
+    "infinitifBase": "attacher",
+    "formeNonPronominale": "attacher",
+    "participePasse": "attaché",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-attarder": {
+    "infinitif": "s'attarder",
+    "infinitifBase": "attarder",
+    "formeNonPronominale": "attarder",
+    "participePasse": "attardé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-avancer": {
+    "infinitif": "s'avancer",
+    "infinitifBase": "avancer",
+    "formeNonPronominale": "avancer",
+    "participePasse": "avancé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-aventurer": {
+    "infinitif": "s'aventurer",
+    "infinitifBase": "aventurer",
+    "formeNonPronominale": "aventurer",
+    "participePasse": "aventuré",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-avérer": {
+    "infinitif": "s'avérer",
+    "infinitifBase": "avérer",
+    "formeNonPronominale": "avérer",
+    "participePasse": "avéré",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-balancer": {
+    "infinitif": "se balancer",
+    "infinitifBase": "balancer",
+    "formeNonPronominale": "balancer",
+    "participePasse": "balancé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-comporter": {
+    "infinitif": "se comporter",
+    "infinitifBase": "comporter",
+    "formeNonPronominale": "comporter",
+    "participePasse": "comporté",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-débrouiller": {
+    "infinitif": "se débrouiller",
+    "infinitifBase": "débrouiller",
+    "formeNonPronominale": "débrouiller",
+    "participePasse": "débrouillé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-dégrader": {
+    "infinitif": "se dégrader",
+    "infinitifBase": "dégrader",
+    "formeNonPronominale": "dégrader",
+    "participePasse": "dégradé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-dérouler": {
+    "infinitif": "se dérouler",
+    "infinitifBase": "dérouler",
+    "formeNonPronominale": "dérouler",
+    "participePasse": "déroulé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-détacher": {
+    "infinitif": "se détacher",
+    "infinitifBase": "détacher",
+    "formeNonPronominale": "détacher",
+    "participePasse": "détaché",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-développer": {
+    "infinitif": "se développer",
+    "infinitifBase": "développer",
+    "formeNonPronominale": "développer",
+    "participePasse": "développé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-diriger": {
+    "infinitif": "se diriger",
+    "infinitifBase": "diriger",
+    "formeNonPronominale": "diriger",
+    "participePasse": "dirigé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-distinguer": {
+    "infinitif": "se distinguer",
+    "infinitifBase": "distinguer",
+    "formeNonPronominale": "distinguer",
+    "participePasse": "distingué",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-distraire": {
+    "infinitif": "se distraire",
+    "infinitifBase": "distraire",
+    "formeNonPronominale": "distraire",
+    "participePasse": "distrait",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-échapper": {
+    "infinitif": "s'échapper",
+    "infinitifBase": "échapper",
+    "formeNonPronominale": "échapper",
+    "participePasse": "échappé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-écarter": {
+    "infinitif": "s'écarter",
+    "infinitifBase": "écarter",
+    "formeNonPronominale": "écarter",
+    "participePasse": "écarté",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-effacer": {
+    "infinitif": "s'effacer",
+    "infinitifBase": "effacer",
+    "formeNonPronominale": "effacer",
+    "participePasse": "effacé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-effondrer": {
+    "infinitif": "s'effondrer",
+    "infinitifBase": "effondrer",
+    "formeNonPronominale": "effondrer",
+    "participePasse": "effondré",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-élancer": {
+    "infinitif": "s'élancer",
+    "infinitifBase": "élancer",
+    "formeNonPronominale": "élancer",
+    "participePasse": "élancé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-emparer": {
+    "infinitif": "s'emparer",
+    "infinitifBase": "emparer",
+    "formeNonPronominale": "emparer",
+    "participePasse": "emparé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-emporter": {
+    "infinitif": "s'emporter",
+    "infinitifBase": "emporter",
+    "formeNonPronominale": "emporter",
+    "participePasse": "emporté",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-enfoncer": {
+    "infinitif": "s'enfoncer",
+    "infinitifBase": "enfoncer",
+    "formeNonPronominale": "enfoncer",
+    "participePasse": "enfoncé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-engouffrer": {
+    "infinitif": "s'engouffrer",
+    "infinitifBase": "engouffrer",
+    "formeNonPronominale": "engouffrer",
+    "participePasse": "engouffré",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-enrichir": {
+    "infinitif": "s'enrichir",
+    "infinitifBase": "enrichir",
+    "formeNonPronominale": "enrichir",
+    "participePasse": "enrichi",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-entêter": {
+    "infinitif": "s'entêter",
+    "infinitifBase": "entêter",
+    "formeNonPronominale": "entêter",
+    "participePasse": "entêté",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-entraider": {
+    "infinitif": "s'entraider",
+    "infinitifBase": "entraider",
+    "formeNonPronominale": "entraider",
+    "participePasse": "entraidé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-entourer": {
+    "infinitif": "s'entourer",
+    "infinitifBase": "entourer",
+    "formeNonPronominale": "entourer",
+    "participePasse": "entouré",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-entretenir": {
+    "infinitif": "s'entretenir",
+    "infinitifBase": "entretenir",
+    "formeNonPronominale": "entretenir",
+    "participePasse": "entretenu",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-épuiser": {
+    "infinitif": "s'épuiser",
+    "infinitifBase": "épuiser",
+    "formeNonPronominale": "épuiser",
+    "participePasse": "épuisé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-équiper": {
+    "infinitif": "s'équiper",
+    "infinitifBase": "équiper",
+    "formeNonPronominale": "équiper",
+    "participePasse": "équipé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-établir": {
+    "infinitif": "s'établir",
+    "infinitifBase": "établir",
+    "formeNonPronominale": "établir",
+    "participePasse": "établi",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-étaler": {
+    "infinitif": "s'étaler",
+    "infinitifBase": "étaler",
+    "formeNonPronominale": "étaler",
+    "participePasse": "étalé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-étouffer": {
+    "infinitif": "s'étouffer",
+    "infinitifBase": "étouffer",
+    "formeNonPronominale": "étouffer",
+    "participePasse": "étouffé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-éveiller": {
+    "infinitif": "s'éveiller",
+    "infinitifBase": "éveiller",
+    "formeNonPronominale": "éveiller",
+    "participePasse": "éveillé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-exercer": {
+    "infinitif": "s'exercer",
+    "infinitifBase": "exercer",
+    "formeNonPronominale": "exercer",
+    "participePasse": "exercé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-exiler": {
+    "infinitif": "s'exiler",
+    "infinitifBase": "exiler",
+    "formeNonPronominale": "exiler",
+    "participePasse": "exilé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-expliquer": {
+    "infinitif": "s'expliquer",
+    "infinitifBase": "expliquer",
+    "formeNonPronominale": "expliquer",
+    "participePasse": "expliqué",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-fâcher": {
+    "infinitif": "se fâcher",
+    "infinitifBase": "fâcher",
+    "formeNonPronominale": "fâcher",
+    "participePasse": "fâché",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-fatiguer": {
+    "infinitif": "se fatiguer",
+    "infinitifBase": "fatiguer",
+    "formeNonPronominale": "fatiguer",
+    "participePasse": "fatigué",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-glisser": {
+    "infinitif": "se glisser",
+    "infinitifBase": "glisser",
+    "formeNonPronominale": "glisser",
+    "participePasse": "glissé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-grouper": {
+    "infinitif": "se grouper",
+    "infinitifBase": "grouper",
+    "formeNonPronominale": "grouper",
+    "participePasse": "groupé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-heurter": {
+    "infinitif": "se heurter",
+    "infinitifBase": "heurter",
+    "formeNonPronominale": "heurter",
+    "participePasse": "heurté",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-humilier": {
+    "infinitif": "se humilier",
+    "infinitifBase": "humilier",
+    "formeNonPronominale": "humilier",
+    "participePasse": "humilié",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-imposer": {
+    "infinitif": "s'imposer",
+    "infinitifBase": "imposer",
+    "formeNonPronominale": "imposer",
+    "participePasse": "imposé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-installer": {
+    "infinitif": "s'installer",
+    "infinitifBase": "installer",
+    "formeNonPronominale": "installer",
+    "participePasse": "installé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-interroger": {
+    "infinitif": "s'interroger",
+    "infinitifBase": "interroger",
+    "formeNonPronominale": "interroger",
+    "participePasse": "interrogé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-isoler": {
+    "infinitif": "s'isoler",
+    "infinitifBase": "isoler",
+    "formeNonPronominale": "isoler",
+    "participePasse": "isolé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-lancer": {
+    "infinitif": "se lancer",
+    "infinitifBase": "lancer",
+    "formeNonPronominale": "lancer",
+    "participePasse": "lancé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-libérer": {
+    "infinitif": "se libérer",
+    "infinitifBase": "libérer",
+    "formeNonPronominale": "libérer",
+    "participePasse": "libéré",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-lier": {
+    "infinitif": "se lier",
+    "infinitifBase": "lier",
+    "formeNonPronominale": "lier",
+    "participePasse": "lié",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-manifester": {
+    "infinitif": "se manifester",
+    "infinitifBase": "manifester",
+    "formeNonPronominale": "manifester",
+    "participePasse": "manifesté",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-méprendre": {
+    "infinitif": "se méprendre",
+    "infinitifBase": "méprendre",
+    "formeNonPronominale": "méprendre",
+    "participePasse": "mépris",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-mêler": {
+    "infinitif": "se mêler",
+    "infinitifBase": "mêler",
+    "formeNonPronominale": "mêler",
+    "participePasse": "mêlé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-modifier": {
+    "infinitif": "se modifier",
+    "infinitifBase": "modifier",
+    "formeNonPronominale": "modifier",
+    "participePasse": "modifié",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-multiplier": {
+    "infinitif": "se multiplier",
+    "infinitifBase": "multiplier",
+    "formeNonPronominale": "multiplier",
+    "participePasse": "multiplié",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-obstiner": {
+    "infinitif": "s'obstiner",
+    "infinitifBase": "obstiner",
+    "formeNonPronominale": "obstiner",
+    "participePasse": "obstiné",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-opposer": {
+    "infinitif": "s'opposer",
+    "infinitifBase": "opposer",
+    "formeNonPronominale": "opposer",
+    "participePasse": "opposé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-organiser": {
+    "infinitif": "s'organiser",
+    "infinitifBase": "organiser",
+    "formeNonPronominale": "organiser",
+    "participePasse": "organisé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-orienter": {
+    "infinitif": "s'orienter",
+    "infinitifBase": "orienter",
+    "formeNonPronominale": "orienter",
+    "participePasse": "orienté",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-pencher": {
+    "infinitif": "se pencher",
+    "infinitifBase": "pencher",
+    "formeNonPronominale": "pencher",
+    "participePasse": "penché",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-précipiter": {
+    "infinitif": "se précipiter",
+    "infinitifBase": "précipiter",
+    "formeNonPronominale": "précipiter",
+    "participePasse": "précipité",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-protéger": {
+    "infinitif": "se protéger",
+    "infinitifBase": "protéger",
+    "formeNonPronominale": "protéger",
+    "participePasse": "protégé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-reconnaître": {
+    "infinitif": "se reconnaître",
+    "infinitifBase": "reconnaître",
+    "formeNonPronominale": "reconnaître",
+    "participePasse": "reconnu",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-réfugier": {
+    "infinitif": "se réfugier",
+    "infinitifBase": "réfugier",
+    "formeNonPronominale": "réfugier",
+    "participePasse": "réfugié",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-réjouir": {
+    "infinitif": "se réjouir",
+    "infinitifBase": "réjouir",
+    "formeNonPronominale": "réjouir",
+    "participePasse": "réjoui",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-répandre": {
+    "infinitif": "se répandre",
+    "infinitifBase": "répandre",
+    "formeNonPronominale": "répandre",
+    "participePasse": "répandu",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-reproduire": {
+    "infinitif": "se reproduire",
+    "infinitifBase": "reproduire",
+    "formeNonPronominale": "reproduire",
+    "participePasse": "reproduit",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-ressaisir": {
+    "infinitif": "se ressaisir",
+    "infinitifBase": "ressaisir",
+    "formeNonPronominale": "ressaisir",
+    "participePasse": "ressaisi",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-résoudre": {
+    "infinitif": "se résoudre",
+    "infinitifBase": "résoudre",
+    "formeNonPronominale": "résoudre",
+    "participePasse": "résolu",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-retirer": {
+    "infinitif": "se retirer",
+    "infinitifBase": "retirer",
+    "formeNonPronominale": "retirer",
+    "participePasse": "retiré",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-réunir": {
+    "infinitif": "se réunir",
+    "infinitifBase": "réunir",
+    "formeNonPronominale": "réunir",
+    "participePasse": "réuni",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-sauver": {
+    "infinitif": "se sauver",
+    "infinitifBase": "sauver",
+    "formeNonPronominale": "sauver",
+    "participePasse": "sauvé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-secouer": {
+    "infinitif": "se secouer",
+    "infinitifBase": "secouer",
+    "formeNonPronominale": "secouer",
+    "participePasse": "secoué",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-situer": {
+    "infinitif": "se situer",
+    "infinitifBase": "situer",
+    "formeNonPronominale": "situer",
+    "participePasse": "situé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-soumettre": {
+    "infinitif": "se soumettre",
+    "infinitifBase": "soumettre",
+    "formeNonPronominale": "soumettre",
+    "participePasse": "soumis",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-soutenir": {
+    "infinitif": "se soutenir",
+    "infinitifBase": "soutenir",
+    "formeNonPronominale": "soutenir",
+    "participePasse": "soutenu",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-suicider": {
+    "infinitif": "se suicider",
+    "infinitifBase": "suicider",
+    "formeNonPronominale": "suicider",
+    "participePasse": "suicidé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-transformer": {
+    "infinitif": "se transformer",
+    "infinitifBase": "transformer",
+    "formeNonPronominale": "transformer",
+    "participePasse": "transformé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-trouver": {
+    "infinitif": "se trouver",
+    "infinitifBase": "trouver",
+    "formeNonPronominale": "trouver",
+    "participePasse": "trouvé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-vanter": {
+    "infinitif": "se vanter",
+    "infinitifBase": "vanter",
+    "formeNonPronominale": "vanter",
+    "participePasse": "vanté",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-vêtir": {
+    "infinitif": "se vêtir",
+    "infinitifBase": "vêtir",
+    "formeNonPronominale": "vêtir",
+    "participePasse": "vêtu",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-voir": {
+    "infinitif": "se voir",
+    "infinitifBase": "voir",
+    "formeNonPronominale": "voir",
+    "participePasse": "vu",
+    "auxiliaire": "être",
+    "accordParticipePasse": "sujet",
+    "actif": true
+  },
+  "se-plaire": {
+    "infinitif": "se plaire",
+    "infinitifBase": "plaire",
+    "formeNonPronominale": "plaire",
+    "participePasse": "plu",
+    "auxiliaire": "être",
+    "accordParticipePasse": "aucun",
+    "actif": true
+  },
+  "se-déplaire": {
+    "infinitif": "se déplaire",
+    "infinitifBase": "déplaire",
+    "formeNonPronominale": "déplaire",
+    "participePasse": "déplu",
+    "auxiliaire": "être",
+    "accordParticipePasse": "aucun",
+    "actif": true
+  },
+  "se-complaire": {
+    "infinitif": "se complaire",
+    "infinitifBase": "complaire",
+    "formeNonPronominale": "complaire",
+    "participePasse": "complu",
+    "auxiliaire": "être",
+    "accordParticipePasse": "aucun",
+    "actif": true
+  },
+  "se-répondre": {
+    "infinitif": "se répondre",
+    "infinitifBase": "répondre",
+    "formeNonPronominale": "répondre",
+    "participePasse": "répondu",
+    "auxiliaire": "être",
+    "accordParticipePasse": "aucun",
+    "actif": true
+  },
+  "se-mentir": {
+    "infinitif": "se mentir",
+    "infinitifBase": "mentir",
+    "formeNonPronominale": "mentir",
+    "participePasse": "menti",
+    "auxiliaire": "être",
+    "accordParticipePasse": "aucun",
+    "actif": true
+  },
+  "se-sourire": {
+    "infinitif": "se sourire",
+    "infinitifBase": "sourire",
+    "formeNonPronominale": "sourire",
+    "participePasse": "souri",
+    "auxiliaire": "être",
+    "accordParticipePasse": "aucun",
+    "actif": true
+  },
+  "se-nuire": {
+    "infinitif": "se nuire",
+    "infinitifBase": "nuire",
+    "formeNonPronominale": "nuire",
+    "participePasse": "nui",
+    "auxiliaire": "être",
+    "accordParticipePasse": "aucun",
+    "actif": true
+  },
+  "se-ressembler": {
+    "infinitif": "se ressembler",
+    "infinitifBase": "ressembler",
+    "formeNonPronominale": "ressembler",
+    "participePasse": "ressemblé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "aucun",
+    "actif": true
+  },
+  "se-succéder": {
+    "infinitif": "se succéder",
+    "infinitifBase": "succéder",
+    "formeNonPronominale": "succéder",
+    "participePasse": "succédé",
+    "auxiliaire": "être",
+    "accordParticipePasse": "aucun",
+    "actif": true
+  },
+  "se-suffire": {
+    "infinitif": "se suffire",
+    "infinitifBase": "suffire",
+    "formeNonPronominale": "suffire",
+    "participePasse": "suffi",
+    "auxiliaire": "être",
+    "accordParticipePasse": "aucun",
+    "actif": true
+  }
 };
 
 window.COQ_PRONOMINAL_DATABASE_VERSION = "1.0.0";
