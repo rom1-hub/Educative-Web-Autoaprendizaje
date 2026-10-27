@@ -1039,7 +1039,7 @@
         ? document.getElementById("practice-auxiliary").value
         : ""
     };
-    if (!filters.verb && !["premier-groupe", "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe", "troisieme-groupe", "ir", "aitre", "dre", "ire-uire", "oir-oire", "ttre", "top-100"].includes(filters.family)) {
+    if (!filters.verb && !["tous-groupes-familles", "premier-groupe", "premier-groupe-reguliers", "ger", "cer", "eler", "eter", "yer", "e-accent", "deuxieme-groupe", "troisieme-groupe", "ir", "aitre", "dre", "ire-uire", "oir-oire", "ttre", "top-100"].includes(filters.family)) {
       showPracticeMessage("Escribe un verbo o selecciona una familia para generar una práctica automática.", true);
       return;
     }
