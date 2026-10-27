@@ -3048,6 +3048,7 @@ def generate_practice(request: GenerateRequest) -> dict:
                 available_verbs = [
                     verb for verb in available_verbs
                     if (family == "deuxieme-groupe" and verb in second_group_pronominal_verbs())
+                    or (family == "premier-groupe" and verb in pronominal_first_group_verbs())
                     or verb in ETRE_PRIORITY_PARTICIPLES
                     or (request.construction == "pronominal" and verb.startswith(("se ", "s'")))
                 ]
