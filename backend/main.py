@@ -509,6 +509,12 @@ def normalize(value: str) -> str:
     return re.sub(r"\s+", " ", value.strip())
 
 
+def strip_accents(value: str) -> str:
+    """Normalize accents for tolerant answer checking without changing displayed forms."""
+    decomposed = unicodedata.normalize("NFD", value or "")
+    return "".join(char for char in decomposed if unicodedata.category(char) != "Mn")
+
+
 ETRE_PRIORITY_PARTICIPLES = {
     "entrer": "entré",
     "monter": "monté",
@@ -4195,7 +4201,8 @@ def check_answer(request: CheckRequest) -> dict:
         if separator and past_participle.endswith("é"):
             for ending in ("é", "ée", "és", "ées"):
                 accepted.add(prefix + " " + past_participle[:-1] + ending)
-    correct = bool(actual) and actual in accepted
+    accepted_without_accents = {strip_accents(value) for value in accepted}
+    correct = bool(actual) and (actual in accepted or strip_accents(actual) in accepted_without_accents)
     return {"correct": correct, "expected": question["answer"]}
 
 
