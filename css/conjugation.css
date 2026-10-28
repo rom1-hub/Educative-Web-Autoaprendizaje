@@ -237,9 +237,10 @@
 /* Traducciones al español: apoyo visual, sin alterar el contenido pedagógico existente. */
 .verb-translation {
   color: var(--color-muted);
-  font-size: clamp(.95rem, 2vw, 1.2rem);
+  font-size: clamp(.85rem, 1.7vw, 1.05rem);
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.2;
+  vertical-align: middle;
 }
 .practice-verb-translation {
   color: var(--color-muted);
