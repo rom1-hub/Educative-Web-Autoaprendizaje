@@ -79,14 +79,11 @@
     return category;
   }
   function validateLoadedRegistry(){
-    const categoryIds=new Set(),subcategoryIds=new Set(),entryIds=new Set();
+    const categoryIds=new Set();
     registry.forEach((category)=>{
       assertCategory(category);
-      if(categoryIds.has(category.id))throw new Error('Vocabulario: id de categoría duplicado: "'+category.id+'".'); categoryIds.add(category.id);
-      (category.subcategories||[]).forEach((subcategory)=>{
-        if(subcategoryIds.has(subcategory.id))throw new Error('Vocabulario: id de subcategoría duplicado globalmente: "'+subcategory.id+'".'); subcategoryIds.add(subcategory.id);
-        (subcategory.entries||[]).forEach((entry)=>{if(entryIds.has(entry.id))throw new Error('Vocabulario: id de entrada duplicado globalmente: "'+entry.id+'".');entryIds.add(entry.id);});
-      });
+      if(categoryIds.has(category.id))throw new Error('Vocabulario: id de categoría duplicado: "'+category.id+'".');
+      categoryIds.add(category.id);
     });
   }
   function registerCategory(category){
