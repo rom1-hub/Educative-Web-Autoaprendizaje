@@ -245,5 +245,6 @@
   "agender": "anotar en la agenda; fijar una fecha (uso suizo)",
   "ailler": "untar o aromatizar con ajo",
   "allégir": "rebajar el grosor, hacer más delgado",
+  "agricher": "agarrar con fuerza, atrapar o detener (coloquial)",
 });
 })();
