@@ -4,10 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#071a3d">
-  <meta name="description" content="Amplía tu vocabulario francés por temas y situaciones cotidianas, con una estructura preparada para añadir ejemplos y práctica.">
+  <meta name="description" content="Busca vocabulario francés en español y francés, organizado por categorías y subcategorías.">
   <title>Vocabulario francés · Coq</title>
   <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/vocabulary.css">
   <script src="js/main.js" defer></script>
+  <script src="js/vocabulary.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#contenido">Saltar al contenido</a>
@@ -16,30 +18,28 @@
     <a class="brand" href="index.html" aria-label="Coq, inicio"><span class="brand-mark" aria-hidden="true"></span><span>Coq</span></a>
     <button class="menu-toggle" type="button" data-menu-toggle aria-controls="nav-links" aria-expanded="false" aria-label="Abrir menú">☰</button>
     <nav class="nav-links" id="nav-links" data-nav-links aria-label="Navegación principal">
-      <a href="index.html">Inicio</a>
-      <a href="conjugacion.html">Conjugación</a>
-      <a href="gramatica.html">Gramática</a>
-      <a href="vocabulario.html" aria-current="page">Vocabulario</a>
+      <a href="index.html">Inicio</a><a href="conjugacion.html">Conjugación</a><a href="gramatica.html">Gramática</a><a href="vocabulario.html" aria-current="page">Vocabulario</a>
     </nav>
     <div class="nav-actions"><a class="button button-primary" href="conjugacion.html">Empezar a aprender <span aria-hidden="true">↗</span></a></div>
   </div>
 </header>
 <main id="contenido">
-  <section class="page-hero"><div class="container"><span class="eyebrow">Palabras en contexto</span><h1>Vocabulario francés</h1><p>Amplía tu vocabulario francés por temas y situaciones cotidianas, con una estructura preparada para añadir ejemplos y práctica.</p></div></section>
-  <section class="content-section"><div class="container"><div class="grid grid-2">
-<article class="content-panel"><div class="card-icon orange">⌂</div><h2>La vida cotidiana</h2><p>Palabras útiles para comunicarte en situaciones frecuentes.</p><ul class="topic-list"><li><a href="#maison"><span>Casa y familia</span><span aria-hidden="true">→</span></a></li><li><a href="#food"><span>Comida y restaurante</span><span aria-hidden="true">→</span></a></li><li><a href="#city"><span>La ciudad y las compras</span><span aria-hidden="true">→</span></a></li></ul></article>
-<article class="content-panel"><div class="card-icon">✈</div><h2>Temas para explorar</h2><p>Organiza palabras y expresiones por contextos que puedas reutilizar.</p><ul class="topic-list"><li><a href="#travel"><span>Viajes y transporte</span><span aria-hidden="true">→</span></a></li><li><a href="#study"><span>Estudios y trabajo</span><span aria-hidden="true">→</span></a></li><li><a href="#feelings"><span>Personas y emociones</span><span aria-hidden="true">→</span></a></li></ul></article></div></div></section>
-  <section class="content-section"><div class="container content-panel"><span class="eyebrow">¿Por dónde empezar?</span><h2>Avanza a tu ritmo.</h2><p>Elige un tema, revisa la explicación y vuelve siempre que necesites practicar.</p><a class="button button-primary" href="index.html">Volver al inicio <span aria-hidden="true">→</span></a></div></section>
-</main>
-<footer class="site-footer">
-  <div class="container">
-    <div class="footer-grid">
-      <div><a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"></span><span>Coq</span></a><p class="footer-brand-copy">Aprender francés a tu ritmo. Comprende, practica y avanza con autonomía.</p></div>
-      <div class="footer-links"><h3>Aprende</h3><a href="conjugacion.html">Conjugación</a><a href="gramatica.html">Gramática</a><a href="vocabulario.html">Vocabulario</a></div>
-      <div class="footer-links"><h3>La plataforma</h3><a href="index.html#metodo">Cómo funciona</a><a href="404.html">Página 404</a></div>
+  <section class="page-hero"><div class="container"><span class="eyebrow">Palabras en contexto</span><h1>Vocabulario francés</h1><p>Busca una palabra en francés o español, o explora el vocabulario por categorías y subcategorías.</p></div></section>
+  <section class="container vocabulary-workspace" aria-label="Buscador y navegador de vocabulario">
+    <div class="vocabulary-search-area">
+      <label class="vocabulary-search" for="vocabulary-search-input"><span aria-hidden="true">⌕</span><input id="vocabulary-search-input" type="search" placeholder="Buscar en francés o español (ej. maison, casa, manger…)" autocomplete="off"><button type="button" id="vocabulary-clear" aria-label="Limpiar búsqueda" title="Limpiar búsqueda">×</button></label>
+      <div class="vocabulary-search-meta"><span>Busca por palabra en francés o por traducción al español.</span><span id="vocabulary-status" aria-live="polite">Explorando categorías</span></div>
     </div>
-    <div class="footer-bottom"><span>© Coq · Plataforma de autoaprendizaje de francés</span><span>Aprende. Practica. Progresa.</span></div>
-  </div>
-</footer>
+    <div class="vocabulary-layout">
+      <aside class="vocabulary-sidebar" aria-label="Categorías de vocabulario"><div class="vocabulary-sidebar-heading"><h2>Categorías</h2><span id="vocabulary-category-count"></span></div><nav id="vocabulary-categories" class="vocabulary-category-list" aria-label="Categorías"></nav></aside>
+      <section id="vocabulary-content" class="vocabulary-content" aria-live="polite"></section>
+    </div>
+  </section>
+</main>
+<footer class="site-footer"><div class="container"><div class="footer-grid">
+  <div><a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"></span><span>Coq</span></a><p class="footer-brand-copy">Aprender francés a tu ritmo. Comprende, practica y avanza con autonomía.</p></div>
+  <div class="footer-links"><h3>Aprende</h3><a href="conjugacion.html">Conjugación</a><a href="gramatica.html">Gramática</a><a href="vocabulario.html">Vocabulario</a></div>
+  <div class="footer-links"><h3>La plataforma</h3><a href="index.html#metodo">Cómo funciona</a><a href="404.html">Página 404</a></div>
+</div><div class="footer-bottom"><span>© Coq · Plataforma de autoaprendizaje de francés</span><span>Aprende. Practica. Progresa.</span></div></div></footer>
 </body>
 </html>
