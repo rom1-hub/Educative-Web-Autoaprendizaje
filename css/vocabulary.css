@@ -66,6 +66,11 @@
 .vocabulary-word-entry{display:grid;gap:.5rem;min-width:0}
 .vocabulary-word{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:.7rem;padding:.8rem .9rem;border:1px solid var(--color-line);border-radius:12px;background:white;transition:border-color var(--duration-fast),box-shadow var(--duration-fast)}
 .vocabulary-word:hover{border-color:rgba(7,91,232,.24);box-shadow:0 5px 18px rgba(7,26,61,.04)}
+.vocabulary-word[data-word-card]{cursor:pointer;outline:none}
+.vocabulary-word[data-word-card]:focus-visible{border-color:var(--color-blue);box-shadow:0 0 0 3px rgba(7,91,232,.18)}
+.vocabulary-word[data-word-card].is-expanded{border-color:rgba(7,91,232,.38);background:#f8fbff}
+.vocabulary-expand-indicator{display:grid;place-items:center;flex:0 0 2.15rem;height:2.15rem;border:1px solid rgba(7,91,232,.18);border-radius:9px;background:#f0f5fc;color:var(--color-blue);font-size:1.35rem;font-weight:650;line-height:1;transition:background var(--duration-fast),color var(--duration-fast)}
+.vocabulary-word[data-word-card].is-expanded .vocabulary-expand-indicator{border-color:var(--color-blue);background:var(--color-blue);color:#fff}
 .vocabulary-word-main{display:flex;align-items:center;gap:.8rem;min-width:0}
 .vocabulary-word-initial{display:grid;place-items:center;flex:0 0 2.45rem;height:2.45rem;border-radius:10px;background:#f0f5fc;color:var(--color-blue);font-weight:850}
 .vocabulary-word-text{min-width:0}
