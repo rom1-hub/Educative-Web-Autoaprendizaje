@@ -63,6 +63,13 @@
       .replace(/\s+/g, " ");
   }
 
+  // La traducción es solo informativa: no participa en la conjugación ni en la evaluación.
+  function getSpanishTranslation(value) {
+    const key = normalizeInfinitive(value);
+    const catalog = window.COQ_VERB_TRANSLATIONS_ES;
+    return catalog && typeof catalog[key] === "string" ? catalog[key] : "";
+  }
+
   // Auxiliares con prioridad de être en el motor de práctica Python.
   // Estos verbos no deben clasificarse como regulares del primer grupo solo por terminar en -er.
   const PRACTICE_ETRE_PRIORITY_VERBS = new Set([
@@ -271,6 +278,7 @@
       "imperatif-passe":"Impératif passé"
     };
     const displayLemma = lemma.charAt(0).toLocaleUpperCase("fr") + lemma.slice(1);
+    const spanishTranslation = getSpanishTranslation(lemma);
     const specialVerbRecords = window.COQ_IMPERSONAL_VERBS || {};
     const normalizedLemma = normalizeInfinitive(getBaseInfinitive(verb));
     const matchedSpecialRecord = Object.entries(specialVerbRecords)
@@ -288,6 +296,7 @@
     const nonPronominalForm = getNonPronominalForm(verb);
     let output = '<section class="verb-summary-card" aria-label="Resumen del verbo">' +
       '<div class="verb-summary-header"><div><span class="eyebrow">Ficha del verbo</span><div class="verb-summary-title"><h2>' + esc(displayLemma) + '</h2>' +
+      (spanishTranslation ? '<span class="verb-translation" lang="es">' + esc(spanishTranslation) + '</span>' : '') +
       (verbTypeLabel ? '<span class="verb-type-badge">' + esc(verbTypeLabel) + '</span>' : '') + '</div></div>' +
       '<span class="pill">' + esc(groupLabel) + '</span></div>' +
       '<div class="verb-summary-details">' +
@@ -906,7 +915,8 @@
       '<section class="practice-session" aria-label="Sesión de práctica">' +
         '<div class="practice-session-top"><div><span class="eyebrow">Pregunta ' + (index + 1) + ' de ' + questions.length + '</span><h2>Conjuga el verbo</h2></div><span class="practice-score">Puntuación: ' + score + ' / ' + index + '</span></div>' +
         '<div class="practice-progress" role="progressbar" aria-label="Progreso de la práctica" aria-valuemin="0" aria-valuemax="' + questions.length + '" aria-valuenow="' + index + '"><span style="width:' + Math.round(index / questions.length * 100) + '%"></span></div>' +
-        '<div class="practice-prompt"><span class="practice-prompt-label">' + esc(PRACTICE_TENSE_LABELS[question.tense] || question.tense) + '</span><div class="practice-prompt-main"><span class="practice-verb">' + esc(question.verb) + '</span></div><p>'+ (question.subject_gender && question.subject_number
+        '<div class="practice-prompt"><span class="practice-prompt-label">' + esc(PRACTICE_TENSE_LABELS[question.tense] || question.tense) + '</span><div class="practice-prompt-main"><span class="practice-verb">' + esc(question.verb) + '</span>' +
+        (getSpanishTranslation(question.verb) ? '<span class="practice-verb-translation" lang="es">' + esc(getSpanishTranslation(question.verb)) + '</span>' : '') + '</div><p>'+ (question.subject_gender && question.subject_number
           ? 'Ten en cuenta el género y el número indicados; no repitas el sujeto.'
           : 'Escribe la forma conjugada sin repetir el sujeto.') + '</p>' + (question.tense === "imperatif-present" || question.tense === "imperatif-passe" ? '<small>* En el imperativo, los sujetos no se escriben y no se pronuncian.</small>' : '') + '</div>' +
         '<form class="practice-answer-form" data-practice-answer-form><label class="practice-answer-label" for="practice-answer">Tu respuesta</label><div class="practice-answer-entry"><span class="practice-answer-person" aria-hidden="true">' + esc(displayedPerson) + '</span><input id="practice-answer" name="answer" type="text" aria-label="Forma conjugada para ' + esc(displayedPerson) + '" autocomplete="off" autocapitalize="off" spellcheck="false" required></div><small>Escribe únicamente la forma conjugada.</small><div class="practice-answer-actions"><button class="button button-primary" type="submit">Comprobar respuesta</button></div></form>' +
