@@ -237,5 +237,13 @@
   "amaigrir": "adelgazar, hacer adelgazar",
   "amalgamer": "amalgamar, mezclar",
   "amancher": "arreglar, preparar; uso regional, especialmente en Quebec",
+  "affourcher": "fondear con dos anclas; colocar a horcajadas (según el contexto)",
+  "affricher": "dejar en barbecho, dejar sin cultivar",
+  "affriter": "preparar una sartén para freír calentando grasa y limpiándola en seco",
+  "affruiter": "dar fruto, producir frutos",
+  "affurer": "ganar, obtener beneficio; engañar (coloquial y anticuado)",
+  "agender": "anotar en la agenda; fijar una fecha (uso suizo)",
+  "ailler": "untar o aromatizar con ajo",
+  "allégir": "rebajar el grosor, hacer más delgado",
 });
 })();
