@@ -22,6 +22,33 @@
 .vocabulary-category.is-active{border-color:rgba(7,91,232,.22);background:var(--color-blue-pale);color:var(--color-blue);font-weight:800}
 .vocabulary-category-code{display:grid;place-items:center;flex:0 0 1.8rem;height:1.8rem;border:1px solid var(--color-line);border-radius:8px;background:white;font-size:.68rem;font-weight:850}
 .vocabulary-category.is-active .vocabulary-category-code{border-color:var(--color-blue);background:var(--color-blue);color:white}
+/* Jerarquía visual: azul COQ para categorías y coral/naranja para subcategorías */
+.vocabulary-category{
+  border-color:rgba(7,91,232,.08);
+  background:#f0f5fc;
+  color:#183b70;
+  transition:background var(--duration-fast),border-color var(--duration-fast),color var(--duration-fast),transform var(--duration-fast);
+}
+.vocabulary-category:hover{
+  border-color:rgba(7,91,232,.24);
+  background:#e5efff;
+}
+.vocabulary-category.is-active{
+  border-color:#075be8;
+  background:#075be8;
+  color:#fff;
+  box-shadow:0 4px 12px rgba(7,91,232,.16);
+}
+.vocabulary-category-code{
+  border-color:rgba(7,91,232,.12);
+  background:rgba(255,255,255,.9);
+  color:#075be8;
+}
+.vocabulary-category.is-active .vocabulary-category-code{
+  border-color:rgba(255,255,255,.45);
+  background:#fff;
+  color:#075be8;
+}
 .vocabulary-content{min-width:0;padding:clamp(1.2rem,3vw,2rem)}
 .vocabulary-breadcrumb{display:flex;flex-wrap:wrap;gap:.45rem;margin-bottom:1rem;color:var(--color-muted);font-size:.78rem}
 .vocabulary-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1.2rem}
@@ -29,9 +56,9 @@
 .vocabulary-heading p{margin:.45rem 0 0;font-size:.9rem}
 .vocabulary-count{flex-shrink:0;padding:.3rem .65rem;border:1px solid var(--color-line);border-radius:var(--radius-pill);background:white;color:var(--color-muted);font-size:.75rem;font-weight:750}
 .vocabulary-subcategories{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem;margin-bottom:1.5rem}
-.vocabulary-subcategory{display:flex;align-items:center;justify-content:space-between;gap:.6rem;min-height:3.25rem;padding:.75rem .9rem;border:1px solid var(--color-line);border-radius:12px;background:white;color:var(--color-ink-soft);text-align:left;cursor:pointer;font-size:.88rem;font-weight:700}
-.vocabulary-subcategory:hover{border-color:rgba(7,91,232,.35)}
-.vocabulary-subcategory.is-active{border-color:rgba(7,91,232,.35);background:#edf4ff;color:var(--color-blue)}
+.vocabulary-subcategory{display:flex;align-items:center;justify-content:space-between;gap:.6rem;min-height:3.25rem;padding:.75rem .9rem;border:1px solid #f5d5c7;border-radius:12px;background:#fff7f2;color:#733b2b;text-align:left;cursor:pointer;font-size:.88rem;font-weight:700;transition:background var(--duration-fast),border-color var(--duration-fast),box-shadow var(--duration-fast),transform var(--duration-fast)}
+.vocabulary-subcategory:hover{border-color:#ff8a65;background:#fff0e8;box-shadow:0 4px 12px rgba(255,91,54,.08)}
+.vocabulary-subcategory.is-active{border-color:#ff5b36;background:#fff0e8;color:#c53d22;box-shadow:inset 3px 0 0 #ff5b36}
 .vocabulary-section-heading{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin:.7rem 0 .8rem}
 .vocabulary-section-heading h3{margin:0;font-size:1rem}
 .vocabulary-section-heading span{color:var(--color-muted);font-size:.78rem}
