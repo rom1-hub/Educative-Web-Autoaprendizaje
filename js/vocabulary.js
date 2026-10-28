@@ -63,7 +63,7 @@
   function wordCard(word) {
     const key = wordKey(word);
     const initial = (word.lemma || word.french).replace(/^(?:le|la|l['’]|les|un|une)\s*/iu, "").trim().charAt(0).toLocaleUpperCase("fr") || "É";
-    return `<div class="vocabulary-word-entry"><article class="vocabulary-word"><div class="vocabulary-word-main"><span class="vocabulary-word-initial" aria-hidden="true">${escapeHTML(word.emoji || initial)}</span><div class="vocabulary-word-text"><div class="vocabulary-word-french">${escapeHTML(word.french)}</div><div class="vocabulary-word-spanish">${escapeHTML(word.spanish)}</div></div></div><div class="vocabulary-word-actions"><button type="button" class="button button-secondary" data-word="${escapeHTML(key)}" aria-expanded="${selectedWord === key}" aria-label="Ver ficha de ${escapeHTML(word.french)}" style="min-height:2.15rem;padding:.25rem .65rem">${selectedWord === key ? "−" : "+"}</button></div></article>${selectedWord === key ? detailMarkup(word) : ""}</div>`;
+    return `<div class="vocabulary-word-entry"><article class="vocabulary-word ${selectedWord === key ? "is-expanded" : ""}" data-word-card="${escapeHTML(key)}" tabindex="0" role="button" aria-expanded="${selectedWord === key}" aria-label="Abrir o cerrar ficha de ${escapeHTML(word.french)}"><div class="vocabulary-word-main"><span class="vocabulary-word-initial" aria-hidden="true">${escapeHTML(word.emoji || initial)}</span><div class="vocabulary-word-text"><div class="vocabulary-word-french">${escapeHTML(word.french)}</div><div class="vocabulary-word-spanish">${escapeHTML(word.spanish)}</div></div></div><div class="vocabulary-word-actions"><span class="vocabulary-expand-indicator" aria-hidden="true">${selectedWord === key ? "−" : "+"}</span></div></article>${selectedWord === key ? detailMarkup(word) : ""}</div>`;
   }
   function renderBrowse() {
     const category = getCategory(), subcategory = getSubcategory();
@@ -105,9 +105,16 @@
     $("vocabulary-content").addEventListener("click", event => {
       const subcategory = event.target.closest("[data-subcategory]");
       if (subcategory) { selectedSubcategory = subcategory.dataset.subcategory; selectedWord = null; render(); return; }
-      const word = event.target.closest("[data-word]");
-      if (word) { selectedWord = selectedWord === word.dataset.word ? null : word.dataset.word; render(); return; }
+      const wordCard = event.target.closest("[data-word-card]");
+      if (wordCard) { selectedWord = selectedWord === wordCard.dataset.wordCard ? null : wordCard.dataset.wordCard; render(); return; }
       if (event.target.closest("[data-close-detail]")) { selectedWord = null; render(); }
+    });
+    $("vocabulary-content").addEventListener("keydown", event => {
+      const card = event.target.closest("[data-word-card]");
+      if (!card || (event.key !== "Enter" && event.key !== " ")) return;
+      event.preventDefault();
+      selectedWord = selectedWord === card.dataset.wordCard ? null : card.dataset.wordCard;
+      render();
     });
     $("vocabulary-search-input").addEventListener("input", () => { selectedWord = null; render(); });
     $("vocabulary-clear").addEventListener("click", () => { $("vocabulary-search-input").value = ""; selectedWord = null; render(); $("vocabulary-search-input").focus(); });
