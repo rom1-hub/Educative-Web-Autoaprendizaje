@@ -7137,5 +7137,6 @@
   "extrapoler": "extrapolar, inferir a partir de datos conocidos",
   "extravaguer": "desvariar, decir o hacer cosas extravagantes",
   "introjeter": "introyectar, interiorizar ideas o sentimientos (término psicológico)",
+  "dégalonner": "quitar los galones o adornos de una prenda",
 });
 })();
