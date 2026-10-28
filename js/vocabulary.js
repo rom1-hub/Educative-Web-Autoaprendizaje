@@ -46,7 +46,7 @@
     if (!word) return "";
     const article = word.articleFr === "un" ? "le" : word.articleFr === "une" ? "la" : "";
     const gender = word.articleFr === "un" ? "masculino" : word.articleFr === "une" ? "femenino" : "";
-    const definedArticle = article && /^[aeiouyàâäéèêëîïôöùûüÿh]/iu.test(word.lemma || "")
+    const definedArticle = article && /^[aeiouyàâäéèêëîïôöùûüÿ]/iu.test(word.lemma || "")
       ? (gender ? "l’" : "")
       : article;
     const articleLabel = definedArticle && word.articleFr
