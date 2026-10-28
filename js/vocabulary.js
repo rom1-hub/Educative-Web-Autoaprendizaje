@@ -44,16 +44,20 @@
   function wordKey(word) { return [word.categoryId, word.subcategoryId, word.id].join("::"); }
   function detailMarkup(word) {
     if (!word) return "";
-    const gender = word.articleFr === "un" ? "masculino" : word.articleFr === "une" ? "femenino" : "No disponible";
+    const article = word.articleFr === "un" ? "le" : word.articleFr === "une" ? "la" : "";
+    const gender = word.articleFr === "un" ? "masculino" : word.articleFr === "une" ? "femenino" : "";
+    const definedArticle = article && /^[aeiouyàâäéèêëîïôöùûüÿh]/iu.test(word.lemma || "")
+      ? (gender ? "l’" : "")
+      : article;
+    const articleLabel = definedArticle && word.articleFr
+      ? `${definedArticle} / ${word.articleFr} (${gender})`
+      : "No disponible en la fuente";
     return `<section class="vocabulary-detail" aria-label="Ficha de vocabulario">
-      <div class="vocabulary-detail-head"><div><span class="eyebrow">Ficha de vocabulario</span><h3>${escapeHTML(word.french)}</h3><p>${escapeHTML(word.spanish)}</p></div><button type="button" class="button button-secondary" data-close-detail aria-label="Cerrar ficha">Cerrar ×</button></div>
+      <div class="vocabulary-detail-head"><div><span class="eyebrow">Ficha de vocabulario</span><h3>${escapeHTML(word.french)}</h3><p>${escapeHTML(word.spanish)}</p></div></div>
       <div class="vocabulary-detail-grid">
-        <div class="vocabulary-detail-cell"><span>Artículo francés</span><strong>${escapeHTML(word.articleFr || "No disponible")}</strong></div>
-        <div class="vocabulary-detail-cell"><span>Artículo español</span><strong>${escapeHTML(word.articleEs || "No disponible")}</strong></div>
-        <div class="vocabulary-detail-cell"><span>Género gramatical</span><strong>${escapeHTML(gender)}</strong></div>
+        <div class="vocabulary-detail-cell"><span>Artículo</span><strong>${escapeHTML(articleLabel)}</strong></div>
         <div class="vocabulary-detail-cell"><span>Plural</span><strong>No disponible en la fuente</strong></div>
       </div>
-      <p class="vocabulary-note">Categoría: ${escapeHTML(word.categoryName)} · Subcategoría: ${escapeHTML(word.subcategoryName)}.</p>
     </section>`;
   }
   function wordCard(word) {
