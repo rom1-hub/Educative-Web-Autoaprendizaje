@@ -10,9 +10,11 @@
   const categorySelect = $("vocabulary-category-select");
   const subcategorySelect = $("vocabulary-subcategory-select");
   const searchInput = $("vocabulary-search-input");
+  const searchArea = document.querySelector(".vocabulary-search-area");
   let categories = [];
   let exerciseType = null;
   let questions = [];
+  let questionChoices = [];
   let questionIndex = 0;
   let score = 0;
   let selectedAnswer = "";
@@ -33,9 +35,7 @@
   function activeCategory() { return getCategory(categorySelect?.value); }
   function activeSubcategory() { const category = activeCategory(); return getSubcategory(category, subcategorySelect?.value); }
   function wordsForSelection() {
-    const words = activeSubcategory()?.words || [];
-    const query = normalize(searchInput?.value || "");
-    return query ? words.filter(word => normalize(word.french).includes(query) || normalize(word.word).includes(query) || normalize(word.spanish).includes(query)) : words;
+    return activeSubcategory()?.words || [];
   }
 
   function mapCategory(source) {
@@ -58,6 +58,7 @@
     $("vocabulary-practice-tab").setAttribute("aria-selected", String(practice));
     learningPanel.hidden = practice;
     practicePanel.hidden = !practice;
+    if (searchArea) searchArea.hidden = practice;
     if (practice) renderSetup();
   }
   function selectMarkup(id, label, options, selected) {
@@ -68,11 +69,10 @@
     const category = activeCategory();
     const subcategory = activeSubcategory();
     const available = wordsForSelection().length;
-    const query = searchInput?.value.trim();
     practicePanel.innerHTML = `
       <div class="vocabulary-breadcrumb">Vocabulario <span>›</span> <strong>Practicar</strong></div>
       <div class="vocabulary-heading"><div><h2>Practicar vocabulario</h2><p>Elige un ejercicio para practicar las palabras de los filtros seleccionados.</p></div></div>
-      <div class="vocabulary-practice-section-title"><h3>Elige un ejercicio</h3><p>${available} palabra(s) disponibles${query ? " para la búsqueda actual" : ""}</p></div>
+      <div class="vocabulary-practice-section-title"><h3>Elige un ejercicio</h3><p>${available} palabra(s) disponibles</p></div>
       <div class="vocabulary-exercise-options">
         <button type="button" class="vocabulary-exercise-option" data-exercise="match">
           <span class="vocabulary-exercise-number">01</span><span class="vocabulary-exercise-copy"><strong>Asociar palabras</strong><small>Elegir la palabra francesa que corresponde a la traducción española.</small></span><span class="vocabulary-exercise-arrow" aria-hidden="true">→</span>
@@ -100,6 +100,7 @@
     exerciseType = type;
     questions = shuffle(words).slice(0, Math.min(10, words.length));
     questionIndex = 0; score = 0; selectedAnswer = ""; answerChecked = false; finished = false;
+    questionChoices = questions.map(word => type === "write" ? [] : distractors(word));
     renderQuestion();
   }
   function distractors(correct) {
@@ -114,7 +115,7 @@
     const progress = Math.round(questionIndex / questions.length * 100);
     const title = exerciseType === "write" ? "Escribe la palabra en francés" : exerciseType === "audio" ? "Escucha y elige la traducción" : "¿Qué palabra corresponde a esta traducción?";
     const prompt = exerciseType === "write" ? word.spanish : exerciseType === "audio" ? "Escucha la palabra francesa" : word.spanish;
-    const choices = exerciseType === "write" ? [] : distractors(word);
+    const choices = exerciseType === "write" ? [] : (questionChoices[questionIndex] || []);
     practicePanel.innerHTML = `
       <div class="vocabulary-breadcrumb"><button type="button" class="vocabulary-text-button" data-back-setup>← Cambiar ejercicio</button><span>›</span><strong>${escapeHTML(activeSubcategory()?.title || "")}</strong></div>
       <div class="vocabulary-practice-progress"><span>Pregunta ${questionIndex + 1} de ${questions.length}</span><span>${score} acierto(s)</span></div>
@@ -122,12 +123,11 @@
       <section class="vocabulary-question-card">
         <span class="eyebrow">${title}</span>
         <h2>${escapeHTML(prompt)}</h2>
-        ${exerciseType === "audio" ? '<button type="button" class="vocabulary-audio-button" data-play-audio><span aria-hidden="true">▶</span> Escuchar de nuevo</button>' : ""}
+        ${exerciseType === "audio" ? '<button type="button" class="vocabulary-audio-button" data-play-audio><span aria-hidden="true">▶</span> Escuchar la palabra</button>' : ""}
         ${exerciseType === "write" ? '<label class="vocabulary-answer-field"><span>Tu respuesta en francés</span><input id="vocabulary-written-answer" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Escribe aquí…"></label>' : `<div class="vocabulary-answer-options">${choices.map((choice,index) => `<button type="button" class="vocabulary-answer-option ${selectedAnswer === choice.id ? "is-selected" : ""}" data-answer="${escapeHTML(choice.id)}" ${answerChecked ? "disabled" : ""}><span>${String.fromCharCode(65+index)}</span>${escapeHTML(exerciseType === "audio" ? choice.spanish : choice.french)}</button>`).join("")}</div>`}
         <div id="vocabulary-answer-feedback" class="vocabulary-answer-feedback" aria-live="polite">${feedbackMarkup(word)}</div>
         <div class="vocabulary-question-actions"><button type="button" class="button button-secondary" data-back-setup>Salir del ejercicio</button><button type="button" class="button button-primary" data-check-answer ${answerChecked ? "" : (exerciseType === "write" ? "" : !selectedAnswer ? "disabled" : "")}>${answerChecked ? (questionIndex === questions.length - 1 ? "Ver resultados" : "Siguiente pregunta") : "Comprobar respuesta"}</button></div>
       </section>`;
-    if (exerciseType === "audio") playCurrentAudio();
     if (exerciseType === "write") $("vocabulary-written-answer")?.focus();
   }
   function feedbackMarkup(word) {
@@ -184,7 +184,6 @@
   });
   categorySelect.addEventListener("change", () => { if (practicePanel && !practicePanel.hidden) renderSetup(); });
   subcategorySelect.addEventListener("change", () => { if (practicePanel && !practicePanel.hidden) renderSetup(); });
-  searchInput.addEventListener("input", () => { if (practicePanel && !practicePanel.hidden && !questions.length) renderSetup(); });
   practicePanel.addEventListener("click", event => {
     const exercise = event.target.closest("[data-exercise]");
     if (exercise) { startExercise(exercise.dataset.exercise); return; }
