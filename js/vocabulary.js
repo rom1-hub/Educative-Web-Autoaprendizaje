@@ -31,8 +31,8 @@
     const explicit = normalizePartOfSpeech(entry.partOfSpeech || entry.wordType || entry.grammaticalCategory || entry.pos || "");
     if (explicit) return explicit;
 
-    const article = normalize(entry.articleFr || "");
-    if (/^(un|une|des|du|de la|de l')$/.test(article)) return "sustantivo";
+    const article = normalize(entry.articleFr || "").replace(/’/g, "'");
+    if (/^(un|une|des|du|de la|de l'|l')$/.test(article)) return "sustantivo";
 
     const context = normalize([source.id, source.title, sub.id, sub.title].join(" "));
     if (source.id === "common-adverbs" || /\badverbs?\b|\badverbios?\b/.test(context)) return "adverbio";
@@ -49,6 +49,20 @@
     const spanishInfinitive = /(?:^|\s)[^\s]+(?:ar|er|ir)(?:$|\s)/u.test(String(entry.translation || "").toLowerCase());
     const irregularVerbTranslations = /^(ser|estar|tener|hacer|poder|deber|querer|saber|poner|salir|venir|ver|ir|dar|decir|traer|conocer|vivir|morir|abrir|cubrir|escribir|describir|descubrir|ofrecer|recibir|seguir|dormir|sentir|pedir|servir|huir|oír|leer|reír|sonreír)$/iu.test(normalize(entry.translation || ""));
     if (!/\s/.test(word) && /^(se\s+)?[a-zà-ÿ]+(?:er|ir|re|oir)$/iu.test(word) && (spanishInfinitive || irregularVerbTranslations)) return "verbo";
+
+    // Color names without an article are normally being used adjectivally in the color vocabulary.
+    if (!/\s/.test(word) && /colou?r|couleur|colores|couleurs/.test(context)) return "adjetivo";
+
+    const knownAdjectives = new Set([
+      "beau","belle","bon","bonne","mauvais","mauvaise","grand","grande","petit","petite",
+      "jeune","vieux","vieille","nouveau","nouvelle","noir","noire","blanc","blanche",
+      "rouge","bleu","bleue","vert","verte","jaune","gris","grise","rose","violet","violette",
+      "orange","marron","rapide","facile","difficile","important","importante","possible","impossible",
+      "utile","pratique","cher","chère","content","contente","triste","fatigué","fatiguée",
+      "heureux","heureuse","malheureux","malheureuse","actif","active","sportif","sportive",
+      "enchanté","enchantée","ravi","ravie","désolé","désolée","sérieux","sérieuse"
+    ]);
+    if (!/\s/.test(word) && knownAdjectives.has(normalize(word))) return "adjetivo";
 
     // Adjectives with common French endings, only for single-word entries without noun articles.
     if (!/\s/.test(word) && /(?:eux|euse|if|ive|able|ible|el|elle|ien|ienne|ant|ante|ent|ente|al|ale|ique|iste|oire)$/iu.test(word)) {
