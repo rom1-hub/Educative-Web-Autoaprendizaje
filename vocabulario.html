@@ -28,17 +28,17 @@
 <main id="contenido">
   <section class="page-hero"><div class="container"><span class="eyebrow">Palabras en contexto</span><h1>Vocabulario francés</h1><p>Busca una palabra en francés o español, o explora el vocabulario por categorías y subcategorías.</p></div></section>
   <section class="container vocabulary-workspace" aria-label="Buscador y navegador de vocabulario">
-    <div id="vocabulary-mode-tabs" class="vocabulary-mode-tabs" role="tablist" aria-label="Modo de vocabulario">
-      <button type="button" class="vocabulary-mode-tab is-active" id="vocabulary-learn-tab" role="tab" aria-selected="true" aria-controls="vocabulary-learning-panel">Ver el vocabulario</button>
-      <button type="button" class="vocabulary-mode-tab" id="vocabulary-practice-tab" role="tab" aria-selected="false" aria-controls="vocabulary-practice-panel">Practicar</button>
+    <div id="vocabulary-mode-tabs" class="conjugation-tabs vocabulary-mode-tabs" role="tablist" aria-label="Modo de vocabulario">
+      <button type="button" class="conjugation-tab vocabulary-mode-tab is-active" id="vocabulary-learn-tab" role="tab" aria-selected="true" aria-controls="vocabulary-learning-panel"><span aria-hidden="true">⌕</span> Ver el vocabulario</button>
+      <button type="button" class="conjugation-tab vocabulary-mode-tab" id="vocabulary-practice-tab" role="tab" aria-selected="false" aria-controls="vocabulary-practice-panel"><span aria-hidden="true">↗</span> Practicar</button>
     </div>
     <div class="vocabulary-search-area">
       <label class="vocabulary-search" for="vocabulary-search-input"><span aria-hidden="true">⌕</span><input id="vocabulary-search-input" type="search" placeholder="Buscar en francés o español (ej. maison, casa, manger…)" autocomplete="off"><button type="button" id="vocabulary-clear" aria-label="Limpiar búsqueda" title="Limpiar búsqueda">×</button></label>
       <div class="vocabulary-search-meta"><span>Busca por palabra en francés o por traducción al español.</span><span id="vocabulary-status" aria-live="polite">Explorando categorías</span></div>
     </div>
     <div class="vocabulary-filters" aria-label="Filtros de vocabulario">
-      <label class="vocabulary-filter-field" for="vocabulary-category-select"><span>Categoría</span><select id="vocabulary-category-select"><option value="">Cargando categorías…</option></select></label>
-      <label class="vocabulary-filter-field" for="vocabulary-subcategory-select"><span>Subcategoría</span><select id="vocabulary-subcategory-select" disabled><option value="">Primero elige una categoría</option></select></label>
+      <div class="form-field vocabulary-filter-field"><label for="vocabulary-category-select">Categoría</label><select id="vocabulary-category-select"><option value="">Cargando categorías…</option></select></div>
+      <div class="form-field vocabulary-filter-field"><label for="vocabulary-subcategory-select">Subcategoría</label><select id="vocabulary-subcategory-select" disabled><option value="">Primero elige una categoría</option></select></div>
     </div>
     <section id="vocabulary-learning-panel" class="vocabulary-content" role="tabpanel" aria-labelledby="vocabulary-learn-tab" aria-live="polite"></section>
     <section id="vocabulary-practice-panel" class="vocabulary-practice-panel" role="tabpanel" aria-labelledby="vocabulary-practice-tab" hidden></section>
