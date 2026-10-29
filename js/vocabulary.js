@@ -44,11 +44,13 @@
         /\b(masculino|femenino)\b/.test(translation) ||
         /\b(adjetivo|adjective|adjectif)\b/.test(translation)) return "adjetivo";
 
-    // A standalone infinitive can be identified reliably from its form; multiword idioms remain expressions.
-    if (!/\s/.test(word) && /^(se\s+)?[a-zà-ÿ]+(?:er|ir|re|oir)$/iu.test(word)) return "verbo";
+    // Infinitives are detected using both the French form and the Spanish infinitive translation.
+    const spanishInfinitive = /(?:^|\s)[^\s]+(?:ar|er|ir)(?:$|\s)/u.test(String(entry.translation || "").toLowerCase());
+    const irregularVerbTranslations = /^(ser|estar|tener|hacer|poder|deber|querer|saber|poner|salir|venir|ver|ir|dar|decir|traer|conocer|vivir|morir|abrir|cubrir|escribir|describir|descubrir|ofrecer|recibir|seguir|dormir|sentir|pedir|servir|huir|oír|leer|reír|sonreír)$/iu.test(normalize(entry.translation || ""));
+    if (!/\s/.test(word) && /^(se\s+)?[a-zà-ÿ]+(?:er|ir|re|oir)$/iu.test(word) && (spanishInfinitive || irregularVerbTranslations)) return "verbo";
 
     // Adjectives with common French endings, only for single-word entries without noun articles.
-    if (!/\s/.test(word) && /(?:eux|euse|if|ive|able|ible|el|elle|ien|ienne|ant|ante|ent|ente|al|ale|ique|iste|oir|oire)$/iu.test(word)) {
+    if (!/\s/.test(word) && /(?:eux|euse|if|ive|able|ible|el|elle|ien|ienne|ant|ante|ent|ente|al|ale|ique|iste|oire)$/iu.test(word)) {
       return "adjetivo";
     }
     // Multiword terms without a noun article are expressions, not presumed nouns.
