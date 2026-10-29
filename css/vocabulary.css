@@ -144,3 +144,18 @@
 .vocabulary-results-track{margin:1.3rem 0}
 .vocabulary-results .vocabulary-question-actions{justify-content:center;flex-wrap:wrap}
 @media(max-width:600px){.vocabulary-mode-tabs{padding:.7rem;display:grid;grid-template-columns:1fr 1fr}.vocabulary-mode-tab{padding:.6rem .4rem;font-size:.8rem}.vocabulary-practice-panel{padding:1rem}.vocabulary-practice-selectors{grid-template-columns:1fr;padding:.8rem}.vocabulary-answer-options{grid-template-columns:1fr}.vocabulary-exercise-option{grid-template-columns:2.5rem minmax(0,1fr) auto;gap:.7rem;padding:.8rem}.vocabulary-exercise-number{width:2.4rem;height:2.4rem}.vocabulary-question-actions{align-items:stretch;flex-direction:column-reverse}.vocabulary-question-actions button{width:100%}.vocabulary-practice-section-title{align-items:flex-start;flex-direction:column;gap:.3rem}}
+
+
+/* Diseño simplificado: buscador y filtros compartidos, sin columna lateral */
+.vocabulary-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;padding:1rem clamp(1rem,3vw,2rem);border-bottom:1px solid var(--color-line);background:#fff}
+.vocabulary-filter-field{display:grid;gap:.45rem;color:var(--color-ink-soft);font-size:.82rem;font-weight:750}
+.vocabulary-filter-field select{width:100%;min-height:3rem;padding:.65rem .8rem;border:1px solid rgba(7,26,61,.18);border-radius:10px;background:#fff;color:var(--color-ink);font:inherit;font-weight:500}
+.vocabulary-filter-field select:focus{outline:3px solid rgba(7,91,232,.16);border-color:var(--color-blue)}
+.vocabulary-filter-field select:disabled{background:#f3f5f8;color:#8a93a3;cursor:not-allowed}
+.vocabulary-layout{display:block;min-height:0}
+.vocabulary-content{padding:clamp(1.2rem,3vw,2rem)}
+.vocabulary-mode-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem;padding:1rem clamp(1rem,3vw,2rem);background:#fff}
+.vocabulary-mode-tab{min-height:2.9rem;border:1px solid var(--color-line);border-radius:10px;background:#f7f9fc;color:var(--color-ink-soft)}
+.vocabulary-mode-tab.is-active{border-color:#075be8;background:#075be8;color:#fff}
+.vocabulary-practice-panel{padding:clamp(1.2rem,3vw,2rem)}
+@media(max-width:600px){.vocabulary-filters{grid-template-columns:1fr;gap:.75rem;padding:.9rem}.vocabulary-content,.vocabulary-practice-panel{padding:1rem}.vocabulary-mode-tabs{padding:.8rem}.vocabulary-mode-tab{font-size:.82rem}}
