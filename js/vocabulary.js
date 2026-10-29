@@ -15,16 +15,61 @@
     if (/['’]$/.test(article)) return article + word;
     return article + " " + word;
   }
+  function normalizePartOfSpeech(value) {
+    const valueNormalized = normalize(value).replace(/[._-]/g, " ");
+    const aliases = {
+      noun: "sustantivo", nom: "sustantivo", sustantivo: "sustantivo",
+      verb: "verbo", verbe: "verbo", verbo: "verbo",
+      adjective: "adjetivo", adjectif: "adjetivo", adjetivo: "adjetivo",
+      adverb: "adverbio", adverbe: "adverbio", adverbio: "adverbio",
+      expression: "expresión", phrase: "expresión", expresion: "expresión",
+      connector: "conector", connecteur: "conector", conector: "conector"
+    };
+    return aliases[valueNormalized] || "";
+  }
+  function inferPartOfSpeech(entry, source, sub) {
+    const explicit = normalizePartOfSpeech(entry.partOfSpeech || entry.wordType || entry.grammaticalCategory || entry.pos || "");
+    if (explicit) return explicit;
+
+    const article = normalize(entry.articleFr || "");
+    if (/^(un|une|des|du|de la|de l')$/.test(article)) return "sustantivo";
+
+    const context = normalize([source.id, source.title, sub.id, sub.title].join(" "));
+    if (source.id === "common-adverbs" || /\badverbs?\b|\badverbios?\b/.test(context)) return "adverbio";
+    if (source.id === "connectors" || /\bconnectors?\b|\bconectores?\b/.test(context)) return "conector";
+
+    const word = String(entry.word || "").trim();
+    const translation = normalize(entry.translation || "");
+    if (/[（(](masculino|femenino)[）)]/.test(translation) ||
+        /\b(masculino|femenino)\b/.test(translation) ||
+        /\b(adjetivo|adjective|adjectif)\b/.test(translation)) return "adjetivo";
+
+    // A standalone infinitive can be identified reliably from its form; multiword idioms remain expressions.
+    if (!/\s/.test(word) && /^(se\s+)?[a-zà-ÿ]+(?:er|ir|re|oir)$/iu.test(word)) return "verbo";
+
+    // Adjectives with common French endings, only for single-word entries without noun articles.
+    if (!/\s/.test(word) && /(?:eux|euse|if|ive|able|ible|el|elle|ien|ienne|ant|ante|ent|ente|al|ale|ique|iste|oir|oire)$/iu.test(word)) {
+      return "adjetivo";
+    }
+    // Multiword terms without a noun article are expressions, not presumed nouns.
+    if (/\s/.test(word) || /[!?…]/.test(word)) return "expresión";
+    return "palabra";
+  }
   function mapCategory(source) {
     return {
       id: source.id, name: source.title,
       subcategories: source.subcategories.map(sub => ({
         id: sub.id, name: sub.title,
-        words: sub.entries.map(entry => ({
-          id: entry.id, french: frenchLabel(entry), lemma: entry.word, spanish: entry.translation,
-          articleFr: entry.articleFr || "", articleEs: entry.articleEs || "", emoji: entry.emoji || "",
-          categoryId: source.id, categoryName: source.title, subcategoryId: sub.id, subcategoryName: sub.title
-        }))
+        words: sub.entries.map(entry => {
+          const partOfSpeech = inferPartOfSpeech(entry, source, sub);
+          return {
+            id: entry.id, french: frenchLabel(entry), lemma: entry.word, spanish: entry.translation,
+            articleFr: entry.articleFr || "", articleEs: entry.articleEs || "", emoji: entry.emoji || "",
+            partOfSpeech, pluralFr: entry.pluralFr || entry.plural || "",
+            adjectiveForms: entry.adjectiveForms || null,
+            categoryId: source.id, categoryName: source.title, subcategoryId: sub.id, subcategoryName: sub.title
+          };
+        })
       }))
     };
   }
@@ -54,14 +99,95 @@
     selectedWord = null;
   }
   function wordKey(word) { return [word.categoryId, word.subcategoryId, word.id].join("::"); }
+  const adjectiveExceptions = {
+    heureux: { feminine: "heureuse" }, vieux: { feminine: "vieille" }, nouveau: { feminine: "nouvelle" },
+    beau: { feminine: "belle" }, fou: { feminine: "folle" }, mou: { feminine: "molle" },
+    doux: { feminine: "douce" }, faux: { feminine: "fausse" }, roux: { feminine: "rousse" },
+    frais: { feminine: "fraîche" }, blanc: { feminine: "blanche" }, sec: { feminine: "sèche" },
+    public: { feminine: "publique" }, long: { feminine: "longue" }, gentil: { feminine: "gentille" },
+    bon: { feminine: "bonne" }, mignon: { feminine: "mignonne" }, ancien: { feminine: "ancienne" },
+    premier: { feminine: "première" }, dernier: { feminine: "dernière" }, léger: { feminine: "légère" },
+    cher: { feminine: "chère" }, fier: { feminine: "fière" }, cruel: { feminine: "cruelle" },
+    naturel: { feminine: "naturelle" }, pareil: { feminine: "pareille" }, nul: { feminine: "nulle" },
+    actif: { feminine: "active" }, sportif: { feminine: "sportive" }, sérieux: { feminine: "sérieuse" },
+    paresseux: { feminine: "paresseuse" }, dangereux: { feminine: "dangereuse" }
+  };
+  function adjectiveInflections(word) {
+    if (word.adjectiveForms && typeof word.adjectiveForms === "object") {
+      return {
+        ms: word.adjectiveForms.masculineSingular || word.adjectiveForms.ms || word.lemma,
+        fs: word.adjectiveForms.feminineSingular || word.adjectiveForms.fs || "",
+        mp: word.adjectiveForms.masculinePlural || word.adjectiveForms.mp || "",
+        fp: word.adjectiveForms.femininePlural || word.adjectiveForms.fp || ""
+      };
+    }
+    const base = String(word.lemma || word.french || "").trim();
+    const key = normalize(base);
+    let feminine = "";
+    if (adjectiveExceptions[key]) feminine = adjectiveExceptions[key].feminine;
+    else if (/(?:e|ée|ie|ue|ée|ique|able|ible|iste)$/iu.test(base)) feminine = base;
+    else if (/eux$/iu.test(base)) feminine = base.replace(/eux$/iu, "euse");
+    else if (/if$/iu.test(base)) feminine = base.replace(/if$/iu, "ive");
+    else if (/er$/iu.test(base)) feminine = base.replace(/er$/iu, "ère");
+    else if (/el$/iu.test(base)) feminine = base + "le";
+    else if (/en$/iu.test(base)) feminine = base + "ne";
+    else if (/on$/iu.test(base)) feminine = base + "ne";
+    else if (/et$/iu.test(base)) feminine = base + "te";
+    else if (/f$/iu.test(base)) feminine = base.replace(/f$/iu, "ve");
+    else if (/x$/iu.test(base)) feminine = base.replace(/x$/iu, "se");
+    else feminine = base + "e";
+    const masculinePlural = /(?:s|x)$/iu.test(base) ? base : base + "s";
+    const femininePlural = /(?:s|x)$/iu.test(feminine) ? feminine : feminine + "s";
+    return { ms: base, fs: feminine, mp: masculinePlural, fp: femininePlural };
+  }
+  function nounPlural(word) {
+    if (word.pluralFr) return String(word.pluralFr).trim();
+    const article = normalize(word.articleFr || "");
+    const base = String(word.lemma || "").trim();
+    if (!base || !article) return "";
+    const irregular = {
+      oeil: "yeux", œil: "yeux", ciel: "cieux", travail: "travaux", cheval: "chevaux",
+      animal: "animaux", journal: "journaux", bijou: "bijoux", genou: "genoux", caillou: "cailloux",
+      chou: "choux", hibou: "hiboux", joujou: "joujoux", pou: "poux"
+    };
+    const key = normalize(base);
+    let plural = irregular[key] || "";
+    if (!plural) {
+      if (/(?:s|x|z)$/iu.test(base)) plural = base;
+      else if (/(?:eau|au|eu)$/iu.test(base)) plural = base + "x";
+      else if (/al$/iu.test(base) && !/^(bal|carnaval|festival|récital|régal)$/iu.test(base)) plural = base.replace(/al$/iu, "aux");
+      else plural = base + "s";
+    }
+    return "les " + plural;
+  }
   function detailMarkup(word) {
-    const article = String(word.articleFr || "").trim();
-    const gender = article === "un" ? "masculino" : article === "une" ? "femenino" : "";
-    const definedArticle = gender && /^[aeiouyàâäéèêëîïôöùûüÿ]/iu.test(word.lemma || "") ? "l’" : (article === "un" ? "le" : article === "une" ? "la" : "");
-    const articleLabel = definedArticle && article ? `${definedArticle} / ${article} (${gender})` : "No disponible en la fuente";
+    const type = word.partOfSpeech || "palabra";
+    let details = "";
+    if (type === "sustantivo") {
+      const article = String(word.articleFr || "").trim();
+      const normalizedArticle = normalize(article);
+      const gender = normalizedArticle === "un" ? "masculino" : normalizedArticle === "une" ? "femenino" : "";
+      const definedArticle = gender && /^[aeiouyàâäéèêëîïôöùûüÿ]/iu.test(word.lemma || "") ? "l’" : (gender === "masculino" ? "le" : gender === "femenino" ? "la" : "");
+      const articleLabel = article && gender ? `${definedArticle} / ${article} (${gender})` : "";
+      const plural = nounPlural(word);
+      details = `<div class="vocabulary-detail-grid">${articleLabel ? `<div class="vocabulary-detail-cell"><span>Artículo</span><strong>${escapeHTML(articleLabel)}</strong></div>` : ""}${plural ? `<div class="vocabulary-detail-cell"><span>Plural</span><strong>${escapeHTML(plural)}</strong></div>` : ""}</div>`;
+    } else if (type === "adjetivo") {
+      const forms = adjectiveInflections(word);
+      details = `<div class="vocabulary-detail-grid vocabulary-adjective-grid">
+        <div class="vocabulary-detail-cell"><span>Masculino singular</span><strong>${escapeHTML(forms.ms || "")}</strong></div>
+        <div class="vocabulary-detail-cell"><span>Femenino singular</span><strong>${escapeHTML(forms.fs || "No disponible")}</strong></div>
+        <div class="vocabulary-detail-cell"><span>Masculino plural</span><strong>${escapeHTML(forms.mp || "No disponible")}</strong></div>
+        <div class="vocabulary-detail-cell"><span>Femenino plural</span><strong>${escapeHTML(forms.fp || "No disponible")}</strong></div>
+      </div>`;
+    } else if (type === "verbo" || type === "adverbio") {
+      details = `<div class="vocabulary-detail-grid"><div class="vocabulary-detail-cell"><span>Categoría</span><strong>${type === "verbo" ? "Verbo" : "Adverbio"}</strong></div><div class="vocabulary-detail-cell"><span>Variación</span><strong>Invariable</strong></div></div>`;
+    } else {
+      const typeLabel = type === "conector" ? "Conector" : type === "expresión" ? "Expresión" : "Palabra";
+      details = `<div class="vocabulary-detail-grid"><div class="vocabulary-detail-cell"><span>Categoría</span><strong>${typeLabel}</strong></div></div>`;
+    }
     return `<section class="vocabulary-detail" aria-label="Ficha de vocabulario">
       <div class="vocabulary-detail-head"><div><span class="eyebrow">Ficha de vocabulario</span><h3>${escapeHTML(word.french)}</h3><p>${escapeHTML(word.spanish)}</p></div></div>
-      <div class="vocabulary-detail-grid"><div class="vocabulary-detail-cell"><span>Artículo</span><strong>${escapeHTML(articleLabel)}</strong></div><div class="vocabulary-detail-cell"><span>Plural</span><strong>No disponible en la fuente</strong></div></div>
+      ${details}
     </section>`;
   }
   function wordCard(word) {
