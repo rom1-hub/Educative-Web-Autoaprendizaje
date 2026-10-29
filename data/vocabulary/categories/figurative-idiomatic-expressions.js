@@ -119,7 +119,7 @@
           ['tenir-le-coup','tenir le coup','aguantar'],
           ['ne-pas-etre-sorti-de-l-auberge','ne pas être sorti de l’auberge','no haber salido todavía del problema']
         ]
-      }
+      },
       {
         id: 'source-animals',
         title: '(1) Animales',
