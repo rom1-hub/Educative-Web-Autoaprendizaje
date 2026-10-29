@@ -100,17 +100,20 @@
   }
   function wordKey(word) { return [word.categoryId, word.subcategoryId, word.id].join("::"); }
   const adjectiveExceptions = {
-    heureux: { feminine: "heureuse" }, vieux: { feminine: "vieille" }, nouveau: { feminine: "nouvelle" },
-    beau: { feminine: "belle" }, fou: { feminine: "folle" }, mou: { feminine: "molle" },
-    doux: { feminine: "douce" }, faux: { feminine: "fausse" }, roux: { feminine: "rousse" },
-    frais: { feminine: "fraîche" }, blanc: { feminine: "blanche" }, sec: { feminine: "sèche" },
-    public: { feminine: "publique" }, long: { feminine: "longue" }, gentil: { feminine: "gentille" },
-    bon: { feminine: "bonne" }, mignon: { feminine: "mignonne" }, ancien: { feminine: "ancienne" },
-    premier: { feminine: "première" }, dernier: { feminine: "dernière" }, léger: { feminine: "légère" },
-    cher: { feminine: "chère" }, fier: { feminine: "fière" }, cruel: { feminine: "cruelle" },
-    naturel: { feminine: "naturelle" }, pareil: { feminine: "pareille" }, nul: { feminine: "nulle" },
-    actif: { feminine: "active" }, sportif: { feminine: "sportive" }, sérieux: { feminine: "sérieuse" },
-    paresseux: { feminine: "paresseuse" }, dangereux: { feminine: "dangereuse" }
+    heureux: { feminine: "heureuse", masculinePlural: "heureux" }, vieux: { feminine: "vieille", masculinePlural: "vieux" },
+    nouveau: { feminine: "nouvelle", masculinePlural: "nouveaux" }, beau: { feminine: "belle", masculinePlural: "beaux" },
+    fou: { feminine: "folle", masculinePlural: "fous" }, mou: { feminine: "molle", masculinePlural: "mous" },
+    doux: { feminine: "douce", masculinePlural: "doux" }, faux: { feminine: "fausse", masculinePlural: "faux" },
+    roux: { feminine: "rousse", masculinePlural: "roux" }, frais: { feminine: "fraîche", masculinePlural: "frais" },
+    blanc: { feminine: "blanche" }, sec: { feminine: "sèche" }, public: { feminine: "publique" },
+    long: { feminine: "longue" }, gentil: { feminine: "gentille" }, bon: { feminine: "bonne" },
+    mignon: { feminine: "mignonne" }, ancien: { feminine: "ancienne" }, premier: { feminine: "première" },
+    dernier: { feminine: "dernière" }, léger: { feminine: "légère" }, cher: { feminine: "chère" },
+    fier: { feminine: "fière" }, cruel: { feminine: "cruelle" }, naturel: { feminine: "naturelle" },
+    pareil: { feminine: "pareille" }, nul: { feminine: "nulle" }, actif: { feminine: "active" },
+    sportif: { feminine: "sportive" }, sérieux: { feminine: "sérieuse" }, paresseux: { feminine: "paresseuse" },
+    dangereux: { feminine: "dangereuse" }, enchanté: { feminine: "enchantée" }, ravi: { feminine: "ravie" },
+    désolé: { feminine: "désolée" }, content: { feminine: "contente" }, heureux: { feminine: "heureuse", masculinePlural: "heureux" }
   };
   function adjectiveInflections(word) {
     if (word.adjectiveForms && typeof word.adjectiveForms === "object") {
@@ -121,7 +124,15 @@
         fp: word.adjectiveForms.femininePlural || word.adjectiveForms.fp || ""
       };
     }
-    const base = String(word.lemma || word.french || "").trim();
+    let base = String(word.lemma || word.french || "").trim();
+    const translation = normalize(word.spanish || "");
+    if (/\bfemenino\b/.test(translation)) {
+      const reverse = Object.entries(adjectiveExceptions).find(([, forms]) => normalize(forms.feminine) === normalize(base));
+      if (reverse) base = reverse[0];
+      else if (/ée$/iu.test(base)) base = base.slice(0, -1);
+      else if (/ie$/iu.test(base)) base = base.slice(0, -1);
+      else if (/e$/iu.test(base) && !/(?:euse|esse|ette|elle|nne)$/iu.test(base)) base = base.slice(0, -1);
+    }
     const key = normalize(base);
     let feminine = "";
     if (adjectiveExceptions[key]) feminine = adjectiveExceptions[key].feminine;
@@ -136,7 +147,7 @@
     else if (/f$/iu.test(base)) feminine = base.replace(/f$/iu, "ve");
     else if (/x$/iu.test(base)) feminine = base.replace(/x$/iu, "se");
     else feminine = base + "e";
-    const masculinePlural = /(?:s|x)$/iu.test(base) ? base : base + "s";
+    const masculinePlural = adjectiveExceptions[key]?.masculinePlural || (/(?:s|x)$/iu.test(base) ? base : base + "s");
     const femininePlural = /(?:s|x)$/iu.test(feminine) ? feminine : feminine + "s";
     return { ms: base, fs: feminine, mp: masculinePlural, fp: femininePlural };
   }
@@ -144,7 +155,8 @@
     if (word.pluralFr) return String(word.pluralFr).trim();
     const article = normalize(word.articleFr || "");
     const base = String(word.lemma || "").trim();
-    if (!base || !article) return "";
+    if (!base || !/^(un|une|des)$/.test(article)) return "";
+    if (/\s/.test(base)) return "";
     const irregular = {
       oeil: "yeux", œil: "yeux", ciel: "cieux", travail: "travaux", cheval: "chevaux",
       animal: "animaux", journal: "journaux", bijou: "bijoux", genou: "genoux", caillou: "cailloux",
