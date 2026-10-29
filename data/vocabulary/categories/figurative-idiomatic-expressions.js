@@ -40,7 +40,6 @@
           ['avoir-le-coeur-leger','avoir le cœur léger','sentirse aliviado / despreocupado'],
           ['etre-rouge-de-honte','être rouge de honte','estar rojo de vergüenza'],
           ['etre-vert-de-rage','être vert de rage','estar verde de rabia'],
-          ['avoir-un-coup-de-foudre','avoir un coup de foudre','enamorarse a primera vista / sentir un flechazo'],
           ['humour-noir','l’humour noir','humor negro']
         ]
       },
@@ -88,7 +87,6 @@
           ['raconter-des-salades','raconter des salades','contar mentiras / inventar historias'],
           ['dire-ses-quatre-verites','dire ses quatre vérités à quelqu’un','decirle a alguien sus cuatro verdades'],
           ['tenir-sa-langue','tenir sa langue','mantener la boca cerrada'],
-          ['avoir-la-langue-bien-pendue','avoir la langue bien pendue','tener mucha facilidad para hablar'],
           ['avoir-un-mot-sur-le-bout-de-la-langue','avoir un mot sur le bout de la langue','tener una palabra en la punta de la lengua'],
           ['passer-un-coup-de-fil','passer un coup de fil','hacer una llamada telefónica'],
           ['jeter-un-oeil','jeter un œil sur quelque chose','echar un vistazo a algo'],
@@ -112,7 +110,6 @@
           ['retrousser-ses-manches','retrousser ses manches','ponerse manos a la obra'],
           ['travailler-d-arrache-pied','travailler d’arrache-pied','trabajar duramente'],
           ['faire-des-pieds-et-des-mains','faire des pieds et des mains','hacer todo lo posible'],
-          ['avoir-du-pain-sur-la-planche','avoir du pain sur la planche','tener mucho trabajo'],
           ['faire-d-une-pierre-deux-coups','faire d’une pierre deux coups','matar dos pájaros de un tiro'],
           ['avoir-plusieurs-cordes-a-son-arc','avoir plusieurs cordes à son arc','tener varios recursos'],
           ['tirer-son-epingle-du-jeu','tirer son épingle du jeu','salir airoso de una situación'],
