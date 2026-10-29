@@ -4,6 +4,7 @@
   const $ = id => document.getElementById(id);
   const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
   const normalize = value => String(value ?? "").toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+  const normalizeExactTerm = value => String(value ?? "").trim().normalize("NFC").toLocaleLowerCase("fr");
   let catalog = [], selectedWord = null;
 
   function frenchLabel(entry) {
@@ -73,13 +74,19 @@
     const query = $("vocabulary-search-input").value.trim();
     const q = normalize(query);
 
-    // Una búsqueda activa recorre todo el catálogo, aunque los filtros estén vacíos.
+    // Una búsqueda activa recorre todo el catálogo y elimina solo términos franceses exactos repetidos.
     if (query) {
-      const words = allWords().filter(word =>
-        normalize(word.french).includes(q) ||
-        normalize(word.lemma).includes(q) ||
-        normalize(word.spanish).includes(q)
-      );
+      const seenTerms = new Set();
+      const words = allWords().filter(word => {
+        const matches = normalize(word.french).includes(q) ||
+          normalize(word.lemma).includes(q) ||
+          normalize(word.spanish).includes(q);
+        if (!matches) return false;
+        const key = normalizeExactTerm(word.french);
+        if (seenTerms.has(key)) return false;
+        seenTerms.add(key);
+        return true;
+      });
       $("vocabulary-status").textContent = words.length + " coincidencia(s)";
       const heading = `<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> <strong>Resultados de búsqueda</strong></div><div class="vocabulary-heading"><div><h2>Resultados de búsqueda</h2><p>Coincidencias en francés y español para «${escapeHTML(query)}».</p></div><span class="vocabulary-count">${words.length} resultado(s)</span></div>`;
       if (!words.length) return heading + '<div class="vocabulary-empty"><h3>No encontramos coincidencias.</h3><p>Prueba otra palabra o cambia los filtros.</p></div>';
