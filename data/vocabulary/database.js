@@ -44,7 +44,7 @@
     Object.freeze({id:'avoir-expressions',title:'Expresiones con avoir',src:'data/vocabulary/categories/avoir-expressions.js?v=20261029-1'}),
     Object.freeze({id:'society-social-life',title:'Sociedad y vida social',src:'data/vocabulary/categories/society-social-life.js?v=20260922-1'}),
     Object.freeze({id:'connectors',title:'Conectores',src:'data/vocabulary/categories/connectors.js?v=20260922-1'}),
-    Object.freeze({id:'figurative-idiomatic-expressions',title:'Expresiones figuradas e idiomáticas',src:'data/vocabulary/categories/figurative-idiomatic-expressions.js?v=20261029-3'}),
+    Object.freeze({id:'figurative-idiomatic-expressions',title:'Expresiones figuradas e idiomáticas',src:'data/vocabulary/categories/figurative-idiomatic-expressions.js?v=20261029-4'}),
     Object.freeze({id:'politics',title:'Política',src:'data/vocabulary/categories/politics.js?v=20260923-1'}),
     Object.freeze({id:'science',title:'Ciencia',src:'data/vocabulary/categories/science.js?v=20260923-1'}),
     Object.freeze({id:'planets-space',title:'Planetas y el espacio',src:'data/vocabulary/categories/planets-space.js?v=20260922-1'}),
