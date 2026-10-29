@@ -1,11 +1,10 @@
-/* COQ — Vocabulario: catálogo modular y búsqueda bilingüe */
+/* COQ — Vocabulario: catálogo, filtros compartidos y búsqueda bilingüe */
 (() => {
   "use strict";
   const $ = id => document.getElementById(id);
   const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
-  const normalize = value => String(value ?? "").toLocaleLowerCase("fr").normalize("NFC").trim();
-  let catalog = [];
-  let selectedCategory = null, selectedSubcategory = null, selectedWord = null;
+  const normalize = value => String(value ?? "").toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+  let catalog = [], selectedWord = null;
 
   function frenchLabel(entry) {
     const article = String(entry.articleFr || "").trim();
@@ -18,7 +17,6 @@
   function mapCategory(source) {
     return {
       id: source.id, name: source.title,
-      code: source.title.split(/\s+/).slice(0, 2).map(part => part[0] || "").join("").toLocaleUpperCase("es"),
       subcategories: source.subcategories.map(sub => ({
         id: sub.id, name: sub.title,
         words: sub.entries.map(entry => ({
@@ -29,35 +27,40 @@
       }))
     };
   }
-  const getCategory = () => catalog.find(item => item.id === selectedCategory) || catalog[0];
-  const getSubcategory = () => {
-    const category = getCategory();
-    return category?.subcategories.find(item => item.id === selectedSubcategory) || category?.subcategories[0];
-  };
+  const getCategory = () => catalog.find(item => item.id === $("vocabulary-category-select").value);
+  const getSubcategory = () => getCategory()?.subcategories.find(item => item.id === $("vocabulary-subcategory-select").value);
   const allWords = () => catalog.flatMap(category => category.subcategories.flatMap(subcategory => subcategory.words));
-  function renderCategories() {
-    $("vocabulary-category-count").textContent = catalog.length + " temas";
-    $("vocabulary-categories").innerHTML = catalog.map(item =>
-      `<button type="button" class="vocabulary-category ${item.id === selectedCategory ? "is-active" : ""}" data-category="${escapeHTML(item.id)}" aria-pressed="${item.id === selectedCategory}"><span class="vocabulary-category-code">${escapeHTML(item.code)}</span><span>${escapeHTML(item.name)}</span></button>`
+  const selectedWords = () => getSubcategory()?.words || [];
+
+  function populateCategorySelect() {
+    const select = $("vocabulary-category-select");
+    select.innerHTML = '<option value="">Selecciona una categoría</option>' + catalog.map(item =>
+      `<option value="${escapeHTML(item.id)}">${escapeHTML(item.name)}</option>`
     ).join("");
+    select.value = catalog[0]?.id || "";
+    populateSubcategorySelect();
+  }
+  function populateSubcategorySelect() {
+    const category = getCategory();
+    const select = $("vocabulary-subcategory-select");
+    select.innerHTML = category
+      ? '<option value="">Selecciona una subcategoría</option>' + category.subcategories.map(item =>
+          `<option value="${escapeHTML(item.id)}">${escapeHTML(item.name)}</option>`
+        ).join("")
+      : '<option value="">Primero elige una categoría</option>';
+    select.disabled = !category || !category.subcategories.length;
+    if (category?.subcategories.length) select.value = category.subcategories[0].id;
+    selectedWord = null;
   }
   function wordKey(word) { return [word.categoryId, word.subcategoryId, word.id].join("::"); }
   function detailMarkup(word) {
-    if (!word) return "";
-    const article = word.articleFr === "un" ? "le" : word.articleFr === "une" ? "la" : "";
-    const gender = word.articleFr === "un" ? "masculino" : word.articleFr === "une" ? "femenino" : "";
-    const definedArticle = article && /^[aeiouyàâäéèêëîïôöùûüÿ]/iu.test(word.lemma || "")
-      ? (gender ? "l’" : "")
-      : article;
-    const articleLabel = definedArticle && word.articleFr
-      ? `${definedArticle} / ${word.articleFr} (${gender})`
-      : "No disponible en la fuente";
+    const article = String(word.articleFr || "").trim();
+    const gender = article === "un" ? "masculino" : article === "une" ? "femenino" : "";
+    const definedArticle = gender && /^[aeiouyàâäéèêëîïôöùûüÿ]/iu.test(word.lemma || "") ? "l’" : (article === "un" ? "le" : article === "une" ? "la" : "");
+    const articleLabel = definedArticle && article ? `${definedArticle} / ${article} (${gender})` : "No disponible en la fuente";
     return `<section class="vocabulary-detail" aria-label="Ficha de vocabulario">
       <div class="vocabulary-detail-head"><div><span class="eyebrow">Ficha de vocabulario</span><h3>${escapeHTML(word.french)}</h3><p>${escapeHTML(word.spanish)}</p></div></div>
-      <div class="vocabulary-detail-grid">
-        <div class="vocabulary-detail-cell"><span>Artículo</span><strong>${escapeHTML(articleLabel)}</strong></div>
-        <div class="vocabulary-detail-cell"><span>Plural</span><strong>No disponible en la fuente</strong></div>
-      </div>
+      <div class="vocabulary-detail-grid"><div class="vocabulary-detail-cell"><span>Artículo</span><strong>${escapeHTML(articleLabel)}</strong></div><div class="vocabulary-detail-cell"><span>Plural</span><strong>No disponible en la fuente</strong></div></div>
     </section>`;
   }
   function wordCard(word) {
@@ -67,47 +70,31 @@
   }
   function renderBrowse() {
     const category = getCategory(), subcategory = getSubcategory();
-    if (!category || !subcategory) return '<div class="vocabulary-empty"><h3>No hay contenido disponible.</h3></div>';
-    return `<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> ${escapeHTML(category.name)} <span>›</span> <strong>${escapeHTML(subcategory.name)}</strong></div>
-      <div class="vocabulary-heading"><div><h2>${escapeHTML(category.name)}</h2><p>Selecciona una subcategoría para consultar sus palabras.</p></div><span class="vocabulary-count">${category.subcategories.length} subcategorías</span></div>
-      <div class="vocabulary-subcategories">${category.subcategories.map(item => `<button type="button" class="vocabulary-subcategory ${item.id === selectedSubcategory ? "is-active" : ""}" data-subcategory="${escapeHTML(item.id)}" aria-pressed="${item.id === selectedSubcategory}"><span>${escapeHTML(item.name)}</span><span aria-hidden="true">→</span></button>`).join("")}</div>
-      <div class="vocabulary-section-heading"><h3>${escapeHTML(subcategory.name)}</h3><span>${subcategory.words.length} palabras</span></div>
-      <div class="vocabulary-word-list">${subcategory.words.map(wordCard).join("")}</div>`;
-  }
-  function renderSearch(query) {
-    const q = normalize(query);
-    const results = allWords().filter(word => normalize(word.french).includes(q) || normalize(word.lemma).includes(q) || normalize(word.spanish).includes(q));
-    $("vocabulary-status").textContent = results.length + " coincidencia(s)";
-    if (!results.length) return `<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> <strong>Resultados de búsqueda</strong></div><div class="vocabulary-empty"><h3>No encontramos coincidencias.</h3><p>Prueba otra palabra en francés o su traducción al español.</p></div>`;
-    return `<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> <strong>Resultados de búsqueda</strong></div><div class="vocabulary-heading"><div><h2>Resultados</h2><p>Coincidencias en francés y español para «${escapeHTML(query)}».</p></div><span class="vocabulary-count">${results.length} resultado(s)</span></div><div class="vocabulary-word-list">${results.map(wordCard).join("")}</div>`;
-  }
-  function render() {
-    renderCategories();
+    if (!category || !subcategory) return '<div class="vocabulary-empty"><h3>Selecciona una categoría y una subcategoría.</h3><p>Los términos aparecerán aquí.</p></div>';
     const query = $("vocabulary-search-input").value.trim();
-    $("vocabulary-content").innerHTML = query ? renderSearch(query) : renderBrowse();
-    if (!query && getCategory() && getSubcategory()) $("vocabulary-status").textContent = getCategory().name + " · " + getSubcategory().name;
+    const sourceWords = query ? allWords() : selectedWords();
+    const q = normalize(query);
+    const words = query ? sourceWords.filter(word => normalize(word.french).includes(q) || normalize(word.lemma).includes(q) || normalize(word.spanish).includes(q)) : sourceWords;
+    $("vocabulary-status").textContent = query ? words.length + " coincidencia(s)" : category.name + " · " + subcategory.name;
+    const heading = query
+      ? `<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> <strong>Resultados de búsqueda</strong></div><div class="vocabulary-heading"><div><h2>Resultados de búsqueda</h2><p>Coincidencias en francés y español para «${escapeHTML(query)}».</p></div><span class="vocabulary-count">${words.length} resultado(s)</span></div>`
+      : `<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> ${escapeHTML(category.name)} <span>›</span> <strong>${escapeHTML(subcategory.name)}</strong></div><div class="vocabulary-heading"><div><h2>${escapeHTML(subcategory.name)}</h2><p>Selecciona una palabra para consultar su ficha.</p></div><span class="vocabulary-count">${words.length} palabra(s)</span></div>`;
+    if (!words.length) return heading + '<div class="vocabulary-empty"><h3>No encontramos coincidencias.</h3><p>Prueba otra palabra o cambia los filtros.</p></div>';
+    return heading + `<div class="vocabulary-word-list">${words.map(wordCard).join("")}</div>`;
   }
+  function render() { $("vocabulary-content").innerHTML = renderBrowse(); }
   async function init() {
     const api = window.COQ_VOCABULARY_DATABASE_API;
     if (!window.COQ_VOCABULARY_DATABASE || !api) throw new Error("No se ha cargado el registro de vocabulario.");
-    const sources = await api.loadAll();
-    catalog = sources.map(mapCategory);
-    selectedCategory = catalog[0]?.id || null;
-    selectedSubcategory = catalog[0]?.subcategories[0]?.id || null;
-    $("vocabulary-categories").addEventListener("click", event => {
-      const button = event.target.closest("[data-category]");
-      if (!button) return;
-      selectedCategory = button.dataset.category;
-      selectedSubcategory = getCategory()?.subcategories[0]?.id || null;
-      selectedWord = null;
-      render();
-    });
+    catalog = (await api.loadAll()).map(mapCategory);
+    populateCategorySelect();
+    $("vocabulary-category-select").addEventListener("change", () => { populateSubcategorySelect(); render(); });
+    $("vocabulary-subcategory-select").addEventListener("change", () => { selectedWord = null; render(); });
     $("vocabulary-content").addEventListener("click", event => {
-      const subcategory = event.target.closest("[data-subcategory]");
-      if (subcategory) { selectedSubcategory = subcategory.dataset.subcategory; selectedWord = null; render(); return; }
-      const wordCard = event.target.closest("[data-word-card]");
-      if (wordCard) { selectedWord = selectedWord === wordCard.dataset.wordCard ? null : wordCard.dataset.wordCard; render(); return; }
-      if (event.target.closest("[data-close-detail]")) { selectedWord = null; render(); }
+      const card = event.target.closest("[data-word-card]");
+      if (!card) return;
+      selectedWord = selectedWord === card.dataset.wordCard ? null : card.dataset.wordCard;
+      render();
     });
     $("vocabulary-content").addEventListener("keydown", event => {
       const card = event.target.closest("[data-word-card]");
