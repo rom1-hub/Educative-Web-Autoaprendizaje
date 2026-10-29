@@ -145,6 +145,50 @@
           ['have-beau-say','avoir beau dire','por más que diga']
         ]
       }
+
+      ,
+      {
+        id: 'avoir-idiomatic-colloquial-expressions',
+        title: 'Expresiones idiomáticas y coloquiales',
+        entries: [
+          ['have-the-blues','avoir le cafard','estar deprimido / estar de bajón'],
+          ['have-a-knot-in-stomach','avoir la boule au ventre','tener un nudo en el estómago'],
+          ['be-scared-colloquial','avoir les jetons','tener miedo (coloquial)'],
+          ['be-talkative','avoir la langue bien pendue','tener mucha labia'],
+          ['have-the-blues-bourdon','avoir le bourdon','estar de bajón / estar deprimido'],
+          ['mind-elsewhere','avoir la tête ailleurs','estar pensando en otra cosa'],
+          ['be-lazy-colloquial','avoir la flemme','darle pereza a alguien'],
+          ['be-fed-up','en avoir marre','estar harto'],
+          ['be-sick-of-it','en avoir ras le bol','estar hasta las narices'],
+          ['have-cat-in-throat','avoir un chat dans la gorge','tener carraspera / tener algo en la garganta'],
+          ['have-something-to-do-with','avoir quelque chose à voir avec','tener algo que ver con'],
+          ['have-head-on-shoulders','avoir la tête sur les épaules','tener la cabeza bien amueblada'],
+          ['keep-feet-on-ground','avoir les pieds sur terre','tener los pies en la tierra'],
+          ['love-at-first-sight','avoir un coup de foudre','enamorarse a primera vista'],
+          ['have-energy-colloquial','avoir la pêche','tener mucha energía'],
+          ['have-good-mood','avoir le moral','estar animado / tener buen ánimo'],
+          ['be-lazy-idiom','avoir un poil dans la main','ser un vago'],
+          ['green-thumb','avoir la main verte','tener buena mano para las plantas'],
+          ['memory-lapse','avoir un trou de mémoire','quedarse en blanco / tener una laguna mental'],
+          ['hangover','avoir la gueule de bois','tener resaca'],
+          ['last-word','avoir le dernier mot','tener la última palabra'],
+          ['lots-of-work','avoir du pain sur la planche','tener mucho trabajo pendiente'],
+          ['weakness-for','avoir un faible pour','sentir debilidad por'],
+          ['love-someone-deeply','avoir quelqu’un dans la peau','estar locamente enamorado de alguien'],
+          ['have-time-elsewhere','avoir l’air de','parecer / tener aspecto de'],
+          ['be-lucky-idiom','avoir de la chance','tener suerte'],
+          ['feel-like-doing','avoir envie de','tener ganas de'],
+          ['have-difficulty-doing','avoir du mal à','tener dificultad para'],
+          ['have-pain-at','avoir mal à','tener dolor en'],
+          ['deal-with-someone','avoir affaire à','tener que tratar con / enfrentarse a'],
+          ['be-hungry-idiom','avoir faim','tener hambre'],
+          ['be-thirsty-idiom','avoir soif','tener sed'],
+          ['be-sleepy-idiom','avoir sommeil','tener sueño'],
+          ['have-place-idiom','avoir lieu','tener lugar'],
+          ['have-reason-idiom','avoir raison','tener razón'],
+          ['be-wrong-idiom','avoir tort','estar equivocado']
+        ]
+      }
     ].map((subcategory) => ({
       ...subcategory,
       entries: subcategory.entries.map(([id, word, translation]) => ({
