@@ -134,8 +134,9 @@
       else if (/e$/iu.test(base) && !/(?:euse|esse|ette|elle|nne)$/iu.test(base)) base = base.slice(0, -1);
     }
     const key = normalize(base);
+    const exceptionKey = Object.keys(adjectiveExceptions).find(candidate => normalize(candidate) === key);
     let feminine = "";
-    if (adjectiveExceptions[key]) feminine = adjectiveExceptions[key].feminine;
+    if (exceptionKey) feminine = adjectiveExceptions[exceptionKey].feminine;
     else if (/(?:e|ée|ie|ue|ée|ique|able|ible|iste)$/iu.test(base)) feminine = base;
     else if (/eux$/iu.test(base)) feminine = base.replace(/eux$/iu, "euse");
     else if (/if$/iu.test(base)) feminine = base.replace(/if$/iu, "ive");
@@ -147,7 +148,7 @@
     else if (/f$/iu.test(base)) feminine = base.replace(/f$/iu, "ve");
     else if (/x$/iu.test(base)) feminine = base.replace(/x$/iu, "se");
     else feminine = base + "e";
-    const masculinePlural = adjectiveExceptions[key]?.masculinePlural || (/(?:s|x)$/iu.test(base) ? base : base + "s");
+    const masculinePlural = (exceptionKey && adjectiveExceptions[exceptionKey].masculinePlural) || (/(?:s|x)$/iu.test(base) ? base : base + "s");
     const femininePlural = /(?:s|x)$/iu.test(feminine) ? feminine : feminine + "s";
     return { ms: base, fs: feminine, mp: masculinePlural, fp: femininePlural };
   }
