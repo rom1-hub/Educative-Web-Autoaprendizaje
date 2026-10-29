@@ -329,9 +329,7 @@
         id: 'source-mystery',
         title: '(2) Expresiones culturales y misteriosas',
         entries: [
-          ['briser-un-reve','briser un rêve','destrozar un sueño'],
           ['epee-de-damocles','une épée de Damoclès','una espada de Damocles'],
-          ['bras-de-morphee','être dans les bras de Morphée','estar en brazos de Morfeo'],
           ['vrai-zombie','être un vrai zombie','estar como un zombi'],
           ['eponge-emotionnelle','être une éponge émotionnelle','ser una esponja emocional'],
           ['avocat-du-diable','jouer l’avocat du diable','hacer de abogado del diablo'],
@@ -380,7 +378,6 @@
           ['fleur-bleue','être fleur bleue','ser muy romántico / sentimental'],
           ['noir-de-monde','noir de monde','abarrotado de gente'],
           ['rire-jaune','rire jaune','reírse por compromiso'],
-          ['voir-vie-en-rose','voir la vie en rose','ver la vida de color de rosa']
         ]
       },
       {
