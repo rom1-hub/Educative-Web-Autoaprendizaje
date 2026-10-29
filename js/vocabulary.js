@@ -40,6 +40,7 @@
 
     const word = String(entry.word || "").trim();
     const translation = normalize(entry.translation || "");
+    if (/\s/.test(word)) return "expresión";
     if (/[（(](masculino|femenino)[）)]/.test(translation) ||
         /\b(masculino|femenino)\b/.test(translation) ||
         /\b(adjetivo|adjective|adjectif)\b/.test(translation)) return "adjetivo";
