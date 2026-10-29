@@ -82,7 +82,7 @@
     if (!words.length) return heading + '<div class="vocabulary-empty"><h3>No encontramos coincidencias.</h3><p>Prueba otra palabra o cambia los filtros.</p></div>';
     return heading + `<div class="vocabulary-word-list">${words.map(wordCard).join("")}</div>`;
   }
-  function render() { $("vocabulary-content").innerHTML = renderBrowse(); }
+  function render() { $("vocabulary-learning-panel").innerHTML = renderBrowse(); }
   async function init() {
     const api = window.COQ_VOCABULARY_DATABASE_API;
     if (!window.COQ_VOCABULARY_DATABASE || !api) throw new Error("No se ha cargado el registro de vocabulario.");
@@ -90,13 +90,13 @@
     populateCategorySelect();
     $("vocabulary-category-select").addEventListener("change", () => { populateSubcategorySelect(); render(); });
     $("vocabulary-subcategory-select").addEventListener("change", () => { selectedWord = null; render(); });
-    $("vocabulary-content").addEventListener("click", event => {
+    $("vocabulary-learning-panel").addEventListener("click", event => {
       const card = event.target.closest("[data-word-card]");
       if (!card) return;
       selectedWord = selectedWord === card.dataset.wordCard ? null : card.dataset.wordCard;
       render();
     });
-    $("vocabulary-content").addEventListener("keydown", event => {
+    $("vocabulary-learning-panel").addEventListener("keydown", event => {
       const card = event.target.closest("[data-word-card]");
       if (!card || (event.key !== "Enter" && event.key !== " ")) return;
       event.preventDefault();
@@ -110,6 +110,6 @@
   init().catch(error => {
     console.error("Error al cargar el vocabulario:", error);
     $("vocabulary-status").textContent = "No se pudo cargar el catálogo";
-    $("vocabulary-content").innerHTML = '<div class="vocabulary-empty"><h3>No se pudo cargar el vocabulario.</h3><p>Recarga la página. Si el problema continúa, revisaremos la carga de los módulos.</p></div>';
+    $("vocabulary-learning-panel").innerHTML = '<div class="vocabulary-empty"><h3>No se pudo cargar el vocabulario.</h3><p>Recarga la página. Si el problema continúa, revisaremos la carga de los módulos.</p></div>';
   });
 })();
