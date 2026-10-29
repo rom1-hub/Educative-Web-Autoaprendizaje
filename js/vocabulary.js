@@ -70,16 +70,31 @@
   }
   function renderBrowse() {
     const category = getCategory(), subcategory = getSubcategory();
-    if (!category || !subcategory) return '<div class="vocabulary-empty"><h3>Selecciona una categoría y una subcategoría.</h3><p>Los términos aparecerán aquí.</p></div>';
     const query = $("vocabulary-search-input").value.trim();
-    const sourceWords = query ? allWords() : selectedWords();
     const q = normalize(query);
-    const words = query ? sourceWords.filter(word => normalize(word.french).includes(q) || normalize(word.lemma).includes(q) || normalize(word.spanish).includes(q)) : sourceWords;
-    $("vocabulary-status").textContent = query ? words.length + " coincidencia(s)" : category.name + " · " + subcategory.name;
-    const heading = query
-      ? `<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> <strong>Resultados de búsqueda</strong></div><div class="vocabulary-heading"><div><h2>Resultados de búsqueda</h2><p>Coincidencias en francés y español para «${escapeHTML(query)}».</p></div><span class="vocabulary-count">${words.length} resultado(s)</span></div>`
-      : `<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> ${escapeHTML(category.name)} <span>›</span> <strong>${escapeHTML(subcategory.name)}</strong></div><div class="vocabulary-heading"><div><h2>${escapeHTML(subcategory.name)}</h2><p>Selecciona una palabra para consultar su ficha.</p></div><span class="vocabulary-count">${words.length} palabra(s)</span></div>`;
-    if (!words.length) return heading + '<div class="vocabulary-empty"><h3>No encontramos coincidencias.</h3><p>Prueba otra palabra o cambia los filtros.</p></div>';
+
+    // Una búsqueda activa recorre todo el catálogo, aunque los filtros estén vacíos.
+    if (query) {
+      const words = allWords().filter(word =>
+        normalize(word.french).includes(q) ||
+        normalize(word.lemma).includes(q) ||
+        normalize(word.spanish).includes(q)
+      );
+      $("vocabulary-status").textContent = words.length + " coincidencia(s)";
+      const heading = `<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> <strong>Resultados de búsqueda</strong></div><div class="vocabulary-heading"><div><h2>Resultados de búsqueda</h2><p>Coincidencias en francés y español para «${escapeHTML(query)}».</p></div><span class="vocabulary-count">${words.length} resultado(s)</span></div>`;
+      if (!words.length) return heading + '<div class="vocabulary-empty"><h3>No encontramos coincidencias.</h3><p>Prueba otra palabra o cambia los filtros.</p></div>';
+      return heading + `<div class="vocabulary-word-list">${words.map(wordCard).join("")}</div>`;
+    }
+
+    if (!category || !subcategory) {
+      $("vocabulary-status").textContent = "Explorando categorías";
+      return '<div class="vocabulary-empty"><h3>Selecciona una categoría y una subcategoría.</h3><p>Los términos aparecerán aquí. También puedes buscar una palabra en francés o español.</p></div>';
+    }
+
+    const words = selectedWords();
+    $("vocabulary-status").textContent = category.name + " · " + subcategory.name;
+    const heading = `<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> ${escapeHTML(category.name)} <span>›</span> <strong>${escapeHTML(subcategory.name)}</strong></div><div class="vocabulary-heading"><div><h2>${escapeHTML(subcategory.name)}</h2><p>Selecciona una palabra para consultar su ficha.</p></div><span class="vocabulary-count">${words.length} palabra(s)</span></div>`;
+    if (!words.length) return heading + '<div class="vocabulary-empty"><h3>No encontramos palabras en esta subcategoría.</h3><p>Prueba otra subcategoría.</p></div>';
     return heading + `<div class="vocabulary-word-list">${words.map(wordCard).join("")}</div>`;
   }
   function render() { $("vocabulary-learning-panel").innerHTML = renderBrowse(); }
