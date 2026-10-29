@@ -122,7 +122,7 @@
       },
       {
         id: 'source-animals',
-        title: '(1) Animales',
+        title: 'Animales',
         entries: [
           ['avoir-du-toupet','avoir du toupet','tener mucho descaro'],
           ['avoir-les-deux-pieds-dans-le-meme-sabot','avoir les deux pieds dans le même sabot','ser torpe o poco resolutivo'],
@@ -155,7 +155,7 @@
       },
       {
         id: 'source-nature',
-        title: '(1) Naturaleza y clima',
+        title: 'Naturaleza y clima',
         entries: [
           ['appuyer-sur-le-champignon','appuyer sur le champignon','pisar el acelerador'],
           ['au-ras-des-paquerettes','être au ras des pâquerettes','ser muy bajo / de poca calidad'],
@@ -182,7 +182,7 @@
       },
       {
         id: 'source-food',
-        title: '(1) Comida y cocina',
+        title: 'Comida y cocina',
         entries: [
           ['aller-se-faire-cuire-un-oeuf','aller se faire cuire un œuf','mandar a alguien a freír espárragos'],
           ['avoir-la-dalle','avoir la dalle','tener un hambre tremenda'],
@@ -209,7 +209,7 @@
       },
       {
         id: 'source-body',
-        title: '(1) Cuerpo y gestos',
+        title: 'Cuerpo y gestos',
         entries: [
           ['peur-au-ventre','avoir la peur au ventre','estar muerto de miedo'],
           ['tete-en-lair','avoir la tête en l’air','ser despistado'],
@@ -247,7 +247,7 @@
       },
       {
         id: 'source-love',
-        title: '(1) Amor y relaciones',
+        title: 'Amor y relaciones',
         entries: [
           ['atomes-croches','avoir des atomes crochus avec quelqu’un','tener mucha química con alguien'],
           ['loin-des-yeux-pres-du-coeur','loin des yeux, près du cœur','ojos que no ven, corazón que no siente (o el cariño perdura en la distancia)'],
@@ -259,7 +259,7 @@
       },
       {
         id: 'source-money',
-        title: '(2) Dinero y gastos',
+        title: 'Dinero y gastos',
         entries: [
           ['arrondir-fins-de-mois','arrondir les fins de mois','llegar mejor a fin de mes'],
           ['oursins-dans-poches','avoir des oursins dans les poches','ser un agarrado'],
@@ -272,7 +272,7 @@
       },
       {
         id: 'source-material',
-        title: '(2) Objetos y situaciones cotidianas',
+        title: 'Objetos y situaciones cotidianas',
         entries: [
           ['amuser-galerie','amuser la galerie','hacer reír al público / buscar llamar la atención'],
           ['arrondir-angles','arrondir les angles','suavizar las diferencias'],
@@ -304,7 +304,7 @@
       },
       {
         id: 'source-clothes',
-        title: '(2) Ropa y apariencia',
+        title: 'Ropa y apariencia',
         entries: [
           ['habille-pour-hiver','être habillé pour l’hiver','recibir críticas por todas partes'],
           ['habit-ne-fait-pas-moine','l’habit ne fait pas le moine','el hábito no hace al monje'],
@@ -315,7 +315,7 @@
       },
       {
         id: 'source-society',
-        title: '(2) Sociedad y vida cotidiana',
+        title: 'Sociedad y vida cotidiana',
         entries: [
           ['cage-doree','une cage dorée','una jaula de oro'],
           ['faire-greve','faire grève','hacer huelga'],
@@ -327,7 +327,7 @@
       },
       {
         id: 'source-mystery',
-        title: '(2) Expresiones culturales y misteriosas',
+        title: 'Expresiones culturales y misteriosas',
         entries: [
           ['epee-de-damocles','une épée de Damoclès','una espada de Damocles'],
           ['vrai-zombie','être un vrai zombie','estar como un zombi'],
@@ -343,7 +343,7 @@
       },
       {
         id: 'source-travel',
-        title: '(2) Viajes y caminos',
+        title: 'Viajes y caminos',
         entries: [
           ['aller-a-vau-leau','aller à vau-l’eau','ir a la deriva / ir cuesta abajo'],
           ['quatre-coins-monde','aux quatre coins du monde','por los cuatro rincones del mundo'],
@@ -355,7 +355,7 @@
       },
       {
         id: 'source-literature',
-        title: '(2) Literatura y lenguaje',
+        title: 'Literatura y lenguaje',
         entries: [
           ['allo','allô','¿diga? / ¿hola? (al contestar el teléfono)'],
           ['au-pied-de-la-lettre','prendre au pied de la lettre','tomar al pie de la letra'],
@@ -371,7 +371,7 @@
       },
       {
         id: 'source-colors',
-        title: '(2) Colores y emociones',
+        title: 'Colores y emociones',
         entries: [
           ['eau-de-rose','à l’eau de rose','romántico y empalagoso'],
           ['en-voir-toutes-couleurs','en voir de toutes les couleurs','pasarlas canutas'],
@@ -382,7 +382,7 @@
       },
       {
         id: 'source-proverbs',
-        title: '(2) Proverbios y refranes',
+        title: 'Proverbios y refranes',
         entries: [
           ['bonne-etoile','être né sous une bonne étoile','nacer con buena estrella'],
           ['peau-ours-avant-tuer','il ne faut pas vendre la peau de l’ours avant de l’avoir tué','no hay que vender la piel del oso antes de cazarlo'],
@@ -396,7 +396,7 @@
       },
       {
         id: 'source-risque',
-        title: '(2) Expresiones coloquiales y de doble sentido',
+        title: 'Expresiones coloquiales y de doble sentido',
         entries: [
           ['grimper-au-rideau','grimper au rideau','ponerse a cien / alcanzar el orgasmo'],
           ['prendre-son-pied','prendre son pied','disfrutar muchísimo / alcanzar el orgasmo'],
@@ -407,7 +407,7 @@
       },
       {
         id: 'source-vulgar',
-        title: '(2) Expresiones vulgares',
+        title: 'Expresiones vulgares',
         entries: [
           ['merde-dans-les-yeux','avoir de la merde dans les yeux','estar ciego / no querer ver lo evidente'],
           ['tete-dans-le-cul','avoir la tête dans le cul','estar hecho polvo / tener resaca'],
