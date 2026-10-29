@@ -7,7 +7,9 @@
   const tabs = $("vocabulary-mode-tabs");
   const learningPanel = $("vocabulary-learning-panel");
   const practicePanel = $("vocabulary-practice-panel");
-  const searchArea = document.querySelector(".vocabulary-search-area");
+  const categorySelect = $("vocabulary-category-select");
+  const subcategorySelect = $("vocabulary-subcategory-select");
+  const searchInput = $("vocabulary-search-input");
   let categories = [];
   let exerciseType = null;
   let questions = [];
@@ -16,6 +18,7 @@
   let selectedAnswer = "";
   let answerChecked = false;
   let finished = false;
+  let lastWrittenAnswer = "";
 
   function frenchLabel(entry) {
     const article = String(entry.articleFr || "").trim();
@@ -27,9 +30,13 @@
   }
   function getCategory(id) { return categories.find(item => item.id === id) || categories[0]; }
   function getSubcategory(category, id) { return category?.subcategories.find(item => item.id === id) || category?.subcategories[0]; }
-  function activeCategory() { return getCategory($("practice-category")?.value); }
-  function activeSubcategory() { const category = activeCategory(); return getSubcategory(category, $("practice-subcategory")?.value); }
-  function wordsForSelection() { return activeSubcategory()?.words || []; }
+  function activeCategory() { return getCategory(categorySelect?.value); }
+  function activeSubcategory() { const category = activeCategory(); return getSubcategory(category, subcategorySelect?.value); }
+  function wordsForSelection() {
+    const words = activeSubcategory()?.words || [];
+    const query = normalize(searchInput?.value || "");
+    return query ? words.filter(word => normalize(word.french).includes(query) || normalize(word.word).includes(query) || normalize(word.spanish).includes(query)) : words;
+  }
 
   function mapCategory(source) {
     return {
@@ -51,7 +58,6 @@
     $("vocabulary-practice-tab").setAttribute("aria-selected", String(practice));
     learningPanel.hidden = practice;
     practicePanel.hidden = !practice;
-    searchArea.hidden = practice;
     if (practice) renderSetup();
   }
   function selectMarkup(id, label, options, selected) {
@@ -59,15 +65,14 @@
   }
   function renderSetup() {
     if (!categories.length) return;
-    const category = activeCategory() || categories[0];
-    const subcategory = getSubcategory(category, $("practice-subcategory")?.value) || category.subcategories[0];
-    const categorySelect = selectMarkup("practice-category", "Categoría", categories.map(item => ({id:item.id,title:item.title})), category.id);
-    const subcategorySelect = selectMarkup("practice-subcategory", "Subcategoría", category.subcategories.map(item => ({id:item.id,title:item.title})), subcategory?.id);
+    const category = activeCategory();
+    const subcategory = activeSubcategory();
+    const available = wordsForSelection().length;
+    const query = searchInput?.value.trim();
     practicePanel.innerHTML = `
       <div class="vocabulary-breadcrumb">Vocabulario <span>›</span> <strong>Practicar</strong></div>
-      <div class="vocabulary-heading"><div><h2>Practicar vocabulario</h2><p>Elige el tema que estás estudiando y después el tipo de ejercicio.</p></div></div>
-      <div class="vocabulary-practice-selectors">${categorySelect}${subcategorySelect}</div>
-      <div class="vocabulary-practice-section-title"><h3>Elige un ejercicio</h3><p id="practice-available-count">${subcategory?.words.length || 0} palabras disponibles</p></div>
+      <div class="vocabulary-heading"><div><h2>Practicar vocabulario</h2><p>Elige un ejercicio para practicar las palabras de los filtros seleccionados.</p></div></div>
+      <div class="vocabulary-practice-section-title"><h3>Elige un ejercicio</h3><p>${available} palabra(s) disponibles${query ? " para la búsqueda actual" : ""}</p></div>
       <div class="vocabulary-exercise-options">
         <button type="button" class="vocabulary-exercise-option" data-exercise="match">
           <span class="vocabulary-exercise-number">01</span><span class="vocabulary-exercise-copy"><strong>Asociar palabras</strong><small>Elegir la palabra francesa que corresponde a la traducción española.</small></span><span class="vocabulary-exercise-arrow" aria-hidden="true">→</span>
@@ -127,7 +132,7 @@
   }
   function feedbackMarkup(word) {
     if (!answerChecked) return "";
-    const correct = exerciseType === "write" ? isWrittenCorrect(word) : selectedAnswer === word.id;
+    const correct = exerciseType === "write" ? normalize(lastWrittenAnswer) === normalize(word.word) || normalize(lastWrittenAnswer) === normalize(word.french) : selectedAnswer === word.id;
     return `<p class="${correct ? "is-correct" : "is-incorrect"}">${correct ? "Correcto." : `Respuesta correcta: <strong>${escapeHTML(word.french)}</strong> — ${escapeHTML(word.spanish)}.`}</p>`;
   }
   function isWrittenCorrect(word) {
@@ -142,6 +147,7 @@
     const word = questions[questionIndex];
     if (exerciseType === "write" && !$("vocabulary-written-answer")?.value.trim()) { $("vocabulary-written-answer")?.focus(); return; }
     if (exerciseType !== "write" && !selectedAnswer) return;
+    lastWrittenAnswer = $("vocabulary-written-answer")?.value || "";
     answerChecked = true;
     if (exerciseType === "write" ? isWrittenCorrect(word) : selectedAnswer === word.id) score++;
     renderQuestion();
@@ -171,22 +177,14 @@
     utterance.rate = 0.85;
     window.speechSynthesis.speak(utterance);
   }
-  function refreshSubcategories() {
-    const category = activeCategory();
-    const select = $("practice-subcategory");
-    if (!category || !select) return;
-    select.innerHTML = category.subcategories.map(item => `<option value="${escapeHTML(item.id)}">${escapeHTML(item.title)}</option>`).join("");
-    renderSetup();
-  }
   tabs.addEventListener("click", event => {
     const button = event.target.closest("[role='tab']");
     if (!button) return;
     switchMode(button.id === "vocabulary-practice-tab" ? "practice" : "learn");
   });
-  practicePanel.addEventListener("change", event => {
-    if (event.target.id === "practice-category") refreshSubcategories();
-    if (event.target.id === "practice-subcategory") renderSetup();
-  });
+  categorySelect.addEventListener("change", () => { if (practicePanel && !practicePanel.hidden) renderSetup(); });
+  subcategorySelect.addEventListener("change", () => { if (practicePanel && !practicePanel.hidden) renderSetup(); });
+  searchInput.addEventListener("input", () => { if (practicePanel && !practicePanel.hidden && !questions.length) renderSetup(); });
   practicePanel.addEventListener("click", event => {
     const exercise = event.target.closest("[data-exercise]");
     if (exercise) { startExercise(exercise.dataset.exercise); return; }
