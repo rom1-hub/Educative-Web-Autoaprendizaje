@@ -34,22 +34,22 @@
 
   function populateCategorySelect() {
     const select = $("vocabulary-category-select");
-    select.innerHTML = '<option value="">Selecciona una categoría</option>' + catalog.map(item =>
+    select.innerHTML = '<option value="" disabled selected>Selecciona una categoría</option>' + catalog.map(item =>
       `<option value="${escapeHTML(item.id)}">${escapeHTML(item.name)}</option>`
     ).join("");
-    select.value = catalog[0]?.id || "";
+    select.value = "";
     populateSubcategorySelect();
   }
   function populateSubcategorySelect() {
     const category = getCategory();
     const select = $("vocabulary-subcategory-select");
     select.innerHTML = category
-      ? '<option value="">Selecciona una subcategoría</option>' + category.subcategories.map(item =>
+      ? '<option value="" disabled selected>Selecciona una subcategoría</option>' + category.subcategories.map(item =>
           `<option value="${escapeHTML(item.id)}">${escapeHTML(item.name)}</option>`
         ).join("")
-      : '<option value="">Primero elige una categoría</option>';
+      : '<option value="" disabled selected>Selecciona una subcategoría</option>';
     select.disabled = !category || !category.subcategories.length;
-    if (category?.subcategories.length) select.value = category.subcategories[0].id;
+    select.value = "";
     selectedWord = null;
   }
   function wordKey(word) { return [word.categoryId, word.subcategoryId, word.id].join("::"); }
@@ -90,6 +90,14 @@
     populateCategorySelect();
     $("vocabulary-category-select").addEventListener("change", () => { populateSubcategorySelect(); render(); });
     $("vocabulary-subcategory-select").addEventListener("change", () => { selectedWord = null; render(); });
+    $("vocabulary-reset-filters").addEventListener("click", () => {
+      $("vocabulary-search-input").value = "";
+      $("vocabulary-category-select").value = "";
+      populateSubcategorySelect();
+      selectedWord = null;
+      render();
+      $("vocabulary-status").textContent = "Explorando categorías";
+    });
     $("vocabulary-learning-panel").addEventListener("click", event => {
       const card = event.target.closest("[data-word-card]");
       if (!card) return;
