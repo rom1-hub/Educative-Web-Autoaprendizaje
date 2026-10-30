@@ -45,7 +45,10 @@
         id: sub.id, title: sub.title,
         words: sub.entries.map(entry => ({
           id: entry.id, word: String(entry.word || ""), french: frenchLabel(entry),
-          spanish: String(entry.translation || ""), emoji: entry.emoji || ""
+          spanish: String(entry.translation || ""), emoji: entry.emoji || "",
+          adjectiveForms: entry.adjectiveForms || null,
+          adjectiveSpanishForms: entry.adjectiveSpanishForms || null,
+          audioGroups: Array.isArray(entry.audioGroups) ? entry.audioGroups : null
         }))
       }))
     };
@@ -101,6 +104,45 @@
     for (let i = copy.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [copy[i], copy[j]] = [copy[j], copy[i]]; }
     return copy;
   }
+  const FORM_KEYS = ["masculineSingular", "feminineSingular", "masculinePlural", "femininePlural"];
+
+  function writtenVariants(word) {
+    const frenchForms = word.adjectiveForms;
+    const spanishForms = word.adjectiveSpanishForms;
+    if (!frenchForms || !spanishForms) {
+      return [{ ...word, exerciseId: word.id, answerId: word.id, french: word.french, spanish: word.spanish }];
+    }
+    const variants = FORM_KEYS
+      .filter(key => frenchForms[key] && spanishForms[key])
+      .map(key => ({
+        ...word,
+        exerciseId: `${word.id}::${key}`,
+        answerId: word.id,
+        formKey: key,
+        word: frenchForms[key],
+        french: frenchForms[key],
+        spanish: spanishForms[key]
+      }));
+    return variants.length ? variants : [{ ...word, exerciseId: word.id, answerId: word.id, french: word.french, spanish: word.spanish }];
+  }
+
+  function audioVariants(word) {
+    if (!word.audioGroups?.length || !word.adjectiveForms) {
+      return [{ ...word, exerciseId: word.id, answerId: word.id, audioFrench: word.french }];
+    }
+    return word.audioGroups.map((group, index) => {
+      const formKey = group.find(key => word.adjectiveForms[key]);
+      const audioFrench = formKey ? word.adjectiveForms[formKey] : word.french;
+      return {
+        ...word,
+        exerciseId: `${word.id}::audio::${index}`,
+        answerId: word.id,
+        french: audioFrench,
+        audioFrench
+      };
+    });
+  }
+
   function startExercise(type) {
     if (!categorySelect?.value || !subcategorySelect?.value || !activeCategory() || !activeSubcategory()) {
       renderSetup();
@@ -112,17 +154,28 @@
       return;
     }
     exerciseType = type;
-    questions = shuffle(words).slice(0, Math.min(10, words.length));
+    const candidates = type === "audio"
+      ? words.flatMap(audioVariants)
+      : words.flatMap(writtenVariants);
+    questions = shuffle(candidates).slice(0, Math.min(10, candidates.length));
     questionIndex = 0; score = 0; selectedAnswer = ""; answerChecked = false; finished = false;
-    questionChoices = questions.map(word => type === "write" ? [] : distractors(word));
+    questionChoices = questions.map(word => type === "write" ? [] : distractors(word, type));
     renderQuestion();
   }
-  function distractors(correct) {
-    // Las opciones deben salir exclusivamente de la subcategoría activa.
-    const subcategory = activeSubcategory();
-    if (!subcategory) return [];
-    const pool = subcategory.words.filter(word =>
-      word.id !== correct.id && normalize(word.french) !== normalize(correct.french)
+  function distractors(correct, type) {
+    // Las opciones se obtienen exclusivamente de la subcategoría seleccionada.
+    const words = wordsForSelection();
+    if (type === "audio") {
+      const unique = new Map();
+      words.forEach(word => {
+        const key = normalize(word.spanish);
+        if (key && word.id !== correct.answerId && !unique.has(key)) unique.set(key, word);
+      });
+      const selected = shuffle([...unique.values()]).slice(0, 3);
+      return shuffle([correct, ...selected]);
+    }
+    const pool = words.flatMap(writtenVariants).filter(option =>
+      option.exerciseId !== correct.exerciseId
     );
     const selected = shuffle(pool).slice(0, 3);
     return shuffle([correct, ...selected]);
@@ -150,13 +203,14 @@
   }
   function feedbackMarkup(word) {
     if (!answerChecked) return "";
-    const correct = exerciseType === "write" ? normalize(lastWrittenAnswer) === normalize(word.word) || normalize(lastWrittenAnswer) === normalize(word.french) : selectedAnswer === word.id;
+    const correct = exerciseType === "write"
+      ? normalize(lastWrittenAnswer) === normalize(word.french)
+      : selectedAnswer === (exerciseType === "audio" ? word.answerId : word.exerciseId);
     return `<p class="${correct ? "is-correct" : "is-incorrect"}">${correct ? "Correcto." : `Respuesta correcta: <strong>${escapeHTML(word.french)}</strong> — ${escapeHTML(word.spanish)}.`}</p>`;
   }
   function isWrittenCorrect(word) {
     const input = $("vocabulary-written-answer");
-    const value = normalize(input?.value);
-    return value === normalize(word.word) || value === normalize(word.french);
+    return normalize(input?.value) === normalize(word.french);
   }
   function checkAnswer() {
     if (answerChecked) {
@@ -167,7 +221,7 @@
     if (exerciseType !== "write" && !selectedAnswer) return;
     lastWrittenAnswer = $("vocabulary-written-answer")?.value || "";
     answerChecked = true;
-    if (exerciseType === "write" ? isWrittenCorrect(word) : selectedAnswer === word.id) score++;
+    if (exerciseType === "write" ? isWrittenCorrect(word) : selectedAnswer === (exerciseType === "audio" ? word.answerId : word.exerciseId)) score++;
     renderQuestion();
   }
   function renderResults() {
@@ -190,7 +244,8 @@
       return;
     }
     window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(questions[questionIndex].word);
+    const current = questions[questionIndex];
+    const utterance = new SpeechSynthesisUtterance(current.audioFrench || current.french || current.word);
     utterance.lang = "fr-FR";
     utterance.rate = 0.85;
     window.speechSynthesis.speak(utterance);
