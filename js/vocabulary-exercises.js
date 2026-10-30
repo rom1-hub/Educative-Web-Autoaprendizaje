@@ -30,8 +30,8 @@
     if (/['’]$/.test(article)) return article + word;
     return article + " " + word;
   }
-  function getCategory(id) { return categories.find(item => item.id === id) || categories[0]; }
-  function getSubcategory(category, id) { return category?.subcategories.find(item => item.id === id) || category?.subcategories[0]; }
+  function getCategory(id) { return categories.find(item => item.id === id) || null; }
+  function getSubcategory(category, id) { return category?.subcategories.find(item => item.id === id) || null; }
   function activeCategory() { return getCategory(categorySelect?.value); }
   function activeSubcategory() { const category = activeCategory(); return getSubcategory(category, subcategorySelect?.value); }
   function wordsForSelection() {
@@ -68,6 +68,16 @@
     if (!categories.length) return;
     const category = activeCategory();
     const subcategory = activeSubcategory();
+    if (!category || !subcategory) {
+      const instruction = !category
+        ? "Selecciona una categoría para continuar."
+        : "Ahora selecciona una subcategoría para continuar.";
+      practicePanel.innerHTML = `
+        <div class="vocabulary-breadcrumb">Vocabulario <span>›</span> <strong>Practicar</strong></div>
+        <div class="vocabulary-heading"><div><h2>Practicar vocabulario</h2><p>${instruction}</p></div></div>
+        <div class="vocabulary-empty"><h3>Selecciona una categoría y una subcategoría.</h3><p>Los ejercicios se habilitarán cuando hayas elegido ambas.</p></div>`;
+      return;
+    }
     const available = wordsForSelection().length;
     practicePanel.innerHTML = `
       <div class="vocabulary-breadcrumb">Vocabulario <span>›</span> <strong>Practicar</strong></div>
@@ -92,6 +102,10 @@
     return copy;
   }
   function startExercise(type) {
+    if (!activeCategory() || !activeSubcategory()) {
+      renderSetup();
+      return;
+    }
     const words = wordsForSelection();
     if (!words.length) {
       practicePanel.innerHTML = '<div class="vocabulary-empty"><h3>No hay palabras disponibles</h3><p>Elige otra subcategoría para practicar.</p><button type="button" class="button button-secondary" data-back-setup>Volver</button></div>';
