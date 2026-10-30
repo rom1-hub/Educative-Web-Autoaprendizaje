@@ -43,18 +43,18 @@
         id: 'greetings-how-are-you',
         title: 'Preguntar y decir cómo está alguien',
         entries: [
-          { id:'how-ca-va', word:'ça va ?', translation:'¿cómo estás? / ¿qué tal? (1.ª forma)', emoji:'🙂' },
-          { id:'how-comment-allez-vous', word:'comment allez-vous ?', translation:'¿cómo está usted?', emoji:'🙂' },
-          { id:'how-comment-vas-tu', word:'comment vas-tu ?', translation:'¿cómo estás?', emoji:'🙂' },
-          { id:'how-comment-ca-va', word:'comment ça va ?', translation:'¿cómo estás? / ¿qué tal? (2.ª forma)', emoji:'🙂' },
-          { id:'how-tu-vas-bien', word:'tu vas bien ?', translation:'¿estás bien?', emoji:'🙂' },
-          { id:'how-vous-allez-bien', word:'vous allez bien ?', translation:'¿está usted bien?', emoji:'🙂' },
-          { id:'how-ca-va-bien', word:'ça va bien', translation:'estoy bien / todo va bien', emoji:'🙂' },
-          { id:'how-ca-va-tres-bien', word:'ça va très bien', translation:'estoy muy bien', emoji:'😄' },
-          { id:'how-ca-va-mal', word:'ça va mal', translation:'estoy mal', emoji:'🙁' },
-          { id:'how-comme-ci-comme-ca', word:'comme ci, comme ça', translation:'así así', emoji:'😐' },
-          { id:'how-bof', word:'bof', translation:'más o menos', emoji:'😐' },
-          { id:'how-pas-mal', word:'pas mal', translation:'no está mal', emoji:'🙂' }
+          { id:'how-ca-va', word:'ça va ?', translation:'¿qué tal?', partOfSpeech:'expression', emoji:'🙂' },
+          { id:'how-comment-allez-vous', word:'comment allez-vous ?', translation:'¿cómo está usted?', partOfSpeech:'expression', emoji:'🙂' },
+          { id:'how-comment-vas-tu', word:'comment vas-tu ?', translation:'¿cómo estás?', partOfSpeech:'expression', emoji:'🙂' },
+          { id:'how-comment-ca-va', word:'comment ça va ?', translation:'¿cómo estás? / ¿cómo está todo?', partOfSpeech:'expression', emoji:'🙂' },
+          { id:'how-tu-vas-bien', word:'tu vas bien ?', translation:'¿estás bien?', partOfSpeech:'expression', emoji:'🙂' },
+          { id:'how-vous-allez-bien', word:'vous allez bien ?', translation:'¿está usted bien?', partOfSpeech:'expression', emoji:'🙂' },
+          { id:'how-ca-va-bien', word:'ça va bien', translation:'estoy bien / todo va bien', partOfSpeech:'expression', emoji:'🙂' },
+          { id:'how-ca-va-tres-bien', word:'ça va très bien', translation:'estoy muy bien', partOfSpeech:'expression', emoji:'😄' },
+          { id:'how-ca-va-mal', word:'ça va mal', translation:'estoy mal', partOfSpeech:'expression', emoji:'🙁' },
+          { id:'how-comme-ci-comme-ca', word:'comme ci, comme ça', translation:'así así', partOfSpeech:'expression', emoji:'😐' },
+          { id:'how-bof', word:'bof', translation:'más o menos', partOfSpeech:'interjection', emoji:'😐' },
+          { id:'how-pas-mal', word:'pas mal', translation:'no está mal', partOfSpeech:'expression', emoji:'🙂' }
         ]
       },
       {
