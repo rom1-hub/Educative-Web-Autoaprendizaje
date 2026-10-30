@@ -28,7 +28,7 @@
           { id:'farewell-au-revoir', word:'au revoir', translation:'adiós / hasta luego', emoji:'👋' },
           { id:'farewell-a-bientot', word:'à bientôt', translation:'hasta pronto', emoji:'🔜' },
           { id:'farewell-a-plus-tard', word:'à plus tard', translation:'hasta luego', emoji:'👋' },
-          { id:'farewell-a-tout-a-lheure', word:'à tout à l’heure', translation:'hasta luego', emoji:'👋' },
+          { id:'farewell-a-tout-a-lheure', word:'à tout à l’heure', translation:'Hasta dentro de un rato', emoji:'👋' },
           { id:'farewell-a-demain', word:'à demain', translation:'hasta mañana', emoji:'🌙' },
           { id:'farewell-a-lundi', word:'à lundi', translation:'hasta el lunes', emoji:'📅' },
           { id:'farewell-a-la-prochaine', word:'à la prochaine', translation:'hasta la próxima', emoji:'👋' },
