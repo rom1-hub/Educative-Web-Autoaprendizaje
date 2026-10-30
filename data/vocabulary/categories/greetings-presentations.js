@@ -69,8 +69,7 @@
           { id:'intro-je-vous-presente', word:'je vous présente', translation:'le presento a', emoji:'🤝' },
           { id:'intro-je-te-presente', word:'je te présente', translation:'te presento a', emoji:'🤝' },
           { id:'intro-voici', word:'voici', translation:'este / esta es', emoji:'👉' },
-          { id:'intro-enchante-faire-votre-connaissance-m', word:'enchanté de faire votre connaissance', translation:'encantado de conocerle (masculino)', emoji:'🤝' },
-          { id:'intro-enchantee-faire-votre-connaissance-f', word:'enchantée de faire votre connaissance', translation:'encantada de conocerle (femenino)', emoji:'🤝' }
+          { id:'intro-enchante-faire-votre-connaissance', word:'enchanté de faire votre connaissance', translation:'encantado de conocerle', partOfSpeech:'expression', adjectiveForms:{ masculineSingular:'enchanté de faire votre connaissance', feminineSingular:'enchantée de faire votre connaissance', masculinePlural:'enchantés de faire votre connaissance', femininePlural:'enchantées de faire votre connaissance' }, adjectiveSpanishForms:{ masculineSingular:'encantado de conocerle', feminineSingular:'encantada de conocerle', masculinePlural:'encantados de conocerle', femininePlural:'encantadas de conocerle' }, audioGroups:[['masculineSingular','feminineSingular','masculinePlural','femininePlural']], emoji:'🤝' }
         ]
       },
       {
