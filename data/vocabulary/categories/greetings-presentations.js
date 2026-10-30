@@ -61,14 +61,14 @@
         id: 'greetings-introduce-yourself',
         title: 'Presentarse',
         entries: [
-          { id:'intro-je-mappelle', word:"je m'appelle", translation:'me llamo', emoji:'🙋' },
-          { id:'intro-mon-nom-est', word:'mon nom est', translation:'mi nombre es', emoji:'🪪' },
-          { id:'intro-moi-cest', word:"moi, c'est", translation:'yo soy / yo me llamo', emoji:'🙋' },
-          { id:'intro-je-suis', word:'je suis', translation:'soy', emoji:'🙋' },
-          { id:'intro-permettez-moi-de-me-presenter', word:'permettez-moi de me présenter', translation:'permítame presentarme', emoji:'🙋' },
-          { id:'intro-je-vous-presente', word:'je vous présente', translation:'le presento a', emoji:'🤝' },
-          { id:'intro-je-te-presente', word:'je te présente', translation:'te presento a', emoji:'🤝' },
-          { id:'intro-voici', word:'voici', translation:'este / esta es', emoji:'👉' },
+          { id:'intro-je-mappelle', word:"je m'appelle", translation:'me llamo', partOfSpeech:'expression', emoji:'🙋' },
+          { id:'intro-mon-nom-est', word:'mon nom est', translation:'mi nombre es', partOfSpeech:'expression', emoji:'🪪' },
+          { id:'intro-moi-cest', word:"moi, c'est", translation:'yo soy / yo me llamo', partOfSpeech:'expression', emoji:'🙋' },
+          { id:'intro-je-suis', word:'je suis', translation:'soy', partOfSpeech:'expression', emoji:'🙋' },
+          { id:'intro-permettez-moi-de-me-presenter', word:'permettez-moi de me présenter', translation:'permítame presentarme', partOfSpeech:'expression', emoji:'🙋' },
+          { id:'intro-je-vous-presente', word:'je vous présente', translation:'le presento a', partOfSpeech:'expression', emoji:'🤝' },
+          { id:'intro-je-te-presente', word:'je te présente', translation:'te presento a', partOfSpeech:'expression', emoji:'🤝' },
+          { id:'intro-voici', word:'voici', translation:'este / esta es', partOfSpeech:'expression', emoji:'👉' },
           { id:'intro-enchante-faire-votre-connaissance', word:'enchanté de faire votre connaissance', translation:'encantado de conocerle', partOfSpeech:'expression', adjectiveForms:{ masculineSingular:'enchanté de faire votre connaissance', feminineSingular:'enchantée de faire votre connaissance', masculinePlural:'enchantés de faire votre connaissance', femininePlural:'enchantées de faire votre connaissance' }, adjectiveSpanishForms:{ masculineSingular:'encantado de conocerle', feminineSingular:'encantada de conocerle', masculinePlural:'encantados de conocerle', femininePlural:'encantadas de conocerle' }, audioGroups:[['masculineSingular','feminineSingular','masculinePlural','femininePlural']], emoji:'🤝' }
         ]
       },
