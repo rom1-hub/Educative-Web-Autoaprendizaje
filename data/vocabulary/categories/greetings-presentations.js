@@ -10,18 +10,15 @@
         id: 'greetings-basic',
         title: 'Saludos básicos',
         entries: [
-          { id:'greeting-bonjour', word:'bonjour', translation:'buenos días', emoji:'☀️' },
-          { id:'greeting-salut', word:'salut', translation:'hola', emoji:'👋' },
-          { id:'greeting-bonsoir', word:'bonsoir', translation:'buenas tardes / buenas noches', emoji:'🌆' },
-          { id:'greeting-bonne-nuit', word:'bonne nuit', translation:'buenas noches', emoji:'🌙' },
-          { id:'greeting-bienvenue', word:'bienvenue', translation:'bienvenido / bienvenida', emoji:'🏠' },
-          { id:'greeting-enchante-m', word:'enchanté', translation:'encantado (masculino)', emoji:'🤝' },
-          { id:'greeting-enchantee-f', word:'enchantée', translation:'encantada (femenino)', emoji:'🤝' },
-          { id:'greeting-ravi-de-vous-rencontrer-m', word:'ravi de vous rencontrer', translation:'encantado de conocerle (masculino)', emoji:'🤝' },
-          { id:'greeting-ravie-de-vous-rencontrer-f', word:'ravie de vous rencontrer', translation:'encantada de conocerle (femenino)', emoji:'🤝' },
-          { id:'greeting-heureux-de-vous-rencontrer-m', word:'heureux de vous rencontrer', translation:'encantado de conocerle (masculino)', emoji:'🤝' },
-          { id:'greeting-heureuse-de-vous-rencontrer-f', word:'heureuse de vous rencontrer', translation:'encantada de conocerle (femenino)', emoji:'🤝' },
-          { id:'greeting-coucou', word:'coucou', translation:'hola (para alguien muy cercano)', emoji:'😊' }
+          { id:'greeting-bonjour', word:'bonjour', translation:'buenos días', partOfSpeech:'interjection', emoji:'☀️' },
+          { id:'greeting-salut', word:'salut', translation:'hola', partOfSpeech:'interjection', emoji:'👋' },
+          { id:'greeting-bonsoir', word:'bonsoir', translation:'buenas tardes / buenas noches', partOfSpeech:'interjection', emoji:'🌆' },
+          { id:'greeting-bonne-nuit', word:'bonne nuit', translation:'buenas noches', partOfSpeech:'expression', emoji:'🌙' },
+          { id:'greeting-bienvenue', word:'bienvenue', translation:'bienvenido / bienvenida', partOfSpeech:'interjection', emoji:'🏠' },
+          { id:'greeting-enchante-m', word:'enchanté', translation:'encantado/a', partOfSpeech:'adjective', adjectiveForms:{ masculineSingular:'enchanté', feminineSingular:'enchantée', masculinePlural:'enchantés', femininePlural:'enchantées' }, emoji:'🤝' },
+          { id:'greeting-ravi-de-vous-rencontrer-m', word:'ravi de vous rencontrer', translation:'encantado/a de conocerle', partOfSpeech:'expression', adjectiveForms:{ masculineSingular:'ravi de vous rencontrer', feminineSingular:'ravie de vous rencontrer', masculinePlural:'ravis de vous rencontrer', femininePlural:'ravies de vous rencontrer' }, emoji:'🤝' },
+          { id:'greeting-heureux-de-vous-rencontrer-m', word:'heureux de vous rencontrer', translation:'encantado/a de conocerle', partOfSpeech:'expression', adjectiveForms:{ masculineSingular:'heureux de vous rencontrer', feminineSingular:'heureuse de vous rencontrer', masculinePlural:'heureux de vous rencontrer', femininePlural:'heureuses de vous rencontrer' }, emoji:'🤝' },
+          { id:'greeting-coucou', word:'coucou', translation:'hola (para alguien muy cercano)', partOfSpeech:'interjection', emoji:'😊' }
         ]
       },
       {
