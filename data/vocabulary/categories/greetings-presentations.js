@@ -36,7 +36,7 @@
           { id:'farewell-bonne-soiree', word:'bonne soirée', translation:'que pase una buena tarde / noche', emoji:'🌆' },
           { id:'farewell-bon-week-end', word:'bon week-end', translation:'buen fin de semana', emoji:'📅' },
           { id:'farewell-a-plus', word:'à plus', translation:'hasta luego', emoji:'👋' },
-          { id:'farewell-salut', word:'salut', translation:'adiós / hasta luego', emoji:'👋' }
+          { id:'farewell-salut', word:'salut', translation:'adiós / hasta luego', partOfSpeech:'interjection', emoji:'👋' }
         ]
       },
       {
