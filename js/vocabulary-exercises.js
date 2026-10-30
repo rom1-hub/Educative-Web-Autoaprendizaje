@@ -66,8 +66,8 @@
   }
   function renderSetup() {
     if (!categories.length) return;
-    const category = activeCategory();
-    const subcategory = activeSubcategory();
+    const category = categorySelect?.value ? activeCategory() : null;
+    const subcategory = category && subcategorySelect?.value ? activeSubcategory() : null;
     if (!category || !subcategory) {
       const instruction = !category
         ? "Selecciona una categoría para continuar."
@@ -102,7 +102,7 @@
     return copy;
   }
   function startExercise(type) {
-    if (!activeCategory() || !activeSubcategory()) {
+    if (!categorySelect?.value || !subcategorySelect?.value || !activeCategory() || !activeSubcategory()) {
       renderSetup();
       return;
     }
@@ -118,8 +118,12 @@
     renderQuestion();
   }
   function distractors(correct) {
-    const category = activeCategory();
-    const pool = category.subcategories.flatMap(sub => sub.words).filter(word => word.id !== correct.id && normalize(word.french) !== normalize(correct.french));
+    // Las opciones deben salir exclusivamente de la subcategoría activa.
+    const subcategory = activeSubcategory();
+    if (!subcategory) return [];
+    const pool = subcategory.words.filter(word =>
+      word.id !== correct.id && normalize(word.french) !== normalize(correct.french)
+    );
     const selected = shuffle(pool).slice(0, 3);
     return shuffle([correct, ...selected]);
   }
