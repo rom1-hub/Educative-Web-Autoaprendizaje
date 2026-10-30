@@ -166,18 +166,26 @@
     // Las opciones se obtienen exclusivamente de la subcategoría seleccionada.
     const words = wordsForSelection();
     if (type === "audio") {
-      const unique = new Map();
+      const unique = new Map([[normalize(correct.spanish), correct]]);
       words.forEach(word => {
         const key = normalize(word.spanish);
-        if (key && word.id !== correct.answerId && !unique.has(key)) unique.set(key, word);
+        if (key && !unique.has(key)) unique.set(key, word);
       });
+      unique.delete(normalize(correct.spanish));
       const selected = shuffle([...unique.values()]).slice(0, 3);
       return shuffle([correct, ...selected]);
     }
-    const pool = words.flatMap(writtenVariants).filter(option =>
-      option.exerciseId !== correct.exerciseId
+    const allVariants = words.flatMap(writtenVariants);
+    const siblingVariants = allVariants.filter(option =>
+      option.answerId === correct.answerId && option.exerciseId !== correct.exerciseId
     );
-    const selected = shuffle(pool).slice(0, 3);
+    const otherVariants = allVariants.filter(option =>
+      option.answerId !== correct.answerId
+    );
+    const selected = [
+      ...shuffle(siblingVariants).slice(0, 3),
+      ...shuffle(otherVariants).slice(0, Math.max(0, 3 - siblingVariants.length))
+    ];
     return shuffle([correct, ...selected]);
   }
   function renderQuestion() {
@@ -195,7 +203,10 @@
         <span class="eyebrow">${title}</span>
         <h2>${escapeHTML(prompt)}</h2>
         ${exerciseType === "audio" ? '<button type="button" class="vocabulary-audio-button" data-play-audio><span aria-hidden="true">▶</span> Escuchar la palabra</button>' : ""}
-        ${exerciseType === "write" ? '<label class="vocabulary-answer-field"><span>Tu respuesta en francés</span><input id="vocabulary-written-answer" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Escribe aquí…"></label>' : `<div class="vocabulary-answer-options">${choices.map((choice,index) => `<button type="button" class="vocabulary-answer-option ${selectedAnswer === choice.id ? "is-selected" : ""}" data-answer="${escapeHTML(choice.id)}" ${answerChecked ? "disabled" : ""}><span>${String.fromCharCode(65+index)}</span>${escapeHTML(exerciseType === "audio" ? choice.spanish : choice.french)}</button>`).join("")}</div>`}
+        ${exerciseType === "write" ? '<label class="vocabulary-answer-field"><span>Tu respuesta en francés</span><input id="vocabulary-written-answer" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Escribe aquí…"></label>' : `<div class="vocabulary-answer-options">${choices.map((choice,index) => {
+          const choiceId = exerciseType === "audio" ? (choice.answerId || choice.id) : (choice.exerciseId || choice.id);
+          return `<button type="button" class="vocabulary-answer-option ${selectedAnswer === choiceId ? "is-selected" : ""}" data-answer="${escapeHTML(choiceId)}" ${answerChecked ? "disabled" : ""}><span>${String.fromCharCode(65+index)}</span>${escapeHTML(exerciseType === "audio" ? choice.spanish : choice.french)}</button>`;
+        }).join("")}</div>`}
         <div id="vocabulary-answer-feedback" class="vocabulary-answer-feedback" aria-live="polite">${feedbackMarkup(word)}</div>
         <div class="vocabulary-question-actions"><button type="button" class="button button-secondary" data-back-setup>Salir del ejercicio</button><button type="button" class="button button-primary" data-check-answer ${answerChecked ? "" : (exerciseType === "write" ? "" : !selectedAnswer ? "disabled" : "")}>${answerChecked ? (questionIndex === questions.length - 1 ? "Ver resultados" : "Siguiente pregunta") : "Comprobar respuesta"}</button></div>
       </section>`;
