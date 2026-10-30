@@ -23,6 +23,7 @@
       adjective: "adjetivo", adjectif: "adjetivo", adjetivo: "adjetivo",
       adverb: "adverbio", adverbe: "adverbio", adverbio: "adverbio",
       expression: "expresión", phrase: "expresión", expresion: "expresión",
+      interjection: "interjección", interjeccion: "interjección",
       connector: "conector", connecteur: "conector", conector: "conector"
     };
     return aliases[valueNormalized] || "";
@@ -201,7 +202,7 @@
       const articleLabel = article && gender ? `${definedArticle} / ${article} (${gender})` : "";
       const plural = nounPlural(word);
       details = `<div class="vocabulary-detail-grid">${articleLabel ? `<div class="vocabulary-detail-cell"><span>Artículo</span><strong>${escapeHTML(articleLabel)}</strong></div>` : ""}${plural ? `<div class="vocabulary-detail-cell"><span>Plural</span><strong>${escapeHTML(plural)}</strong></div>` : ""}</div>`;
-    } else if (type === "adjetivo") {
+    } else if (type === "adjetivo" || word.adjectiveForms) {
       const forms = adjectiveInflections(word);
       details = `<div class="vocabulary-detail-grid vocabulary-adjective-grid">
         <div class="vocabulary-detail-cell"><span>Masculino singular</span><strong>${escapeHTML(forms.ms || "")}</strong></div>
@@ -212,7 +213,7 @@
     } else if (type === "verbo" || type === "adverbio") {
       details = `<div class="vocabulary-detail-grid"><div class="vocabulary-detail-cell"><span>Categoría</span><strong>${type === "verbo" ? "Verbo" : "Adverbio"}</strong></div><div class="vocabulary-detail-cell"><span>Variación</span><strong>Invariable</strong></div></div>`;
     } else {
-      const typeLabel = type === "conector" ? "Conector" : type === "expresión" ? "Expresión" : "Palabra";
+      const typeLabel = type === "conector" ? "Conector" : type === "interjección" ? "Interjección" : type === "expresión" ? "Expresión" : "Palabra";
       details = `<div class="vocabulary-detail-grid"><div class="vocabulary-detail-cell"><span>Categoría</span><strong>${typeLabel}</strong></div></div>`;
     }
     return `<section class="vocabulary-detail" aria-label="Ficha de vocabulario">
