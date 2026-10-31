@@ -76,71 +76,70 @@
         id: 'greetings-name-identity',
         title: 'Preguntar por el nombre y la identidad',
         entries: [
-          { id:'identity-comment-vous-appelez-vous', word:'comment vous appelez-vous ?', translation:'¿cómo se llama?', emoji:'❓' },
-          { id:'identity-comment-tu-tappelles', word:"comment tu t'appelles ?", translation:'¿cómo te llamas?', emoji:'❓' },
-          { id:'identity-quel-est-votre-nom', word:'quel est votre nom ?', translation:'¿cuál es su nombre?', emoji:'❓' },
-          { id:'identity-quel-est-ton-nom', word:'quel est ton nom ?', translation:'¿cuál es tu nombre?', emoji:'❓' },
-          { id:'identity-qui-etes-vous', word:'qui êtes-vous ?', translation:'¿quién es usted?', emoji:'❓' },
-          { id:'identity-qui-es-tu', word:'qui es-tu ?', translation:'¿quién eres?', emoji:'❓' },
-          { id:'identity-vous-etes-qui', word:'vous êtes qui ?', translation:'¿quién es usted? / ¿quién eres?', emoji:'❓' },
-          { id:'identity-tu-es-qui', word:'tu es qui ?', translation:'¿quién eres?', emoji:'❓' }
+          { id:'identity-comment-vous-appelez-vous', word:'comment vous appelez-vous ?', translation:'¿cómo se llama?', partOfSpeech:'expression', emoji:'❓' },
+          { id:'identity-comment-tu-tappelles', word:"comment tu t'appelles ?", translation:'¿cómo te llamas?', partOfSpeech:'expression', emoji:'❓' },
+          { id:'identity-quel-est-votre-nom', word:'quel est votre nom ?', translation:'¿cuál es su apellido?', partOfSpeech:'expression', emoji:'❓' },
+          { id:'identity-quel-est-ton-nom', word:'quel est ton nom ?', translation:'¿cuál es tu apellido?', partOfSpeech:'expression', emoji:'❓' },
+          { id:'identity-quel-est-votre-prenom', word:'quel est votre prénom ?', translation:'¿cuál es su nombre?', partOfSpeech:'expression', emoji:'❓' },
+          { id:'identity-quel-est-ton-prenom', word:'quel est ton prénom ?', translation:'¿cuál es tu nombre?', partOfSpeech:'expression', emoji:'❓' },
+          { id:'identity-qui-etes-vous', word:'qui êtes-vous ?', translation:'¿quién es usted?', partOfSpeech:'expression', emoji:'❓' },
+          { id:'identity-qui-es-tu', word:'qui es-tu ?', translation:'¿quién eres?', partOfSpeech:'expression', emoji:'❓' },
+          { id:'identity-vous-etes-qui', word:'vous êtes qui ?', translation:'¿y usted quién es?', partOfSpeech:'expression', emoji:'❓' },
+          { id:'identity-tu-es-qui', word:'tu es qui ?', translation:'¿y tú quién eres?', partOfSpeech:'expression', emoji:'❓' }
         ]
       },
       {
         id: 'greetings-present-others',
         title: 'Presentar a otras personas',
         entries: [
-          { id:'present-voici-mon-ami', word:'voici mon ami', translation:'este es mi amigo', emoji:'👨' },
-          { id:'present-voici-mon-amie', word:'voici mon amie', translation:'esta es mi amiga', emoji:'👩' },
-          { id:'present-je-vous-presente-mon-ami', word:'je vous présente mon ami', translation:'le presento a mi amigo', emoji:'🤝' },
-          { id:'present-je-vous-presente-mon-amie', word:'je vous présente mon amie', translation:'le presento a mi amiga', emoji:'🤝' },
-          { id:'present-je-te-presente-mon-ami', word:'je te présente mon ami', translation:'te presento a mi amigo', emoji:'🤝' },
-          { id:'present-je-te-presente-mon-amie', word:'je te présente mon amie', translation:'te presento a mi amiga', emoji:'🤝' },
-          { id:'present-cest-mon-frere', word:"c'est mon frère", translation:'es mi hermano', emoji:'👨' },
-          { id:'present-cest-ma-soeur', word:"c'est ma sœur", translation:'es mi hermana', emoji:'👩' },
-          { id:'present-cest-mon-collegue', word:"c'est mon collègue", translation:'es mi compañero de trabajo', emoji:'👨‍💼' },
-          { id:'present-cest-ma-collegue', word:"c'est ma collègue", translation:'es mi compañera de trabajo', emoji:'👩‍💼' }
+          { id:'present-voici-mon-ami', word:'voici mon ami', translation:'este es mi amigo', partOfSpeech:'expression', audioGroupId:'present-voici-mon-ami-audio', emoji:'👨' },
+          { id:'present-voici-mon-amie', word:'voici mon amie', translation:'esta es mi amiga', partOfSpeech:'expression', audioGroupId:'present-voici-mon-ami-audio', emoji:'👩' },
+          { id:'present-je-vous-presente-mon-ami', word:'je vous présente mon ami', translation:'le presento a mi amigo', partOfSpeech:'expression', audioGroupId:'present-je-vous-presente-mon-ami-audio', emoji:'🤝' },
+          { id:'present-je-vous-presente-mon-amie', word:'je vous présente mon amie', translation:'le presento a mi amiga', partOfSpeech:'expression', audioGroupId:'present-je-vous-presente-mon-ami-audio', emoji:'🤝' },
+          { id:'present-je-te-presente-mon-ami', word:'je te présente mon ami', translation:'te presento a mi amigo', partOfSpeech:'expression', audioGroupId:'present-je-te-presente-mon-ami-audio', emoji:'🤝' },
+          { id:'present-je-te-presente-mon-amie', word:'je te présente mon amie', translation:'te presento a mi amiga', partOfSpeech:'expression', audioGroupId:'present-je-te-presente-mon-ami-audio', emoji:'🤝' },
+          { id:'present-cest-mon-frere', word:"c'est mon frère", translation:'es mi hermano', partOfSpeech:'expression', emoji:'👨' },
+          { id:'present-cest-ma-soeur', word:"c'est ma sœur", translation:'es mi hermana', partOfSpeech:'expression', emoji:'👩' },
+          { id:'present-cest-mon-collegue', word:"c'est mon collègue", translation:'es mi compañero de trabajo', partOfSpeech:'expression', emoji:'👨‍💼' },
+          { id:'present-cest-ma-collegue', word:"c'est ma collègue", translation:'es mi compañera de trabajo', partOfSpeech:'expression', emoji:'👩‍💼' }
         ]
       },
       {
         id: 'greetings-meet-contact',
         title: 'Conocer y establecer contacto',
         entries: [
-          { id:'contact-faire-connaissance', word:'faire connaissance', translation:'conocerse / entablar conocimiento', emoji:'🤝' },
-          { id:'contact-ravi-faire-votre-connaissance-m', word:'ravi de faire votre connaissance', translation:'encantado de conocerle (masculino)', emoji:'🤝' },
-          { id:'contact-ravie-faire-votre-connaissance-f', word:'ravie de faire votre connaissance', translation:'encantada de conocerle (femenino)', emoji:'🤝' },
-          { id:'contact-ravi-faire-ta-connaissance-m', word:'ravi de faire ta connaissance', translation:'encantado de conocerte (masculino)', emoji:'🤝' },
-          { id:'contact-ravie-faire-ta-connaissance-f', word:'ravie de faire ta connaissance', translation:'encantada de conocerte (femenino)', emoji:'🤝' },
-          { id:'contact-content-vous-rencontrer-m', word:'content de vous rencontrer', translation:'contento de conocerle (masculino)', emoji:'😊' },
-          { id:'contact-contente-vous-rencontrer-f', word:'contente de vous rencontrer', translation:'contenta de conocerle (femenino)', emoji:'😊' },
-          { id:'contact-content-te-rencontrer-m', word:'content de te rencontrer', translation:'contento de conocerte (masculino)', emoji:'😊' },
-          { id:'contact-contente-te-rencontrer-f', word:'contente de te rencontrer', translation:'contenta de conocerte (femenino)', emoji:'😊' },
-          { id:'contact-ca-fait-plaisir-de-vous-voir', word:'ça fait plaisir de vous voir', translation:'me alegra verle', emoji:'😊' },
-          { id:'contact-ca-fait-plaisir-de-te-voir', word:'ça fait plaisir de te voir', translation:'me alegra verte', emoji:'😊' },
-          { id:'contact-on-se-connait', word:'on se connaît ?', translation:'¿nos conocemos?', emoji:'❓' }
+          { id:'contact-faire-connaissance', word:'faire connaissance', translation:'conocerse / entablar conocimiento', partOfSpeech:'expression', emoji:'🤝' },
+          { id:'contact-ravi-faire-votre-connaissance', word:'ravi de faire votre connaissance', translation:'encantado de conocerle', partOfSpeech:'expression', adjectiveForms:{ masculineSingular:'ravi de faire votre connaissance', feminineSingular:'ravie de faire votre connaissance', masculinePlural:'ravis de faire votre connaissance', femininePlural:'ravies de faire votre connaissance' }, adjectiveSpanishForms:{ masculineSingular:'encantado de conocerle', feminineSingular:'encantada de conocerle', masculinePlural:'encantados de conocerle', femininePlural:'encantadas de conocerle' }, audioGroups:[['masculineSingular','feminineSingular','masculinePlural','femininePlural']], emoji:'🤝' },
+          { id:'contact-ravi-faire-ta-connaissance', word:'ravi de faire ta connaissance', translation:'encantado de conocerte', partOfSpeech:'expression', adjectiveForms:{ masculineSingular:'ravi de faire ta connaissance', feminineSingular:'ravie de faire ta connaissance', masculinePlural:'ravis de faire ta connaissance', femininePlural:'ravies de faire ta connaissance' }, adjectiveSpanishForms:{ masculineSingular:'encantado de conocerte', feminineSingular:'encantada de conocerte', masculinePlural:'encantados de conocerte', femininePlural:'encantadas de conocerte' }, audioGroups:[['masculineSingular','feminineSingular','masculinePlural','femininePlural']], emoji:'🤝' },
+          { id:'contact-content-vous-rencontrer', word:'content de vous rencontrer', translation:'contento de conocerle', partOfSpeech:'expression', adjectiveForms:{ masculineSingular:'content de vous rencontrer', feminineSingular:'contente de vous rencontrer', masculinePlural:'contents de vous rencontrer', femininePlural:'contentes de vous rencontrer' }, adjectiveSpanishForms:{ masculineSingular:'contento de conocerle', feminineSingular:'contenta de conocerle', masculinePlural:'contentos de conocerle', femininePlural:'contentas de conocerle' }, audioGroups:[['masculineSingular','masculinePlural'],['feminineSingular','femininePlural']], emoji:'😊' },
+          { id:'contact-content-te-rencontrer', word:'content de te rencontrer', translation:'contento de conocerte', partOfSpeech:'expression', adjectiveForms:{ masculineSingular:'content de te rencontrer', feminineSingular:'contente de te rencontrer', masculinePlural:'contents de te rencontrer', femininePlural:'contentes de te rencontrer' }, adjectiveSpanishForms:{ masculineSingular:'contento de conocerte', feminineSingular:'contenta de conocerte', masculinePlural:'contentos de conocerte', femininePlural:'contentas de conocerte' }, audioGroups:[['masculineSingular','masculinePlural'],['feminineSingular','femininePlural']], emoji:'😊' },
+          { id:'contact-ca-fait-plaisir-de-vous-voir', word:'ça fait plaisir de vous voir', translation:'me alegra verle', partOfSpeech:'expression', emoji:'😊' },
+          { id:'contact-ca-fait-plaisir-de-te-voir', word:'ça fait plaisir de te voir', translation:'me alegra verte', partOfSpeech:'expression', emoji:'😊' },
+          { id:'contact-on-se-connait', word:'on se connaît ?', translation:'¿nos conocemos?', partOfSpeech:'expression', emoji:'❓' }
         ]
       },
       {
         id: 'greetings-courtesy-contact',
         title: 'Fórmulas de cortesía y contacto',
         entries: [
-          { id:'courtesy-sil-vous-plait', word:"s'il vous plaît", translation:'por favor', emoji:'🙏' },
-          { id:'courtesy-sil-te-plait', word:"s'il te plaît", translation:'por favor', emoji:'🙏' },
-          { id:'courtesy-merci', word:'merci', translation:'gracias', emoji:'🙏' },
-          { id:'courtesy-merci-beaucoup', word:'merci beaucoup', translation:'muchas gracias', emoji:'🙏' },
-          { id:'courtesy-de-rien', word:'de rien', translation:'de nada', emoji:'😊' },
-          { id:'courtesy-avec-plaisir', word:'avec plaisir', translation:'con mucho gusto', emoji:'😊' },
-          { id:'courtesy-je-vous-en-prie', word:'je vous en prie', translation:'de nada / por favor', emoji:'🙏' },
-          { id:'courtesy-excusez-moi', word:'excusez-moi', translation:'disculpe', emoji:'🙏' },
-          { id:'courtesy-excuse-moi', word:'excuse-moi', translation:'disculpa', emoji:'🙏' },
-          { id:'courtesy-pardon', word:'pardon', translation:'perdón / disculpe', emoji:'🙏' },
-          { id:'courtesy-desole-m', word:'désolé', translation:'lo siento (masculino)', emoji:'🙏' },
-          { id:'courtesy-desolee-f', word:'désolée', translation:'lo siento (femenino)', emoji:'🙏' },
-          { id:'courtesy-tu-habites-ou', word:'tu habites où ?', translation:'¿dónde vives?', emoji:'🏠' },
-          { id:'courtesy-vous-habitez-ou', word:'vous habitez où ?', translation:'¿dónde vive?', emoji:'🏠' },
-          { id:'courtesy-jhabite-a', word:"j'habite à", translation:'vivo en', emoji:'🏠' }
+          { id:'courtesy-sil-vous-plait', word:"s'il vous plaît", translation:'por favor (tratamiento formal)', partOfSpeech:'expression', emoji:'🙏' },
+          { id:'courtesy-sil-te-plait', word:"s'il te plaît", translation:'por favor (tratamiento informal)', partOfSpeech:'expression', emoji:'🙏' },
+          { id:'courtesy-merci', word:'merci', translation:'gracias', partOfSpeech:'interjection', emoji:'🙏' },
+          { id:'courtesy-merci-beaucoup', word:'merci beaucoup', translation:'muchas gracias', partOfSpeech:'expression', emoji:'🙏' },
+          { id:'courtesy-de-rien', word:'de rien', translation:'de nada', partOfSpeech:'expression', emoji:'😊' },
+          { id:'courtesy-avec-plaisir', word:'avec plaisir', translation:'con mucho gusto', partOfSpeech:'expression', emoji:'😊' },
+          { id:'courtesy-je-vous-en-prie', word:'je vous en prie', translation:'de nada (formal)', partOfSpeech:'expression', emoji:'🙏' },
+          { id:'courtesy-excusez-moi', word:'excusez-moi', translation:'disculpe', partOfSpeech:'expression', emoji:'🙏' },
+          { id:'courtesy-excuse-moi', word:'excuse-moi', translation:'disculpa', partOfSpeech:'expression', emoji:'🙏' },
+          { id:'courtesy-pardon', word:'pardon', translation:'perdón', partOfSpeech:'interjection', emoji:'🙏' },
+          { id:'courtesy-desole-m', word:'désolé', translation:'lo siento (masculino)', partOfSpeech:'adjective', audioGroupId:'courtesy-desole-audio', emoji:'🙏' },
+          { id:'courtesy-desolee-f', word:'désolée', translation:'lo siento (femenino)', partOfSpeech:'adjective', audioGroupId:'courtesy-desole-audio', emoji:'🙏' },
+          { id:'courtesy-tu-habites-ou', word:'tu habites où ?', translation:'¿dónde vives?', partOfSpeech:'expression', emoji:'🏠' },
+          { id:'courtesy-vous-habitez-ou', word:'vous habitez où ?', translation:'¿dónde vive?', partOfSpeech:'expression', emoji:'🏠' },
+          { id:'courtesy-jhabite-a', word:"j'habite à", translation:'vivo en', partOfSpeech:'expression', emoji:'🏠' }
         ]
       }
+
     ]
   };
 
