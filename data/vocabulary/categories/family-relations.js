@@ -12,7 +12,7 @@
         entries: [
           {id:'person-father',word:'père',translation:'padre',articleFr:'un',articleEs:'un'},
           {id:'person-mother',word:'mère',translation:'madre',articleFr:'une',articleEs:'una'},
-          {id:'person-girl',word:'fille',translation:'hija',articleFr:'une',articleEs:'una'},
+          {id:'person-girl',word:'fille',translation:'hija',articleFr:'une',articleEs:'una',audioGroupId:'person-girl-family-granddaughter'},
           {id:'person-brother',word:'frère',translation:'hermano',articleFr:'un',articleEs:'un'},
           {id:'person-sister',word:'sœur',translation:'hermana',articleFr:'une',articleEs:'una'},
           {id:'family-parents',word:'parents',translation:'padres',articleFr:'des',articleEs:'unos'},
@@ -20,7 +20,7 @@
           {id:'family-grandfather',word:'grand-père',translation:'abuelo',articleFr:'un',articleEs:'un'},
           {id:'family-grandmother',word:'grand-mère',translation:'abuela',articleFr:'une',articleEs:'una'},
           {id:'family-grandson',word:'petit-fils',translation:'nieto',articleFr:'un',articleEs:'un'},
-          {id:'family-granddaughter',word:'petite-fille',translation:'nieta',articleFr:'une',articleEs:'una'}
+          {id:'family-granddaughter',word:'petite-fille',translation:'nieta',articleFr:'une',articleEs:'una',audioGroupId:'person-girl-family-granddaughter'}
         ]
       },
       {
@@ -59,8 +59,8 @@
           {id:'family-husband',word:'mari',translation:'marido / esposo',articleFr:'un',articleEs:'un'},
           {id:'family-spouse-f',word:'épouse',translation:'esposa / cónyuge',articleFr:'une',articleEs:'una'},
           {id:'family-spouse-m',word:'époux',translation:'esposo / cónyuge',articleFr:'un',articleEs:'un'},
-          {id:'family-fiance-m',word:'fiancé',translation:'prometido',articleFr:'un',articleEs:'un'},
-          {id:'family-fiance-f',word:'fiancée',translation:'prometida',articleFr:'une',articleEs:'una'},
+          {id:'family-fiance-m',word:'fiancé',translation:'prometido',articleFr:'un',articleEs:'un',audioGroupId:'family-fiance-m-family-fiance-f'},
+          {id:'family-fiance-f',word:'fiancée',translation:'prometida',articleFr:'une',articleEs:'una',audioGroupId:'family-fiance-m-family-fiance-f'},
           {id:'family-boyfriend',word:'petit ami',translation:'novio',articleFr:'un',articleEs:'un'},
           {id:'family-girlfriend',word:'petite amie',translation:'novia',articleFr:'une',articleEs:'una'},
           {id:'family-ex-husband',word:'ex-mari',translation:'exmarido',articleFr:'un',articleEs:'un'},
@@ -74,12 +74,12 @@
           {id:'family-family',word:'famille',translation:'familia',articleFr:'une',articleEs:'una'},
           {id:'family-generation',word:'génération',translation:'generación',articleFr:'une',articleEs:'una'},
           {id:'family-kin-member',word:'membre de la famille',translation:'miembro de la familia',articleFr:'un',articleEs:'un'},
-          {id:'family-ancestor',word:'ancêtre',translation:'antepasado',articleFr:'un',articleEs:'un'},
-          {id:'family-descendant',word:'descendant',translation:'descendiente',articleFr:'un',articleEs:'un'},
-          {id:'family-twin-m',word:'jumeau',translation:'gemelo',articleFr:'un',articleEs:'un'},
-          {id:'family-twin-f',word:'jumelle',translation:'gemela',articleFr:'une',articleEs:'una'},
-          {id:'family-elder-m',word:'aîné',translation:'hijo mayor / hermano mayor',articleFr:'un',articleEs:'un'},
-          {id:'family-elder-f',word:'aînée',translation:'hija mayor / hermana mayor',articleFr:'une',articleEs:'una'},
+          {id:'family-ancestor',word:'ancêtre',translation:'antepasado / antepasada',articleFr:'un / une',articleEs:'un / una',partOfSpeech:'sustantivo',genderVariants:{masculine:{article:'un',translation:'antepasado',plural:'ancêtres'},feminine:{article:'une',translation:'antepasada',plural:'ancêtres'}}},
+          {id:'family-descendant',word:'descendant',translation:'descendiente',articleFr:'un',articleEs:'un',partOfSpeech:'sustantivo',genderVariants:{masculine:{article:'un',word:'descendant',translation:'descendiente',plural:'descendants'},feminine:{article:'une',word:'descendante',translation:'descendiente',plural:'descendantes'}}},
+          {id:'family-twin-m',word:'jumeau',translation:'gemelo',articleFr:'un',articleEs:'un',audioGroupId:'family-twin-m-family-twin-f'},
+          {id:'family-twin-f',word:'jumelle',translation:'gemela',articleFr:'une',articleEs:'una',audioGroupId:'family-twin-m-family-twin-f'},
+          {id:'family-elder-m',word:'aîné',translation:'hijo mayor / hermano mayor',articleFr:'un',articleEs:'un',audioGroupId:'family-elder-m-family-elder-f'},
+          {id:'family-elder-f',word:'aînée',translation:'hija mayor / hermana mayor',articleFr:'une',articleEs:'una',audioGroupId:'family-elder-m-family-elder-f'},
           {id:'family-younger-m',word:'cadet',translation:'hijo menor / hermano menor',articleFr:'un',articleEs:'un'},
           {id:'family-younger-f',word:'cadette',translation:'hija menor / hermana menor',articleFr:'une',articleEs:'una'}
         ]
@@ -88,7 +88,7 @@
         id: 'family-social-relations',
         title: 'Relaciones sociales',
         entries: [
-          {id:'family-classmate-m',word:'camarade',translation:'compañero / compañera',articleFr:'un',articleEs:'un'},
+          {id:'family-classmate-m',word:'camarade',translation:'compañero / compañera',articleFr:'un / une',articleEs:'un / una',partOfSpeech:'sustantivo',genderVariants:{masculine:{article:'un',translation:'compañero',plural:'camarades'},feminine:{article:'une',translation:'compañera',plural:'camarades'}}},
           {id:'family-acquaintance',word:'connaissance',translation:'conocido / conocida',articleFr:'une',articleEs:'una'},
           {id:'family-friend-m',word:'ami',translation:'amigo',articleFr:'un',articleEs:'un'},
           {id:'family-friend-f',word:'amie',translation:'amiga',articleFr:'une',articleEs:'una'},
@@ -98,8 +98,8 @@
           {id:'family-girlfriend-informal-f',word:'petite copine',translation:'novia',articleFr:'une',articleEs:'una'},
           {id:'family-widower-m',word:'veuf',translation:'viudo',articleFr:'un',articleEs:'un'},
           {id:'family-widow-f',word:'veuve',translation:'viuda',articleFr:'une',articleEs:'una'},
-          {id:'family-colleague',word:'collègue',translation:'colega / compañero / compañera',articleFr:'un / une',articleEs:'un / una'},
-          {id:'family-partner',word:'partenaire',translation:'compañero / pareja',articleFr:'un',articleEs:'un'}
+          {id:'family-colleague',word:'collègue',translation:'colega / compañero / compañera',articleFr:'un / une',articleEs:'un / una',partOfSpeech:'sustantivo',genderVariants:{masculine:{article:'un',translation:'colega / compañero',plural:'collègues'},feminine:{article:'une',translation:'colega / compañera',plural:'collègues'}}},
+          {id:'family-partner',word:'partenaire',translation:'compañero / compañera / pareja',articleFr:'un / une',articleEs:'un / una',partOfSpeech:'sustantivo',genderVariants:{masculine:{article:'un',translation:'compañero / pareja',plural:'partenaires'},feminine:{article:'une',translation:'compañera / pareja',plural:'partenaires'}}}
         ]
       }
     ]
