@@ -20,7 +20,7 @@
           {id:'family-grandfather',word:'grand-père',translation:'abuelo',articleFr:'un',articleEs:'un'},
           {id:'family-grandmother',word:'grand-mère',translation:'abuela',articleFr:'une',articleEs:'una'},
           {id:'family-grandson',word:'petit-fils',translation:'nieto',articleFr:'un',articleEs:'un'},
-          {id:'family-granddaughter',word:'petite-fille',translation:'nieta',articleFr:'une',articleEs:'una',audioGroupId:'person-girl-family-granddaughter'}
+          {id:'family-granddaughter',word:'petite-fille',translation:'nieta',articleFr:'une',articleEs:'una'}
         ]
       },
       {
@@ -77,7 +77,7 @@
           {id:'family-ancestor',word:'ancêtre',translation:'antepasado / antepasada',articleFr:'un / une',articleEs:'un / una',partOfSpeech:'sustantivo',genderVariants:{masculine:{article:'un',translation:'antepasado',plural:'ancêtres'},feminine:{article:'une',translation:'antepasada',plural:'ancêtres'}}},
           {id:'family-descendant',word:'descendant',translation:'descendiente',articleFr:'un',articleEs:'un',partOfSpeech:'sustantivo',genderVariants:{masculine:{article:'un',word:'descendant',translation:'descendiente',plural:'descendants'},feminine:{article:'une',word:'descendante',translation:'descendiente',plural:'descendantes'}}},
           {id:'family-twin-m',word:'jumeau',translation:'gemelo',articleFr:'un',articleEs:'un'},
-          {id:'family-twin-f',word:'jumelle',translation:'gemela',articleFr:'une',articleEs:'una',audioGroupId:'family-twin-m-family-twin-f'},
+          {id:'family-twin-f',word:'jumelle',translation:'gemela',articleFr:'une',articleEs:'una'},
           {id:'family-elder-m',word:'aîné',translation:'hijo mayor / hermano mayor',articleFr:'un',articleEs:'un',audioGroupId:'family-elder-m-family-elder-f'},
           {id:'family-elder-f',word:'aînée',translation:'hija mayor / hermana mayor',articleFr:'une',articleEs:'una',audioGroupId:'family-elder-m-family-elder-f'},
           {id:'family-younger-m',word:'cadet',translation:'hijo menor / hermano menor',articleFr:'un',articleEs:'un'},
