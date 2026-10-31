@@ -85,6 +85,8 @@
             articleFr: entry.articleFr || "", articleEs: entry.articleEs || "", emoji: entry.emoji || "",
             partOfSpeech, pluralFr: entry.pluralFr || entry.plural || "",
             adjectiveForms: entry.adjectiveForms || null,
+            adjectiveSpanishForms: entry.adjectiveSpanishForms || null,
+            detailCategoryLabel: entry.detailCategoryLabel || '',
             categoryId: source.id, categoryName: source.title, subcategoryId: sub.id, subcategoryName: sub.title
           };
         })
@@ -202,13 +204,17 @@
       const articleLabel = article && gender ? `${definedArticle} / ${article} (${gender})` : "";
       const plural = nounPlural(word);
       details = `<div class="vocabulary-detail-grid">${articleLabel ? `<div class="vocabulary-detail-cell"><span>Artículo</span><strong>${escapeHTML(articleLabel)}</strong></div>` : ""}${plural ? `<div class="vocabulary-detail-cell"><span>Plural</span><strong>${escapeHTML(plural)}</strong></div>` : ""}</div>`;
+    } else if (word.detailCategoryLabel && !word.adjectiveForms) {
+      details = `<div class="vocabulary-detail-grid"><div class="vocabulary-detail-cell"><span>Categoría</span><strong>${escapeHTML(word.detailCategoryLabel)}</strong></div></div>`;
     } else if (type === "adjetivo" || word.adjectiveForms) {
       const forms = adjectiveInflections(word);
+      const spanishForms = word.adjectiveSpanishForms || {};
       details = `<div class="vocabulary-detail-grid vocabulary-adjective-grid">
-        <div class="vocabulary-detail-cell"><span>Masculino singular</span><strong>${escapeHTML(forms.ms || "")}</strong></div>
-        <div class="vocabulary-detail-cell"><span>Femenino singular</span><strong>${escapeHTML(forms.fs || "No disponible")}</strong></div>
-        <div class="vocabulary-detail-cell"><span>Masculino plural</span><strong>${escapeHTML(forms.mp || "No disponible")}</strong></div>
-        <div class="vocabulary-detail-cell"><span>Femenino plural</span><strong>${escapeHTML(forms.fp || "No disponible")}</strong></div>
+        <div class="vocabulary-detail-cell"><span>Categoría</span><strong>${escapeHTML(word.detailCategoryLabel || "Adjetivo")}</strong></div>
+        <div class="vocabulary-detail-cell"><span>Masculino singular</span><strong>${escapeHTML(forms.ms || "")}</strong><small>${escapeHTML(spanishForms.masculineSingular || "")}</small></div>
+        <div class="vocabulary-detail-cell"><span>Femenino singular</span><strong>${escapeHTML(forms.fs || "No disponible")}</strong><small>${escapeHTML(spanishForms.feminineSingular || "")}</small></div>
+        <div class="vocabulary-detail-cell"><span>Masculino plural</span><strong>${escapeHTML(forms.mp || "No disponible")}</strong><small>${escapeHTML(spanishForms.masculinePlural || "")}</small></div>
+        <div class="vocabulary-detail-cell"><span>Femenino plural</span><strong>${escapeHTML(forms.fp || "No disponible")}</strong><small>${escapeHTML(spanishForms.femininePlural || "")}</small></div>
       </div>`;
     } else if (type === "verbo" || type === "adverbio") {
       details = `<div class="vocabulary-detail-grid"><div class="vocabulary-detail-cell"><span>Categoría</span><strong>${type === "verbo" ? "Verbo" : "Adverbio"}</strong></div><div class="vocabulary-detail-cell"><span>Variación</span><strong>Invariable</strong></div></div>`;
