@@ -178,3 +178,11 @@
 .vocabulary-filter-actions{grid-column:1/-1;display:flex;justify-content:flex-end}
 .vocabulary-filter-actions .button{min-height:2.8rem;padding:.7rem 1.15rem}
 @media(max-width:600px){.vocabulary-filter-actions{justify-content:stretch}.vocabulary-filter-actions .button{width:100%}}
+
+
+/* Ficha de números ordinales: categoría separada y traducciones alineadas */
+.vocabulary-numeral-adjective-grid .vocabulary-numeral-category{grid-column:1/-1}
+.vocabulary-numeral-adjective-grid .vocabulary-detail-cell strong,
+.vocabulary-numeral-adjective-grid .vocabulary-detail-cell small{display:block}
+.vocabulary-numeral-adjective-grid .vocabulary-detail-cell strong{margin-top:.18rem}
+.vocabulary-numeral-adjective-grid .vocabulary-detail-cell small{margin-top:.2rem;color:var(--color-muted);font-size:.82rem;line-height:1.35}
