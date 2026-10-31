@@ -5,7 +5,8 @@
   const makeEntries = (prefix, pairs) => pairs.map(([word, translation], index) => ({
     id: 'numbers-' + prefix + '-' + String(index + 1).padStart(2, '0'),
     word,
-    translation
+    translation,
+    detailCategoryLabel: 'Determinante numeral'
   }));
 
   const makeOrdinal = (id, word, translation, forms, spanishForms, audioGroups) => ({
