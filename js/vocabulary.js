@@ -82,7 +82,7 @@
           const partOfSpeech = inferPartOfSpeech(entry, source, sub);
           return {
             id: entry.id, french: frenchLabel(entry), lemma: entry.word, spanish: entry.translation,
-            articleFr: entry.articleFr || "", articleEs: entry.articleEs || "", emoji: entry.emoji || "",
+            articleFr: entry.articleFr || "", articleEs: entry.articleEs || "", genderVariants: entry.genderVariants || null, emoji: entry.emoji || "",
             partOfSpeech, pluralFr: entry.pluralFr || entry.plural || "",
             adjectiveForms: entry.adjectiveForms || null,
             adjectiveSpanishForms: entry.adjectiveSpanishForms || null,
@@ -199,11 +199,18 @@
     if (type === "sustantivo") {
       const article = String(word.articleFr || "").trim();
       const normalizedArticle = normalize(article);
-      const gender = normalizedArticle === "un" ? "masculino" : normalizedArticle === "une" ? "femenino" : "";
-      const definedArticle = gender && /^[aeiouyàâäéèêëîïôöùûüÿ]/iu.test(word.lemma || "") ? "l’" : (gender === "masculino" ? "le" : gender === "femenino" ? "la" : "");
-      const articleLabel = article && gender ? `${definedArticle} / ${article} (${gender})` : "";
       const plural = nounPlural(word);
-      details = `<div class="vocabulary-detail-grid">${articleLabel ? `<div class="vocabulary-detail-cell"><span>Artículo</span><strong>${escapeHTML(articleLabel)}</strong></div>` : ""}${plural ? `<div class="vocabulary-detail-cell"><span>Plural</span><strong>${escapeHTML(plural)}</strong></div>` : ""}</div>`;
+      if (word.genderVariants) {
+        const variants = word.genderVariants;
+        const genderCell = (label, variant) => `<div class="vocabulary-detail-cell"><span>${label}</span><strong>${escapeHTML(variant.article + " " + (variant.word || word.lemma))}</strong><small>${escapeHTML(variant.translation || "")}</small></div>`;
+        const pluralCell = `<div class="vocabulary-detail-cell"><span>Plural</span><strong>${escapeHTML("les " + (variants.masculine.plural || variants.feminine.plural || ""))}</strong></div>`;
+        details = `<div class="vocabulary-detail-grid vocabulary-gender-variants">${genderCell("Masculino", variants.masculine)}${genderCell("Femenino", variants.feminine)}${pluralCell}</div>`;
+      } else {
+        const gender = normalizedArticle === "un" ? "masculino" : normalizedArticle === "une" ? "femenino" : "";
+        const definedArticle = gender && /^[aeiouyàâäéèêëîïôöùûüÿ]/iu.test(word.lemma || "") ? "l’" : (gender === "masculino" ? "le" : gender === "femenino" ? "la" : "");
+        const articleLabel = article && gender ? `${definedArticle} / ${article} (${gender})` : "";
+        details = `<div class="vocabulary-detail-grid">${articleLabel ? `<div class="vocabulary-detail-cell"><span>Artículo</span><strong>${escapeHTML(articleLabel)}</strong></div>` : ""}${plural ? `<div class="vocabulary-detail-cell"><span>Plural</span><strong>${escapeHTML(plural)}</strong></div>` : ""}</div>`;
+      }
     } else if (word.detailCategoryLabel && !word.adjectiveForms) {
       details = `<div class="vocabulary-detail-grid"><div class="vocabulary-detail-cell"><span>Categoría</span><strong>${escapeHTML(word.detailCategoryLabel)}</strong></div></div>`;
     } else if (type === "adjetivo" || word.adjectiveForms) {
