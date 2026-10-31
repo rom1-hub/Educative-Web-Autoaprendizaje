@@ -48,7 +48,8 @@
           spanish: String(entry.translation || ""), emoji: entry.emoji || "",
           adjectiveForms: entry.adjectiveForms || null,
           adjectiveSpanishForms: entry.adjectiveSpanishForms || null,
-          audioGroups: Array.isArray(entry.audioGroups) ? entry.audioGroups : null
+          audioGroups: Array.isArray(entry.audioGroups) ? entry.audioGroups : null,
+          audioGroupId: entry.audioGroupId || null
         }))
       }))
     };
@@ -126,7 +127,21 @@
     return variants.length ? variants : [{ ...word, exerciseId: word.id, answerId: word.id, french: word.french, spanish: word.spanish }];
   }
 
-  function audioVariants(word) {
+  function audioVariants(word, allWords = wordsForSelection()) {
+    if (word.audioGroupId) {
+      const members = allWords.filter(item => item.audioGroupId === word.audioGroupId);
+      if (members.length && members[0].id !== word.id) return [];
+      const translations = [...new Set(members.map(item =>
+        String(item.spanish || "").replace(/\\s*\\((?:masculino|femenino)\\)/gi, "").trim()
+      ).filter(Boolean))];
+      return [{
+        ...word,
+        exerciseId: `audio-group::${word.audioGroupId}`,
+        answerId: `audio-group::${word.audioGroupId}`,
+        spanish: translations.join(" / "),
+        audioFrench: word.french
+      }];
+    }
     if (!word.audioGroups?.length || !word.adjectiveForms) {
       return [{ ...word, exerciseId: word.id, answerId: word.id, audioFrench: word.french }];
     }
@@ -155,7 +170,7 @@
     }
     exerciseType = type;
     const candidates = type === "audio"
-      ? words.flatMap(audioVariants)
+      ? words.flatMap(word => audioVariants(word, words))
       : words.flatMap(writtenVariants);
     questions = shuffle(candidates).slice(0, Math.min(10, candidates.length));
     questionIndex = 0; score = 0; selectedAnswer = ""; answerChecked = false; finished = false;
@@ -166,10 +181,10 @@
     // Las opciones se obtienen exclusivamente de la subcategoría seleccionada.
     const words = wordsForSelection();
     if (type === "audio") {
-      const unique = new Map([[normalize(correct.spanish), correct]]);
-      words.forEach(word => {
-        const key = normalize(word.spanish);
-        if (key && !unique.has(key)) unique.set(key, word);
+      const unique = new Map();
+      words.flatMap(word => audioVariants(word, words)).forEach(option => {
+        const key = normalize(option.spanish);
+        if (key && !unique.has(key)) unique.set(key, option);
       });
       unique.delete(normalize(correct.spanish));
       const selected = shuffle([...unique.values()]).slice(0, 3);
