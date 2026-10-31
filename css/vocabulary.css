@@ -186,3 +186,9 @@
 .vocabulary-numeral-adjective-grid .vocabulary-detail-cell small{display:block}
 .vocabulary-numeral-adjective-grid .vocabulary-detail-cell strong{margin-top:.18rem}
 .vocabulary-numeral-adjective-grid .vocabulary-detail-cell small{margin-top:.2rem;color:var(--color-muted);font-size:.82rem;line-height:1.35}
+
+/* Fichas con variantes de género: separar la forma francesa de su traducción */
+.vocabulary-gender-variants .vocabulary-detail-cell strong,
+.vocabulary-gender-variants .vocabulary-detail-cell small{display:block}
+.vocabulary-gender-variants .vocabulary-detail-cell strong{margin-top:.18rem}
+.vocabulary-gender-variants .vocabulary-detail-cell small{margin-top:.2rem}
