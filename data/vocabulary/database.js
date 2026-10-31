@@ -16,7 +16,7 @@
   const MANIFEST = Object.freeze([
     Object.freeze({id:'greetings-presentations',title:'Saludos y presentaciones',src:'data/vocabulary/categories/greetings-presentations.js?v=20261031-1'}),
     Object.freeze({id:'numbers-cardinal-ordinal',title:'Números cardinales y ordinales',src:'data/vocabulary/categories/numbers-cardinal-ordinal.js?v=20261031-1'}),
-    Object.freeze({id:'family-relations',title:'Familia y relaciones',src:'data/vocabulary/categories/family-relations.js?v=20261031-1'}),
+    Object.freeze({id:'family-relations',title:'Familia y relaciones',src:'data/vocabulary/categories/family-relations.js?v=20261031-2'}),
     Object.freeze({id:'body-person',title:'Cuerpo y persona',src:'data/vocabulary/categories/body.js?v=20260919-6'}),
     Object.freeze({id:'house',title:'Casa',src:'data/vocabulary/categories/house.js?v=20260920-8'}),
     Object.freeze({id:'daily-life-routines',title:'Vida cotidiana y rutinas',src:'data/vocabulary/categories/daily-life-routines.js?v=20260921-1'}),
