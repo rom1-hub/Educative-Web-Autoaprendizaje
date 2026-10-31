@@ -209,8 +209,8 @@
     } else if (type === "adjetivo" || word.adjectiveForms) {
       const forms = adjectiveInflections(word);
       const spanishForms = word.adjectiveSpanishForms || {};
-      details = `<div class="vocabulary-detail-grid vocabulary-adjective-grid vocabulary-numeral-adjective-grid">
-        <div class="vocabulary-detail-cell vocabulary-numeral-category"><span>Categoría</span><strong>${escapeHTML(word.detailCategoryLabel || "Adjetivo")}</strong></div>
+      details = `<div class="vocabulary-detail-grid vocabulary-adjective-grid ${word.detailCategoryLabel ? "vocabulary-numeral-adjective-grid" : ""}">
+        <div class="vocabulary-detail-cell ${word.detailCategoryLabel ? "vocabulary-numeral-category" : ""}"><span>Categoría</span><strong>${escapeHTML(word.detailCategoryLabel || "Adjetivo")}</strong></div>
         <div class="vocabulary-detail-cell"><span>Masculino singular</span><strong>${escapeHTML(forms.ms || "")}</strong><small>${escapeHTML(spanishForms.masculineSingular || "")}</small></div>
         <div class="vocabulary-detail-cell"><span>Femenino singular</span><strong>${escapeHTML(forms.fs || "No disponible")}</strong><small>${escapeHTML(spanishForms.feminineSingular || "")}</small></div>
         <div class="vocabulary-detail-cell"><span>Masculino plural</span><strong>${escapeHTML(forms.mp || "No disponible")}</strong><small>${escapeHTML(spanishForms.masculinePlural || "")}</small></div>
