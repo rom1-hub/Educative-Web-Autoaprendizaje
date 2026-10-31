@@ -203,8 +203,10 @@
       if (word.genderVariants) {
         const variants = word.genderVariants;
         const genderCell = (label, variant) => `<div class="vocabulary-detail-cell"><span>${label}</span><strong>${escapeHTML(variant.article + " " + (variant.word || word.lemma))}</strong><small>${escapeHTML(variant.translation || "")}</small></div>`;
-        const pluralCell = `<div class="vocabulary-detail-cell"><span>Plural</span><strong>${escapeHTML("les " + (variants.masculine.plural || variants.feminine.plural || ""))}</strong></div>`;
-        details = `<div class="vocabulary-detail-grid vocabulary-gender-variants">${genderCell("Masculino", variants.masculine)}${genderCell("Femenino", variants.feminine)}${pluralCell}</div>`;
+        const pluralCells = variants.masculine.plural === variants.feminine.plural
+          ? `<div class="vocabulary-detail-cell"><span>Plural</span><strong>${escapeHTML("les " + variants.masculine.plural)}</strong></div>`
+          : `<div class="vocabulary-detail-cell"><span>Plural masculino</span><strong>${escapeHTML("les " + variants.masculine.plural)}</strong></div><div class="vocabulary-detail-cell"><span>Plural femenino</span><strong>${escapeHTML("les " + variants.feminine.plural)}</strong></div>`;
+        details = `<div class="vocabulary-detail-grid vocabulary-gender-variants">${genderCell("Masculino", variants.masculine)}${genderCell("Femenino", variants.feminine)}${pluralCells}</div>`;
       } else {
         const gender = normalizedArticle === "un" ? "masculino" : normalizedArticle === "une" ? "femenino" : "";
         const definedArticle = gender && /^[aeiouyàâäéèêëîïôöùûüÿ]/iu.test(word.lemma || "") ? "l’" : (gender === "masculino" ? "le" : gender === "femenino" ? "la" : "");
