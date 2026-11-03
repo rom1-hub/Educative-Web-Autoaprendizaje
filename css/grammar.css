@@ -379,3 +379,40 @@ a.grammar-search-result:hover { border-color:rgba(7,91,232,.35); background:#f8f
  .grammar-adj-table th,.grammar-adj-table td { padding: .58rem .65rem; }
  .grammar-adj-table { min-width: 450px; }
 }
+
+/* Lección A1: adjetivos plurales */
+.grammar-plural-hero { padding-bottom: 2.6rem; }
+.grammar-plural-hero h1 { max-width: 900px; margin: .7rem 0 .45rem; font-size: clamp(2.1rem,4.8vw,3.5rem); }
+.grammar-plural-hero > .container > p { margin: 0; color: var(--color-ink-soft); font-size: 1.12rem; font-weight: 650; }
+.grammar-plural-content { display: grid; gap: 1.5rem; max-width: 1050px; padding-top: 2.25rem; padding-bottom: 5rem; }
+.grammar-plural-content .grammar-lesson-section { margin: 0; }
+.grammar-plural-heading { margin-bottom: 1.15rem; }
+.grammar-plural-heading .eyebrow { display: inline-block; margin-bottom: .45rem; }
+.grammar-plural-heading h2 { margin: 0; font-size: clamp(1.4rem,3vw,1.9rem); }
+.grammar-plural-subsection { display: grid; gap: .8rem; margin-top: 1.5rem; padding-top: 1.35rem; border-top: 1px solid var(--color-line); }
+.grammar-plural-subsection h3 { margin: 0; color: var(--color-blue); font-size: 1.2rem; }
+.grammar-plural-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--color-line); border-radius: 12px; }
+.grammar-plural-table { width: 100%; min-width: 700px; border-collapse: collapse; }
+.grammar-plural-table th,.grammar-plural-table td { padding: .65rem .7rem; text-align: left; border-bottom: 1px solid var(--color-line); }
+.grammar-plural-table thead th { background: #0b3975; color: #fff; font-size: .9rem; font-weight: 700; }
+.grammar-plural-table tbody td:first-child { background: #fff1df; font-weight: 650; }
+.grammar-plural-table tbody td:nth-child(2),.grammar-plural-table tbody td:nth-child(3) { color: var(--color-blue); font-weight: 700; }
+.grammar-plural-table tbody td:nth-child(4),.grammar-plural-table tbody td:nth-child(5) { background: #fff9c9; color: #493b00; font-weight: 700; }
+.grammar-plural-table tbody tr:last-child td { border-bottom: 0; }
+.grammar-plural-note { padding: 1.15rem 1.3rem; border: 1px solid var(--color-line); border-radius: 14px; background: #eff9f8; line-height: 1.7; }
+.grammar-plural-note h3 { margin: 0 0 .6rem; color: var(--color-blue); }
+.grammar-plural-note p { margin: .55rem 0; }
+.grammar-plural-note ul { display: grid; gap: .4rem; margin: .6rem 0; padding-left: 1.25rem; }
+.grammar-plural-example-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; }
+.grammar-plural-example-grid > div { padding: 1rem 1.1rem; border: 1px solid var(--color-line); border-radius: 12px; background: #fffaf4; }
+.grammar-plural-example-grid h3 { margin: 0 0 .6rem; color: var(--color-blue); }
+.grammar-plural-example-grid ul { display: grid; gap: .5rem; margin: 0; padding-left: 1.2rem; }
+.grammar-plural-content .grammar-lesson-end { margin-top: .25rem; }
+@media (max-width: 700px) {
+ .grammar-plural-content { gap: 1rem; padding-top: 1.25rem; }
+ .grammar-plural-content .grammar-lesson-section { padding: 1.1rem; }
+ .grammar-plural-note { padding: 1rem; }
+ .grammar-plural-example-grid { grid-template-columns: 1fr; }
+ .grammar-plural-table th,.grammar-plural-table td { padding: .58rem .6rem; }
+ .grammar-plural-table { min-width: 660px; }
+}
