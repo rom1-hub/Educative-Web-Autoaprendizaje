@@ -485,3 +485,48 @@ a.grammar-search-result:hover { border-color:rgba(7,91,232,.35); background:#f8f
  .grammar-person-note,.grammar-person-explanation { padding: 1rem; }
  .grammar-person-table th,.grammar-person-table td { padding: .58rem .65rem; }
 }
+
+
+/* Lección A1: verbos regulares en -ER en presente */
+.grammar-er-hero { padding-bottom: 2.6rem; }
+.grammar-er-hero h1 { max-width: 900px; margin: .7rem 0 .45rem; font-size: clamp(2.1rem,4.8vw,3.5rem); }
+.grammar-er-hero > .container > p { margin: 0; color: var(--color-ink-soft); font-size: 1.12rem; font-weight: 650; }
+.grammar-er-content { display: grid; gap: 1.5rem; max-width: 1050px; padding-top: 2.25rem; padding-bottom: 5rem; }
+.grammar-er-content .grammar-lesson-section { margin: 0; }
+.grammar-er-heading { margin-bottom: 1.15rem; }
+.grammar-er-heading .eyebrow { display: inline-block; margin-bottom: .45rem; }
+.grammar-er-heading h2 { margin: 0; font-size: clamp(1.4rem,3vw,1.9rem); }
+.grammar-er-note,.grammar-er-explanation,.grammar-er-phonetic { padding: 1.2rem 1.35rem; border: 1px solid var(--color-line); border-radius: 14px; line-height: 1.7; }
+.grammar-er-note { background: #eff9f8; }
+.grammar-er-explanation { background: #fffaf4; }
+.grammar-er-phonetic { background: #eaf7f7; }
+.grammar-er-note p,.grammar-er-explanation p,.grammar-er-phonetic p { margin: .55rem 0; }
+.grammar-er-note ul,.grammar-er-explanation ul,.grammar-er-phonetic ul { display: grid; gap: .4rem; margin: .6rem 0; padding-left: 1.25rem; }
+.grammar-er-explanation h3 { margin: 1.2rem 0 .45rem; color: var(--color-blue); font-size: 1.15rem; }
+.grammar-er-explanation h3:first-child { margin-top: 0; }
+.grammar-er-root-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .8rem; margin: .9rem 0; }
+.grammar-er-root-grid > div { display: flex; align-items: center; justify-content: space-between; gap: .7rem; padding: .85rem 1rem; border: 1px solid var(--color-line); border-radius: 10px; background: #fff; }
+.grammar-er-root-grid strong { color: var(--color-blue); font-size: 1.15rem; }
+.grammar-er-root-grid span { color: var(--color-ink-soft); font-size: .9rem; }
+.grammar-er-endings { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .65rem; margin-top: .8rem; }
+.grammar-er-endings > div { display: flex; align-items: center; justify-content: space-between; gap: .6rem; padding: .75rem .9rem; border: 1px solid var(--color-line); border-radius: 10px; background: #fff; }
+.grammar-er-endings span { color: var(--color-ink-soft); font-weight: 650; }
+.grammar-er-endings strong { color: var(--color-blue); font-size: 1.1rem; }
+.grammar-er-intro { margin: 0 0 1rem; color: var(--color-ink-soft); }
+.grammar-er-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--color-line); border-radius: 12px; }
+.grammar-er-table { width: 100%; min-width: 540px; border-collapse: collapse; }
+.grammar-er-table th,.grammar-er-table td { padding: .7rem .9rem; text-align: left; border-bottom: 1px solid var(--color-line); }
+.grammar-er-table thead th { background: #0b3975; color: #fff; font-weight: 700; }
+.grammar-er-table tbody td:first-child { background: #fff1df; font-weight: 650; }
+.grammar-er-table tbody td:nth-child(2) { color: var(--color-blue); font-weight: 700; }
+.grammar-er-table tbody tr:last-child td { border-bottom: 0; }
+.grammar-er-phonetic { margin: 0; }
+.grammar-er-content .grammar-lesson-end { margin-top: .25rem; }
+@media (max-width: 700px) {
+ .grammar-er-content { gap: 1rem; padding-top: 1.25rem; }
+ .grammar-er-content .grammar-lesson-section { padding: 1.1rem; }
+ .grammar-er-note,.grammar-er-explanation,.grammar-er-phonetic { padding: 1rem; }
+ .grammar-er-root-grid { grid-template-columns: 1fr; }
+ .grammar-er-endings { grid-template-columns: repeat(2,minmax(0,1fr)); }
+ .grammar-er-table th,.grammar-er-table td { padding: .6rem .7rem; }
+}
