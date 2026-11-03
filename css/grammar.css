@@ -347,3 +347,35 @@ a.grammar-search-result:hover { border-color:rgba(7,91,232,.35); background:#f8f
  .grammar-hours-table th,.grammar-hours-table td { padding: .58rem .65rem; }
  .grammar-hours-table { min-width: 430px; }
 }
+
+/* Lección A1: adjetivos masculinos y femeninos */
+.grammar-adj-hero { padding-bottom: 2.6rem; }
+.grammar-adj-hero h1 { max-width: 900px; margin: .7rem 0 .45rem; font-size: clamp(2.1rem,4.8vw,3.5rem); }
+.grammar-adj-hero > .container > p { margin: 0; color: var(--color-ink-soft); font-size: 1.12rem; font-weight: 650; }
+.grammar-adj-content { display: grid; gap: 1.5rem; max-width: 1000px; padding-top: 2.25rem; padding-bottom: 5rem; }
+.grammar-adj-content .grammar-lesson-section { margin: 0; }
+.grammar-adj-heading { margin-bottom: 1.15rem; }
+.grammar-adj-heading .eyebrow { display: inline-block; margin-bottom: .45rem; }
+.grammar-adj-heading h2 { margin: 0; font-size: clamp(1.4rem,3vw,1.9rem); }
+.grammar-adj-subsection { display: grid; gap: .8rem; margin-top: 1.5rem; padding-top: 1.35rem; border-top: 1px solid var(--color-line); }
+.grammar-adj-subsection h3 { margin: 0; color: var(--color-blue); font-size: 1.2rem; }
+.grammar-adj-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--color-line); border-radius: 12px; }
+.grammar-adj-table { width: 100%; border-collapse: collapse; min-width: 470px; }
+.grammar-adj-table th,.grammar-adj-table td { width: 33.33%; padding: .65rem .8rem; text-align: left; border-bottom: 1px solid var(--color-line); }
+.grammar-adj-table thead th { background: #0b3975; color: #fff; font-weight: 700; }
+.grammar-adj-table tbody td:first-child { background: #fff1df; font-weight: 650; }
+.grammar-adj-table tbody td:nth-child(2),.grammar-adj-table tbody td:nth-child(3) { color: var(--color-blue); font-weight: 700; }
+.grammar-adj-table tbody tr:last-child td { border-bottom: 0; }
+.grammar-adj-note { padding: 1.15rem 1.3rem; border: 1px solid var(--color-line); border-radius: 14px; background: #eff9f8; line-height: 1.7; }
+.grammar-adj-note h3 { margin: 0 0 .6rem; color: var(--color-blue); }
+.grammar-adj-note p { margin: .55rem 0; }
+.grammar-adj-note ul { display: grid; gap: .4rem; margin: .6rem 0; padding-left: 1.25rem; }
+.grammar-adj-note-phonetic { background: #edf7f7; }
+.grammar-adj-content .grammar-lesson-end { margin-top: .25rem; }
+@media (max-width: 600px) {
+ .grammar-adj-content { gap: 1rem; padding-top: 1.25rem; }
+ .grammar-adj-content .grammar-lesson-section { padding: 1.1rem; }
+ .grammar-adj-note { padding: 1rem; }
+ .grammar-adj-table th,.grammar-adj-table td { padding: .58rem .65rem; }
+ .grammar-adj-table { min-width: 450px; }
+}
