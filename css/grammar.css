@@ -206,3 +206,40 @@ a.grammar-search-result:hover { border-color:rgba(7,91,232,.35); background:#f8f
   .grammar-avoir-table th,.grammar-avoir-table td,.grammar-avoir-examples th,.grammar-avoir-examples td,.grammar-avoir-expressions th,.grammar-avoir-expressions td { padding: .7rem .65rem; }
   .grammar-avoir-note { padding: 1rem; }
 }
+
+/* Lección A1: países, regiones y ciudades */
+.grammar-geography-hero { padding-bottom: 2.75rem; }
+.grammar-geography-hero h1 { max-width: 900px; margin: .7rem 0 .45rem; font-size: clamp(2.1rem,4.8vw,3.5rem); }
+.grammar-geography-hero > .container > p { margin: 0; color: var(--color-ink-soft); font-size: 1.12rem; font-weight: 650; }
+.grammar-geography-content { display: grid; gap: 1.5rem; max-width: 1000px; padding-top: 2.25rem; padding-bottom: 5rem; }
+.grammar-geography-content .grammar-lesson-section { margin: 0; }
+.grammar-geography-heading { margin-bottom: 1.15rem; }
+.grammar-geography-heading .eyebrow { display: inline-block; margin-bottom: .45rem; }
+.grammar-geography-heading h2 { margin: 0; font-size: clamp(1.4rem,3vw,1.9rem); }
+.grammar-geography-content p { line-height: 1.7; }
+.grammar-geography-subsection { display: grid; gap: .85rem; margin-top: 1.5rem; padding-top: 1.35rem; border-top: 1px solid var(--color-line); }
+.grammar-geography-subsection h3 { margin: 0; font-size: 1.18rem; color: var(--color-blue); }
+.grammar-geography-subsection h4 { margin: .3rem 0 0; font-size: 1rem; }
+.grammar-geography-subsection > p { margin: 0; }
+.grammar-geography-chip-list { display: flex; flex-wrap: wrap; gap: .55rem; }
+.grammar-geography-chip-list span { display: inline-flex; align-items: center; padding: .48rem .8rem; border: 1px solid var(--color-line); border-radius: 9px; background: #fff8ef; font-weight: 650; }
+.grammar-geography-example-pairs { display: grid; gap: .55rem; }
+.grammar-geography-pair { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: .65rem; align-items: stretch; }
+.grammar-geography-pair > span,.grammar-geography-pair > strong { display: flex; align-items: center; padding: .7rem .85rem; border-radius: 9px; line-height: 1.45; }
+.grammar-geography-pair > span { background: #f6e4cc; border: 1px solid #e8b36f; }
+.grammar-geography-pair > strong { background: #0b3975; color: white; border: 1px solid #e8b36f; font-weight: 650; }
+.grammar-geography-note { padding: 1.15rem 1.3rem; border: 1px solid var(--color-line); border-radius: 14px; background: #eff9f8; line-height: 1.7; }
+.grammar-geography-note h3,.grammar-geography-note h4 { margin: 0 0 .65rem; color: var(--color-blue); }
+.grammar-geography-note p { margin: .45rem 0; }
+.grammar-geography-note ul { display: grid; gap: .4rem; margin: .65rem 0 0; padding-left: 1.25rem; }
+.grammar-geography-warning { background: #fff6ef; border-color: #edc49b; }
+.grammar-geography-warning > strong { display: block; margin-bottom: .35rem; color: #a44327; }
+.grammar-geography-warning .grammar-geography-chip-list { margin-top: .7rem; }
+.grammar-geography-content .grammar-lesson-end { margin-top: .25rem; }
+@media (max-width: 650px) {
+ .grammar-geography-content { gap: 1rem; padding-top: 1.25rem; }
+ .grammar-geography-content .grammar-lesson-section { padding: 1.1rem; }
+ .grammar-geography-pair { grid-template-columns: 1fr; gap: .25rem; }
+ .grammar-geography-pair > span,.grammar-geography-pair > strong { padding: .65rem .75rem; }
+ .grammar-geography-note { padding: 1rem; }
+}
