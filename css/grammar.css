@@ -416,3 +416,38 @@ a.grammar-search-result:hover { border-color:rgba(7,91,232,.35); background:#f8f
  .grammar-plural-table th,.grammar-plural-table td { padding: .58rem .6rem; }
  .grammar-plural-table { min-width: 660px; }
 }
+
+/* Lección A1: el cuerpo humano */
+.grammar-body-hero { padding-bottom: 2.6rem; }
+.grammar-body-hero h1 { max-width: 900px; margin: .7rem 0 .45rem; font-size: clamp(2.1rem,4.8vw,3.5rem); }
+.grammar-body-hero > .container > p { margin: 0; color: var(--color-ink-soft); font-size: 1.12rem; font-weight: 650; }
+.grammar-body-content { display: grid; gap: 1.5rem; max-width: 1000px; padding-top: 2.25rem; padding-bottom: 5rem; }
+.grammar-body-content .grammar-lesson-section { margin: 0; }
+.grammar-body-heading { margin-bottom: 1.15rem; }
+.grammar-body-heading .eyebrow { display: inline-block; margin-bottom: .45rem; }
+.grammar-body-heading h2 { margin: 0; font-size: clamp(1.4rem,3vw,1.9rem); }
+.grammar-body-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--color-line); border-radius: 12px; }
+.grammar-body-table { width: 100%; border-collapse: collapse; min-width: 380px; }
+.grammar-body-table th,.grammar-body-table td { padding: .7rem .9rem; text-align: left; border-bottom: 1px solid var(--color-line); }
+.grammar-body-table thead th { background: #0b3975; color: #fff; font-weight: 700; }
+.grammar-body-table tbody td:first-child { background: #fff1df; font-weight: 650; }
+.grammar-body-table tbody td:nth-child(2) { color: var(--color-blue); font-weight: 700; }
+.grammar-body-table tbody tr:last-child td { border-bottom: 0; }
+.grammar-body-note { margin-top: 1.1rem; padding: 1.15rem 1.3rem; border: 1px solid var(--color-line); border-radius: 14px; background: #eff9f8; line-height: 1.7; }
+.grammar-body-note h3 { margin: 0 0 .6rem; color: var(--color-blue); }
+.grammar-body-note p { margin: .55rem 0; }
+.grammar-body-explanation { padding: 1.2rem 1.3rem; border: 1px solid var(--color-line); border-radius: 14px; background: #fffaf4; line-height: 1.7; }
+.grammar-body-explanation h3 { margin: 1rem 0 .35rem; color: var(--color-blue); }
+.grammar-body-explanation h3:first-of-type { margin-top: .5rem; }
+.grammar-body-explanation p { margin: .5rem 0; }
+.grammar-body-explanation ul { display: grid; gap: .4rem; margin: .5rem 0; padding-left: 1.25rem; }
+.grammar-body-subsection { display: grid; gap: .8rem; margin-top: 1.5rem; padding-top: 1.35rem; border-top: 1px solid var(--color-line); }
+.grammar-body-subsection h3 { margin: 0; color: var(--color-blue); font-size: 1.15rem; }
+.grammar-body-content .grammar-lesson-end { margin-top: .25rem; }
+@media (max-width: 600px) {
+ .grammar-body-content { gap: 1rem; padding-top: 1.25rem; }
+ .grammar-body-content .grammar-lesson-section { padding: 1.1rem; }
+ .grammar-body-note,.grammar-body-explanation { padding: 1rem; }
+ .grammar-body-table th,.grammar-body-table td { padding: .6rem .7rem; }
+ .grammar-body-table { min-width: 350px; }
+}
