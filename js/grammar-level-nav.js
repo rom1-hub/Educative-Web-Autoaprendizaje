@@ -11,6 +11,15 @@
 
   if (!links.length || !sections.length) return;
 
+  let pendingTargetId = null;
+  let previousPendingTargetTop = null;
+
+  const getActivationLine = () => {
+    const styles = window.getComputedStyle(nav);
+    const stickyTop = Number.parseFloat(styles.top) || 0;
+    return stickyTop + nav.offsetHeight + 12;
+  };
+
   const setActiveLevel = (sectionId) => {
     links.forEach((link) => {
       const isCurrent = link.getAttribute("href") === `#${sectionId}`;
@@ -25,9 +34,7 @@
   };
 
   const getCurrentSection = () => {
-    const styles = window.getComputedStyle(nav);
-    const stickyTop = Number.parseFloat(styles.top) || 0;
-    const activationLine = stickyTop + nav.offsetHeight + 12;
+    const activationLine = getActivationLine();
     let currentSection = sections[0];
 
     sections.forEach((section) => {
@@ -40,6 +47,27 @@
   };
 
   const updateFromScrollPosition = () => {
+    if (pendingTargetId) {
+      const pendingSection = sections.find((section) => section.id === pendingTargetId);
+      if (!pendingSection) {
+        pendingTargetId = null;
+        previousPendingTargetTop = null;
+      } else {
+        const targetTop = pendingSection.getBoundingClientRect().top;
+        if (targetTop <= getActivationLine()) {
+          pendingTargetId = null;
+          previousPendingTargetTop = null;
+        } else if (previousPendingTargetTop !== null && targetTop > previousPendingTargetTop + 1) {
+          pendingTargetId = null;
+          previousPendingTargetTop = null;
+        } else {
+          previousPendingTargetTop = targetTop;
+          setActiveLevel(pendingTargetId);
+          return;
+        }
+      }
+    }
+
     const currentSection = getCurrentSection();
     if (currentSection) setActiveLevel(currentSection.id);
   };
@@ -47,7 +75,10 @@
   links.forEach((link) => {
     link.addEventListener("click", () => {
       const targetId = link.getAttribute("href").slice(1);
-      if (sections.some((section) => section.id === targetId)) {
+      const target = sections.find((section) => section.id === targetId);
+      if (target) {
+        pendingTargetId = targetId;
+        previousPendingTargetTop = target.getBoundingClientRect().top;
         setActiveLevel(targetId);
       }
     });
@@ -81,6 +112,7 @@
     window.addEventListener("scroll", updateFromScrollPosition, { passive: true });
   }
 
+  window.addEventListener("scroll", updateFromScrollPosition, { passive: true });
   window.addEventListener("resize", updateFromScrollPosition, { passive: true });
   window.addEventListener("hashchange", () => {
     const target = sections.find((section) => `#${section.id}` === window.location.hash);
