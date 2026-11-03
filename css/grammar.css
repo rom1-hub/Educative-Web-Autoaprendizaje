@@ -642,3 +642,23 @@ a.grammar-search-result:hover { border-color:rgba(7,91,232,.35); background:#f8f
  .grammar-negation-note,.grammar-negation-explanation,.grammar-negation-warning { padding: 1rem; }
  .grammar-negation-table th,.grammar-negation-table td { padding: .62rem .7rem; }
 }
+
+
+/* Listas de lecciones: mostrar aproximadamente cinco elementos y desplazar el resto */
+.grammar-topic-list {
+  max-height: 23.5rem;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+  padding: .1rem .35rem .1rem 0;
+  scroll-behavior: smooth;
+}
+.grammar-topic-list:focus-within {
+  outline: 2px solid rgba(7,91,232,.18);
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+.grammar-topic-list::-webkit-scrollbar { width: 8px; }
+.grammar-topic-list::-webkit-scrollbar-track { background: #edf2f8; border-radius: 999px; }
+.grammar-topic-list::-webkit-scrollbar-thumb { background: #b8c7dc; border: 2px solid #edf2f8; border-radius: 999px; }
+.grammar-topic-list { scrollbar-width: thin; scrollbar-color: #b8c7dc #edf2f8; }
