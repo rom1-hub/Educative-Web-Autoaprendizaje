@@ -175,3 +175,34 @@ a.grammar-search-result:hover { border-color:rgba(7,91,232,.35); background:#f8f
   .grammar-etre-content .grammar-lesson-section { padding: 1.1rem; }
   .grammar-etre-table th,.grammar-etre-table td,.grammar-etre-examples th,.grammar-etre-examples td { padding: .7rem .65rem; }
 }
+
+/* Lección A1: verbo AVOIR */
+.grammar-avoir-hero { padding-bottom: 2.75rem; }
+.grammar-avoir-hero h1 { max-width: 850px; margin: .7rem 0 .45rem; font-size: clamp(2.2rem,5vw,3.65rem); }
+.grammar-avoir-hero > .container > p { margin: 0; color: var(--color-ink-soft); font-size: 1.15rem; font-weight: 650; }
+.grammar-avoir-content { display: grid; gap: 1.5rem; max-width: 980px; padding-top: 2.25rem; padding-bottom: 5rem; }
+.grammar-avoir-content .grammar-lesson-section { margin: 0; }
+.grammar-avoir-section-heading { margin-bottom: 1.25rem; }
+.grammar-avoir-section-heading .eyebrow { display: inline-block; margin-bottom: .45rem; }
+.grammar-avoir-section-heading h2 { margin: 0; font-size: clamp(1.4rem,3vw,1.9rem); }
+.grammar-avoir-table-wrap { max-width: 760px; margin-inline: auto; }
+.grammar-avoir-table th:first-child,.grammar-avoir-table td:first-child { width: 58%; }
+.grammar-avoir-table td strong,.grammar-avoir-examples td strong,.grammar-avoir-expressions td strong { color: var(--color-blue); }
+.grammar-avoir-table tbody tr:nth-child(even),.grammar-avoir-examples tbody tr:nth-child(even),.grammar-avoir-expressions tbody tr:nth-child(even) { background: #f8faff; }
+.grammar-avoir-note { padding: 1.25rem 1.4rem; border: 1px solid var(--color-line); border-radius: 14px; background: #f0fbfb; line-height: 1.75; }
+.grammar-avoir-note p { margin: 0 0 .9rem; }
+.grammar-avoir-note p:last-of-type { margin-bottom: .5rem; }
+.grammar-avoir-note ul { margin: .5rem 0 1rem; padding-left: 1.3rem; }
+.grammar-avoir-note ul:last-child { margin-bottom: 0; }
+.grammar-avoir-pronunciation { display: grid; gap: .4rem; }
+.grammar-avoir-pronunciation li { display: flex; justify-content: space-between; max-width: 300px; gap: 1rem; }
+.grammar-avoir-pronunciation span { color: var(--color-blue); font-weight: 700; font-variant-ligatures: none; }
+.grammar-avoir-examples,.grammar-avoir-expressions { min-width: 560px; }
+.grammar-avoir-examples th:first-child,.grammar-avoir-examples td:first-child { width: 52%; }
+.grammar-avoir-content .grammar-lesson-end { margin-top: .25rem; }
+@media (max-width: 600px) {
+  .grammar-avoir-content { gap: 1rem; padding-top: 1.25rem; }
+  .grammar-avoir-content .grammar-lesson-section { padding: 1.1rem; }
+  .grammar-avoir-table th,.grammar-avoir-table td,.grammar-avoir-examples th,.grammar-avoir-examples td,.grammar-avoir-expressions th,.grammar-avoir-expressions td { padding: .7rem .65rem; }
+  .grammar-avoir-note { padding: 1rem; }
+}
