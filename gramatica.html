@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/grammar.css?v=grammar-menu-1">
   <script src="js/main.js" defer></script>
+  <script src="js/grammar-search.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#contenido">Saltar al contenido</a>
@@ -51,6 +52,19 @@
         <div><span class="eyebrow">Itinerario de aprendizaje</span><h2>Elige tu nivel y tu próximo tema.</h2></div>
         <p>Los contenidos siguen una progresión. Puedes estudiar en orden o entrar directamente en el tema que necesitas repasar.</p>
       </div>
+
+      <section class="grammar-search" aria-labelledby="grammar-search-title">
+        <div class="grammar-search-heading">
+          <label id="grammar-search-title" for="grammar-topic-search">¿Buscas un tema específico?</label>
+          <p>Escribe el nombre del tema o una palabra clave para encontrarlo directamente.</p>
+        </div>
+        <div class="grammar-search-control">
+          <span class="grammar-search-icon" aria-hidden="true">⌕</span>
+          <input id="grammar-topic-search" type="search" placeholder="Ej.: négation, pronoms, articles…" autocomplete="off" aria-controls="grammar-search-results">
+          <button class="grammar-search-clear" type="button" aria-label="Borrar búsqueda" hidden>×</button>
+        </div>
+        <div class="grammar-search-results" id="grammar-search-results" aria-live="polite" aria-atomic="true" hidden></div>
+      </section>
 
       <section class="grammar-level-section" id="nivel-a1" aria-labelledby="heading-a1">
         <div class="grammar-level-heading">
