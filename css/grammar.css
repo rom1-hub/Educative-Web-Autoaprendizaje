@@ -1,0 +1,123 @@
+/* ==========================================================
+   GRAMÁTICA — menú de niveles y páginas de lecciones
+   Reutiliza los tokens y componentes globales de COQ.
+   ========================================================== */
+.grammar-hero { padding-bottom: 3.5rem; }
+.grammar-hero h1 { max-width: 900px; }
+.grammar-hero p { max-width: 52rem; }
+.grammar-hero-action { margin-top: .75rem; }
+
+.grammar-level-nav {
+  position: sticky;
+  z-index: 20;
+  top: 4.8rem;
+  border-block: 1px solid var(--color-line);
+  background: rgba(255,255,255,.94);
+  backdrop-filter: blur(14px);
+}
+.grammar-level-nav-inner { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: .75rem; padding-block: .7rem; }
+.grammar-level-link {
+  display: flex; align-items: center; justify-content: center; gap: .7rem;
+  min-height: 3.1rem; padding: .45rem .75rem; border: 1px solid transparent;
+  border-radius: 12px; color: var(--color-muted); transition: background var(--duration-fast),border-color var(--duration-fast),color var(--duration-fast);
+}
+.grammar-level-link strong { color: var(--color-ink); font-size: 1.05rem; }
+.grammar-level-link span { font-size: .8rem; font-weight: 650; }
+.grammar-level-link:hover,.grammar-level-link.is-current { border-color: rgba(7,91,232,.16); background: var(--color-blue-pale); color: var(--color-blue); }
+.grammar-level-link.is-current strong { color: var(--color-blue); }
+
+.grammar-curriculum { padding-top: 3.5rem; }
+.grammar-intro { display: flex; align-items: end; justify-content: space-between; gap: 2rem; margin-bottom: 3rem; }
+.grammar-intro h2 { margin-top: .75rem; font-size: clamp(1.8rem,3.5vw,2.6rem); }
+.grammar-intro p { max-width: 35rem; margin: 0; }
+.grammar-level-section { scroll-margin-top: 9rem; margin-bottom: 3.5rem; }
+.grammar-level-heading { display: grid; grid-template-columns: auto minmax(0,1fr); align-items: center; gap: 1.25rem; margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--color-line); }
+.grammar-level-mark { display: grid; place-items: center; align-content: center; width: 5rem; min-height: 5rem; border: 1px solid rgba(7,91,232,.16); border-radius: 18px; background: var(--color-blue-pale); color: var(--color-blue); }
+.grammar-level-mark strong { font-size: 1.55rem; line-height: 1.1; }
+.grammar-level-mark span { margin-top: .25rem; font-size: .62rem; font-weight: 750; }
+.grammar-level-heading h2 { margin-bottom: .45rem; font-size: clamp(1.35rem,2.8vw,1.9rem); }
+.grammar-level-heading p { margin: 0; }
+.grammar-topic-groups { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1.25rem; }
+.grammar-topic-group { min-width: 0; padding: 1.2rem; border: 1px solid var(--color-line); border-radius: var(--radius-md); background: rgba(255,255,255,.78); box-shadow: 0 8px 28px rgba(7,26,61,.035); }
+.grammar-topic-group h3 { margin-bottom: 1rem; font-size: 1rem; }
+.grammar-topic-list { display: grid; gap: .55rem; }
+.grammar-topic { display: grid; grid-template-columns: 2.15rem minmax(0,1fr) auto; align-items: center; gap: .75rem; min-width: 0; min-height: 4.15rem; padding: .7rem .75rem; border: 1px solid var(--color-line); border-radius: 11px; background: #fff; }
+a.grammar-topic { color: var(--color-ink); transition: transform var(--duration-fast),border-color var(--duration-fast),background var(--duration-fast),box-shadow var(--duration-fast); }
+a.grammar-topic:hover { transform: translateY(-2px); border-color: rgba(7,91,232,.35); background: #f8fbff; box-shadow: 0 5px 15px rgba(7,26,61,.05); }
+.grammar-topic-number { display: grid; place-items: center; width: 2.05rem; height: 2.05rem; border-radius: 9px; background: #f0f5fc; color: var(--color-blue); font-size: .75rem; font-weight: 850; }
+.grammar-topic-copy { display: grid; gap: .2rem; min-width: 0; }
+.grammar-topic-copy strong { font-size: .86rem; line-height: 1.35; }
+.grammar-topic-copy small { color: var(--color-muted); font-size: .73rem; line-height: 1.4; }
+.grammar-topic-arrow { color: var(--color-blue); font-size: 1.2rem; font-weight: 750; }
+.grammar-topic-status { color: var(--color-muted); font-size: .65rem; font-weight: 700; white-space: nowrap; }
+.grammar-topic.is-pending { background: #fbfcfe; }
+.grammar-topic.is-pending .grammar-topic-number { background: #f1f3f7; color: #738097; }
+
+.grammar-breadcrumb { display: flex; flex-wrap: wrap; align-items: center; gap: .55rem; margin-bottom: 1.4rem; color: var(--color-muted); font-size: .82rem; }
+.grammar-breadcrumb a { color: var(--color-blue); font-weight: 700; }
+.grammar-lesson-hero { padding: 2.5rem 0 2rem; background: radial-gradient(ellipse at 85% 0%,rgba(17,168,245,.15),transparent 36%); }
+.grammar-lesson-hero h1 { max-width: 850px; margin: .7rem 0 1rem; font-size: clamp(2.25rem,5vw,4rem); }
+.grammar-lesson-hero p { max-width: 48rem; font-size: 1.05rem; }
+.grammar-lesson-meta { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: 1.2rem; }
+.grammar-lesson-meta span { padding: .35rem .7rem; border: 1px solid var(--color-line); border-radius: 999px; background: rgba(255,255,255,.8); color: var(--color-ink-soft); font-size: .75rem; font-weight: 750; }
+.grammar-lesson-layout { display: grid; grid-template-columns: minmax(0,1fr) 260px; align-items: start; gap: 2rem; padding-top: 2rem; padding-bottom: 5rem; }
+.grammar-lesson-content { min-width: 0; }
+.grammar-lesson-section { margin-bottom: 2.5rem; padding: clamp(1.2rem,3vw,2rem); border: 1px solid var(--color-line); border-radius: var(--radius-md); background: rgba(255,255,255,.88); box-shadow: 0 8px 28px rgba(7,26,61,.035); }
+.grammar-lesson-section h2 { margin-bottom: 1rem; font-size: clamp(1.4rem,3vw,1.9rem); }
+.grammar-lesson-section h3 { margin: 1.5rem 0 .65rem; font-size: 1.05rem; }
+.grammar-lesson-section p { line-height: 1.75; }
+.grammar-lesson-section p:last-child { margin-bottom: 0; }
+.grammar-example-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .75rem; margin-top: 1rem; }
+.grammar-example { padding: .9rem 1rem; border: 1px solid var(--color-line); border-radius: 11px; background: #f8faff; }
+.grammar-example strong { display: block; margin-bottom: .2rem; color: var(--color-blue); font-size: 1rem; }
+.grammar-example span { color: var(--color-muted); font-size: .84rem; }
+.grammar-table-wrap { overflow-x: auto; margin-top: 1rem; border: 1px solid var(--color-line); border-radius: 12px; background: #fff; }
+.grammar-table { width: 100%; border-collapse: collapse; text-align: left; }
+.grammar-table th,.grammar-table td { padding: .8rem 1rem; border-bottom: 1px solid var(--color-line); }
+.grammar-table th { background: #f2f6fc; color: var(--color-muted); font-size: .76rem; }
+.grammar-table td { font-size: .9rem; }
+.grammar-table td:first-child { color: var(--color-blue); font-weight: 850; }
+.grammar-table tr:last-child td { border-bottom: 0; }
+.grammar-note { margin-top: 1rem; padding: 1rem 1.1rem; border-left: 3px solid var(--color-blue); border-radius: 0 10px 10px 0; background: #f0f5fc; color: var(--color-ink-soft); font-size: .88rem; }
+.grammar-warning { border-left-color: var(--color-orange); background: #fff7f0; }
+.grammar-lesson-aside { position: sticky; top: 6.5rem; display: grid; gap: 1rem; }
+.grammar-aside-card { padding: 1.15rem; border: 1px solid var(--color-line); border-radius: 14px; background: #fff; }
+.grammar-aside-card h2 { margin-bottom: .7rem; font-size: 1rem; }
+.grammar-aside-card p,.grammar-aside-card li { font-size: .82rem; line-height: 1.6; }
+.grammar-aside-card ul { margin: 0; padding-left: 1.1rem; }
+.grammar-aside-card .button { width: 100%; margin-top: .5rem; }
+.grammar-exercise-list { display: grid; gap: .75rem; margin-top: 1rem; }
+.grammar-exercise { padding: 1rem; border: 1px solid var(--color-line); border-radius: 12px; background: #fff; }
+.grammar-exercise p { margin-bottom: .65rem; color: var(--color-ink); font-weight: 700; }
+.grammar-exercise details { color: var(--color-blue); font-size: .85rem; }
+.grammar-exercise summary { width: fit-content; cursor: pointer; font-weight: 750; }
+.grammar-exercise details p { margin: .6rem 0 0; color: var(--color-muted); font-size: .85rem; font-weight: 500; }
+.grammar-lesson-end { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 1.5rem; }
+.grammar-lesson-end p { margin: 0; font-size: .85rem; }
+
+@media (max-width: 900px) {
+  .grammar-lesson-layout { grid-template-columns: minmax(0,1fr) 220px; gap: 1.25rem; }
+}
+@media (max-width: 760px) {
+  .grammar-level-nav { top: 4.25rem; }
+  .grammar-intro { display: block; }
+  .grammar-intro p { margin-top: .8rem; }
+  .grammar-topic-groups { grid-template-columns: 1fr; }
+  .grammar-lesson-layout { grid-template-columns: 1fr; }
+  .grammar-lesson-aside { position: static; grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 520px) {
+  .grammar-level-nav-inner { gap: .3rem; }
+  .grammar-level-link { flex-direction: column; gap: .05rem; min-height: 3.4rem; padding: .35rem .2rem; }
+  .grammar-level-link span { font-size: .65rem; }
+  .grammar-level-heading { grid-template-columns: 3.8rem minmax(0,1fr); gap: .8rem; }
+  .grammar-level-mark { width: 3.8rem; min-height: 3.8rem; border-radius: 13px; }
+  .grammar-level-mark strong { font-size: 1.25rem; }
+  .grammar-level-mark span { font-size: .52rem; }
+  .grammar-topic { grid-template-columns: 1.8rem minmax(0,1fr); gap: .55rem; }
+  .grammar-topic-number { width: 1.75rem; height: 1.75rem; }
+  .grammar-topic-arrow,.grammar-topic-status { grid-column: 2; justify-self: start; }
+  .grammar-topic-status { margin-top: -.25rem; }
+  .grammar-example-grid,.grammar-lesson-aside { grid-template-columns: 1fr; }
+  .grammar-table th,.grammar-table td { padding: .7rem; }
+}
