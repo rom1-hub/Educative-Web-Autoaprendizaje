@@ -608,3 +608,37 @@ a.grammar-search-result:hover { border-color:rgba(7,91,232,.35); background:#f8f
  .grammar-tuvous-note,.grammar-tuvous-explanation { padding: 1rem; }
  .grammar-tuvous-table th,.grammar-tuvous-table td { padding: .62rem .7rem; }
 }
+
+
+/* Lección A1: la negación básica */
+.grammar-negation-hero { padding-bottom: 2.6rem; }
+.grammar-negation-hero h1 { max-width: 900px; margin: .7rem 0 .45rem; font-size: clamp(2.1rem,4.8vw,3.5rem); }
+.grammar-negation-hero > .container > p { margin: 0; color: var(--color-ink-soft); font-size: 1.12rem; font-weight: 650; }
+.grammar-negation-content { display: grid; gap: 1.5rem; max-width: 1050px; padding-top: 2.25rem; padding-bottom: 5rem; }
+.grammar-negation-content .grammar-lesson-section { margin: 0; }
+.grammar-negation-heading { margin-bottom: 1.15rem; }
+.grammar-negation-heading .eyebrow { display: inline-block; margin-bottom: .45rem; }
+.grammar-negation-heading h2 { margin: 0; font-size: clamp(1.4rem,3vw,1.9rem); }
+.grammar-negation-note,.grammar-negation-explanation,.grammar-negation-warning { padding: 1.2rem 1.35rem; border: 1px solid var(--color-line); border-radius: 14px; line-height: 1.7; }
+.grammar-negation-note { background: #eff9ed; }
+.grammar-negation-explanation { background: #fff1ef; }
+.grammar-negation-warning { background: #fff4e4; }
+.grammar-negation-note p,.grammar-negation-explanation p,.grammar-negation-warning p { margin: .55rem 0; }
+.grammar-negation-note ul,.grammar-negation-explanation ul { display: grid; gap: .4rem; margin: .6rem 0; padding-left: 1.25rem; }
+.grammar-negation-formula { margin: .85rem 0; padding: .8rem 1rem; border: 1px solid rgba(11,57,117,.16); border-radius: 10px; background: #fff; color: var(--color-blue); text-align: center; font-weight: 800; letter-spacing: .02em; }
+.grammar-negation-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--color-line); border-radius: 12px; }
+.grammar-negation-table { width: 100%; min-width: 480px; border-collapse: collapse; }
+.grammar-negation-table th,.grammar-negation-table td { padding: .72rem .9rem; text-align: left; border-bottom: 1px solid var(--color-line); }
+.grammar-negation-table thead th { background: #0b3975; color: #fff; font-weight: 700; }
+.grammar-negation-table tbody td:first-child { background: #fff1df; font-weight: 650; }
+.grammar-negation-table tbody td:nth-child(2) { color: var(--color-blue); font-weight: 700; }
+.grammar-negation-table tbody tr:last-child td { border-bottom: 0; }
+.grammar-negation-warning .grammar-negation-formula { margin: .8rem 0 1rem; }
+.grammar-negation-oral { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .8rem; margin: 1rem 0; padding: .9rem; border: 1px solid var(--color-line); border-radius: 10px; background: #fff; color: var(--color-blue); font-weight: 800; }
+.grammar-negation-content .grammar-lesson-end { margin-top: .25rem; }
+@media (max-width: 700px) {
+ .grammar-negation-content { gap: 1rem; padding-top: 1.25rem; }
+ .grammar-negation-content .grammar-lesson-section { padding: 1.1rem; }
+ .grammar-negation-note,.grammar-negation-explanation,.grammar-negation-warning { padding: 1rem; }
+ .grammar-negation-table th,.grammar-negation-table td { padding: .62rem .7rem; }
+}
