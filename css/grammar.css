@@ -243,3 +243,42 @@ a.grammar-search-result:hover { border-color:rgba(7,91,232,.35); background:#f8f
  .grammar-geography-pair > span,.grammar-geography-pair > strong { padding: .65rem .75rem; }
  .grammar-geography-note { padding: 1rem; }
 }
+
+/* Lección A1: números cardinales y ordinales */
+.grammar-numbers-hero { padding-bottom: 2.6rem; }
+.grammar-numbers-hero h1 { max-width: 900px; margin: .7rem 0 .45rem; font-size: clamp(2.1rem,4.8vw,3.5rem); }
+.grammar-numbers-hero > .container > p { margin: 0; color: var(--color-ink-soft); font-size: 1.12rem; font-weight: 650; }
+.grammar-numbers-content { display: grid; gap: 1.5rem; max-width: 1000px; padding-top: 2.25rem; padding-bottom: 5rem; }
+.grammar-numbers-content .grammar-lesson-section { margin: 0; }
+.grammar-numbers-heading { margin-bottom: 1.15rem; }
+.grammar-numbers-heading .eyebrow { display: inline-block; margin-bottom: .45rem; }
+.grammar-numbers-heading h2 { margin: 0; font-size: clamp(1.4rem,3vw,1.9rem); }
+.grammar-numbers-subsection { display: grid; gap: .8rem; margin-top: 1.5rem; padding-top: 1.35rem; border-top: 1px solid var(--color-line); }
+.grammar-numbers-subsection h3 { margin: 0; color: var(--color-blue); font-size: 1.2rem; }
+.grammar-numbers-subsection h4 { margin: .35rem 0 0; }
+.grammar-numbers-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--color-line); border-radius: 12px; }
+.grammar-numbers-table { width: 100%; border-collapse: collapse; min-width: 280px; }
+.grammar-numbers-table th,.grammar-numbers-table td { padding: .58rem .8rem; text-align: left; border-bottom: 1px solid var(--color-line); }
+.grammar-numbers-table thead th { background: #0b3975; color: #fff; font-weight: 700; }
+.grammar-numbers-table tbody th { width: 32%; background: #fff1df; font-weight: 700; }
+.grammar-numbers-table tbody td[lang="fr"] { color: var(--color-blue); font-weight: 700; }
+.grammar-numbers-table tbody tr:last-child th,.grammar-numbers-table tbody tr:last-child td { border-bottom: 0; }
+.grammar-numbers-pair-table tbody td:first-child { background: #fff1df; font-weight: 650; }
+.grammar-numbers-pair-table tbody td:last-child { color: var(--color-blue); font-weight: 700; }
+.grammar-numbers-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; align-items: start; }
+.grammar-numbers-grid > div { min-width: 0; }
+.grammar-numbers-grid .grammar-numbers-table { min-width: 0; }
+.grammar-numbers-grid .grammar-numbers-table th,.grammar-numbers-grid .grammar-numbers-table td { padding: .5rem .55rem; font-size: .92rem; }
+.grammar-numbers-note { padding: 1.15rem 1.3rem; border: 1px solid var(--color-line); border-radius: 14px; background: #eff9f8; line-height: 1.7; }
+.grammar-numbers-note h3,.grammar-numbers-note h4 { margin: 0 0 .6rem; color: var(--color-blue); }
+.grammar-numbers-note p { margin: .45rem 0; }
+.grammar-numbers-note ul { display: grid; gap: .4rem; margin: .6rem 0 0; padding-left: 1.25rem; }
+.grammar-numbers-note-accent { background: #fff6ef; border-color: #edc49b; }
+.grammar-numbers-content .grammar-lesson-end { margin-top: .25rem; }
+@media (max-width: 760px) { .grammar-numbers-grid { grid-template-columns: 1fr; } }
+@media (max-width: 600px) {
+ .grammar-numbers-content { gap: 1rem; padding-top: 1.25rem; }
+ .grammar-numbers-content .grammar-lesson-section { padding: 1.1rem; }
+ .grammar-numbers-note { padding: 1rem; }
+ .grammar-numbers-table th,.grammar-numbers-table td { padding: .55rem .65rem; }
+}
