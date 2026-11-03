@@ -47,7 +47,8 @@
     results.replaceChildren();
     clearButton.hidden = !input.value;
     if (!query) { results.hidden = true; return; }
-    const matches = topics.filter((topic) => topic.searchable.includes(query));
+    const terms = query.split(" ").filter(Boolean);
+    const matches = topics.filter((topic) => terms.every((term) => topic.searchable.includes(term)));
     results.hidden = false;
     if (!matches.length) {
       const message = document.createElement("p");
