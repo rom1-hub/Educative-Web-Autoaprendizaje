@@ -108,8 +108,6 @@
     );
 
     sections.forEach((section) => observer.observe(section));
-  } else {
-    window.addEventListener("scroll", updateFromScrollPosition, { passive: true });
   }
 
   window.addEventListener("scroll", updateFromScrollPosition, { passive: true });
