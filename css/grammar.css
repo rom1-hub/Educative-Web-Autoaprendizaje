@@ -662,3 +662,57 @@ a.grammar-search-result:hover { border-color:rgba(7,91,232,.35); background:#f8f
 .grammar-topic-list::-webkit-scrollbar-track { background: #edf2f8; border-radius: 999px; }
 .grammar-topic-list::-webkit-scrollbar-thumb { background: #b8c7dc; border: 2px solid #edf2f8; border-radius: 999px; }
 .grammar-topic-list { scrollbar-width: thin; scrollbar-color: #b8c7dc #edf2f8; }
+
+
+/* Lección A1: adjetivos posesivos */
+.grammar-possessive-hero { padding-bottom: 2.6rem; }
+.grammar-possessive-hero h1 { max-width: 900px; margin: .7rem 0 .45rem; font-size: clamp(2.1rem,4.8vw,3.5rem); }
+.grammar-possessive-hero > .container > p { margin: 0; color: var(--color-ink-soft); font-size: 1.12rem; font-weight: 650; }
+.grammar-possessive-content { display: grid; gap: 1.5rem; max-width: 1100px; padding-top: 2.25rem; padding-bottom: 5rem; }
+.grammar-possessive-content .grammar-lesson-section { margin: 0; }
+.grammar-possessive-heading { margin-bottom: 1.15rem; }
+.grammar-possessive-heading .eyebrow { display: inline-block; margin-bottom: .45rem; }
+.grammar-possessive-heading h2 { margin: 0; font-size: clamp(1.4rem,3vw,1.9rem); }
+.grammar-possessive-note { padding: 1.2rem 1.35rem; border: 1px solid var(--color-line); border-radius: 14px; background: #eff9ed; line-height: 1.7; }
+.grammar-possessive-note p { margin: .55rem 0; }
+.grammar-possessive-note p:first-child { margin-top: 0; }
+.grammar-possessive-note p:last-child { margin-bottom: 0; }
+.grammar-possessive-note h3 { margin: 0 0 .6rem; color: var(--color-blue); }
+.grammar-possessive-note ul { display: grid; gap: .45rem; margin: .65rem 0; padding-left: 1.25rem; }
+.grammar-possessive-note-accent { background: #fff1ef; }
+.grammar-possessive-note-important { background: #fff6e8; }
+.grammar-possessive-note-phonetic { background: #eaf7f7; }
+.grammar-possessive-note-warning { background: #fff1ef; border-color: #edc49b; }
+.grammar-possessive-example { padding: .7rem .9rem; border: 1px solid var(--color-line); border-radius: 9px; background: #fff; color: var(--color-blue); font-weight: 750; }
+.grammar-possessive-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--color-line); border-radius: 12px; }
+.grammar-possessive-table { width: 100%; border-collapse: collapse; }
+.grammar-possessive-table th,.grammar-possessive-table td { padding: .72rem .8rem; text-align: left; border-bottom: 1px solid var(--color-line); vertical-align: middle; }
+.grammar-possessive-table thead th { background: #0b3975; color: #fff; font-size: .88rem; font-weight: 700; }
+.grammar-possessive-table tbody td:first-child { background: #fff1df; font-weight: 650; }
+.grammar-possessive-table tbody td:not(:first-child) { color: var(--color-blue); font-weight: 750; }
+.grammar-possessive-table tbody tr:last-child td { border-bottom: 0; }
+.grammar-possessive-pair-table tbody td:last-child { color: var(--color-blue); font-weight: 750; }
+.grammar-possessive-pairs { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .6rem; margin-top: .9rem; }
+.grammar-possessive-pair { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); align-items: stretch; min-width: 0; border: 1px solid var(--color-line); border-radius: 10px; overflow: hidden; }
+.grammar-possessive-pair span,.grammar-possessive-pair strong { display: flex; align-items: center; padding: .7rem .8rem; line-height: 1.45; }
+.grammar-possessive-pair span { background: #fff1df; font-weight: 650; }
+.grammar-possessive-pair strong { background: #f0f5fc; color: var(--color-blue); font-weight: 750; }
+.grammar-possessive-examples { display: grid; gap: .65rem; margin-top: 1.25rem; }
+.grammar-possessive-examples h3 { margin: .4rem 0 0; color: var(--color-blue); font-size: 1.08rem; }
+.grammar-possessive-examples .grammar-possessive-pairs { margin-top: 0; }
+.grammar-possessive-phonetic { color: var(--color-muted); font-size: .88rem; font-weight: 650; }
+.grammar-possessive-content .grammar-lesson-end { margin-top: .25rem; }
+@media (max-width: 760px) {
+ .grammar-possessive-table th,.grammar-possessive-table td { padding: .62rem .65rem; }
+ .grammar-possessive-table thead th { font-size: .8rem; }
+}
+@media (max-width: 650px) {
+ .grammar-possessive-content { gap: 1rem; padding-top: 1.25rem; }
+ .grammar-possessive-content .grammar-lesson-section { padding: 1.1rem; }
+ .grammar-possessive-note { padding: 1rem; }
+ .grammar-possessive-pairs { grid-template-columns: 1fr; }
+}
+@media (max-width: 430px) {
+ .grammar-possessive-pair { grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); }
+ .grammar-possessive-pair span,.grammar-possessive-pair strong { padding: .65rem .6rem; font-size: .9rem; }
+}
