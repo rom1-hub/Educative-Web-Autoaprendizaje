@@ -312,3 +312,38 @@ a.grammar-search-result:hover { border-color:rgba(7,91,232,.35); background:#f8f
  .grammar-date-note { padding: 1rem; }
  .grammar-date-table th,.grammar-date-table td { padding: .58rem .7rem; }
 }
+
+/* Lección A1: las horas */
+.grammar-hours-hero { padding-bottom: 2.6rem; }
+.grammar-hours-hero h1 { max-width: 900px; margin: .7rem 0 .45rem; font-size: clamp(2.1rem,4.8vw,3.5rem); }
+.grammar-hours-hero > .container > p { margin: 0; color: var(--color-ink-soft); font-size: 1.12rem; font-weight: 650; }
+.grammar-hours-content { display: grid; gap: 1.5rem; max-width: 1000px; padding-top: 2.25rem; padding-bottom: 5rem; }
+.grammar-hours-content .grammar-lesson-section { margin: 0; }
+.grammar-hours-heading { margin-bottom: 1.15rem; }
+.grammar-hours-heading .eyebrow { display: inline-block; margin-bottom: .45rem; }
+.grammar-hours-heading h2 { margin: 0; font-size: clamp(1.4rem,3vw,1.9rem); }
+.grammar-hours-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--color-line); border-radius: 12px; }
+.grammar-hours-table { width: 100%; border-collapse: collapse; min-width: 470px; }
+.grammar-hours-table th,.grammar-hours-table td { padding: .68rem .85rem; text-align: left; border-bottom: 1px solid var(--color-line); }
+.grammar-hours-table thead th { background: #0b3975; color: #fff; font-weight: 700; }
+.grammar-hours-table tbody th { background: #fff1df; white-space: nowrap; font-weight: 700; }
+.grammar-hours-table tbody td:nth-child(2) { background: #fffaf4; font-weight: 650; }
+.grammar-hours-table tbody td:nth-child(3) { color: var(--color-blue); font-weight: 700; }
+.grammar-hours-table tbody tr:last-child th,.grammar-hours-table tbody tr:last-child td { border-bottom: 0; }
+.grammar-hours-note { padding: 1.15rem 1.3rem; border: 1px solid var(--color-line); border-radius: 14px; background: #eff9f8; line-height: 1.7; }
+.grammar-hours-note h3 { margin: 0 0 .6rem; color: var(--color-blue); }
+.grammar-hours-note p { margin: .55rem 0; }
+.grammar-hours-note ul { display: grid; gap: .4rem; margin: .6rem 0; padding-left: 1.25rem; }
+.grammar-hours-subsection { display: grid; gap: .85rem; margin-top: 1.5rem; padding-top: 1.35rem; border-top: 1px solid var(--color-line); }
+.grammar-hours-subsection h3 { margin: 0; color: var(--color-blue); font-size: 1.2rem; }
+.grammar-hours-format-list { display: grid; gap: .7rem; margin: .5rem 0 1rem; padding-left: 1.3rem; }
+.grammar-hours-format-list li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem 1rem; padding: .75rem .9rem; border: 1px solid var(--color-line); border-radius: 10px; background: #fffaf4; }
+.grammar-hours-format-list span { color: var(--color-blue); font-weight: 700; }
+.grammar-hours-content .grammar-lesson-end { margin-top: .25rem; }
+@media (max-width: 600px) {
+ .grammar-hours-content { gap: 1rem; padding-top: 1.25rem; }
+ .grammar-hours-content .grammar-lesson-section { padding: 1.1rem; }
+ .grammar-hours-note { padding: 1rem; }
+ .grammar-hours-table th,.grammar-hours-table td { padding: .58rem .65rem; }
+ .grammar-hours-table { min-width: 430px; }
+}
