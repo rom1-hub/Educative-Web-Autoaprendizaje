@@ -1225,3 +1225,55 @@ a.grammar-search-result:hover { border-color:rgba(7,91,232,.35); background:#f8f
  .grammar-passerecent-note,.grammar-passerecent-important,.grammar-passerecent-reminder,.grammar-passerecent-extra,.grammar-passerecent-final { padding: 1rem; }
  .grammar-passerecent-table th,.grammar-passerecent-table td { padding: .58rem .65rem; }
 }
+
+
+/* Lección A1: adjetivos demostrativos */
+.grammar-demonstratifs-hero { padding-bottom: 2.6rem; }
+.grammar-demonstratifs-hero h1 { max-width: 950px; margin: .7rem 0 .45rem; font-size: clamp(2.1rem,4.8vw,3.5rem); }
+.grammar-demonstratifs-hero > .container > p { margin: 0; color: var(--color-ink-soft); font-size: 1.12rem; font-weight: 650; }
+.grammar-demonstratifs-content { display: grid; gap: 1.5rem; max-width: 1120px; padding-top: 2.25rem; padding-bottom: 5rem; }
+.grammar-demonstratifs-content .grammar-lesson-section { margin: 0; }
+.grammar-demonstratifs-heading { margin-bottom: 1.15rem; }
+.grammar-demonstratifs-heading .eyebrow { display: inline-block; margin-bottom: .45rem; }
+.grammar-demonstratifs-heading h2 { margin: 0; font-size: clamp(1.4rem,3vw,1.9rem); }
+.grammar-demonstratifs-note,.grammar-demonstratifs-important,.grammar-demonstratifs-reminder,.grammar-demonstratifs-final { padding: 1.2rem 1.35rem; border: 1px solid var(--color-line); border-radius: 14px; line-height: 1.7; }
+.grammar-demonstratifs-note { background: #eff9ed; }
+.grammar-demonstratifs-important { margin-top: 1rem; background: #fff1ef; }
+.grammar-demonstratifs-reminder { margin-top: 1rem; background: #fff6e8; }
+.grammar-demonstratifs-final { background: #fffaf4; }
+.grammar-demonstratifs-note p,.grammar-demonstratifs-important p,.grammar-demonstratifs-reminder p,.grammar-demonstratifs-final p { margin: .55rem 0; }
+.grammar-demonstratifs-note p:first-child,.grammar-demonstratifs-important p:first-child,.grammar-demonstratifs-reminder p:first-child,.grammar-demonstratifs-final p:first-child { margin-top: 0; }
+.grammar-demonstratifs-note p:last-child,.grammar-demonstratifs-important p:last-child,.grammar-demonstratifs-reminder p:last-child,.grammar-demonstratifs-final p:last-child { margin-bottom: 0; }
+.grammar-demonstratifs-note h3,.grammar-demonstratifs-important h3,.grammar-demonstratifs-reminder h3 { margin: 0 0 .65rem; color: var(--color-blue); font-size: 1.12rem; }
+.grammar-demonstratifs-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--color-line); border-radius: 12px; margin-top: 1rem; }
+.grammar-demonstratifs-table { width: 100%; min-width: 480px; border-collapse: collapse; }
+.grammar-demonstratifs-table th,.grammar-demonstratifs-table td { padding: .7rem .85rem; text-align: left; border-bottom: 1px solid var(--color-line); vertical-align: middle; }
+.grammar-demonstratifs-table thead th { background: #0b3975; color: #fff; font-weight: 700; }
+.grammar-demonstratifs-table tbody td:first-child { color: var(--color-blue); font-weight: 700; }
+.grammar-demonstratifs-table tbody tr:last-child td { border-bottom: 0; }
+.grammar-demonstratifs-compare { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .8rem; margin-top: 1rem; }
+.grammar-demonstratifs-compare > div { display: flex; flex-direction: column; gap: .4rem; padding: 1rem 1.1rem; border: 1px solid var(--color-line); border-radius: 12px; background: #fff; }
+.grammar-demonstratifs-compare span { color: var(--color-ink-soft); font-size: .85rem; font-weight: 750; }
+.grammar-demonstratifs-compare strong { color: var(--color-blue); }
+.grammar-demonstratifs-compare small { color: var(--color-ink-soft); line-height: 1.5; }
+.grammar-demonstratifs-summary { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .7rem; margin-top: 1rem; }
+.grammar-demonstratifs-summary > div { display: flex; flex-direction: column; gap: .4rem; padding: 1rem; border: 1px solid var(--color-line); border-radius: 12px; background: #fff; min-width: 0; }
+.grammar-demonstratifs-summary strong { color: var(--color-blue); }
+.grammar-demonstratifs-summary p { margin: 0; font-weight: 750; overflow-wrap: anywhere; }
+.grammar-demonstratifs-summary span { color: var(--color-ink-soft); font-size: .9rem; }
+.grammar-demonstratifs-pronunciation { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .8rem; margin: .9rem 0; }
+.grammar-demonstratifs-pronunciation > div { display: flex; flex-direction: column; gap: .25rem; align-items: center; padding: 1rem; border: 1px solid var(--color-line); border-radius: 12px; background: #fff; }
+.grammar-demonstratifs-pronunciation strong { color: var(--color-blue); font-size: 1.2rem; }
+.grammar-demonstratifs-pronunciation span { font-size: 1.1rem; font-weight: 750; }
+.grammar-demonstratifs-pronunciation small { color: var(--color-ink-soft); text-align: center; }
+.grammar-demonstratifs-content .grammar-lesson-end { margin-top: .25rem; }
+@media (max-width: 800px) {
+ .grammar-demonstratifs-summary { grid-template-columns: 1fr; }
+}
+@media (max-width: 650px) {
+ .grammar-demonstratifs-content { gap: 1rem; padding-top: 1.25rem; }
+ .grammar-demonstratifs-content .grammar-lesson-section { padding: 1.1rem; }
+ .grammar-demonstratifs-note,.grammar-demonstratifs-important,.grammar-demonstratifs-reminder,.grammar-demonstratifs-final { padding: 1rem; }
+ .grammar-demonstratifs-compare,.grammar-demonstratifs-pronunciation { grid-template-columns: 1fr; }
+ .grammar-demonstratifs-table th,.grammar-demonstratifs-table td { padding: .58rem .65rem; }
+}
