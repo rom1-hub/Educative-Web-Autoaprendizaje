@@ -837,3 +837,51 @@ a.grammar-search-result:hover { border-color:rgba(7,91,232,.35); background:#f8f
  .grammar-pronominal-elision { gap: .35rem; }
  .grammar-pronominal-elision > div { gap: .4rem; padding: .65rem .35rem; }
 }
+
+
+/* Lección A1: verbos en -YER */
+.grammar-yer-hero { padding-bottom: 2.6rem; }
+.grammar-yer-hero h1 { max-width: 950px; margin: .7rem 0 .45rem; font-size: clamp(2.1rem,4.8vw,3.5rem); }
+.grammar-yer-hero > .container > p { margin: 0; color: var(--color-ink-soft); font-size: 1.12rem; font-weight: 650; }
+.grammar-yer-content { display: grid; gap: 1.5rem; max-width: 1120px; padding-top: 2.25rem; padding-bottom: 5rem; }
+.grammar-yer-content .grammar-lesson-section { margin: 0; }
+.grammar-yer-heading { margin-bottom: 1.15rem; }
+.grammar-yer-heading .eyebrow { display: inline-block; margin-bottom: .45rem; }
+.grammar-yer-heading h2 { margin: 0; font-size: clamp(1.4rem,3vw,1.9rem); }
+.grammar-yer-note,.grammar-yer-reminder,.grammar-yer-example,.grammar-yer-extra,.grammar-yer-pronunciation { padding: 1.2rem 1.35rem; border: 1px solid var(--color-line); border-radius: 14px; line-height: 1.7; }
+.grammar-yer-note { background: #eff9ed; }
+.grammar-yer-reminder { margin-top: 1rem; background: #fff6e8; }
+.grammar-yer-example { background: #fffaf4; }
+.grammar-yer-extra { margin-top: 1rem; background: #eaf7f7; }
+.grammar-yer-pronunciation { margin-top: 1rem; background: #fff1ef; }
+.grammar-yer-note p,.grammar-yer-reminder p,.grammar-yer-example p,.grammar-yer-extra p,.grammar-yer-pronunciation p { margin: .55rem 0; }
+.grammar-yer-note p:first-child,.grammar-yer-reminder p:first-child,.grammar-yer-example p:first-child,.grammar-yer-extra p:first-child,.grammar-yer-pronunciation p:first-child { margin-top: 0; }
+.grammar-yer-note p:last-child,.grammar-yer-reminder p:last-child,.grammar-yer-example p:last-child,.grammar-yer-extra p:last-child,.grammar-yer-pronunciation p:last-child { margin-bottom: 0; }
+.grammar-yer-note h3,.grammar-yer-reminder h3,.grammar-yer-example h3,.grammar-yer-extra h3,.grammar-yer-pronunciation h3 { margin: 0 0 .65rem; color: var(--color-blue); font-size: 1.12rem; }
+.grammar-yer-extra ul,.grammar-yer-note ul { display: grid; gap: .4rem; margin: .6rem 0; padding-left: 1.25rem; }
+.grammar-yer-comparison { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; align-items: start; }
+.grammar-yer-comparison > * { min-width: 0; }
+.grammar-yer-table-wrap,.grammar-yer-summary-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--color-line); border-radius: 12px; }
+.grammar-yer-table,.grammar-yer-summary { width: 100%; border-collapse: collapse; }
+.grammar-yer-table th,.grammar-yer-table td,.grammar-yer-summary th,.grammar-yer-summary td { padding: .62rem .8rem; text-align: left; border-bottom: 1px solid var(--color-line); vertical-align: middle; }
+.grammar-yer-table thead th,.grammar-yer-summary thead th { background: #0b3975; color: #fff; font-weight: 700; }
+.grammar-yer-table tbody td:first-child { background: #fff1df; font-weight: 650; }
+.grammar-yer-table tbody td:nth-child(2) { color: var(--color-blue); font-weight: 700; }
+.grammar-yer-table tbody tr:last-child td,.grammar-yer-summary tbody tr:last-child td { border-bottom: 0; }
+.grammar-yer-summary tbody td:first-child { color: var(--color-blue); font-weight: 750; white-space: nowrap; }
+.grammar-yer-change { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .6rem; margin: .8rem 0; }
+.grammar-yer-change > div { display: flex; flex-direction: column; gap: .2rem; padding: .75rem .85rem; border: 1px solid var(--color-line); border-radius: 10px; background: #fff; min-width: 0; }
+.grammar-yer-change span { color: var(--color-ink-soft); font-size: .85rem; }
+.grammar-yer-change strong { color: var(--color-blue); overflow-wrap: anywhere; }
+.grammar-yer-final-note { margin-top: 1rem; }
+.grammar-yer-content .grammar-lesson-end { margin-top: .25rem; }
+@media (max-width: 800px) {
+ .grammar-yer-comparison { grid-template-columns: 1fr; }
+}
+@media (max-width: 650px) {
+ .grammar-yer-content { gap: 1rem; padding-top: 1.25rem; }
+ .grammar-yer-content .grammar-lesson-section { padding: 1.1rem; }
+ .grammar-yer-note,.grammar-yer-reminder,.grammar-yer-example,.grammar-yer-extra,.grammar-yer-pronunciation { padding: 1rem; }
+ .grammar-yer-table th,.grammar-yer-table td,.grammar-yer-summary th,.grammar-yer-summary td { padding: .58rem .65rem; }
+ .grammar-yer-change { grid-template-columns: 1fr; }
+}
