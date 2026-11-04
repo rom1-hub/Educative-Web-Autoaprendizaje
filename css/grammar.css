@@ -1560,3 +1560,52 @@ a.grammar-search-result:hover { border-color:rgba(7,91,232,.35); background:#f8f
  .grammar-questions-table th,.grammar-questions-table td { padding: .58rem .65rem; }
  .grammar-questions-contrast { grid-template-columns: 1fr; }
 }
+
+
+/* Lección A1: preguntas con adverbios interrogativos */
+.grammar-wh-hero { padding-bottom: 2.6rem; }
+.grammar-wh-hero h1 { max-width: 950px; margin: .7rem 0 .45rem; font-size: clamp(2.1rem,4.8vw,3.5rem); }
+.grammar-wh-hero > .container > p { margin: 0; color: var(--color-ink-soft); font-size: 1.12rem; font-weight: 650; }
+.grammar-wh-content { display: grid; gap: 1.5rem; max-width: 1120px; padding-top: 2.25rem; padding-bottom: 5rem; }
+.grammar-wh-content .grammar-lesson-section { margin: 0; }
+.grammar-wh-heading { margin-bottom: 1.15rem; }
+.grammar-wh-heading .eyebrow { display: inline-block; margin-bottom: .45rem; }
+.grammar-wh-heading h2 { margin: 0; font-size: clamp(1.4rem,3vw,1.9rem); }
+.grammar-wh-note,.grammar-wh-important,.grammar-wh-final { padding: 1.2rem 1.35rem; border: 1px solid var(--color-line); border-radius: 14px; line-height: 1.7; }
+.grammar-wh-note { background: #eff9ed; }
+.grammar-wh-important { margin-top: 1rem; background: #fff1ef; }
+.grammar-wh-final { background: #fffaf4; }
+.grammar-wh-note p,.grammar-wh-important p,.grammar-wh-final p { margin: .55rem 0; }
+.grammar-wh-note p:first-child,.grammar-wh-important p:first-child,.grammar-wh-final p:first-child { margin-top: 0; }
+.grammar-wh-note p:last-child,.grammar-wh-important p:last-child,.grammar-wh-final p:last-child { margin-bottom: 0; }
+.grammar-wh-note h3,.grammar-wh-important h3 { margin: .9rem 0 .65rem; color: var(--color-blue); font-size: 1.12rem; }
+.grammar-wh-note h3:first-child,.grammar-wh-important h3:first-child { margin-top: 0; }
+.grammar-wh-note ul,.grammar-wh-note ol,.grammar-wh-important ul { display: grid; gap: .45rem; margin: .7rem 0; padding-left: 1.25rem; }
+.grammar-wh-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--color-line); border-radius: 12px; margin-top: 1rem; }
+.grammar-wh-table { width: 100%; min-width: 540px; border-collapse: collapse; }
+.grammar-wh-table th,.grammar-wh-table td { padding: .7rem .85rem; text-align: left; border-bottom: 1px solid var(--color-line); vertical-align: middle; }
+.grammar-wh-table thead th { background: #0b3975; color: #fff; font-weight: 700; }
+.grammar-wh-table tbody td:first-child { color: var(--color-blue); font-weight: 700; }
+.grammar-wh-table tbody tr:last-child td { border-bottom: 0; }
+.grammar-wh-formula { display: flex; flex-direction: column; gap: .45rem; margin: .8rem 0; padding: .95rem 1rem; border: 1px solid var(--color-line); border-radius: 10px; background: #fff; text-align: center; }
+.grammar-wh-formula strong { color: var(--color-blue); font-size: 1rem; }
+.grammar-wh-patterns { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .7rem; margin: .9rem 0; }
+.grammar-wh-patterns > div { display: flex; flex-direction: column; gap: .45rem; padding: 1rem; border: 1px solid var(--color-line); border-radius: 12px; background: #fff; min-width: 0; }
+.grammar-wh-patterns strong { color: var(--color-blue); }
+.grammar-wh-patterns span { font-weight: 750; }
+.grammar-wh-summary { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .7rem; margin: .8rem 0 1rem; }
+.grammar-wh-summary > div { display: flex; flex-direction: column; gap: .4rem; padding: 1rem; border: 1px solid var(--color-line); border-radius: 12px; background: #fff; min-width: 0; }
+.grammar-wh-summary strong { color: var(--color-blue); }
+.grammar-wh-summary p { margin: 0; }
+.grammar-wh-summary span { color: var(--color-ink-soft); font-size: .9rem; line-height: 1.5; }
+.grammar-wh-content .grammar-lesson-end { margin-top: .25rem; }
+@media (max-width: 900px) {
+ .grammar-wh-patterns { grid-template-columns: 1fr; }
+}
+@media (max-width: 650px) {
+ .grammar-wh-content { gap: 1rem; padding-top: 1.25rem; }
+ .grammar-wh-content .grammar-lesson-section { padding: 1.1rem; }
+ .grammar-wh-note,.grammar-wh-important,.grammar-wh-final { padding: 1rem; }
+ .grammar-wh-table th,.grammar-wh-table td { padding: .58rem .65rem; }
+ .grammar-wh-summary { grid-template-columns: 1fr; }
+}
