@@ -940,3 +940,73 @@ a.grammar-search-result:hover { border-color:rgba(7,91,232,.35); background:#f8f
  .grammar-econsonant-summary > div { align-items: flex-start; flex-direction: column; gap: .25rem; }
  .grammar-econsonant-summary strong { text-align: left; }
 }
+
+
+/* Lección A1: FAIRE y JOUER */
+.grammar-fairejouer-hero { padding-bottom: 2.6rem; }
+.grammar-fairejouer-hero h1 { max-width: 950px; margin: .7rem 0 .45rem; font-size: clamp(2.1rem,4.8vw,3.5rem); }
+.grammar-fairejouer-hero > .container > p { margin: 0; color: var(--color-ink-soft); font-size: 1.12rem; font-weight: 650; }
+.grammar-fairejouer-content { display: grid; gap: 1.5rem; max-width: 1120px; padding-top: 2.25rem; padding-bottom: 5rem; }
+.grammar-fairejouer-content .grammar-lesson-section { margin: 0; }
+.grammar-fairejouer-heading { margin-bottom: 1.15rem; }
+.grammar-fairejouer-heading .eyebrow { display: inline-block; margin-bottom: .45rem; }
+.grammar-fairejouer-heading h2 { margin: 0; font-size: clamp(1.4rem,3vw,1.9rem); }
+.grammar-fairejouer-note,.grammar-fairejouer-extra,.grammar-fairejouer-important,.grammar-fairejouer-grammar,.grammar-fairejouer-final { padding: 1.2rem 1.35rem; border: 1px solid var(--color-line); border-radius: 14px; line-height: 1.7; }
+.grammar-fairejouer-note { background: #eff9ed; }
+.grammar-fairejouer-extra { margin-top: 1rem; background: #eaf7f7; }
+.grammar-fairejouer-important { margin-top: 1rem; background: #fff1ef; }
+.grammar-fairejouer-grammar { margin-top: 1rem; background: #fff6e8; }
+.grammar-fairejouer-final { margin-top: 1rem; background: #fffaf4; }
+.grammar-fairejouer-note p,.grammar-fairejouer-extra p,.grammar-fairejouer-important p,.grammar-fairejouer-grammar p,.grammar-fairejouer-final p { margin: .55rem 0; }
+.grammar-fairejouer-note p:first-child,.grammar-fairejouer-extra p:first-child,.grammar-fairejouer-important p:first-child,.grammar-fairejouer-grammar p:first-child,.grammar-fairejouer-final p:first-child { margin-top: 0; }
+.grammar-fairejouer-note p:last-child,.grammar-fairejouer-extra p:last-child,.grammar-fairejouer-important p:last-child,.grammar-fairejouer-grammar p:last-child,.grammar-fairejouer-final p:last-child { margin-bottom: 0; }
+.grammar-fairejouer-note h3,.grammar-fairejouer-extra h3,.grammar-fairejouer-important h3,.grammar-fairejouer-grammar h3 { margin: 0 0 .65rem; color: var(--color-blue); font-size: 1.12rem; }
+.grammar-fairejouer-note ul,.grammar-fairejouer-extra ul { display: grid; gap: .4rem; margin: .6rem 0; padding-left: 1.25rem; }
+.grammar-fairejouer-overview { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .7rem; margin-top: 1rem; }
+.grammar-fairejouer-overview > div { display: flex; flex-direction: column; gap: .35rem; padding: .9rem 1rem; border: 1px solid var(--color-line); border-radius: 12px; background: #fff; }
+.grammar-fairejouer-overview strong { color: var(--color-blue); font-size: 1.08rem; }
+.grammar-fairejouer-overview span { color: var(--color-ink-soft); font-size: .9rem; }
+.grammar-fairejouer-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--color-line); border-radius: 12px; }
+.grammar-fairejouer-table { width: 100%; min-width: 560px; border-collapse: collapse; }
+.grammar-fairejouer-table th,.grammar-fairejouer-table td { padding: .65rem .8rem; text-align: left; border-bottom: 1px solid var(--color-line); vertical-align: middle; }
+.grammar-fairejouer-table thead th { background: #0b3975; color: #fff; font-weight: 700; }
+.grammar-fairejouer-table tbody td:first-child { background: #fff1df; font-weight: 650; }
+.grammar-fairejouer-table tbody td:nth-child(2) { color: var(--color-blue); font-weight: 700; }
+.grammar-fairejouer-table tbody tr:last-child td { border-bottom: 0; }
+.grammar-fairejouer-prepositions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .8rem; margin-top: 1rem; }
+.grammar-fairejouer-prepositions > div { display: flex; flex-direction: column; gap: .2rem; padding: 1rem 1.1rem; border: 1px solid var(--color-line); border-radius: 12px; background: #fff; min-width: 0; }
+.grammar-fairejouer-prepositions strong { color: var(--color-blue); font-size: 1.25rem; }
+.grammar-fairejouer-prepositions span { color: var(--color-ink-soft); font-size: .85rem; }
+.grammar-fairejouer-prepositions p { margin: .45rem 0 0; color: var(--color-blue); font-weight: 750; }
+.grammar-fairejouer-prepositions small { color: var(--color-ink-soft); }
+.grammar-fairejouer-examples { display: grid; gap: .35rem; margin-top: .65rem; }
+.grammar-fairejouer-examples p { margin: 0; color: var(--color-blue); font-weight: 750; }
+.grammar-fairejouer-compare { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .8rem; margin: 1rem 0; }
+.grammar-fairejouer-compare > div { display: flex; flex-direction: column; gap: .35rem; padding: 1rem; border: 1px solid var(--color-line); border-radius: 12px; background: #fff; }
+.grammar-fairejouer-compare span { color: var(--color-ink-soft); font-size: .85rem; font-weight: 750; }
+.grammar-fairejouer-compare strong { color: var(--color-blue); }
+.grammar-fairejouer-compare small { color: var(--color-ink-soft); }
+.grammar-fairejouer-vocab-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; margin-top: 1rem; }
+.grammar-fairejouer-vocab { padding: 1rem; border: 1px solid var(--color-line); border-radius: 12px; background: #fff; }
+.grammar-fairejouer-vocab h3 { margin: 0 0 .75rem; color: var(--color-blue); font-size: 1.1rem; }
+.grammar-fairejouer-vocab-columns { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .7rem; }
+.grammar-fairejouer-vocab-columns > div { min-width: 0; }
+.grammar-fairejouer-vocab-columns span { display: block; margin-bottom: .35rem; color: var(--color-ink-soft); font-size: .85rem; font-weight: 750; }
+.grammar-fairejouer-vocab-columns p { margin: .25rem 0; color: var(--color-blue); font-weight: 650; }
+.grammar-fairejouer-summary { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .7rem; }
+.grammar-fairejouer-summary > div { display: flex; flex-direction: column; gap: .35rem; padding: 1rem; border: 1px solid var(--color-line); border-radius: 12px; background: #fff; }
+.grammar-fairejouer-summary strong { color: var(--color-blue); font-size: 1.1rem; }
+.grammar-fairejouer-summary span { color: var(--color-ink-soft); font-size: .9rem; }
+.grammar-fairejouer-summary p { margin: .3rem 0 0; font-weight: 750; }
+.grammar-fairejouer-content .grammar-lesson-end { margin-top: .25rem; }
+@media (max-width: 800px) {
+ .grammar-fairejouer-overview,.grammar-fairejouer-summary { grid-template-columns: 1fr; }
+ .grammar-fairejouer-vocab-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 650px) {
+ .grammar-fairejouer-content { gap: 1rem; padding-top: 1.25rem; }
+ .grammar-fairejouer-content .grammar-lesson-section { padding: 1.1rem; }
+ .grammar-fairejouer-note,.grammar-fairejouer-extra,.grammar-fairejouer-important,.grammar-fairejouer-grammar,.grammar-fairejouer-final { padding: 1rem; }
+ .grammar-fairejouer-prepositions,.grammar-fairejouer-compare { grid-template-columns: 1fr; }
+ .grammar-fairejouer-table th,.grammar-fairejouer-table td { padding: .58rem .65rem; }
+}
