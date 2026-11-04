@@ -1010,3 +1010,67 @@ a.grammar-search-result:hover { border-color:rgba(7,91,232,.35); background:#f8f
  .grammar-fairejouer-prepositions,.grammar-fairejouer-compare { grid-template-columns: 1fr; }
  .grammar-fairejouer-table th,.grammar-fairejouer-table td { padding: .58rem .65rem; }
 }
+
+
+/* Lección A1: verbos del segundo grupo en -IR */
+.grammar-secondir-hero { padding-bottom: 2.6rem; }
+.grammar-secondir-hero h1 { max-width: 980px; margin: .7rem 0 .45rem; font-size: clamp(2.1rem,4.8vw,3.5rem); }
+.grammar-secondir-hero > .container > p { margin: 0; color: var(--color-ink-soft); font-size: 1.12rem; font-weight: 650; }
+.grammar-secondir-content { display: grid; gap: 1.5rem; max-width: 1120px; padding-top: 2.25rem; padding-bottom: 5rem; }
+.grammar-secondir-content .grammar-lesson-section { margin: 0; }
+.grammar-secondir-heading { margin-bottom: 1.15rem; }
+.grammar-secondir-heading .eyebrow { display: inline-block; margin-bottom: .45rem; }
+.grammar-secondir-heading h2 { margin: 0; font-size: clamp(1.4rem,3vw,1.9rem); }
+.grammar-secondir-note,.grammar-secondir-important,.grammar-secondir-extra,.grammar-secondir-final { padding: 1.2rem 1.35rem; border: 1px solid var(--color-line); border-radius: 14px; line-height: 1.7; }
+.grammar-secondir-note { background: #eff9ed; }
+.grammar-secondir-important { background: #fff1ef; }
+.grammar-secondir-extra { margin-top: 1rem; background: #eaf7f7; }
+.grammar-secondir-final { background: #fffaf4; }
+.grammar-secondir-note p,.grammar-secondir-important p,.grammar-secondir-extra p,.grammar-secondir-final p { margin: .55rem 0; }
+.grammar-secondir-note p:first-child,.grammar-secondir-important p:first-child,.grammar-secondir-extra p:first-child,.grammar-secondir-final p:first-child { margin-top: 0; }
+.grammar-secondir-note p:last-child,.grammar-secondir-important p:last-child,.grammar-secondir-extra p:last-child,.grammar-secondir-final p:last-child { margin-bottom: 0; }
+.grammar-secondir-note h3,.grammar-secondir-important h3,.grammar-secondir-extra h3 { margin: 0 0 .65rem; color: var(--color-blue); font-size: 1.12rem; }
+.grammar-secondir-note ul,.grammar-secondir-important ul,.grammar-secondir-extra ul { display: grid; gap: .4rem; margin: .6rem 0; padding-left: 1.25rem; }
+.grammar-secondir-split { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .7rem; margin: .9rem 0; }
+.grammar-secondir-split > div { display: flex; flex-direction: column; gap: .2rem; padding: .85rem 1rem; border: 1px solid var(--color-line); border-radius: 10px; background: #fff; }
+.grammar-secondir-split span,.grammar-secondir-summary span,.grammar-secondir-clues span { color: var(--color-ink-soft); font-size: .85rem; }
+.grammar-secondir-split strong { color: var(--color-blue); font-size: 1.2rem; }
+.grammar-secondir-endings { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .6rem; margin-top: .9rem; }
+.grammar-secondir-endings > div { display: flex; justify-content: space-between; align-items: center; gap: .6rem; padding: .7rem .85rem; border: 1px solid var(--color-line); border-radius: 10px; background: #fff; }
+.grammar-secondir-endings span { color: var(--color-ink-soft); font-weight: 650; }
+.grammar-secondir-endings strong { color: var(--color-blue); font-size: 1.05rem; }
+.grammar-secondir-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--color-line); border-radius: 12px; }
+.grammar-secondir-table { width: 100%; min-width: 540px; border-collapse: collapse; }
+.grammar-secondir-table th,.grammar-secondir-table td { padding: .65rem .8rem; text-align: left; border-bottom: 1px solid var(--color-line); vertical-align: middle; }
+.grammar-secondir-table thead th { background: #0b3975; color: #fff; font-weight: 700; }
+.grammar-secondir-table tbody td:first-child { background: #fff1df; font-weight: 650; }
+.grammar-secondir-table tbody td:nth-child(2) { color: var(--color-blue); font-weight: 700; }
+.grammar-secondir-table tbody tr:last-child td { border-bottom: 0; }
+.grammar-secondir-vocabulary { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .65rem; margin-top: .8rem; }
+.grammar-secondir-vocabulary > div { display: flex; flex-direction: column; gap: .2rem; padding: .75rem .9rem; border: 1px solid var(--color-line); border-radius: 10px; background: #fff; }
+.grammar-secondir-vocabulary strong { color: var(--color-blue); }
+.grammar-secondir-vocabulary span { color: var(--color-ink-soft); font-size: .9rem; }
+.grammar-secondir-third-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .65rem; margin-top: 1rem; }
+.grammar-secondir-third-list > div { display: flex; justify-content: space-between; align-items: center; gap: .8rem; padding: .8rem 1rem; border: 1px solid var(--color-line); border-radius: 10px; background: #fff; }
+.grammar-secondir-third-list strong { color: var(--color-blue); }
+.grammar-secondir-third-list span { color: var(--color-ink-soft); text-align: right; font-size: .9rem; }
+.grammar-secondir-clues { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .6rem; margin: .8rem 0; }
+.grammar-secondir-clues > div { display: flex; flex-direction: column; gap: .2rem; padding: .75rem .9rem; border: 1px solid var(--color-line); border-radius: 10px; background: #fff; }
+.grammar-secondir-clues strong { color: var(--color-blue); }
+.grammar-secondir-summary { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .65rem; margin-bottom: 1rem; }
+.grammar-secondir-summary > div { display: flex; flex-direction: column; gap: .25rem; padding: .85rem 1rem; border: 1px solid var(--color-line); border-radius: 10px; background: #fff; }
+.grammar-secondir-summary strong { color: var(--color-blue); overflow-wrap: anywhere; }
+.grammar-secondir-content .grammar-lesson-end { margin-top: .25rem; }
+@media (max-width: 800px) {
+ .grammar-secondir-vocabulary { grid-template-columns: repeat(2,minmax(0,1fr)); }
+ .grammar-secondir-endings { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 650px) {
+ .grammar-secondir-content { gap: 1rem; padding-top: 1.25rem; }
+ .grammar-secondir-content .grammar-lesson-section { padding: 1.1rem; }
+ .grammar-secondir-note,.grammar-secondir-important,.grammar-secondir-extra,.grammar-secondir-final { padding: 1rem; }
+ .grammar-secondir-split,.grammar-secondir-summary,.grammar-secondir-third-list,.grammar-secondir-clues { grid-template-columns: 1fr; }
+ .grammar-secondir-vocabulary { grid-template-columns: 1fr; }
+ .grammar-secondir-endings { grid-template-columns: repeat(2,minmax(0,1fr)); }
+ .grammar-secondir-table th,.grammar-secondir-table td { padding: .58rem .65rem; }
+}
