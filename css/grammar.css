@@ -1074,3 +1074,56 @@ a.grammar-search-result:hover { border-color:rgba(7,91,232,.35); background:#f8f
  .grammar-secondir-endings { grid-template-columns: repeat(2,minmax(0,1fr)); }
  .grammar-secondir-table th,.grammar-secondir-table td { padding: .58rem .65rem; }
 }
+
+
+/* Lección A1: presente continuo */
+.grammar-continuous-hero { padding-bottom: 2.6rem; }
+.grammar-continuous-hero h1 { max-width: 950px; margin: .7rem 0 .45rem; font-size: clamp(2.1rem,4.8vw,3.5rem); }
+.grammar-continuous-hero > .container > p { margin: 0; color: var(--color-ink-soft); font-size: 1.12rem; font-weight: 650; }
+.grammar-continuous-content { display: grid; gap: 1.5rem; max-width: 1120px; padding-top: 2.25rem; padding-bottom: 5rem; }
+.grammar-continuous-content .grammar-lesson-section { margin: 0; }
+.grammar-continuous-heading { margin-bottom: 1.15rem; }
+.grammar-continuous-heading .eyebrow { display: inline-block; margin-bottom: .45rem; }
+.grammar-continuous-heading h2 { margin: 0; font-size: clamp(1.4rem,3vw,1.9rem); }
+.grammar-continuous-note,.grammar-continuous-important,.grammar-continuous-reminder,.grammar-continuous-extra,.grammar-continuous-final { padding: 1.2rem 1.35rem; border: 1px solid var(--color-line); border-radius: 14px; line-height: 1.7; }
+.grammar-continuous-note { background: #eff9ed; }
+.grammar-continuous-important { margin-top: 1rem; background: #fff1ef; }
+.grammar-continuous-reminder { margin-top: 1rem; background: #fff6e8; }
+.grammar-continuous-extra { margin-top: 1rem; background: #eaf7f7; }
+.grammar-continuous-final { background: #fffaf4; }
+.grammar-continuous-note p,.grammar-continuous-important p,.grammar-continuous-reminder p,.grammar-continuous-extra p,.grammar-continuous-final p { margin: .55rem 0; }
+.grammar-continuous-note p:first-child,.grammar-continuous-important p:first-child,.grammar-continuous-reminder p:first-child,.grammar-continuous-extra p:first-child,.grammar-continuous-final p:first-child { margin-top: 0; }
+.grammar-continuous-note p:last-child,.grammar-continuous-important p:last-child,.grammar-continuous-reminder p:last-child,.grammar-continuous-extra p:last-child,.grammar-continuous-final p:last-child { margin-bottom: 0; }
+.grammar-continuous-note h3,.grammar-continuous-important h3,.grammar-continuous-reminder h3,.grammar-continuous-extra h3 { margin: 0 0 .65rem; color: var(--color-blue); font-size: 1.12rem; }
+.grammar-continuous-formula { display: flex; flex-direction: column; gap: .35rem; margin: .8rem 0; padding: .9rem 1rem; border: 1px solid var(--color-line); border-radius: 10px; background: #fff; text-align: center; }
+.grammar-continuous-formula span { color: var(--color-ink-soft); font-size: .85rem; font-weight: 750; }
+.grammar-continuous-formula strong { color: var(--color-blue); font-size: 1.05rem; }
+.grammar-continuous-formula small { color: var(--color-ink-soft); }
+.grammar-continuous-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--color-line); border-radius: 12px; margin-top: 1rem; }
+.grammar-continuous-table { width: 100%; min-width: 540px; border-collapse: collapse; }
+.grammar-continuous-table th,.grammar-continuous-table td { padding: .7rem .85rem; text-align: left; border-bottom: 1px solid var(--color-line); vertical-align: middle; }
+.grammar-continuous-table thead th { background: #0b3975; color: #fff; font-weight: 700; }
+.grammar-continuous-table tbody td:first-child { color: var(--color-blue); font-weight: 700; }
+.grammar-continuous-table tbody tr:last-child td { border-bottom: 0; }
+.grammar-continuous-compare { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .8rem; margin-bottom: 1rem; }
+.grammar-continuous-compare > div { display: flex; flex-direction: column; gap: .35rem; padding: 1rem 1.1rem; border: 1px solid var(--color-line); border-radius: 12px; background: #fff; }
+.grammar-continuous-compare span { color: var(--color-ink-soft); font-size: .85rem; font-weight: 750; }
+.grammar-continuous-compare strong { color: var(--color-blue); font-size: 1.12rem; }
+.grammar-continuous-compare p { margin: 0; font-weight: 650; }
+.grammar-continuous-compare small { color: var(--color-ink-soft); line-height: 1.5; }
+.grammar-continuous-summary { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .7rem; margin-bottom: 1rem; }
+.grammar-continuous-summary > div { display: flex; flex-direction: column; gap: .4rem; padding: 1rem; border: 1px solid var(--color-line); border-radius: 12px; background: #fff; min-width: 0; }
+.grammar-continuous-summary strong { color: var(--color-blue); }
+.grammar-continuous-summary p { margin: 0; font-weight: 750; overflow-wrap: anywhere; }
+.grammar-continuous-summary span { color: var(--color-ink-soft); font-size: .9rem; }
+.grammar-continuous-content .grammar-lesson-end { margin-top: .25rem; }
+@media (max-width: 800px) {
+ .grammar-continuous-summary { grid-template-columns: 1fr; }
+}
+@media (max-width: 650px) {
+ .grammar-continuous-content { gap: 1rem; padding-top: 1.25rem; }
+ .grammar-continuous-content .grammar-lesson-section { padding: 1.1rem; }
+ .grammar-continuous-note,.grammar-continuous-important,.grammar-continuous-reminder,.grammar-continuous-extra,.grammar-continuous-final { padding: 1rem; }
+ .grammar-continuous-compare { grid-template-columns: 1fr; }
+ .grammar-continuous-table th,.grammar-continuous-table td { padding: .58rem .65rem; }
+}
