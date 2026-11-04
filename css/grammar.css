@@ -1370,3 +1370,47 @@ a.grammar-search-result:hover { border-color:rgba(7,91,232,.35); background:#f8f
  .grammar-prepositions-formula { grid-template-columns: 1fr; }
  .grammar-prepositions-table th,.grammar-prepositions-table td { padding: .58rem .65rem; }
 }
+
+
+/* Lección A1: diferencia entre C'EST e IL EST */
+.grammar-cest-hero { padding-bottom: 2.6rem; }
+.grammar-cest-hero h1 { max-width: 950px; margin: .7rem 0 .45rem; font-size: clamp(2.1rem,4.8vw,3.5rem); }
+.grammar-cest-hero > .container > p { margin: 0; color: var(--color-ink-soft); font-size: 1.12rem; font-weight: 650; }
+.grammar-cest-content { display: grid; gap: 1.5rem; max-width: 1120px; padding-top: 2.25rem; padding-bottom: 5rem; }
+.grammar-cest-content .grammar-lesson-section { margin: 0; }
+.grammar-cest-heading { margin-bottom: 1.15rem; }
+.grammar-cest-heading .eyebrow { display: inline-block; margin-bottom: .45rem; }
+.grammar-cest-heading h2 { margin: 0; font-size: clamp(1.4rem,3vw,1.9rem); }
+.grammar-cest-note,.grammar-cest-important,.grammar-cest-final { padding: 1.2rem 1.35rem; border: 1px solid var(--color-line); border-radius: 14px; line-height: 1.7; }
+.grammar-cest-note { background: #eff9ed; }
+.grammar-cest-important { margin-top: 1rem; background: #fff1ef; }
+.grammar-cest-final { background: #fffaf4; }
+.grammar-cest-note p,.grammar-cest-important p,.grammar-cest-final p { margin: .55rem 0; }
+.grammar-cest-note p:first-child,.grammar-cest-important p:first-child,.grammar-cest-final p:first-child { margin-top: 0; }
+.grammar-cest-note p:last-child,.grammar-cest-important p:last-child,.grammar-cest-final p:last-child { margin-bottom: 0; }
+.grammar-cest-note h3,.grammar-cest-important h3 { margin: .9rem 0 .65rem; color: var(--color-blue); font-size: 1.12rem; }
+.grammar-cest-note h3:first-child,.grammar-cest-important h3:first-child { margin-top: 0; }
+.grammar-cest-note ul,.grammar-cest-summary ul { display: grid; gap: .45rem; margin: .7rem 0; padding-left: 1.25rem; }
+.grammar-cest-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--color-line); border-radius: 12px; margin-top: 1rem; }
+.grammar-cest-table { width: 100%; min-width: 500px; border-collapse: collapse; }
+.grammar-cest-table th,.grammar-cest-table td { padding: .7rem .85rem; text-align: left; border-bottom: 1px solid var(--color-line); vertical-align: middle; }
+.grammar-cest-table thead th { background: #0b3975; color: #fff; font-weight: 700; }
+.grammar-cest-table tbody td:first-child { color: var(--color-blue); font-weight: 700; }
+.grammar-cest-table tbody tr:last-child td { border-bottom: 0; }
+.grammar-cest-formula { display: flex; flex-direction: column; gap: .55rem; margin: .8rem 0; padding: .95rem 1rem; border: 1px solid var(--color-line); border-radius: 10px; background: #fff; text-align: center; }
+.grammar-cest-formula strong { color: var(--color-blue); font-size: 1rem; }
+.grammar-cest-formula small { color: var(--color-ink-soft); }
+.grammar-cest-summary { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .8rem; margin-bottom: 1rem; }
+.grammar-cest-summary > div { padding: 1.1rem; border: 1px solid var(--color-line); border-radius: 12px; background: #fff; min-width: 0; }
+.grammar-cest-summary strong { color: var(--color-blue); font-size: 1.05rem; }
+.grammar-cest-summary ul { margin-bottom: 0; }
+.grammar-cest-content .grammar-lesson-end { margin-top: .25rem; }
+@media (max-width: 800px) {
+ .grammar-cest-summary { grid-template-columns: 1fr; }
+}
+@media (max-width: 650px) {
+ .grammar-cest-content { gap: 1rem; padding-top: 1.25rem; }
+ .grammar-cest-content .grammar-lesson-section { padding: 1.1rem; }
+ .grammar-cest-note,.grammar-cest-important,.grammar-cest-final { padding: 1rem; }
+ .grammar-cest-table th,.grammar-cest-table td { padding: .58rem .65rem; }
+}
