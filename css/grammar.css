@@ -771,3 +771,69 @@ a.grammar-search-result:hover { border-color:rgba(7,91,232,.35); background:#f8f
  .grammar-elereter-rule,.grammar-elereter-sound-pairs { grid-template-columns: 1fr; }
  .grammar-elereter-table th,.grammar-elereter-table td { padding: .58rem .65rem; }
 }
+
+
+/* Lección A1: verbos pronominales */
+.grammar-pronominal-hero { padding-bottom: 2.6rem; }
+.grammar-pronominal-hero h1 { max-width: 950px; margin: .7rem 0 .45rem; font-size: clamp(2.1rem,4.8vw,3.5rem); }
+.grammar-pronominal-hero > .container > p { margin: 0; color: var(--color-ink-soft); font-size: 1.12rem; font-weight: 650; }
+.grammar-pronominal-content { display: grid; gap: 1.5rem; max-width: 1120px; padding-top: 2.25rem; padding-bottom: 5rem; }
+.grammar-pronominal-content .grammar-lesson-section { margin: 0; }
+.grammar-pronominal-heading { margin-bottom: 1.15rem; }
+.grammar-pronominal-heading .eyebrow { display: inline-block; margin-bottom: .45rem; }
+.grammar-pronominal-heading h2 { margin: 0; font-size: clamp(1.4rem,3vw,1.9rem); }
+.grammar-pronominal-note,.grammar-pronominal-example,.grammar-pronominal-phonetic { padding: 1.2rem 1.35rem; border: 1px solid var(--color-line); border-radius: 14px; line-height: 1.7; }
+.grammar-pronominal-note { background: #eff9ed; }
+.grammar-pronominal-observation { background: #fff6e8; }
+.grammar-pronominal-important { background: #fff1ef; }
+.grammar-pronominal-phonetic { background: #eaf7f7; }
+.grammar-pronominal-example { background: #fffaf4; }
+.grammar-pronominal-note p,.grammar-pronominal-example p,.grammar-pronominal-phonetic p { margin: .55rem 0; }
+.grammar-pronominal-note p:first-child,.grammar-pronominal-example p:first-child,.grammar-pronominal-phonetic p:first-child { margin-top: 0; }
+.grammar-pronominal-note p:last-child,.grammar-pronominal-example p:last-child,.grammar-pronominal-phonetic p:last-child { margin-bottom: 0; }
+.grammar-pronominal-note h3,.grammar-pronominal-example h3,.grammar-pronominal-phonetic h3 { margin: 0 0 .65rem; color: var(--color-blue); font-size: 1.12rem; }
+.grammar-pronominal-note ul,.grammar-pronominal-example ul,.grammar-pronominal-phonetic ul { display: grid; gap: .4rem; margin: .6rem 0; padding-left: 1.25rem; }
+.grammar-pronominal-columns { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(250px,.85fr); gap: 1rem; align-items: stretch; }
+.grammar-pronominal-columns > * { min-width: 0; }
+.grammar-pronominal-example-list { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .6rem; margin-top: 1rem; }
+.grammar-pronominal-example-list > div { display: flex; flex-direction: column; gap: .2rem; padding: .75rem .9rem; border: 1px solid var(--color-line); border-radius: 10px; background: #fff; }
+.grammar-pronominal-example-list strong { color: var(--color-blue); }
+.grammar-pronominal-example-list span { color: var(--color-ink-soft); font-size: .9rem; }
+.grammar-pronominal-contrast { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .7rem; margin: .9rem 0; }
+.grammar-pronominal-contrast > div { display: flex; flex-direction: column; gap: .2rem; padding: .8rem 1rem; border: 1px solid var(--color-line); border-radius: 10px; background: #fff; }
+.grammar-pronominal-contrast strong { color: var(--color-blue); }
+.grammar-pronominal-contrast span { color: var(--color-ink-soft); font-size: .9rem; }
+.grammar-pronominal-formula { margin: .9rem 0; padding: .85rem 1rem; border: 1px solid rgba(11,57,117,.16); border-radius: 10px; background: #fff; color: var(--color-blue); text-align: center; font-weight: 800; }
+.grammar-pronominal-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--color-line); border-radius: 12px; }
+.grammar-pronominal-table { width: 100%; min-width: 450px; border-collapse: collapse; }
+.grammar-pronominal-table th,.grammar-pronominal-table td { padding: .68rem .85rem; text-align: left; border-bottom: 1px solid var(--color-line); vertical-align: middle; }
+.grammar-pronominal-table thead th { background: #0b3975; color: #fff; font-weight: 700; }
+.grammar-pronominal-table tbody td:first-child { background: #fff1df; font-weight: 650; }
+.grammar-pronominal-table tbody td:nth-child(2) { color: var(--color-blue); font-weight: 700; }
+.grammar-pronominal-table tbody tr:last-child td { border-bottom: 0; }
+.grammar-pronominal-roots { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .7rem; margin: .8rem 0; }
+.grammar-pronominal-roots > div { display: flex; flex-direction: column; gap: .2rem; padding: .75rem .9rem; border: 1px solid var(--color-line); border-radius: 10px; background: #fff; }
+.grammar-pronominal-roots span { color: var(--color-ink-soft); font-size: .85rem; }
+.grammar-pronominal-roots strong { color: var(--color-blue); font-size: 1.08rem; }
+.grammar-pronominal-elision { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .65rem; margin: .8rem 0; }
+.grammar-pronominal-elision > div { display: flex; justify-content: center; align-items: center; gap: .75rem; padding: .75rem; border: 1px solid var(--color-line); border-radius: 10px; background: #fff; color: var(--color-blue); }
+.grammar-pronominal-elision strong { font-size: 1.1rem; }
+.grammar-pronominal-elision span { color: var(--color-ink-soft); }
+.grammar-pronominal-highlight { color: var(--color-blue); font-weight: 800; }
+.grammar-pronominal-content .grammar-lesson-end { margin-top: .25rem; }
+@media (max-width: 800px) {
+ .grammar-pronominal-columns { grid-template-columns: 1fr; }
+ .grammar-pronominal-example-list { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 650px) {
+ .grammar-pronominal-content { gap: 1rem; padding-top: 1.25rem; }
+ .grammar-pronominal-content .grammar-lesson-section { padding: 1.1rem; }
+ .grammar-pronominal-note,.grammar-pronominal-example,.grammar-pronominal-phonetic { padding: 1rem; }
+ .grammar-pronominal-roots,.grammar-pronominal-contrast { grid-template-columns: 1fr; }
+ .grammar-pronominal-table th,.grammar-pronominal-table td { padding: .58rem .65rem; }
+}
+@media (max-width: 430px) {
+ .grammar-pronominal-example-list { grid-template-columns: 1fr; }
+ .grammar-pronominal-elision { gap: .35rem; }
+ .grammar-pronominal-elision > div { gap: .4rem; padding: .65rem .35rem; }
+}
