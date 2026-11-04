@@ -1127,3 +1127,55 @@ a.grammar-search-result:hover { border-color:rgba(7,91,232,.35); background:#f8f
  .grammar-continuous-compare { grid-template-columns: 1fr; }
  .grammar-continuous-table th,.grammar-continuous-table td { padding: .58rem .65rem; }
 }
+
+
+/* Lección A1: futuro próximo */
+.grammar-futurproche-hero { padding-bottom: 2.6rem; }
+.grammar-futurproche-hero h1 { max-width: 950px; margin: .7rem 0 .45rem; font-size: clamp(2.1rem,4.8vw,3.5rem); }
+.grammar-futurproche-hero > .container > p { margin: 0; color: var(--color-ink-soft); font-size: 1.12rem; font-weight: 650; }
+.grammar-futurproche-content { display: grid; gap: 1.5rem; max-width: 1120px; padding-top: 2.25rem; padding-bottom: 5rem; }
+.grammar-futurproche-content .grammar-lesson-section { margin: 0; }
+.grammar-futurproche-heading { margin-bottom: 1.15rem; }
+.grammar-futurproche-heading .eyebrow { display: inline-block; margin-bottom: .45rem; }
+.grammar-futurproche-heading h2 { margin: 0; font-size: clamp(1.4rem,3vw,1.9rem); }
+.grammar-futurproche-note,.grammar-futurproche-important,.grammar-futurproche-reminder,.grammar-futurproche-extra,.grammar-futurproche-final { padding: 1.2rem 1.35rem; border: 1px solid var(--color-line); border-radius: 14px; line-height: 1.7; }
+.grammar-futurproche-note { background: #eff9ed; }
+.grammar-futurproche-important { margin-top: 1rem; background: #fff1ef; }
+.grammar-futurproche-reminder { margin-top: 1rem; background: #fff6e8; }
+.grammar-futurproche-extra { margin-top: 1rem; background: #eaf7f7; }
+.grammar-futurproche-final { background: #fffaf4; }
+.grammar-futurproche-note p,.grammar-futurproche-important p,.grammar-futurproche-reminder p,.grammar-futurproche-extra p,.grammar-futurproche-final p { margin: .55rem 0; }
+.grammar-futurproche-note p:first-child,.grammar-futurproche-important p:first-child,.grammar-futurproche-reminder p:first-child,.grammar-futurproche-extra p:first-child,.grammar-futurproche-final p:first-child { margin-top: 0; }
+.grammar-futurproche-note p:last-child,.grammar-futurproche-important p:last-child,.grammar-futurproche-reminder p:last-child,.grammar-futurproche-extra p:last-child,.grammar-futurproche-final p:last-child { margin-bottom: 0; }
+.grammar-futurproche-note h3,.grammar-futurproche-important h3,.grammar-futurproche-reminder h3,.grammar-futurproche-extra h3 { margin: 0 0 .65rem; color: var(--color-blue); font-size: 1.12rem; }
+.grammar-futurproche-formula { display: flex; flex-direction: column; gap: .35rem; margin: .8rem 0; padding: .9rem 1rem; border: 1px solid var(--color-line); border-radius: 10px; background: #fff; text-align: center; }
+.grammar-futurproche-formula span { color: var(--color-ink-soft); font-size: .85rem; font-weight: 750; }
+.grammar-futurproche-formula strong { color: var(--color-blue); font-size: 1.05rem; }
+.grammar-futurproche-formula small { color: var(--color-ink-soft); }
+.grammar-futurproche-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--color-line); border-radius: 12px; margin-top: 1rem; }
+.grammar-futurproche-table { width: 100%; min-width: 540px; border-collapse: collapse; }
+.grammar-futurproche-table th,.grammar-futurproche-table td { padding: .7rem .85rem; text-align: left; border-bottom: 1px solid var(--color-line); vertical-align: middle; }
+.grammar-futurproche-table thead th { background: #0b3975; color: #fff; font-weight: 700; }
+.grammar-futurproche-table tbody td:first-child { color: var(--color-blue); font-weight: 700; }
+.grammar-futurproche-table tbody tr:last-child td { border-bottom: 0; }
+.grammar-futurproche-contrast { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .7rem; margin: .8rem 0; }
+.grammar-futurproche-contrast > div { display: flex; flex-direction: column; gap: .3rem; padding: .85rem 1rem; border: 1px solid var(--color-line); border-radius: 10px; background: #fff; }
+.grammar-futurproche-contrast span { color: var(--color-ink-soft); font-size: .85rem; font-weight: 750; }
+.grammar-futurproche-contrast strong { color: var(--color-blue); }
+.grammar-futurproche-contrast small { color: var(--color-ink-soft); }
+.grammar-futurproche-summary { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .7rem; margin-bottom: 1rem; }
+.grammar-futurproche-summary > div { display: flex; flex-direction: column; gap: .4rem; padding: 1rem; border: 1px solid var(--color-line); border-radius: 12px; background: #fff; min-width: 0; }
+.grammar-futurproche-summary strong { color: var(--color-blue); }
+.grammar-futurproche-summary p { margin: 0; font-weight: 750; overflow-wrap: anywhere; }
+.grammar-futurproche-summary span { color: var(--color-ink-soft); font-size: .9rem; }
+.grammar-futurproche-content .grammar-lesson-end { margin-top: .25rem; }
+@media (max-width: 800px) {
+ .grammar-futurproche-summary { grid-template-columns: 1fr; }
+}
+@media (max-width: 650px) {
+ .grammar-futurproche-content { gap: 1rem; padding-top: 1.25rem; }
+ .grammar-futurproche-content .grammar-lesson-section { padding: 1.1rem; }
+ .grammar-futurproche-note,.grammar-futurproche-important,.grammar-futurproche-reminder,.grammar-futurproche-extra,.grammar-futurproche-final { padding: 1rem; }
+ .grammar-futurproche-contrast { grid-template-columns: 1fr; }
+ .grammar-futurproche-table th,.grammar-futurproche-table td { padding: .58rem .65rem; }
+}
