@@ -1609,3 +1609,51 @@ a.grammar-search-result:hover { border-color:rgba(7,91,232,.35); background:#f8f
  .grammar-wh-table th,.grammar-wh-table td { padding: .58rem .65rem; }
  .grammar-wh-summary { grid-template-columns: 1fr; }
 }
+
+
+/* Lección A1: verbos en -IR del tercer grupo */
+.grammar-ir3-hero { padding-bottom: 2.6rem; }
+.grammar-ir3-hero h1 { max-width: 980px; margin: .7rem 0 .45rem; font-size: clamp(2.1rem,4.8vw,3.5rem); }
+.grammar-ir3-hero > .container > p { margin: 0; color: var(--color-ink-soft); font-size: 1.12rem; font-weight: 650; }
+.grammar-ir3-content { display: grid; gap: 1.5rem; max-width: 1120px; padding-top: 2.25rem; padding-bottom: 5rem; }
+.grammar-ir3-content .grammar-lesson-section { margin: 0; }
+.grammar-ir3-heading { margin-bottom: 1.15rem; }
+.grammar-ir3-heading .eyebrow { display: inline-block; margin-bottom: .45rem; }
+.grammar-ir3-heading h2 { margin: 0; font-size: clamp(1.4rem,3vw,1.9rem); }
+.grammar-ir3-note,.grammar-ir3-important,.grammar-ir3-final { padding: 1.2rem 1.35rem; border: 1px solid var(--color-line); border-radius: 14px; line-height: 1.7; }
+.grammar-ir3-note { background: #eff9ed; }
+.grammar-ir3-important { margin-top: 1rem; background: #fff1ef; }
+.grammar-ir3-final { background: #fffaf4; }
+.grammar-ir3-note p,.grammar-ir3-important p,.grammar-ir3-final p { margin: .55rem 0; }
+.grammar-ir3-note p:first-child,.grammar-ir3-important p:first-child,.grammar-ir3-final p:first-child { margin-top: 0; }
+.grammar-ir3-note p:last-child,.grammar-ir3-important p:last-child,.grammar-ir3-final p:last-child { margin-bottom: 0; }
+.grammar-ir3-note h3,.grammar-ir3-important h3 { margin: .9rem 0 .65rem; color: var(--color-blue); font-size: 1.12rem; }
+.grammar-ir3-note h3:first-child,.grammar-ir3-important h3:first-child { margin-top: 0; }
+.grammar-ir3-note ul,.grammar-ir3-note ol,.grammar-ir3-important ul { display: grid; gap: .45rem; margin: .7rem 0; padding-left: 1.25rem; }
+.grammar-ir3-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--color-line); border-radius: 12px; margin-top: 1rem; }
+.grammar-ir3-table { width: 100%; min-width: 520px; border-collapse: collapse; }
+.grammar-ir3-table th,.grammar-ir3-table td { padding: .7rem .85rem; text-align: left; border-bottom: 1px solid var(--color-line); vertical-align: middle; }
+.grammar-ir3-table thead th { background: #0b3975; color: #fff; font-weight: 700; }
+.grammar-ir3-table tbody td:first-child { color: var(--color-blue); font-weight: 700; }
+.grammar-ir3-table tbody tr:last-child td { border-bottom: 0; }
+.grammar-ir3-families { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .7rem; margin-top: 1rem; }
+.grammar-ir3-families > div { padding: 1rem; border: 1px solid var(--color-line); border-radius: 12px; background: #fff; min-width: 0; }
+.grammar-ir3-families strong { color: var(--color-blue); }
+.grammar-ir3-families ul { padding-left: 1.1rem; margin-bottom: 0; }
+.grammar-ir3-summary { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .7rem; margin-bottom: 1rem; }
+.grammar-ir3-summary > div { display: flex; flex-direction: column; gap: .4rem; padding: 1rem; border: 1px solid var(--color-line); border-radius: 12px; background: #fff; min-width: 0; }
+.grammar-ir3-summary strong { color: var(--color-blue); }
+.grammar-ir3-summary span { color: var(--color-ink-soft); font-size: .9rem; line-height: 1.5; }
+.grammar-ir3-content .grammar-lesson-end { margin-top: .25rem; }
+@media (max-width: 900px) {
+ .grammar-ir3-families { grid-template-columns: 1fr; }
+}
+@media (max-width: 800px) {
+ .grammar-ir3-summary { grid-template-columns: 1fr; }
+}
+@media (max-width: 650px) {
+ .grammar-ir3-content { gap: 1rem; padding-top: 1.25rem; }
+ .grammar-ir3-content .grammar-lesson-section { padding: 1.1rem; }
+ .grammar-ir3-note,.grammar-ir3-important,.grammar-ir3-final { padding: 1rem; }
+ .grammar-ir3-table th,.grammar-ir3-table td { padding: .58rem .65rem; }
+}
