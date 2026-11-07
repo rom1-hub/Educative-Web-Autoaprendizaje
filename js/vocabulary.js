@@ -364,6 +364,7 @@
       $("vocabulary-status").textContent = "Explorando categorías";
     });
     $("vocabulary-learning-panel").addEventListener("click", event => {
+      if (event.target.closest("[data-scene-close]")) { selectedWord = null; render(); return; }
       const sceneWord = event.target.closest("[data-scene-word]");
       if (sceneWord) { selectedWord = selectedWord === sceneWord.dataset.sceneWord ? null : sceneWord.dataset.sceneWord; render(); return; }
       const card = event.target.closest("[data-word-card]");
