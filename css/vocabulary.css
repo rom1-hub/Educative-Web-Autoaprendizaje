@@ -261,3 +261,16 @@
  .scene-room-labels{font-size:10px}
  .vocabulary-scene-hint{font-size:.74rem;line-height:1.5}
 }
+
+
+.vocabulary-scene-legend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.55rem;max-width:940px;margin:1rem auto 0}
+.vocabulary-scene-legend-item{display:flex;align-items:center;gap:.65rem;min-width:0;padding:.65rem .75rem;border:1px solid #e1e8f0;border-radius:11px;background:#fff;color:#34465d;text-align:left;font:inherit;cursor:pointer;transition:border-color .16s,background .16s,box-shadow .16s}
+.vocabulary-scene-legend-item:hover,.vocabulary-scene-legend-item:focus-visible{border-color:#9bb8d7;background:#f8fbff;outline:none}
+.vocabulary-scene-legend-item.is-selected{border-color:#1765c1;background:#eff6ff;box-shadow:inset 3px 0 #1765c1}
+.vocabulary-scene-legend-number{display:grid;place-items:center;flex:0 0 1.7rem;height:1.7rem;border-radius:8px;background:#eaf1f8;color:#1765c1;font-size:.75rem;font-weight:850}
+.vocabulary-scene-legend-item.is-selected .vocabulary-scene-legend-number{background:#1765c1;color:#fff}
+.vocabulary-scene-legend-item>span:last-child{display:grid;gap:.12rem;min-width:0}
+.vocabulary-scene-legend-item strong{overflow-wrap:anywhere;font-size:.8rem}
+.vocabulary-scene-legend-item small{color:#718096;font-size:.72rem}
+@media(max-width:700px){.vocabulary-scene-legend{grid-template-columns:repeat(2,minmax(0,1fr));gap:.4rem}.vocabulary-scene-legend-item{padding:.55rem}.vocabulary-scene-legend-item strong{font-size:.75rem}}
+@media(max-width:390px){.vocabulary-scene-legend{grid-template-columns:1fr}}
