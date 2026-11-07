@@ -266,6 +266,15 @@
         '<circle class="scene-marker" cx="' + spot.x + '" cy="' + spot.y + '" r="12"></circle>' +
         '<text x="' + spot.x + '" y="' + (spot.y + 4) + '">' + (index + 1) + '</text></g>';
     }).join("");
+    const sceneLegend = hotspots.map((spot, index) => {
+      const word = byId.get(spot.id);
+      if (!word) return "";
+      const active = selectedWord === wordKey(word);
+      return '<button type="button" class="vocabulary-scene-legend-item ' + (active ? "is-selected" : "") +
+        '" data-scene-word="' + escapeHTML(wordKey(word)) + '" aria-pressed="' + active + '">' +
+        '<span class="vocabulary-scene-legend-number">' + (index + 1) + '</span>' +
+        '<span><strong>' + escapeHTML(word.french) + '</strong><small>' + escapeHTML(word.spanish) + '</small></span></button>';
+    }).join("");
     return '<div class="vocabulary-scene-intro"><p>Explora la vivienda y selecciona cualquiera de sus espacios.</p><span>18 espacios interactivos</span></div>' +
       '<div class="vocabulary-house-scene"><svg viewBox="0 0 900 640" role="group" aria-label="Casa moderna en corte con habitaciones, sótano, garaje y jardín">' +
       '<defs><linearGradient id="scene-wall-gradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#f4f7fb"/></linearGradient></defs>' +
@@ -283,14 +292,15 @@
       '<path class="scene-cellar-line" d="M330 553 H570"/>' +
       '<rect class="scene-window" x="245" y="270" width="52" height="45" rx="4"/><path class="scene-window-line" d="M271 270 V315 M245 292 H297"/>' +
       '<rect class="scene-window" x="600" y="270" width="48" height="45" rx="4"/><path class="scene-window-line" d="M624 270 V315 M600 292 H648"/>' +
-      '<rect class="scene-door" x="265" y="440" width="38" height="70" rx="18 18 0 0"/><circle class="scene-door-knob" cx="294" cy="478" r="3"/>' +
+      '<rect class="scene-door" x="265" y="440" width="38" height="70" rx="8"/><circle class="scene-door-knob" cx="294" cy="478" r="3"/>' +
       '<rect class="scene-balcony" x="700" y="225" width="92" height="16" rx="3"/><path class="scene-balcony-rail" d="M710 225 V190 H782 V225 M726 190 V225 M746 190 V225 M766 190 V225"/>' +
       '<path class="scene-garage" d="M55 500 L125 455 L195 500 V580 H55 Z"/><rect class="scene-garage-door" x="77" y="510" width="96" height="70" rx="3"/><path class="scene-garage-lines" d="M77 527 H173 M77 545 H173 M77 563 H173"/>' +
       '<path class="scene-garden" d="M700 510 Q780 480 870 520 L870 580 H700 Z"/><circle class="scene-tree" cx="820" cy="490" r="25"/><rect class="scene-tree-trunk" x="815" y="510" width="10" height="38" rx="3"/>' +
       '<rect class="scene-terrace" x="700" y="455" width="150" height="42" rx="5"/><path class="scene-terrace-line" d="M715 455 V497 M735 455 V497 M755 455 V497"/>' +
       '<g class="scene-room-labels" aria-hidden="true"><text x="450" y="207">GRENIER</text><text x="332" y="270">CHAMBRE</text><text x="565" y="270">SALLE DE BAINS</text><text x="328" y="397">SALON</text><text x="501" y="397">SALLE À MANGER</text><text x="623" y="397">CUISINE</text><text x="450" y="561">CAVE</text><text x="125" y="490">GARAGE</text><text x="785" y="575">JARDIN</text><text x="775" y="448">TERRASSE</text></g>' +
       svgHotspots + '</svg></div>' +
-      '<p class="vocabulary-scene-hint">Los marcadores numerados corresponden a los espacios de la casa. También puedes recorrerlos con el teclado.</p>' +
+      '<p class="vocabulary-scene-hint">Selecciona un marcador o una palabra de la lista para consultar su ficha.</p>' +
+      '<div class="vocabulary-scene-legend" aria-label="Lista de espacios de la casa">' + sceneLegend + '</div>' +
       (selected ? detailMarkup(selected) : '<div class="vocabulary-scene-selection">Selecciona un espacio para consultar su palabra en francés y su traducción.</div>');
   }
 
