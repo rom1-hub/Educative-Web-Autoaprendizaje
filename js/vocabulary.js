@@ -244,10 +244,15 @@
   function renderHouseScene(words) {
     const byId = new Map(words.map(word => [word.id, word]));
     const hotspots = [
-      {id:"test-house-salon",x:166,y:177},{id:"test-house-cuisine",x:358,y:177},
-      {id:"test-house-chambre",x:166,y:324},{id:"test-house-bathroom",x:358,y:324},
-      {id:"test-house-sofa",x:130,y:222},{id:"test-house-fridge",x:392,y:224},
-      {id:"test-house-bed",x:132,y:370},{id:"test-house-shower",x:390,y:370}
+      {id:"house-home",x:438,y:42},{id:"house-apartment",x:570,y:42},
+      {id:"house-attic",x:440,y:112},{id:"house-bedroom",x:545,y:185},
+      {id:"house-bathroom",x:675,y:185},{id:"house-shower-room",x:680,y:265},
+      {id:"house-balcony",x:770,y:190},{id:"house-room",x:405,y:190},
+      {id:"house-hallway",x:405,y:285},{id:"house-living-room",x:250,y:385},
+      {id:"house-dining-room",x:430,y:385},{id:"house-kitchen",x:610,y:385},
+      {id:"house-toilet",x:690,y:385},{id:"house-entrance",x:280,y:485},
+      {id:"house-terrace",x:755,y:475},{id:"house-garden",x:830,y:555},
+      {id:"house-garage",x:105,y:550},{id:"house-cellar",x:450,y:565}
     ];
     const selected = words.find(word => wordKey(word) === selectedWord);
     const svgHotspots = hotspots.map((spot, index) => {
@@ -256,28 +261,37 @@
       const active = selectedWord === wordKey(word);
       return '<g class="vocabulary-scene-hotspot ' + (active ? "is-selected" : "") +
         '" data-scene-word="' + escapeHTML(wordKey(word)) + '" role="button" tabindex="0" aria-label="' +
-        escapeHTML(word.french) + ' — ' + escapeHTML(word.spanish) + '" aria-pressed="' + active + '">' +
-        '<circle cx="' + spot.x + '" cy="' + spot.y + '" r="15"></circle>' +
+        escapeHTML(word.french + " — " + word.spanish) + '" aria-pressed="' + active + '">' +
+        '<circle class="scene-marker-halo" cx="' + spot.x + '" cy="' + spot.y + '" r="17"></circle>' +
+        '<circle class="scene-marker" cx="' + spot.x + '" cy="' + spot.y + '" r="12"></circle>' +
         '<text x="' + spot.x + '" y="' + (spot.y + 4) + '">' + (index + 1) + '</text></g>';
     }).join("");
-    return '<div class="vocabulary-scene-intro"><p>Selecciona una habitación o un objeto de la ilustración para descubrir cómo se dice en francés.</p><span>8 elementos interactivos</span></div>' +
-      '<div class="vocabulary-house-scene"><svg viewBox="0 0 540 450" role="group" aria-label="Ilustración interactiva de una casa dividida en cuatro habitaciones">' +
-      '<path class="house-roof" d="M35 105 L270 18 L505 105 Z"></path>' +
-      '<rect class="house-shell" x="54" y="100" width="432" height="322" rx="8"></rect>' +
-      '<rect class="house-room room-one" x="72" y="118" width="190" height="140" rx="5"></rect>' +
-      '<rect class="house-room room-two" x="278" y="118" width="190" height="140" rx="5"></rect>' +
-      '<rect class="house-room room-three" x="72" y="270" width="190" height="134" rx="5"></rect>' +
-      '<rect class="house-room room-four" x="278" y="270" width="190" height="134" rx="5"></rect>' +
-      '<path class="house-wall" d="M270 112 V410 M65 264 H475"></path>' +
-      '<g class="house-furniture" aria-hidden="true">' +
-      '<rect x="95" y="194" width="74" height="27" rx="8"></rect><rect x="103" y="183" width="58" height="15" rx="6"></rect>' +
-      '<rect x="374" y="180" width="32" height="54" rx="4"></rect><path d="M378 191 H402 M378 199 H402"></path>' +
-      '<rect x="102" y="342" width="72" height="31" rx="5"></rect><rect x="108" y="333" width="28" height="12" rx="4"></rect><rect x="141" y="333" width="27" height="12" rx="4"></rect>' +
-      '<rect x="373" y="340" width="38" height="46" rx="8"></rect><path d="M373 352 H411"></path></g>' +
-      '<g class="house-room-labels" aria-hidden="true"><text x="167" y="145">SALON</text><text x="373" y="145">CUISINE</text><text x="167" y="294">CHAMBRE</text><text x="373" y="294">SALLE DE BAINS</text></g>' +
+    return '<div class="vocabulary-scene-intro"><p>Explora la vivienda y selecciona cualquiera de sus espacios.</p><span>18 espacios interactivos</span></div>' +
+      '<div class="vocabulary-house-scene"><svg viewBox="0 0 900 640" role="group" aria-label="Casa moderna en corte con habitaciones, sótano, garaje y jardín">' +
+      '<defs><linearGradient id="scene-wall-gradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#f4f7fb"/></linearGradient></defs>' +
+      '<ellipse class="scene-ground-shadow" cx="450" cy="585" rx="390" ry="22"/>' +
+      '<path class="scene-roof" d="M180 145 L450 42 L720 145 Z"/><path class="scene-roof-detail" d="M450 42 L450 145"/>' +
+      '<rect class="scene-house-shell" x="205" y="140" width="490" height="390" rx="8"/>' +
+      '<rect class="scene-room scene-attic" x="225" y="158" width="450" height="76" rx="4"/>' +
+      '<rect class="scene-room scene-bedroom" x="225" y="246" width="215" height="112" rx="4"/>' +
+      '<rect class="scene-room scene-bath" x="455" y="246" width="220" height="112" rx="4"/>' +
+      '<rect class="scene-room scene-living" x="225" y="370" width="205" height="140" rx="4"/>' +
+      '<rect class="scene-room scene-dining" x="445" y="370" width="112" height="140" rx="4"/>' +
+      '<rect class="scene-room scene-kitchen" x="572" y="370" width="103" height="140" rx="4"/>' +
+      '<path class="scene-wall-line" d="M450 245 V358 M440 365 V515 M565 365 V515 M215 364 H685"/>' +
+      '<rect class="scene-cellar" x="330" y="530" width="240" height="48" rx="4"/>' +
+      '<path class="scene-cellar-line" d="M330 553 H570"/>' +
+      '<rect class="scene-window" x="245" y="270" width="52" height="45" rx="4"/><path class="scene-window-line" d="M271 270 V315 M245 292 H297"/>' +
+      '<rect class="scene-window" x="600" y="270" width="48" height="45" rx="4"/><path class="scene-window-line" d="M624 270 V315 M600 292 H648"/>' +
+      '<rect class="scene-door" x="265" y="440" width="38" height="70" rx="18 18 0 0"/><circle class="scene-door-knob" cx="294" cy="478" r="3"/>' +
+      '<rect class="scene-balcony" x="700" y="225" width="92" height="16" rx="3"/><path class="scene-balcony-rail" d="M710 225 V190 H782 V225 M726 190 V225 M746 190 V225 M766 190 V225"/>' +
+      '<path class="scene-garage" d="M55 500 L125 455 L195 500 V580 H55 Z"/><rect class="scene-garage-door" x="77" y="510" width="96" height="70" rx="3"/><path class="scene-garage-lines" d="M77 527 H173 M77 545 H173 M77 563 H173"/>' +
+      '<path class="scene-garden" d="M700 510 Q780 480 870 520 L870 580 H700 Z"/><circle class="scene-tree" cx="820" cy="490" r="25"/><rect class="scene-tree-trunk" x="815" y="510" width="10" height="38" rx="3"/>' +
+      '<rect class="scene-terrace" x="700" y="455" width="150" height="42" rx="5"/><path class="scene-terrace-line" d="M715 455 V497 M735 455 V497 M755 455 V497"/>' +
+      '<g class="scene-room-labels" aria-hidden="true"><text x="450" y="207">GRENIER</text><text x="332" y="270">CHAMBRE</text><text x="565" y="270">SALLE DE BAINS</text><text x="328" y="397">SALON</text><text x="501" y="397">SALLE À MANGER</text><text x="623" y="397">CUISINE</text><text x="450" y="561">CAVE</text><text x="125" y="490">GARAGE</text><text x="785" y="575">JARDIN</text><text x="775" y="448">TERRASSE</text></g>' +
       svgHotspots + '</svg></div>' +
-      '<p class="vocabulary-scene-hint">Pulsa los círculos numerados para consultar cada palabra.</p>' +
-      (selected ? detailMarkup(selected) : '<div class="vocabulary-scene-selection">Selecciona un elemento para ver su ficha de vocabulario.</div>');
+      '<p class="vocabulary-scene-hint">Los marcadores numerados corresponden a los espacios de la casa. También puedes recorrerlos con el teclado.</p>' +
+      (selected ? detailMarkup(selected) : '<div class="vocabulary-scene-selection">Selecciona un espacio para consultar su palabra en francés y su traducción.</div>');
   }
 
   function renderBrowse() {
