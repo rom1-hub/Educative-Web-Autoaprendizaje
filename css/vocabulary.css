@@ -315,3 +315,9 @@
  .vocabulary-scene-selection{bottom:.5rem}
  .vocabulary-scene-intro{align-items:flex-start;flex-direction:column;gap:.5rem}
 }
+
+
+/* Imagen WebP de la casa interactiva */
+.vocabulary-scene-layout .vocabulary-house-scene{position:relative;aspect-ratio:3/2;padding:0;overflow:hidden}
+.vocabulary-scene-layout .vocabulary-house-image{display:block;width:100%;height:100%;object-fit:fill}
+.vocabulary-scene-layout .vocabulary-house-scene .scene-hotspot-overlay{position:absolute;inset:0;display:block;width:100%;height:100%;overflow:visible}
