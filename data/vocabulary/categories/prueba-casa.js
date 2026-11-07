@@ -1,6 +1,7 @@
 /* COQ — Vocabulario · Prueba casa
- * Categoría temporal para validar una escena ilustrada e interactiva.
- * Las entradas reutilizan términos ya presentes en la categoría «Casa».
+ * Categoría temporal para validar la escena interactiva moderna.
+ * El vocabulario se replica desde «Casa · Habitaciones y espacios de la casa»
+ * sin modificar la categoría original.
  */
 (function () {
   'use strict';
@@ -14,14 +15,24 @@
         title: 'La casa interactiva',
         scene: 'house-cutaway',
         entries: [
-          {id:'test-house-salon',word:'salon',translation:'salón',articleFr:'un',articleEs:'un'},
-          {id:'test-house-cuisine',word:'cuisine',translation:'cocina',articleFr:'une',articleEs:'una'},
-          {id:'test-house-chambre',word:'chambre',translation:'dormitorio',articleFr:'une',articleEs:'un'},
-          {id:'test-house-bathroom',word:'salle de bains',translation:'baño',articleFr:'une',articleEs:'un'},
-          {id:'test-house-sofa',word:'canapé',translation:'sofá',articleFr:'un',articleEs:'un'},
-          {id:'test-house-fridge',word:'réfrigérateur',translation:'refrigerador',articleFr:'un',articleEs:'un'},
-          {id:'test-house-bed',word:'lit',translation:'cama',articleFr:'un',articleEs:'una'},
-          {id:'test-house-shower',word:'douche',translation:'ducha',articleFr:'une',articleEs:'una'}
+          {id:'house-home',word:'maison',translation:'casa',articleFr:'une',articleEs:'una'},
+          {id:'house-apartment',word:'appartement',translation:'apartamento',articleFr:'un',articleEs:'un'},
+          {id:'house-room',word:'pièce',translation:'habitación / estancia',articleFr:'une',articleEs:'una'},
+          {id:'house-bedroom',word:'chambre',translation:'dormitorio',articleFr:'une',articleEs:'un'},
+          {id:'house-living-room',word:'salon',translation:'salón',articleFr:'un',articleEs:'un'},
+          {id:'house-dining-room',word:'salle à manger',translation:'comedor',articleFr:'une',articleEs:'un'},
+          {id:'house-kitchen',word:'cuisine',translation:'cocina',articleFr:'une',articleEs:'una'},
+          {id:'house-bathroom',word:'salle de bains',translation:'baño',articleFr:'une',articleEs:'un'},
+          {id:'house-shower-room',word:'salle de douche',translation:'cuarto de ducha',articleFr:'une',articleEs:'un'},
+          {id:'house-toilet',word:'toilettes',translation:'aseo / baño',articleFr:'les',articleEs:'el'},
+          {id:'house-hallway',word:'couloir',translation:'pasillo',articleFr:'un',articleEs:'un'},
+          {id:'house-entrance',word:'entrée',translation:'entrada',articleFr:'une',articleEs:'una'},
+          {id:'house-balcony',word:'balcon',translation:'balcón',articleFr:'un',articleEs:'un'},
+          {id:'house-terrace',word:'terrasse',translation:'terraza',articleFr:'une',articleEs:'una'},
+          {id:'house-garden',word:'jardin',translation:'jardín',articleFr:'un',articleEs:'un'},
+          {id:'house-garage',word:'garage',translation:'garaje',articleFr:'un',articleEs:'un'},
+          {id:'house-cellar',word:'cave',translation:'sótano / bodega',articleFr:'une',articleEs:'un'},
+          {id:'house-attic',word:'grenier',translation:'ático / buhardilla',articleFr:'un',articleEs:'un'}
         ]
       }
     ]
