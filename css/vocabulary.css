@@ -192,3 +192,26 @@
 .vocabulary-gender-variants .vocabulary-detail-cell small{display:block}
 .vocabulary-gender-variants .vocabulary-detail-cell strong{margin-top:.18rem}
 .vocabulary-gender-variants .vocabulary-detail-cell small{margin-top:.2rem}
+
+
+/* Escena interactiva temporal: Prueba casa */
+.vocabulary-scene-intro{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin:0 0 1rem;color:var(--color-muted);font-size:.88rem}
+.vocabulary-scene-intro p{margin:0}
+.vocabulary-scene-intro span{flex:0 0 auto;padding:.35rem .65rem;border:1px solid var(--color-line);border-radius:999px;background:#fff;font-size:.75rem;font-weight:700}
+.vocabulary-house-scene{max-width:680px;margin:0 auto;padding:1rem;border:1px solid var(--color-line);border-radius:16px;background:linear-gradient(180deg,#f3f7fc,#fff)}
+.vocabulary-house-scene svg{display:block;width:100%;height:auto;overflow:visible}
+.house-roof{fill:#e9a58a;stroke:#a65e48;stroke-width:5;stroke-linejoin:round}
+.house-shell{fill:#fff;stroke:#526b89;stroke-width:5}
+.house-room{stroke:#fff;stroke-width:5}
+.house-room.room-one{fill:#e7efff}.house-room.room-two{fill:#fff0dc}.house-room.room-three{fill:#e9f3e8}.house-room.room-four{fill:#e9e5f5}
+.house-wall{fill:none;stroke:#526b89;stroke-width:7;stroke-linecap:round}
+.house-furniture{fill:#c49a78;stroke:#8b684e;stroke-width:3;stroke-linejoin:round}
+.house-room-labels{fill:#344b68;font-size:12px;font-weight:800;text-anchor:middle;letter-spacing:1px}
+.vocabulary-scene-hotspot{cursor:pointer;outline:none}
+.vocabulary-scene-hotspot circle{fill:#075be8;stroke:#fff;stroke-width:3;transition:fill .15s, r .15s}
+.vocabulary-scene-hotspot text{fill:#fff;font-size:12px;font-weight:800;text-anchor:middle;pointer-events:none}
+.vocabulary-scene-hotspot:hover circle,.vocabulary-scene-hotspot:focus circle,.vocabulary-scene-hotspot.is-selected circle{fill:#ff5b36;stroke:#fff;stroke-width:4}
+.vocabulary-scene-hotspot:focus circle{filter:drop-shadow(0 0 4px rgba(7,91,232,.45))}
+.vocabulary-scene-hint{margin:.75rem 0 1rem;color:var(--color-muted);font-size:.8rem;text-align:center}
+.vocabulary-scene-selection{max-width:680px;margin:0 auto;padding:1.1rem;border:1px dashed rgba(7,91,232,.28);border-radius:12px;background:#f7faff;color:var(--color-muted);font-size:.88rem;text-align:center}
+@media(max-width:600px){.vocabulary-scene-intro{align-items:flex-start;flex-direction:column}.vocabulary-house-scene{padding:.35rem}.vocabulary-scene-hint{font-size:.75rem}}
