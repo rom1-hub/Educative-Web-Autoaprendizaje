@@ -277,7 +277,7 @@
         '<span><strong>' + escapeHTML(word.french) + '</strong><small>' + escapeHTML(word.spanish) + '</small></span></button>';
     }).join("");
     const floatingCard = selected && selectedSpot
-      ? '<div class="vocabulary-scene-popover" style="--scene-x:' + (selectedSpot.x * (960 / 900) / 960 * 100) + '%;--scene-y:' + (selectedSpot.y / 640 * 100) + '%" role="status">' +
+      ? '<div class="vocabulary-scene-popover" style="--scene-x:' + (selectedSpot.x / 900 * 100) + '%;--scene-y:' + (selectedSpot.y / 640 * 100) + '%" role="status">' +
         '<button type="button" class="vocabulary-scene-popover-close" data-scene-close aria-label="Cerrar ficha">×</button>' +
         detailMarkup(selected) + '</div>'
       : '<div class="vocabulary-scene-selection">Selecciona un número para consultar la palabra en francés y su traducción.</div>';
@@ -285,7 +285,7 @@
       '<div class="vocabulary-scene-layout"><div class="vocabulary-scene-visual">' +
       '<div class="vocabulary-house-scene">' +
       '<img class="vocabulary-house-image" src="assets/images/casa-interactiva-moderna.webp" alt="Casa moderna en corte con habitaciones amuebladas, sótano, garaje y jardín" width="1400" height="933" loading="lazy" decoding="async">' +
-      '<svg class="scene-hotspot-overlay" viewBox="0 0 960 640" preserveAspectRatio="none" role="group" aria-label="Zonas interactivas de la casa">' +
+      '<svg class="scene-hotspot-overlay" viewBox="0 0 900 600" preserveAspectRatio="none" role="group" aria-label="Zonas interactivas de la casa">' +
       svgHotspots + '</svg></div>' + floatingCard + '</div>' +
       '<aside class="vocabulary-scene-sidebar" aria-label="Vocabulario de la casa"><h3>Vocabulario <span>18 términos</span></h3><div class="vocabulary-scene-legend">' + sceneLegend + '</div></aside></div>';
   }
