@@ -277,33 +277,15 @@
         '<span><strong>' + escapeHTML(word.french) + '</strong><small>' + escapeHTML(word.spanish) + '</small></span></button>';
     }).join("");
     const floatingCard = selected && selectedSpot
-      ? '<div class="vocabulary-scene-popover" style="--scene-x:' + (selectedSpot.x / 900 * 100) + '%;--scene-y:' + (selectedSpot.y / 640 * 100) + '%" role="status">' +
+      ? '<div class="vocabulary-scene-popover" style="--scene-x:' + (selectedSpot.x * (960 / 900) / 960 * 100) + '%;--scene-y:' + (selectedSpot.y / 640 * 100) + '%" role="status">' +
         '<button type="button" class="vocabulary-scene-popover-close" data-scene-close aria-label="Cerrar ficha">×</button>' +
         detailMarkup(selected) + '</div>'
       : '<div class="vocabulary-scene-selection">Selecciona un número para consultar la palabra en francés y su traducción.</div>';
     return '<div class="vocabulary-scene-intro"><p>Selecciona un número de la imagen o una palabra de la columna.</p><span>18 espacios interactivos</span></div>' +
       '<div class="vocabulary-scene-layout"><div class="vocabulary-scene-visual">' +
-      '<div class="vocabulary-house-scene"><svg viewBox="0 0 900 640" role="group" aria-label="Casa moderna en corte con habitaciones, sótano, garaje y jardín">' +
-      '<defs><linearGradient id="scene-wall-gradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#f4f7fb"/></linearGradient></defs>' +
-      '<ellipse class="scene-ground-shadow" cx="450" cy="585" rx="390" ry="22"/>' +
-      '<path class="scene-roof" d="M180 145 L450 42 L720 145 Z"/><path class="scene-roof-detail" d="M450 42 L450 145"/>' +
-      '<rect class="scene-house-shell" x="205" y="140" width="490" height="390" rx="8"/>' +
-      '<rect class="scene-room scene-attic" x="225" y="158" width="450" height="76" rx="4"/>' +
-      '<rect class="scene-room scene-bedroom" x="225" y="246" width="215" height="112" rx="4"/>' +
-      '<rect class="scene-room scene-bath" x="455" y="246" width="220" height="112" rx="4"/>' +
-      '<rect class="scene-room scene-living" x="225" y="370" width="205" height="140" rx="4"/>' +
-      '<rect class="scene-room scene-dining" x="445" y="370" width="112" height="140" rx="4"/>' +
-      '<rect class="scene-room scene-kitchen" x="572" y="370" width="103" height="140" rx="4"/>' +
-      '<path class="scene-wall-line" d="M450 245 V358 M440 365 V515 M565 365 V515 M215 364 H685"/>' +
-      '<rect class="scene-cellar" x="330" y="530" width="240" height="48" rx="4"/><path class="scene-cellar-line" d="M330 553 H570"/>' +
-      '<rect class="scene-window" x="245" y="270" width="52" height="45" rx="4"/><path class="scene-window-line" d="M271 270 V315 M245 292 H297"/>' +
-      '<rect class="scene-window" x="600" y="270" width="48" height="45" rx="4"/><path class="scene-window-line" d="M624 270 V315 M600 292 H648"/>' +
-      '<rect class="scene-door" x="265" y="440" width="38" height="70" rx="8"/><circle class="scene-door-knob" cx="294" cy="478" r="3"/>' +
-      '<rect class="scene-balcony" x="700" y="225" width="92" height="16" rx="3"/><path class="scene-balcony-rail" d="M710 225 V190 H782 V225 M726 190 V225 M746 190 V225 M766 190 V225"/>' +
-      '<path class="scene-garage" d="M55 500 L125 455 L195 500 V580 H55 Z"/><rect class="scene-garage-door" x="77" y="510" width="96" height="70" rx="3"/><path class="scene-garage-lines" d="M77 527 H173 M77 545 H173 M77 563 H173"/>' +
-      '<path class="scene-garden" d="M700 510 Q780 480 870 520 L870 580 H700 Z"/><circle class="scene-tree" cx="820" cy="490" r="25"/><rect class="scene-tree-trunk" x="815" y="510" width="10" height="38" rx="3"/>' +
-      '<rect class="scene-terrace" x="700" y="455" width="150" height="42" rx="5"/><path class="scene-terrace-line" d="M715 455 V497 M735 455 V497 M755 455 V497"/>' +
-      '<g class="scene-room-labels" aria-hidden="true"><text x="450" y="207">GRENIER</text><text x="332" y="270">CHAMBRE</text><text x="565" y="270">SALLE DE BAINS</text><text x="328" y="397">SALON</text><text x="501" y="397">SALLE À MANGER</text><text x="623" y="397">CUISINE</text><text x="450" y="561">CAVE</text><text x="125" y="490">GARAGE</text><text x="785" y="575">JARDIN</text><text x="775" y="448">TERRASSE</text></g>' +
+      '<div class="vocabulary-house-scene">' +
+      '<img class="vocabulary-house-image" src="assets/images/casa-interactiva-moderna.webp" alt="Casa moderna en corte con habitaciones amuebladas, sótano, garaje y jardín" width="1400" height="933" loading="lazy" decoding="async">' +
+      '<svg class="scene-hotspot-overlay" viewBox="0 0 960 640" preserveAspectRatio="none" role="group" aria-label="Zonas interactivas de la casa">' +
       svgHotspots + '</svg></div>' + floatingCard + '</div>' +
       '<aside class="vocabulary-scene-sidebar" aria-label="Vocabulario de la casa"><h3>Vocabulario <span>18 términos</span></h3><div class="vocabulary-scene-legend">' + sceneLegend + '</div></aside></div>';
   }
