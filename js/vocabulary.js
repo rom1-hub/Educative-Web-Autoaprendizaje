@@ -77,7 +77,7 @@
     return {
       id: source.id, name: source.title,
       subcategories: source.subcategories.map(sub => ({
-        id: sub.id, name: sub.title,
+        id: sub.id, name: sub.title, scene: sub.scene || null,
         words: sub.entries.map(entry => {
           const partOfSpeech = inferPartOfSpeech(entry, source, sub);
           return {
@@ -241,6 +241,45 @@
     const initial = (word.lemma || word.french).replace(/^(?:le|la|l['’]|les|un|une)\s*/iu, "").trim().charAt(0).toLocaleUpperCase("fr") || "É";
     return `<div class="vocabulary-word-entry"><article class="vocabulary-word ${selectedWord === key ? "is-expanded" : ""}" data-word-card="${escapeHTML(key)}" tabindex="0" role="button" aria-expanded="${selectedWord === key}" aria-label="Abrir o cerrar ficha de ${escapeHTML(word.french)}"><div class="vocabulary-word-main"><span class="vocabulary-word-initial" aria-hidden="true">${escapeHTML(word.emoji || initial)}</span><div class="vocabulary-word-text"><div class="vocabulary-word-french">${escapeHTML(word.french)}</div><div class="vocabulary-word-spanish">${escapeHTML(word.spanish)}</div></div></div><div class="vocabulary-word-actions"><span class="vocabulary-expand-indicator" aria-hidden="true">${selectedWord === key ? "−" : "+"}</span></div></article>${selectedWord === key ? detailMarkup(word) : ""}</div>`;
   }
+  function renderHouseScene(words) {
+    const byId = new Map(words.map(word => [word.id, word]));
+    const hotspots = [
+      {id:"test-house-salon",x:166,y:177},{id:"test-house-cuisine",x:358,y:177},
+      {id:"test-house-chambre",x:166,y:324},{id:"test-house-bathroom",x:358,y:324},
+      {id:"test-house-sofa",x:130,y:222},{id:"test-house-fridge",x:392,y:224},
+      {id:"test-house-bed",x:132,y:370},{id:"test-house-shower",x:390,y:370}
+    ];
+    const selected = words.find(word => wordKey(word) === selectedWord);
+    const svgHotspots = hotspots.map((spot, index) => {
+      const word = byId.get(spot.id);
+      if (!word) return "";
+      const active = selectedWord === wordKey(word);
+      return '<g class="vocabulary-scene-hotspot ' + (active ? "is-selected" : "") +
+        '" data-scene-word="' + escapeHTML(wordKey(word)) + '" role="button" tabindex="0" aria-label="' +
+        escapeHTML(word.french) + ' — ' + escapeHTML(word.spanish) + '" aria-pressed="' + active + '">' +
+        '<circle cx="' + spot.x + '" cy="' + spot.y + '" r="15"></circle>' +
+        '<text x="' + spot.x + '" y="' + (spot.y + 4) + '">' + (index + 1) + '</text></g>';
+    }).join("");
+    return '<div class="vocabulary-scene-intro"><p>Selecciona una habitación o un objeto de la ilustración para descubrir cómo se dice en francés.</p><span>8 elementos interactivos</span></div>' +
+      '<div class="vocabulary-house-scene"><svg viewBox="0 0 540 450" role="group" aria-label="Ilustración interactiva de una casa dividida en cuatro habitaciones">' +
+      '<path class="house-roof" d="M35 105 L270 18 L505 105 Z"></path>' +
+      '<rect class="house-shell" x="54" y="100" width="432" height="322" rx="8"></rect>' +
+      '<rect class="house-room room-one" x="72" y="118" width="190" height="140" rx="5"></rect>' +
+      '<rect class="house-room room-two" x="278" y="118" width="190" height="140" rx="5"></rect>' +
+      '<rect class="house-room room-three" x="72" y="270" width="190" height="134" rx="5"></rect>' +
+      '<rect class="house-room room-four" x="278" y="270" width="190" height="134" rx="5"></rect>' +
+      '<path class="house-wall" d="M270 112 V410 M65 264 H475"></path>' +
+      '<g class="house-furniture" aria-hidden="true">' +
+      '<rect x="95" y="194" width="74" height="27" rx="8"></rect><rect x="103" y="183" width="58" height="15" rx="6"></rect>' +
+      '<rect x="374" y="180" width="32" height="54" rx="4"></rect><path d="M378 191 H402 M378 199 H402"></path>' +
+      '<rect x="102" y="342" width="72" height="31" rx="5"></rect><rect x="108" y="333" width="28" height="12" rx="4"></rect><rect x="141" y="333" width="27" height="12" rx="4"></rect>' +
+      '<rect x="373" y="340" width="38" height="46" rx="8"></rect><path d="M373 352 H411"></path></g>' +
+      '<g class="house-room-labels" aria-hidden="true"><text x="167" y="145">SALON</text><text x="373" y="145">CUISINE</text><text x="167" y="294">CHAMBRE</text><text x="373" y="294">SALLE DE BAINS</text></g>' +
+      svgHotspots + '</svg></div>' +
+      '<p class="vocabulary-scene-hint">Pulsa los círculos numerados para consultar cada palabra.</p>' +
+      (selected ? detailMarkup(selected) : '<div class="vocabulary-scene-selection">Selecciona un elemento para ver su ficha de vocabulario.</div>');
+  }
+
   function renderBrowse() {
     const category = getCategory(), subcategory = getSubcategory();
     const query = $("vocabulary-search-input").value.trim();
@@ -272,6 +311,10 @@
 
     const words = selectedWords();
     $("vocabulary-status").textContent = category.name + " · " + subcategory.name;
+    if (subcategory.scene === "house-cutaway") {
+      const sceneHeading = `<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> ${escapeHTML(category.name)} <span>›</span> <strong>${escapeHTML(subcategory.name)}</strong></div><div class="vocabulary-heading"><div><h2>${escapeHTML(subcategory.name)}</h2><p>Explora la casa y selecciona sus habitaciones y objetos.</p></div><span class="vocabulary-count">${words.length} elementos</span></div>`;
+      return sceneHeading + renderHouseScene(words);
+    }
     const heading = `<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> ${escapeHTML(category.name)} <span>›</span> <strong>${escapeHTML(subcategory.name)}</strong></div><div class="vocabulary-heading"><div><h2>${escapeHTML(subcategory.name)}</h2><p>Selecciona una palabra para consultar su ficha.</p></div><span class="vocabulary-count">${words.length} palabra(s)</span></div>`;
     if (!words.length) return heading + '<div class="vocabulary-empty"><h3>No encontramos palabras en esta subcategoría.</h3><p>Prueba otra subcategoría.</p></div>';
     return heading + `<div class="vocabulary-word-list">${words.map(wordCard).join("")}</div>`;
@@ -293,12 +336,16 @@
       $("vocabulary-status").textContent = "Explorando categorías";
     });
     $("vocabulary-learning-panel").addEventListener("click", event => {
+      const sceneWord = event.target.closest("[data-scene-word]");
+      if (sceneWord) { selectedWord = selectedWord === sceneWord.dataset.sceneWord ? null : sceneWord.dataset.sceneWord; render(); return; }
       const card = event.target.closest("[data-word-card]");
       if (!card) return;
       selectedWord = selectedWord === card.dataset.wordCard ? null : card.dataset.wordCard;
       render();
     });
     $("vocabulary-learning-panel").addEventListener("keydown", event => {
+      const sceneWord = event.target.closest("[data-scene-word]");
+      if (sceneWord && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); selectedWord = selectedWord === sceneWord.dataset.sceneWord ? null : sceneWord.dataset.sceneWord; render(); return; }
       const card = event.target.closest("[data-word-card]");
       if (!card || (event.key !== "Enter" && event.key !== " ")) return;
       event.preventDefault();
