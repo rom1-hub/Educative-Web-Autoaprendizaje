@@ -215,3 +215,49 @@
 .vocabulary-scene-hint{margin:.75rem 0 1rem;color:var(--color-muted);font-size:.8rem;text-align:center}
 .vocabulary-scene-selection{max-width:680px;margin:0 auto;padding:1.1rem;border:1px dashed rgba(7,91,232,.28);border-radius:12px;background:#f7faff;color:var(--color-muted);font-size:.88rem;text-align:center}
 @media(max-width:600px){.vocabulary-scene-intro{align-items:flex-start;flex-direction:column}.vocabulary-house-scene{padding:.35rem}.vocabulary-scene-hint{font-size:.75rem}}
+
+
+/* Escena moderna de vivienda — categoría temporal Prueba casa */
+.vocabulary-scene-intro{align-items:center;margin-bottom:1rem;color:#53647b}
+.vocabulary-scene-intro span{border-color:#dce5ef;background:#fff;color:#42536a}
+.vocabulary-house-scene{max-width:940px;padding:clamp(.4rem,1.5vw,1rem);overflow:hidden;border:1px solid #e2e9f1;border-radius:20px;background:linear-gradient(145deg,#f7f9fc 0%,#edf3f8 100%);box-shadow:0 16px 40px rgba(31,53,82,.07)}
+.vocabulary-house-scene svg{width:100%;height:auto}
+.scene-ground-shadow{fill:#dce5ed;opacity:.7}
+.scene-roof{fill:#d9e3ec;stroke:#8799ad;stroke-width:3;stroke-linejoin:round}
+.scene-roof-detail{fill:none;stroke:#b3c1cf;stroke-width:2}
+.scene-house-shell{fill:url(#scene-wall-gradient);stroke:#9aabba;stroke-width:3}
+.scene-room{stroke:#fff;stroke-width:5}
+.scene-attic{fill:#edf1f6}.scene-bedroom{fill:#e6edf7}.scene-bath{fill:#e5f1f2}
+.scene-living{fill:#f1ece4}.scene-dining{fill:#f5f0e8}.scene-kitchen{fill:#eaf0e9}
+.scene-wall-line{fill:none;stroke:#a9b7c5;stroke-width:7;stroke-linecap:round}
+.scene-cellar{fill:#e9edf1;stroke:#a9b7c5;stroke-width:2}
+.scene-cellar-line{stroke:#c1ccd6;stroke-width:2}
+.scene-window{fill:#d9edf3;stroke:#90aebe;stroke-width:2}
+.scene-window-line{stroke:#fff;stroke-width:2}
+.scene-door{fill:#c8b6a2;stroke:#9e8975;stroke-width:2}
+.scene-door-knob{fill:#fff}
+.scene-balcony{fill:#cbd8e2;stroke:#91a2b2;stroke-width:2}
+.scene-balcony-rail{fill:none;stroke:#8fa1b2;stroke-width:4;stroke-linecap:round}
+.scene-garage{fill:#e7edf3;stroke:#a5b4c2;stroke-width:3;stroke-linejoin:round}
+.scene-garage-door{fill:#d5dfe8;stroke:#a5b4c2;stroke-width:2}
+.scene-garage-lines{fill:none;stroke:#a5b4c2;stroke-width:2}
+.scene-garden{fill:#dfece2}
+.scene-tree{fill:#bdd5c2}.scene-tree-trunk{fill:#a58f7c}
+.scene-terrace{fill:#e8e0d4;stroke:#c6b9a7;stroke-width:2}
+.scene-terrace-line{stroke:#c6b9a7;stroke-width:2}
+.scene-room-labels{fill:#66788d;font-size:11px;font-weight:800;text-anchor:middle;letter-spacing:1.1px}
+.vocabulary-scene-hotspot{cursor:pointer;outline:none}
+.vocabulary-scene-hotspot .scene-marker-halo{fill:#fff;opacity:.94;stroke:#c4d2e0;stroke-width:1.5}
+.vocabulary-scene-hotspot .scene-marker{fill:#1765c1;stroke:#fff;stroke-width:2;transition:fill .16s,transform .16s}
+.vocabulary-scene-hotspot text{fill:#fff;font-size:10px;font-weight:800;text-anchor:middle;pointer-events:none}
+.vocabulary-scene-hotspot:hover .scene-marker,.vocabulary-scene-hotspot:focus .scene-marker,.vocabulary-scene-hotspot.is-selected .scene-marker{fill:#e87956}
+.vocabulary-scene-hotspot:focus .scene-marker-halo{stroke:#1765c1;stroke-width:3}
+.vocabulary-scene-hotspot.is-selected .scene-marker-halo{stroke:#e87956;stroke-width:2}
+.vocabulary-scene-hint{margin:.8rem 0 1rem;color:#697b90;font-size:.8rem;text-align:center}
+.vocabulary-scene-selection{max-width:940px;margin:0 auto;padding:1.2rem;border:1px solid #dfe7f0;border-radius:14px;background:#f8fafc;color:#65768a;font-size:.9rem;text-align:center}
+@media(max-width:600px){
+ .vocabulary-house-scene{padding:.15rem;border-radius:14px}
+ .vocabulary-scene-intro{align-items:flex-start;flex-direction:column;gap:.5rem}
+ .scene-room-labels{font-size:10px}
+ .vocabulary-scene-hint{font-size:.74rem;line-height:1.5}
+}
