@@ -316,7 +316,7 @@
       {id:"house-kitchen-glass",x:740,y:675},{id:"house-kitchen-cup",x:850,y:685},
       {id:"house-kitchen-knife",x:1100,y:770},{id:"house-kitchen-fork",x:620,y:800},
       {id:"house-kitchen-spoon",x:735,y:805},{id:"house-kitchen-spatula",x:575,y:535},
-      {id:"house-kitchen-cutting-board",x:1010,y:835}
+      {id:"house-kitchen-cutting-board",x:1000,y:840}
     ];
     const selected = words.find(word => wordKey(word) === selectedWord);
     const selectedSpot = selected ? hotspots.find(spot => spot.id === selected.id) : null;
