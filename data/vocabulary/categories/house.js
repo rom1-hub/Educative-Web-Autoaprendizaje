@@ -69,6 +69,7 @@
       {
         id:'house-living-room',
         title:'Salón',
+        scene:'living-room-hotspots',
         entries:[
           {id:'house-living-sofa',word:'canapé',translation:'sofá',articleFr:'un',articleEs:'un'},
           {id:'house-living-armchair',word:'fauteuil',translation:'sillón',articleFr:'un',articleEs:'un'},
