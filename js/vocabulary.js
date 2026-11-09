@@ -302,7 +302,7 @@
 
   function renderKitchenScene(words) {
     const byId = new Map(words.map(word => [word.id, word]));
-    // Coordenadas sobre la imagen original (1648 × 1024).
+    // Coordenadas sobre la imagen original (1648 × 1024). Marcadores 25 y 21 ajustados según indicaciones.
     const hotspots = [
       {id:"house-kitchen-refrigerator",x:145,y:275},{id:"house-kitchen-fridge",x:205,y:405},
       {id:"house-kitchen-freezer",x:150,y:610},{id:"house-kitchen-oven",x:930,y:520},
