@@ -300,6 +300,80 @@
       '<aside class="vocabulary-scene-sidebar" aria-label="Vocabulario de la casa"><h3>Vocabulario <span>18 términos</span></h3><div class="vocabulary-scene-legend">' + sceneLegend + '</div></aside></div>';
   }
 
+  function renderLivingRoomScene(words) {
+    const byId = new Map(words.map(word => [word.id, word]));
+    // Coordenadas sobre la imagen original «Salón moderno cálido con chimenea.png» (1671 × 941).
+    // Cada punto se sitúa en el centro visual del objeto correspondiente.
+    const hotspots = [
+      {id:"house-living-sofa",x:300,y:565},
+      {id:"house-living-armchair",x:1480,y:690},
+      {id:"house-living-coffee-table",x:785,y:700},
+      {id:"house-living-television",x:1060,y:370},
+      {id:"house-living-remote",x:940,y:690},
+      {id:"house-living-lamp",x:545,y:330},
+      {id:"house-living-carpet",x:790,y:820},
+      {id:"house-living-curtain",x:475,y:170},
+      {id:"house-living-cushion",x:410,y:490},
+      {id:"house-living-blanket",x:145,y:690},
+      {id:"house-living-shelf",x:1480,y:255},
+      {id:"house-living-bookcase",x:1460,y:405},
+      {id:"house-living-furniture",x:1080,y:565},
+      {id:"house-living-vase",x:810,y:600},
+      {id:"house-living-plant",x:685,y:445},
+      {id:"house-living-frame",x:745,y:260},
+      {id:"house-living-wall-clock",x:1135,y:180},
+      {id:"house-living-decoration",x:1550,y:420},
+      {id:"house-living-fireplace",x:1550,y:570},
+      {id:"house-living-fan",x:865,y:205},
+      {id:"house-living-air-conditioning",x:1130,y:55},
+      {id:"house-living-speaker",x:1265,y:460},
+      {id:"house-living-outlet",x:1320,y:600},
+      {id:"house-living-switch",x:600,y:370},
+      {id:"house-living-window",x:245,y:240}
+    ];
+    const selected = words.find(word => wordKey(word) === selectedWord);
+    const selectedSpot = selected ? hotspots.find(spot => spot.id === selected.id) : null;
+    const svgHotspots = hotspots.map((spot,index) => {
+      const word = byId.get(spot.id);
+      if (!word) return "";
+      const active = selectedWord === wordKey(word);
+      return '<g class="vocabulary-scene-hotspot ' + (active ? "is-selected" : "") +
+        '" data-scene-word="' + escapeHTML(wordKey(word)) + '" role="button" tabindex="0" aria-label="' +
+        escapeHTML(word.french + " — " + word.spanish) + '" aria-pressed="' + active + '">' +
+        '<circle class="scene-marker-halo" cx="' + spot.x + '" cy="' + spot.y + '" r="23"></circle>' +
+        '<circle class="scene-marker" cx="' + spot.x + '" cy="' + spot.y + '" r="17"></circle>' +
+        '<text x="' + spot.x + '" y="' + (spot.y + 6) + '" style="font-size:18px">' + (index + 1) + '</text></g>';
+    }).join("");
+    const sceneLegend = hotspots.map((spot,index) => {
+      const word = byId.get(spot.id);
+      if (!word) return "";
+      const active = selectedWord === wordKey(word);
+      return '<button type="button" class="vocabulary-scene-legend-item ' + (active ? "is-selected" : "") +
+        '" data-scene-word="' + escapeHTML(wordKey(word)) + '" aria-pressed="' + active + '">' +
+        '<span class="vocabulary-scene-legend-number">' + (index + 1) + '</span>' +
+        '<span><strong>' + escapeHTML(word.french) + '</strong><small>' + escapeHTML(word.spanish) + '</small></span></button>';
+    }).join("");
+    const floatingCard = selected && selectedSpot
+      ? '<div class="vocabulary-scene-popover" style="--scene-x:' + (selectedSpot.x / 1671 * 100) + '%;--scene-y:' + (selectedSpot.y / 941 * 100) + '%" role="status">' +
+        '<button type="button" class="vocabulary-scene-popover-close" data-scene-close aria-label="Cerrar ficha">×</button>' +
+        detailMarkup(selected) + '</div>'
+      : '<div class="vocabulary-scene-selection">Selecciona un número para consultar la palabra en francés y su traducción.</div>';
+    // El vocabulario incluye «ventilateur», que no aparece en la fotografía; se representa
+    // con un pequeño ventilador vectorial en una zona libre de pared para mantener los 25 términos.
+    const fanIllustration = '<g class="living-room-fan-illustration" aria-label="Ventilador ilustrado">' +
+      '<circle cx="865" cy="205" r="25" fill="#f4f0e8" fill-opacity=".9" stroke="#705b48" stroke-width="4"/>' +
+      '<circle cx="865" cy="205" r="6" fill="#705b48"/>' +
+      '<path d="M865 199 C850 183 852 170 863 174 C875 178 871 192 868 200 Z M871 205 C889 193 900 199 895 210 C890 220 878 213 870 209 Z M862 211 C860 232 849 237 844 227 C840 216 853 210 861 207 Z" fill="#b88a55" stroke="#705b48" stroke-width="2"/>' +
+      '<path d="M865 230 L865 263 M849 264 H881" stroke="#705b48" stroke-width="5" stroke-linecap="round"/></g>';
+    return '<div class="vocabulary-scene-intro"><p>Selecciona un número de la imagen o una palabra de la columna.</p><span>25 términos interactivos</span></div>' +
+      '<div class="vocabulary-scene-layout"><div class="vocabulary-scene-visual">' +
+      '<div class="vocabulary-house-scene vocabulary-living-room-scene">' +
+      '<img class="vocabulary-house-image" src="assets/images/Salón moderno cálido con chimenea.png" alt="Salón moderno y cálido con sofá, sillón, mesa, televisión, estanterías, chimenea y decoración" width="1671" height="941" loading="lazy" decoding="async">' +
+      '<svg class="scene-hotspot-overlay" viewBox="0 0 1671 941" preserveAspectRatio="none" role="group" aria-label="Vocabulario interactivo del salón">' +
+      fanIllustration + svgHotspots + '</svg></div>' + floatingCard + '</div>' +
+      '<aside class="vocabulary-scene-sidebar" aria-label="Vocabulario del salón"><h3>Vocabulario <span>25 términos</span></h3><div class="vocabulary-scene-legend">' + sceneLegend + '</div></aside></div>';
+  }
+
   function renderKitchenScene(words) {
     const byId = new Map(words.map(word => [word.id, word]));
     // Coordenadas sobre la imagen original (1648 × 1024). Marcadores 25 y 21 ajustados según indicaciones.
