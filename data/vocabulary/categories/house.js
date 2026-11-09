@@ -12,25 +12,26 @@
       {
         id: 'house-rooms',
         title: 'Habitaciones y espacios de la casa',
+        scene: 'house-cutaway',
         entries: [
           {id:'house-home',word:'maison',translation:'casa',articleFr:'une',articleEs:'una'},
           {id:'house-apartment',word:'appartement',translation:'apartamento',articleFr:'un',articleEs:'un'},
-          {id:'house-room',word:'pièce',translation:'habitación / estancia',articleFr:'une',articleEs:'una'},
+          {id:'house-attic',word:'grenier',translation:'ático / buhardilla',articleFr:'un',articleEs:'un'},
           {id:'house-bedroom',word:'chambre',translation:'dormitorio',articleFr:'une',articleEs:'un'},
-          {id:'house-living-room',word:'salon',translation:'salón',articleFr:'un',articleEs:'un'},
-          {id:'house-dining-room',word:'salle à manger',translation:'comedor',articleFr:'une',articleEs:'un'},
-          {id:'house-kitchen',word:'cuisine',translation:'cocina',articleFr:'une',articleEs:'una'},
-          {id:'house-bathroom',word:'salle de bains',translation:'baño',articleFr:'une',articleEs:'un'},
-          {id:'house-shower-room',word:'salle de douche',translation:'cuarto de ducha',articleFr:'une',articleEs:'un'},
-          {id:'house-toilet',word:'toilettes',translation:'aseo / baño',articleFr:'les',articleEs:'el'},
-          {id:'house-hallway',word:'couloir',translation:'pasillo',articleFr:'un',articleEs:'un'},
-          {id:'house-entrance',word:'entrée',translation:'entrada',articleFr:'une',articleEs:'una'},
+          {id:'house-bathroom',word:'salle de bain',translation:'cuarto de baño',articleFr:'une',articleEs:'un'},
           {id:'house-balcony',word:'balcon',translation:'balcón',articleFr:'un',articleEs:'un'},
+          {id:'house-room',word:'pièce',translation:'habitación / estancia',articleFr:'une',articleEs:'una'},
+          {id:'house-dining-room',word:'salle à manger',translation:'comedor',articleFr:'une',articleEs:'un'},
+          {id:'house-living-room',word:'salon',translation:'salón',articleFr:'un',articleEs:'un'},
+          {id:'house-hallway',word:'couloir',translation:'pasillo',articleFr:'un',articleEs:'un'},
+          {id:'house-kitchen',word:'cuisine',translation:'cocina',articleFr:'une',articleEs:'una'},
+          {id:'house-toilet',word:'toilettes',translation:'aseo / baño',articleFr:'les',articleEs:'el'},
+          {id:'house-entrance',word:'entrée',translation:'entrada',articleFr:'une',articleEs:'una'},
           {id:'house-terrace',word:'terrasse',translation:'terraza',articleFr:'une',articleEs:'una'},
-          {id:'house-garden',word:'jardin',translation:'jardín',articleFr:'un',articleEs:'un'},
           {id:'house-garage',word:'garage',translation:'garaje',articleFr:'un',articleEs:'un'},
+          {id:'house-garden',word:'jardin',translation:'jardín',articleFr:'un',articleEs:'un'},
           {id:'house-cellar',word:'cave',translation:'sótano / bodega',articleFr:'une',articleEs:'un'},
-          {id:'house-attic',word:'grenier',translation:'ático / buhardilla',articleFr:'un',articleEs:'un'}
+          {id:'house-stairs',word:'escalier',translation:'escalera',articleFr:'un',articleEs:'una'}
         ]
       },
       {
