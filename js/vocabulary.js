@@ -294,7 +294,7 @@
     return '<div class="vocabulary-scene-intro"><p>Selecciona un número de la imagen o una palabra de la columna.</p><span>18 espacios interactivos</span></div>' +
       '<div class="vocabulary-scene-layout"><div class="vocabulary-scene-visual">' +
       '<div class="vocabulary-house-scene">' +
-      '<img class="vocabulary-house-image" src="assets/images/casa-interactiva-moderna.webp" alt="Casa moderna en corte con ático, dormitorio, baño, salón, comedor, cocina, sótano, garaje y jardín" width="1536" height="1024" loading="lazy" decoding="async">' +
+      '<img class="vocabulary-house-image" src="assets/images/casa-interactiva-moderna.webp.png" alt="Casa moderna en corte con ático, dormitorio, baño, salón, comedor, cocina, sótano, garaje y jardín" width="1536" height="1024" loading="lazy" decoding="async">' +
       '<svg class="scene-hotspot-overlay" viewBox="0 0 900 600" preserveAspectRatio="none" role="group" aria-label="Zonas interactivas de la casa">' +
       svgHotspots + '</svg></div>' + floatingCard + '</div>' +
       '<aside class="vocabulary-scene-sidebar" aria-label="Vocabulario de la casa"><h3>Vocabulario <span>18 términos</span></h3><div class="vocabulary-scene-legend">' + sceneLegend + '</div></aside></div>';
