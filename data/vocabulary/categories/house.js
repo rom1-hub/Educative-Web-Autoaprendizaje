@@ -37,6 +37,7 @@
       {
         id:'house-kitchen',
         title:'Cocina',
+        scene:'kitchen-hotspots',
         entries:[
           {id:'house-kitchen-refrigerator',word:'réfrigérateur',translation:'refrigerador',articleFr:'un',articleEs:'un'},
           {id:'house-kitchen-fridge',word:'frigo',translation:'frigorífico',articleFr:'un',articleEs:'un'},
