@@ -300,6 +300,60 @@
       '<aside class="vocabulary-scene-sidebar" aria-label="Vocabulario de la casa"><h3>Vocabulario <span>18 términos</span></h3><div class="vocabulary-scene-legend">' + sceneLegend + '</div></aside></div>';
   }
 
+  function renderKitchenScene(words) {
+    const byId = new Map(words.map(word => [word.id, word]));
+    // Coordenadas sobre la imagen original (1648 × 1024).
+    const hotspots = [
+      {id:"house-kitchen-refrigerator",x:145,y:275},{id:"house-kitchen-fridge",x:205,y:405},
+      {id:"house-kitchen-freezer",x:150,y:575},{id:"house-kitchen-oven",x:930,y:520},
+      {id:"house-kitchen-microwave",x:1140,y:340},{id:"house-kitchen-cooktop",x:895,y:400},
+      {id:"house-kitchen-dishwasher",x:1195,y:590},{id:"house-kitchen-coffeemaker",x:360,y:365},
+      {id:"house-kitchen-kettle",x:455,y:370},{id:"house-kitchen-toaster",x:555,y:375},
+      {id:"house-kitchen-blender",x:675,y:365},{id:"house-kitchen-sink",x:1410,y:420},
+      {id:"house-kitchen-faucet",x:1500,y:315},{id:"house-kitchen-trash-bin",x:1575,y:720},
+      {id:"house-kitchen-saucepan",x:840,y:350},{id:"house-kitchen-frying-pan",x:980,y:365},
+      {id:"house-kitchen-plate",x:355,y:735},{id:"house-kitchen-bowl",x:540,y:700},
+      {id:"house-kitchen-glass",x:740,y:675},{id:"house-kitchen-cup",x:850,y:685},
+      {id:"house-kitchen-knife",x:1100,y:730},{id:"house-kitchen-fork",x:620,y:800},
+      {id:"house-kitchen-spoon",x:735,y:805},{id:"house-kitchen-spatula",x:575,y:535},
+      {id:"house-kitchen-cutting-board",x:1040,y:755}
+    ];
+    const selected = words.find(word => wordKey(word) === selectedWord);
+    const selectedSpot = selected ? hotspots.find(spot => spot.id === selected.id) : null;
+    const svgHotspots = hotspots.map((spot,index) => {
+      const word = byId.get(spot.id);
+      if (!word) return "";
+      const active = selectedWord === wordKey(word);
+      return '<g class="vocabulary-scene-hotspot ' + (active ? "is-selected" : "") +
+        '" data-scene-word="' + escapeHTML(wordKey(word)) + '" role="button" tabindex="0" aria-label="' +
+        escapeHTML(word.french + " — " + word.spanish) + '" aria-pressed="' + active + '">' +
+        '<circle class="scene-marker-halo" cx="' + spot.x + '" cy="' + spot.y + '" r="23"></circle>' +
+        '<circle class="scene-marker" cx="' + spot.x + '" cy="' + spot.y + '" r="17"></circle>' +
+        '<text x="' + spot.x + '" y="' + (spot.y + 6) + '">' + (index + 1) + '</text></g>';
+    }).join("");
+    const sceneLegend = hotspots.map((spot,index) => {
+      const word = byId.get(spot.id);
+      if (!word) return "";
+      const active = selectedWord === wordKey(word);
+      return '<button type="button" class="vocabulary-scene-legend-item ' + (active ? "is-selected" : "") +
+        '" data-scene-word="' + escapeHTML(wordKey(word)) + '" aria-pressed="' + active + '">' +
+        '<span class="vocabulary-scene-legend-number">' + (index + 1) + '</span>' +
+        '<span><strong>' + escapeHTML(word.french) + '</strong><small>' + escapeHTML(word.spanish) + '</small></span></button>';
+    }).join("");
+    const floatingCard = selected && selectedSpot
+      ? '<div class="vocabulary-scene-popover" style="--scene-x:' + (selectedSpot.x / 1648 * 100) + '%;--scene-y:' + (selectedSpot.y / 1024 * 100) + '%" role="status">' +
+        '<button type="button" class="vocabulary-scene-popover-close" data-scene-close aria-label="Cerrar ficha">×</button>' +
+        detailMarkup(selected) + '</div>'
+      : '<div class="vocabulary-scene-selection">Selecciona un número para consultar la palabra en francés y su traducción.</div>';
+    return '<div class="vocabulary-scene-intro"><p>Selecciona un número de la imagen o una palabra de la columna.</p><span>25 términos interactivos</span></div>' +
+      '<div class="vocabulary-scene-layout"><div class="vocabulary-scene-visual">' +
+      '<div class="vocabulary-house-scene vocabulary-kitchen-scene">' +
+      '<img class="vocabulary-house-image" src="assets/images/Cocina-moderna-llena-de-detalles.png" alt="Cocina moderna con electrodomésticos, fregadero, utensilios, vajilla y cubiertos" width="1648" height="1024" loading="lazy" decoding="async">' +
+      '<svg class="scene-hotspot-overlay" viewBox="0 0 1648 1024" preserveAspectRatio="none" role="group" aria-label="Vocabulario interactivo de la cocina">' +
+      svgHotspots + '</svg></div>' + floatingCard + '</div>' +
+      '<aside class="vocabulary-scene-sidebar" aria-label="Vocabulario de la cocina"><h3>Vocabulario <span>25 términos</span></h3><div class="vocabulary-scene-legend">' + sceneLegend + '</div></aside></div>';
+  }
+
   function renderBrowse() {
     const category = getCategory(), subcategory = getSubcategory();
     const query = $("vocabulary-search-input").value.trim();
@@ -334,6 +388,10 @@
     if (subcategory.scene === "house-cutaway") {
       const sceneHeading = `<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> ${escapeHTML(category.name)} <span>›</span> <strong>${escapeHTML(subcategory.name)}</strong></div><div class="vocabulary-heading"><div><h2>${escapeHTML(subcategory.name)}</h2><p>Explora la casa y selecciona sus habitaciones y objetos.</p></div><span class="vocabulary-count">${words.length} elementos</span></div>`;
       return sceneHeading + renderHouseScene(words);
+    }
+    if (subcategory.scene === "kitchen-hotspots") {
+      const sceneHeading = '<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> ' + escapeHTML(category.name) + ' <span>›</span> <strong>' + escapeHTML(subcategory.name) + '</strong></div><div class="vocabulary-heading"><div><h2>' + escapeHTML(subcategory.name) + '</h2><p>Explora la cocina y selecciona sus electrodomésticos, utensilios y objetos.</p></div><span class="vocabulary-count">' + words.length + ' elementos</span></div>';
+      return sceneHeading + renderKitchenScene(words);
     }
     const heading = `<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> ${escapeHTML(category.name)} <span>›</span> <strong>${escapeHTML(subcategory.name)}</strong></div><div class="vocabulary-heading"><div><h2>${escapeHTML(subcategory.name)}</h2><p>Selecciona una palabra para consultar su ficha.</p></div><span class="vocabulary-count">${words.length} palabra(s)</span></div>`;
     if (!words.length) return heading + '<div class="vocabulary-empty"><h3>No encontramos palabras en esta subcategoría.</h3><p>Prueba otra subcategoría.</p></div>';
