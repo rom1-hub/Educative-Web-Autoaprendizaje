@@ -19,7 +19,7 @@
           {id:'house-apartment',word:'appartement',translation:'apartamento',articleFr:'un',articleEs:'un'},
           {id:'house-attic',word:'grenier',translation:'ático / buhardilla',articleFr:'un',articleEs:'un'},
           {id:'house-bedroom',word:'chambre',translation:'dormitorio',articleFr:'une',articleEs:'un'},
-          {id:'house-bathroom',word:'salle de bains',translation:'cuarto de baño',articleFr:'une',articleEs:'un'},
+          {id:'house-bathroom',word:'salle de bain',translation:'cuarto de baño',articleFr:'une',articleEs:'un'},
           {id:'house-balcony',word:'balcon',translation:'balcón',articleFr:'un',articleEs:'un'},
           {id:'house-room',word:'pièce',translation:'habitación / estancia',articleFr:'une',articleEs:'una'},
           {id:'house-dining-room',word:'salle à manger',translation:'comedor',articleFr:'une',articleEs:'un'},
