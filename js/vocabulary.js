@@ -246,7 +246,7 @@
     // Coordenadas ajustadas a la fotografía nueva (1536 × 1024; viewBox 900 × 600).
     // Cada marcador se sitúa dentro del espacio que nombra.
     const hotspots = [
-      {id:"house-home",x:450,y:300},          // Casa: estructura central
+      {id:"house-home",x:120,y:95},          // Casa: estructura central
       {id:"house-apartment",x:785,y:95},      // Edificio del círculo superior derecho
       {id:"house-attic",x:455,y:110},         // Ático bajo el tejado
       {id:"house-bedroom",x:290,y:220},       // Dormitorio superior izquierdo
@@ -255,7 +255,7 @@
       {id:"house-room",x:660,y:220},          // Despacho / estancia superior derecha
       {id:"house-dining-room",x:625,y:365},   // Comedor inferior derecho
       {id:"house-living-room",x:295,y:365},   // Salón inferior izquierdo
-      {id:"house-hallway",x:450,y:365},       // Distribuidor central
+      {id:"house-hallway",x:590,y:220},       // Distribuidor central
       {id:"house-kitchen",x:710,y:365},       // Cocina inferior derecha
       {id:"house-toilet",x:525,y:365},        // Aseo junto a la zona central
       {id:"house-entrance",x:390,y:390},      // Entrada principal
