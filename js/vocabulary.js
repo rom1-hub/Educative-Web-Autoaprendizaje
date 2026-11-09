@@ -244,17 +244,25 @@
   function renderHouseScene(words) {
     const byId = new Map(words.map(word => [word.id, word]));
     const hotspots = [
-      {id:"house-home",x:438,y:42},{id:"house-apartment",x:570,y:42},
-      {id:"house-attic",x:440,y:112},{id:"house-bedroom",x:545,y:185},
-      {id:"house-bathroom",x:675,y:185},{id:"house-shower-room",x:680,y:265},
-      {id:"house-balcony",x:770,y:190},{id:"house-room",x:405,y:190},
-      {id:"house-hallway",x:405,y:285},{id:"house-living-room",x:250,y:385},
-      {id:"house-dining-room",x:430,y:385},{id:"house-kitchen",x:610,y:385},
-      {id:"house-toilet",x:690,y:385},{id:"house-entrance",x:280,y:485},
-      {id:"house-terrace",x:755,y:475},{id:"house-garden",x:830,y:555},
-      {id:"house-garage",x:105,y:550},{id:"house-cellar",x:450,y:565}
-    ];
-    const selected = words.find(word => wordKey(word) === selectedWord);
+      {id:"house-home",x:450,y:300},
+      {id:"house-apartment",x:790,y:95},
+      {id:"house-attic",x:450,y:115},
+      {id:"house-bedroom",x:285,y:230},
+      {id:"house-bathroom",x:400,y:230},
+      {id:"house-balcony",x:125,y:245},
+      {id:"house-room",x:665,y:245},
+      {id:"house-dining-room",x:625,y:440},
+      {id:"house-living-room",x:285,y:440},
+      {id:"house-hallway",x:520,y:365},
+      {id:"house-kitchen",x:700,y:445},
+      {id:"house-toilet",x:525,y:425},
+      {id:"house-entrance",x:405,y:455},
+      {id:"house-terrace",x:115,y:390},
+      {id:"house-garage",x:815,y:425},
+      {id:"house-garden",x:105,y:555},
+      {id:"house-cellar",x:450,y:555},
+      {id:"house-stairs",x:470,y:340}
+    ];    const selected = words.find(word => wordKey(word) === selectedWord);
     const selectedSpot = selected ? hotspots.find(spot => spot.id === selected.id) : null;
     const svgHotspots = hotspots.map((spot, index) => {
       const word = byId.get(spot.id);
