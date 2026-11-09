@@ -305,8 +305,8 @@
     // Coordenadas sobre la imagen original (1648 × 1024).
     const hotspots = [
       {id:"house-kitchen-refrigerator",x:145,y:275},{id:"house-kitchen-fridge",x:205,y:405},
-      {id:"house-kitchen-freezer",x:150,y:575},{id:"house-kitchen-oven",x:930,y:520},
-      {id:"house-kitchen-microwave",x:1140,y:340},{id:"house-kitchen-cooktop",x:895,y:400},
+      {id:"house-kitchen-freezer",x:150,y:610},{id:"house-kitchen-oven",x:930,y:520},
+      {id:"house-kitchen-microwave",x:1140,y:340},{id:"house-kitchen-cooktop",x:895,y:425},
       {id:"house-kitchen-dishwasher",x:1195,y:590},{id:"house-kitchen-coffeemaker",x:360,y:365},
       {id:"house-kitchen-kettle",x:455,y:370},{id:"house-kitchen-toaster",x:555,y:375},
       {id:"house-kitchen-blender",x:675,y:365},{id:"house-kitchen-sink",x:1410,y:420},
@@ -314,9 +314,9 @@
       {id:"house-kitchen-saucepan",x:840,y:350},{id:"house-kitchen-frying-pan",x:980,y:365},
       {id:"house-kitchen-plate",x:355,y:735},{id:"house-kitchen-bowl",x:540,y:700},
       {id:"house-kitchen-glass",x:740,y:675},{id:"house-kitchen-cup",x:850,y:685},
-      {id:"house-kitchen-knife",x:1100,y:730},{id:"house-kitchen-fork",x:620,y:800},
+      {id:"house-kitchen-knife",x:1100,y:760},{id:"house-kitchen-fork",x:620,y:800},
       {id:"house-kitchen-spoon",x:735,y:805},{id:"house-kitchen-spatula",x:575,y:535},
-      {id:"house-kitchen-cutting-board",x:1040,y:755}
+      {id:"house-kitchen-cutting-board",x:1040,y:805}
     ];
     const selected = words.find(word => wordKey(word) === selectedWord);
     const selectedSpot = selected ? hotspots.find(spot => spot.id === selected.id) : null;
