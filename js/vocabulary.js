@@ -318,7 +318,7 @@
       {id:"house-living-shelf",x:1480,y:255},
       {id:"house-living-bookcase",x:1460,y:405},
       {id:"house-living-furniture",x:1080,y:565},
-      {id:"house-living-vase",x:810,y:600},
+      {id:"house-living-vase",x:810,y:650},
       {id:"house-living-plant",x:685,y:445},
       {id:"house-living-frame",x:745,y:260},
       {id:"house-living-wall-clock",x:1135,y:180},
