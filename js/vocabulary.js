@@ -329,7 +329,7 @@
         escapeHTML(word.french + " — " + word.spanish) + '" aria-pressed="' + active + '">' +
         '<circle class="scene-marker-halo" cx="' + spot.x + '" cy="' + spot.y + '" r="23"></circle>' +
         '<circle class="scene-marker" cx="' + spot.x + '" cy="' + spot.y + '" r="17"></circle>' +
-        '<text x="' + spot.x + '" y="' + (spot.y + 6) + '">' + (index + 1) + '</text></g>';
+        '<text x="' + spot.x + '" y="' + (spot.y + 6) + '" style="font-size:18px">' + (index + 1) + '</text></g>';
     }).join("");
     const sceneLegend = hotspots.map((spot,index) => {
       const word = byId.get(spot.id);
