@@ -374,6 +374,74 @@
       '<aside class="vocabulary-scene-sidebar" aria-label="Vocabulario del salón"><h3>Vocabulario <span>25 términos</span></h3><div class="vocabulary-scene-legend">' + sceneLegend + '</div></aside></div>';
   }
 
+  function renderBedroomScene(words) {
+    const byId = new Map(words.map(word => [word.id, word]));
+    // Coordenadas sobre la imagen original (1670 × 942). Los marcadores se sitúan
+    // sobre el centro de cada objeto o sobre una zona inequívoca de cada textil.
+    const hotspots = [
+      {id:"house-bedroom-room",x:820,y:42},
+      {id:"house-bedroom-bed",x:565,y:765},
+      {id:"house-bedroom-mattress",x:555,y:650},
+      {id:"house-bedroom-pillow",x:300,y:460},
+      {id:"house-bedroom-pillowcase",x:465,y:455},
+      {id:"house-bedroom-sheet",x:470,y:610},
+      {id:"house-bedroom-duvet-cover",x:785,y:555},
+      {id:"house-bedroom-duvet",x:650,y:590},
+      {id:"house-bedroom-blanket",x:930,y:715},
+      {id:"house-bedroom-bedside-table",x:115,y:720},
+      {id:"house-bedroom-bedside-lamp",x:75,y:465},
+      {id:"house-bedroom-wardrobe",x:895,y:285},
+      {id:"house-bedroom-chest",x:1260,y:565},
+      {id:"house-bedroom-hanger",x:945,y:205},
+      {id:"house-bedroom-mirror",x:1290,y:260},
+      {id:"house-bedroom-alarm-clock",x:165,y:610},
+      {id:"house-bedroom-curtain",x:500,y:170},
+      {id:"house-bedroom-carpet",x:800,y:860},
+      {id:"house-bedroom-window",x:645,y:220},
+      {id:"house-bedroom-shutter",x:645,y:110},
+      {id:"house-bedroom-door",x:1560,y:365},
+      {id:"house-bedroom-handle",x:1510,y:455},
+      {id:"house-bedroom-switch",x:1440,y:350},
+      {id:"house-bedroom-pyjamas",x:1605,y:300},
+      {id:"house-bedroom-laundry-basket",x:1540,y:700},
+      {id:"house-bedroom-jewelry-box",x:1275,y:405}
+    ];
+    const selected = words.find(word => wordKey(word) === selectedWord);
+    const selectedSpot = selected ? hotspots.find(spot => spot.id === selected.id) : null;
+    const svgHotspots = hotspots.map((spot,index) => {
+      const word = byId.get(spot.id);
+      if (!word) return "";
+      const active = selectedWord === wordKey(word);
+      return '<g class="vocabulary-scene-hotspot ' + (active ? "is-selected" : "") +
+        '" data-scene-word="' + escapeHTML(wordKey(word)) + '" role="button" tabindex="0" aria-label="' +
+        escapeHTML(word.french + " — " + word.spanish) + '" aria-pressed="' + active + '">' +
+        '<circle class="scene-marker-halo" cx="' + spot.x + '" cy="' + spot.y + '" r="23"></circle>' +
+        '<circle class="scene-marker" cx="' + spot.x + '" cy="' + spot.y + '" r="17"></circle>' +
+        '<text x="' + spot.x + '" y="' + (spot.y + 6) + '" style="font-size:18px">' + (index + 1) + '</text></g>';
+    }).join("");
+    const sceneLegend = hotspots.map((spot,index) => {
+      const word = byId.get(spot.id);
+      if (!word) return "";
+      const active = selectedWord === wordKey(word);
+      return '<button type="button" class="vocabulary-scene-legend-item ' + (active ? "is-selected" : "") +
+        '" data-scene-word="' + escapeHTML(wordKey(word)) + '" aria-pressed="' + active + '">' +
+        '<span class="vocabulary-scene-legend-number">' + (index + 1) + '</span>' +
+        '<span><strong>' + escapeHTML(word.french) + '</strong><small>' + escapeHTML(word.spanish) + '</small></span></button>';
+    }).join("");
+    const floatingCard = selected && selectedSpot
+      ? '<div class="vocabulary-scene-popover" style="--scene-x:' + (selectedSpot.x / 1670 * 100) + '%;--scene-y:' + (selectedSpot.y / 942 * 100) + '%" role="status">' +
+        '<button type="button" class="vocabulary-scene-popover-close" data-scene-close aria-label="Cerrar ficha">×</button>' +
+        detailMarkup(selected) + '</div>'
+      : '<div class="vocabulary-scene-selection">Selecciona un número para consultar la palabra en francés y su traducción.</div>';
+    return '<div class="vocabulary-scene-intro"><p>Selecciona un número de la imagen o una palabra de la columna.</p><span>26 términos interactivos</span></div>' +
+      '<div class="vocabulary-scene-layout"><div class="vocabulary-scene-visual">' +
+      '<div class="vocabulary-house-scene vocabulary-bedroom-scene">' +
+      '<img class="vocabulary-house-image" src="assets/images/Dormitorio acogedor con detalles botánicos.png" alt="Dormitorio acogedor con cama vestida con varias capas de ropa de cama, mesita, lámpara, armario, cómoda, ventana con persiana y cortinas" width="1670" height="942" loading="lazy" decoding="async">' +
+      '<svg class="scene-hotspot-overlay" viewBox="0 0 1670 942" preserveAspectRatio="none" role="group" aria-label="Vocabulario interactivo del dormitorio">' +
+      svgHotspots + '</svg></div>' + floatingCard + '</div>' +
+      '<aside class="vocabulary-scene-sidebar" aria-label="Vocabulario del dormitorio"><h3>Vocabulario <span>26 términos</span></h3><div class="vocabulary-scene-legend">' + sceneLegend + '</div></aside></div>';
+  }
+
   function renderKitchenScene(words) {
     const byId = new Map(words.map(word => [word.id, word]));
     // Coordenadas sobre la imagen original (1648 × 1024). Marcadores 25 y 21 ajustados según indicaciones.
@@ -466,6 +534,10 @@
     if (subcategory.scene === "kitchen-hotspots") {
       const sceneHeading = '<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> ' + escapeHTML(category.name) + ' <span>›</span> <strong>' + escapeHTML(subcategory.name) + '</strong></div><div class="vocabulary-heading"><div><h2>' + escapeHTML(subcategory.name) + '</h2><p>Explora la cocina y selecciona sus electrodomésticos, utensilios y objetos.</p></div><span class="vocabulary-count">' + words.length + ' elementos</span></div>';
       return sceneHeading + renderKitchenScene(words);
+    }
+    if (subcategory.scene === "bedroom-hotspots") {
+      const sceneHeading = '<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> ' + escapeHTML(category.name) + ' <span>›</span> <strong>' + escapeHTML(subcategory.name) + '</strong></div><div class="vocabulary-heading"><div><h2>' + escapeHTML(subcategory.name) + '</h2><p>Explora el dormitorio y descubre los muebles, los objetos y las distintas capas de ropa de cama.</p></div><span class="vocabulary-count">' + words.length + ' elementos</span></div>';
+      return sceneHeading + renderBedroomScene(words);
     }
     if (subcategory.scene === "living-room-hotspots") {
       const sceneHeading = '<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> ' + escapeHTML(category.name) + ' <span>›</span> <strong>' + escapeHTML(subcategory.name) + '</strong></div><div class="vocabulary-heading"><div><h2>' + escapeHTML(subcategory.name) + '</h2><p>Explora el salón y selecciona sus muebles, aparatos y elementos decorativos.</p></div><span class="vocabulary-count">' + words.length + ' elementos</span></div>';
