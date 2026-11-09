@@ -491,10 +491,48 @@
       render();
       $("vocabulary-status").textContent = "Explorando categorías";
     });
+    // Conserva el scroll al seleccionar desde la lista y solo desplaza la lista
+    // cuando la selección se origina en un marcador de la imagen.
+    function renderSceneSelection(wordKey, source) {
+      const panel = $("vocabulary-learning-panel");
+      const oldLegend = panel.querySelector(".vocabulary-scene-legend");
+      const previousScrollTop = oldLegend ? oldLegend.scrollTop : 0;
+      selectedWord = selectedWord === wordKey ? null : wordKey;
+      render();
+      const newLegend = panel.querySelector(".vocabulary-scene-legend");
+      if (!newLegend) return;
+      if (source === "marker" && selectedWord) {
+        const selectedItem = Array.from(newLegend.querySelectorAll(".vocabulary-scene-legend-item"))
+          .find(item => item.dataset.sceneWord === selectedWord);
+        if (selectedItem) {
+          const listRect = newLegend.getBoundingClientRect();
+          const itemRect = selectedItem.getBoundingClientRect();
+          if (itemRect.top < listRect.top) {
+            newLegend.scrollTop += itemRect.top - listRect.top;
+          } else if (itemRect.bottom > listRect.bottom) {
+            newLegend.scrollTop += itemRect.bottom - listRect.bottom;
+          }
+        }
+      } else {
+        newLegend.scrollTop = previousScrollTop;
+      }
+    }
     $("vocabulary-learning-panel").addEventListener("click", event => {
-      if (event.target.closest("[data-scene-close]")) { selectedWord = null; render(); return; }
+      if (event.target.closest("[data-scene-close]")) {
+        const legend = $("vocabulary-learning-panel").querySelector(".vocabulary-scene-legend");
+        const previousScrollTop = legend ? legend.scrollTop : 0;
+        selectedWord = null;
+        render();
+        const newLegend = $("vocabulary-learning-panel").querySelector(".vocabulary-scene-legend");
+        if (newLegend) newLegend.scrollTop = previousScrollTop;
+        return;
+      }
       const sceneWord = event.target.closest("[data-scene-word]");
-      if (sceneWord) { selectedWord = selectedWord === sceneWord.dataset.sceneWord ? null : sceneWord.dataset.sceneWord; render(); return; }
+      if (sceneWord) {
+        const source = sceneWord.classList.contains("vocabulary-scene-hotspot") ? "marker" : "list";
+        renderSceneSelection(sceneWord.dataset.sceneWord, source);
+        return;
+      }
       const card = event.target.closest("[data-word-card]");
       if (!card) return;
       selectedWord = selectedWord === card.dataset.wordCard ? null : card.dataset.wordCard;
@@ -502,7 +540,12 @@
     });
     $("vocabulary-learning-panel").addEventListener("keydown", event => {
       const sceneWord = event.target.closest("[data-scene-word]");
-      if (sceneWord && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); selectedWord = selectedWord === sceneWord.dataset.sceneWord ? null : sceneWord.dataset.sceneWord; render(); return; }
+      if (sceneWord && (event.key === "Enter" || event.key === " ")) {
+        event.preventDefault();
+        const source = sceneWord.classList.contains("vocabulary-scene-hotspot") ? "marker" : "list";
+        renderSceneSelection(sceneWord.dataset.sceneWord, source);
+        return;
+      }
       const card = event.target.closest("[data-word-card]");
       if (!card || (event.key !== "Enter" && event.key !== " ")) return;
       event.preventDefault();
