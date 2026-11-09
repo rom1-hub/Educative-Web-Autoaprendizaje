@@ -103,7 +103,7 @@
         title:'Dormitorio',
         scene:'bedroom-hotspots',
         entries:[
-          {id:'house-bedroom-room',word:'chambre',translation:'dormitorio',articleFr:'une',articleEs:'un'},
+          {id:'house-bedroom-room',word:'chambre',translation:'dormitorio',articleFr:'une',articleEs:'una'},
           {id:'house-bedroom-bed',word:'lit',translation:'cama',articleFr:'un',articleEs:'una'},
           {id:'house-bedroom-mattress',word:'matelas',translation:'colchón',articleFr:'un',articleEs:'un'},
           {id:'house-bedroom-pillow',word:'oreiller',translation:'almohada',articleFr:'un',articleEs:'una'},
