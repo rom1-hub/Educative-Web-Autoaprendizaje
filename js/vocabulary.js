@@ -243,25 +243,27 @@
   }
   function renderHouseScene(words) {
     const byId = new Map(words.map(word => [word.id, word]));
+    // Coordenadas ajustadas a la fotografía nueva (1536 × 1024; viewBox 900 × 600).
+    // Cada marcador se sitúa dentro del espacio que nombra.
     const hotspots = [
-      {id:"house-home",x:450,y:300},
-      {id:"house-apartment",x:790,y:95},
-      {id:"house-attic",x:450,y:115},
-      {id:"house-bedroom",x:285,y:230},
-      {id:"house-bathroom",x:400,y:230},
-      {id:"house-balcony",x:125,y:245},
-      {id:"house-room",x:665,y:245},
-      {id:"house-dining-room",x:625,y:440},
-      {id:"house-living-room",x:285,y:440},
-      {id:"house-hallway",x:520,y:365},
-      {id:"house-kitchen",x:700,y:445},
-      {id:"house-toilet",x:525,y:425},
-      {id:"house-entrance",x:405,y:455},
-      {id:"house-terrace",x:115,y:390},
-      {id:"house-garage",x:815,y:425},
-      {id:"house-garden",x:105,y:555},
-      {id:"house-cellar",x:450,y:555},
-      {id:"house-stairs",x:470,y:340}
+      {id:"house-home",x:450,y:300},          // Casa: estructura central
+      {id:"house-apartment",x:785,y:95},      // Edificio del círculo superior derecho
+      {id:"house-attic",x:455,y:110},         // Ático bajo el tejado
+      {id:"house-bedroom",x:290,y:220},       // Dormitorio superior izquierdo
+      {id:"house-bathroom",x:410,y:220},      // Cuarto de baño con bañera
+      {id:"house-balcony",x:165,y:225},       // Balcón superior izquierdo
+      {id:"house-room",x:660,y:220},          // Despacho / estancia superior derecha
+      {id:"house-dining-room",x:625,y:365},   // Comedor inferior derecho
+      {id:"house-living-room",x:295,y:365},   // Salón inferior izquierdo
+      {id:"house-hallway",x:450,y:365},       // Distribuidor central
+      {id:"house-kitchen",x:710,y:365},       // Cocina inferior derecha
+      {id:"house-toilet",x:525,y:365},        // Aseo junto a la zona central
+      {id:"house-entrance",x:390,y:390},      // Entrada principal
+      {id:"house-terrace",x:95,y:365},        // Terraza exterior izquierda
+      {id:"house-garage",x:815,y:365},        // Garaje derecho
+      {id:"house-garden",x:260,y:555},        // Jardín delantero
+      {id:"house-cellar",x:455,y:485},        // Sótano
+      {id:"house-stairs",x:485,y:320}         // Escalera central
     ];    const selected = words.find(word => wordKey(word) === selectedWord);
     const selectedSpot = selected ? hotspots.find(spot => spot.id === selected.id) : null;
     const svgHotspots = hotspots.map((spot, index) => {
@@ -285,14 +287,14 @@
         '<span><strong>' + escapeHTML(word.french) + '</strong><small>' + escapeHTML(word.spanish) + '</small></span></button>';
     }).join("");
     const floatingCard = selected && selectedSpot
-      ? '<div class="vocabulary-scene-popover" style="--scene-x:' + (selectedSpot.x / 900 * 100) + '%;--scene-y:' + (selectedSpot.y / 640 * 100) + '%" role="status">' +
+      ? '<div class="vocabulary-scene-popover" style="--scene-x:' + (selectedSpot.x / 900 * 100) + '%;--scene-y:' + (selectedSpot.y / 600 * 100) + '%" role="status">' +
         '<button type="button" class="vocabulary-scene-popover-close" data-scene-close aria-label="Cerrar ficha">×</button>' +
         detailMarkup(selected) + '</div>'
       : '<div class="vocabulary-scene-selection">Selecciona un número para consultar la palabra en francés y su traducción.</div>';
     return '<div class="vocabulary-scene-intro"><p>Selecciona un número de la imagen o una palabra de la columna.</p><span>18 espacios interactivos</span></div>' +
       '<div class="vocabulary-scene-layout"><div class="vocabulary-scene-visual">' +
       '<div class="vocabulary-house-scene">' +
-      '<img class="vocabulary-house-image" src="assets/images/casa-interactiva-moderna.webp" alt="Casa moderna en corte con habitaciones amuebladas, sótano, garaje y jardín" width="1400" height="933" loading="lazy" decoding="async">' +
+      '<img class="vocabulary-house-image" src="assets/images/casa-interactiva-moderna.webp" alt="Casa moderna en corte con ático, dormitorio, baño, salón, comedor, cocina, sótano, garaje y jardín" width="1536" height="1024" loading="lazy" decoding="async">' +
       '<svg class="scene-hotspot-overlay" viewBox="0 0 900 600" preserveAspectRatio="none" role="group" aria-label="Zonas interactivas de la casa">' +
       svgHotspots + '</svg></div>' + floatingCard + '</div>' +
       '<aside class="vocabulary-scene-sidebar" aria-label="Vocabulario de la casa"><h3>Vocabulario <span>18 términos</span></h3><div class="vocabulary-scene-legend">' + sceneLegend + '</div></aside></div>';
