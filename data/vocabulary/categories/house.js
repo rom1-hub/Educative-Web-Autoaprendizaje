@@ -166,6 +166,7 @@
       {
         id:'house-entrance-hallways',
         title:'Entrada y pasillos',
+        scene:'entry-hallways-hotspots',
         entries:[
           {id:'house-entry',word:'entrée',translation:'entrada',articleFr:'une',articleEs:'una'},
           {id:'house-entry-hallway',word:'couloir',translation:'pasillo',articleFr:'un',articleEs:'un'},
