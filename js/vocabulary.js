@@ -426,15 +426,15 @@
         '<span><strong>' + escapeHTML(word.french) + '</strong><small>' + escapeHTML(word.spanish) + '</small></span></button>';
     }).join("");
     const floatingCard = selected && selectedSpot
-      ? '<div class="vocabulary-scene-popover" style="--scene-x:' + (selectedSpot.x / 1580 * 100) + '%;--scene-y:' + (selectedSpot.y / 944 * 100) + '%" role="status">' +
+      ? '<div class="vocabulary-scene-popover" style="--scene-x:' + (selectedSpot.x / 1602 * 100) + '%;--scene-y:' + (selectedSpot.y / 982 * 100) + '%" role="status">' +
         '<button type="button" class="vocabulary-scene-popover-close" data-scene-close aria-label="Cerrar ficha">×</button>' +
         detailMarkup(selected) + '</div>'
       : '<div class="vocabulary-scene-selection">Selecciona un número para consultar la palabra en francés y su traducción.</div>';
     return '<div class="vocabulary-scene-intro"><p>Selecciona un número de la imagen o una palabra de la columna.</p><span>24 términos interactivos</span></div>' +
       '<div class="vocabulary-scene-layout"><div class="vocabulary-scene-visual">' +
       '<div class="vocabulary-house-scene vocabulary-bathroom-scene">' +
-      '<img class="vocabulary-house-image" src="assets/images/Salle de bains moderne beige.png" alt="Baño moderno con lavabo, espejo, bañera, inodoro, ducha, mueble y accesorios de higiene" width="1580" height="944" loading="lazy" decoding="async">' +
-      '<svg class="scene-hotspot-overlay" viewBox="0 0 1580 944" preserveAspectRatio="none" role="group" aria-label="Vocabulario interactivo del baño">' +
+      '<img class="vocabulary-house-image" src="assets/images/Salle de bains moderne beige.png" alt="Baño moderno con lavabo, espejo, bañera, inodoro, ducha, mueble y accesorios de higiene" width="1602" height="982" loading="lazy" decoding="async">' +
+      '<svg class="scene-hotspot-overlay" viewBox="0 0 1602 982" preserveAspectRatio="none" role="group" aria-label="Vocabulario interactivo del baño">' +
       svgHotspots + '</svg></div>' + floatingCard + '</div>' +
       '<aside class="vocabulary-scene-sidebar" aria-label="Vocabulario del baño"><h3>Vocabulario <span>24 términos</span></h3><div class="vocabulary-scene-legend">' + sceneLegend + '</div></aside></div>';
   }
