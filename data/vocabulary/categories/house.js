@@ -134,6 +134,7 @@
       {
         id:'house-bathroom',
         title:'Baño',
+        scene:'bathroom-hotspots',
         entries:[
           {id:'house-bathroom-sink',word:'lavabo',translation:'lavabo',articleFr:'un',articleEs:'un'},
           {id:'house-bathroom-shower',word:'douche',translation:'ducha',articleFr:'une',articleEs:'una'},
@@ -155,7 +156,7 @@
           {id:'house-bathroom-razor',word:'rasoir',translation:'maquinilla de afeitar',articleFr:'un',articleEs:'una'},
           {id:'house-bathroom-toilet-paper',word:'papier toilette',translation:'papel higiénico',articleFr:'le',articleEs:'el'},
           {id:'house-bathroom-bin',word:'poubelle',translation:'papelera',articleFr:'une',articleEs:'una'},
-          {id:'house-bathroom-soap-dish',word:'porte-savon',translation:'jabonera',articleFr:'un',articleEs:'una'},
+          
           {id:'house-bathroom-towel-rack',word:'porte-serviettes',translation:'toallero',articleFr:'un',articleEs:'un'},
           {id:'house-bathroom-faucet',word:'robinet',translation:'grifo',articleFr:'un',articleEs:'un'},
           {id:'house-bathroom-flush',word:'chasse d’eau',translation:'cisterna',articleFr:'une',articleEs:'una'},
