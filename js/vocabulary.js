@@ -374,6 +374,71 @@
       '<aside class="vocabulary-scene-sidebar" aria-label="Vocabulario del salón"><h3>Vocabulario <span>25 términos</span></h3><div class="vocabulary-scene-legend">' + sceneLegend + '</div></aside></div>';
   }
 
+  function renderBathroomScene(words) {
+    const byId = new Map(words.map(word => [word.id, word]));
+    // Coordenadas sobre la imagen original (1580 × 944), centradas en cada objeto visible.
+    const hotspots = [
+      {id:"house-bathroom-sink",x:430,y:510},
+      {id:"house-bathroom-shower",x:1450,y:400},
+      {id:"house-bathroom-bathtub",x:1085,y:580},
+      {id:"house-bathroom-toilet",x:825,y:590},
+      {id:"house-bathroom-mirror",x:385,y:205},
+      {id:"house-bathroom-towel",x:430,y:675},
+      {id:"house-bathroom-mat",x:1230,y:865},
+      {id:"house-bathroom-shower-curtain",x:1550,y:500},
+      {id:"house-bathroom-bathrobe",x:75,y:300},
+      {id:"house-bathroom-soap",x:535,y:455},
+      {id:"house-bathroom-shampoo",x:625,y:290},
+      {id:"house-bathroom-shower-gel",x:1395,y:300},
+      {id:"house-bathroom-toothbrush",x:250,y:470},
+      {id:"house-bathroom-toothpaste",x:310,y:555},
+      {id:"house-bathroom-comb",x:675,y:260},
+      {id:"house-bathroom-hairbrush",x:705,y:315},
+      {id:"house-bathroom-hairdryer",x:620,y:510},
+      {id:"house-bathroom-razor",x:755,y:285},
+      {id:"house-bathroom-toilet-paper",x:900,y:490},
+      {id:"house-bathroom-bin",x:780,y:790},
+      {id:"house-bathroom-towel-rack",x:900,y:150},
+      {id:"house-bathroom-faucet",x:430,y:430},
+      {id:"house-bathroom-flush",x:820,y:465},
+      {id:"house-bathroom-cabinet",x:420,y:745}
+    ];
+    const selected = words.find(word => wordKey(word) === selectedWord);
+    const selectedSpot = selected ? hotspots.find(spot => spot.id === selected.id) : null;
+    const svgHotspots = hotspots.map((spot,index) => {
+      const word = byId.get(spot.id);
+      if (!word) return "";
+      const active = selectedWord === wordKey(word);
+      return '<g class="vocabulary-scene-hotspot ' + (active ? "is-selected" : "") +
+        '" data-scene-word="' + escapeHTML(wordKey(word)) + '" role="button" tabindex="0" aria-label="' +
+        escapeHTML(word.french + " — " + word.spanish) + '" aria-pressed="' + active + '">' +
+        '<circle class="scene-marker-halo" cx="' + spot.x + '" cy="' + spot.y + '" r="23"></circle>' +
+        '<circle class="scene-marker" cx="' + spot.x + '" cy="' + spot.y + '" r="17"></circle>' +
+        '<text x="' + spot.x + '" y="' + (spot.y + 6) + '" style="font-size:18px">' + (index + 1) + '</text></g>';
+    }).join("");
+    const sceneLegend = hotspots.map((spot,index) => {
+      const word = byId.get(spot.id);
+      if (!word) return "";
+      const active = selectedWord === wordKey(word);
+      return '<button type="button" class="vocabulary-scene-legend-item ' + (active ? "is-selected" : "") +
+        '" data-scene-word="' + escapeHTML(wordKey(word)) + '" aria-pressed="' + active + '">' +
+        '<span class="vocabulary-scene-legend-number">' + (index + 1) + '</span>' +
+        '<span><strong>' + escapeHTML(word.french) + '</strong><small>' + escapeHTML(word.spanish) + '</small></span></button>';
+    }).join("");
+    const floatingCard = selected && selectedSpot
+      ? '<div class="vocabulary-scene-popover" style="--scene-x:' + (selectedSpot.x / 1580 * 100) + '%;--scene-y:' + (selectedSpot.y / 944 * 100) + '%" role="status">' +
+        '<button type="button" class="vocabulary-scene-popover-close" data-scene-close aria-label="Cerrar ficha">×</button>' +
+        detailMarkup(selected) + '</div>'
+      : '<div class="vocabulary-scene-selection">Selecciona un número para consultar la palabra en francés y su traducción.</div>';
+    return '<div class="vocabulary-scene-intro"><p>Selecciona un número de la imagen o una palabra de la columna.</p><span>24 términos interactivos</span></div>' +
+      '<div class="vocabulary-scene-layout"><div class="vocabulary-scene-visual">' +
+      '<div class="vocabulary-house-scene vocabulary-bathroom-scene">' +
+      '<img class="vocabulary-house-image" src="assets/images/Salle de bains moderne beige.png" alt="Baño moderno con lavabo, espejo, bañera, inodoro, ducha, mueble y accesorios de higiene" width="1580" height="944" loading="lazy" decoding="async">' +
+      '<svg class="scene-hotspot-overlay" viewBox="0 0 1580 944" preserveAspectRatio="none" role="group" aria-label="Vocabulario interactivo del baño">' +
+      svgHotspots + '</svg></div>' + floatingCard + '</div>' +
+      '<aside class="vocabulary-scene-sidebar" aria-label="Vocabulario del baño"><h3>Vocabulario <span>24 términos</span></h3><div class="vocabulary-scene-legend">' + sceneLegend + '</div></aside></div>';
+  }
+
   function renderBedroomScene(words) {
     const byId = new Map(words.map(word => [word.id, word]));
     // Coordenadas sobre la imagen original (1670 × 942). Los marcadores se sitúan
@@ -534,6 +599,10 @@
     if (subcategory.scene === "kitchen-hotspots") {
       const sceneHeading = '<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> ' + escapeHTML(category.name) + ' <span>›</span> <strong>' + escapeHTML(subcategory.name) + '</strong></div><div class="vocabulary-heading"><div><h2>' + escapeHTML(subcategory.name) + '</h2><p>Explora la cocina y selecciona sus electrodomésticos, utensilios y objetos.</p></div><span class="vocabulary-count">' + words.length + ' elementos</span></div>';
       return sceneHeading + renderKitchenScene(words);
+    }
+    if (subcategory.scene === "bathroom-hotspots") {
+      const sceneHeading = '<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> ' + escapeHTML(category.name) + ' <span>›</span> <strong>' + escapeHTML(subcategory.name) + '</strong></div><div class="vocabulary-heading"><div><h2>' + escapeHTML(subcategory.name) + '</h2><p>Explora el baño y descubre sus instalaciones, accesorios y productos de higiene.</p></div><span class="vocabulary-count">' + words.length + ' elementos</span></div>';
+      return sceneHeading + renderBathroomScene(words);
     }
     if (subcategory.scene === "bedroom-hotspots") {
       const sceneHeading = '<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> ' + escapeHTML(category.name) + ' <span>›</span> <strong>' + escapeHTML(subcategory.name) + '</strong></div><div class="vocabulary-heading"><div><h2>' + escapeHTML(subcategory.name) + '</h2><p>Explora el dormitorio y descubre los muebles, los objetos y las distintas capas de ropa de cama.</p></div><span class="vocabulary-count">' + words.length + ' elementos</span></div>';
