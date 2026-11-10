@@ -374,7 +374,74 @@
       '<aside class="vocabulary-scene-sidebar" aria-label="Vocabulario del salón"><h3>Vocabulario <span>25 términos</span></h3><div class="vocabulary-scene-legend">' + sceneLegend + '</div></aside></div>';
   }
 
-  function renderBathroomScene(words) {
+    function renderEntryHallwaysScene(words) {
+    const byId = new Map(words.map(word => [word.id, word]));
+    // Imagen 1602 × 982. Los marcadores se centran en los objetos visibles.
+    // Escalera, ascensor y buzón se muestran como pictogramas complementarios.
+    const hotspots = [
+      {id:"house-entry",x:180,y:590},
+      {id:"house-entry-hallway",x:1030,y:440},
+      {id:"house-entry-doormat",x:285,y:855},
+      {id:"house-entry-coat-rack",x:610,y:250},
+      {id:"house-entry-hanger",x:700,y:240},
+      {id:"house-entry-mirror",x:385,y:245},
+      {id:"house-entry-console",x:405,y:620},
+      {id:"house-entry-lamp",x:360,y:445},
+      {id:"house-entry-carpet",x:930,y:750},
+      {id:"house-entry-door",x:150,y:455},
+      {id:"house-entry-lock",x:210,y:525},
+      {id:"house-entry-key",x:565,y:550},
+      {id:"house-entry-handle",x:215,y:470},
+      {id:"house-entry-doorbell",x:1215,y:265},
+      {id:"house-entry-switch",x:800,y:420},
+      {id:"house-entry-outlet",x:1135,y:830},
+      {id:"house-entry-stairs",x:1335,y:175},
+      {id:"house-entry-elevator",x:1425,y:175},
+      {id:"house-entry-mailbox",x:1515,y:175},
+      {id:"house-entry-shoe-cabinet",x:600,y:755}
+    ];
+    const selected = words.find(word => wordKey(word) === selectedWord);
+    const selectedSpot = selected ? hotspots.find(spot => spot.id === selected.id) : null;
+    const pictograms = [
+      '<g transform="translate(1300 95)"><rect x="0" y="0" width="72" height="64" rx="7" fill="#f7f1e8" stroke="#765b43" stroke-width="3"/><path d="M10 52h14V40h14V28h14V16h10" fill="none" stroke="#765b43" stroke-width="5" stroke-linejoin="round"/></g>',
+      '<g transform="translate(1390 95)"><rect x="0" y="0" width="64" height="64" rx="6" fill="#f7f1e8" stroke="#765b43" stroke-width="3"/><rect x="17" y="8" width="30" height="48" rx="2" fill="none" stroke="#765b43" stroke-width="3"/><path d="M23 14h18M23 22h18M23 30h18M23 38h18" stroke="#765b43" stroke-width="2"/><circle cx="41" cy="49" r="2" fill="#765b43"/></g>',
+      '<g transform="translate(1480 95)"><rect x="0" y="0" width="72" height="64" rx="6" fill="#f7f1e8" stroke="#765b43" stroke-width="3"/><path d="M8 18h56v36H8zM8 18l28 20 28-20" fill="none" stroke="#765b43" stroke-width="3"/><path d="M26 10h20" stroke="#765b43" stroke-width="3"/></g>'
+    ].join("");
+    const svgHotspots = hotspots.map((spot,index) => {
+      const word = byId.get(spot.id);
+      if (!word) return "";
+      const active = selectedWord === wordKey(word);
+      return '<g class="vocabulary-scene-hotspot ' + (active ? "is-selected" : "") +
+        '" data-scene-word="' + escapeHTML(wordKey(word)) + '" role="button" tabindex="0" aria-label="' +
+        escapeHTML(word.french + " — " + word.spanish) + '" aria-pressed="' + active + '">' +
+        '<circle class="scene-marker-halo" cx="' + spot.x + '" cy="' + spot.y + '" r="23"></circle>' +
+        '<circle class="scene-marker" cx="' + spot.x + '" cy="' + spot.y + '" r="17"></circle>' +
+        '<text x="' + spot.x + '" y="' + (spot.y + 6) + '" style="font-size:18px">' + (index + 1) + '</text></g>';
+    }).join("");
+    const sceneLegend = hotspots.map((spot,index) => {
+      const word = byId.get(spot.id);
+      if (!word) return "";
+      const active = selectedWord === wordKey(word);
+      return '<button type="button" class="vocabulary-scene-legend-item ' + (active ? "is-selected" : "") +
+        '" data-scene-word="' + escapeHTML(wordKey(word)) + '" aria-pressed="' + active + '">' +
+        '<span class="vocabulary-scene-legend-number">' + (index + 1) + '</span>' +
+        '<span><strong>' + escapeHTML(word.french) + '</strong><small>' + escapeHTML(word.spanish) + '</small></span></button>';
+    }).join("");
+    const floatingCard = selected && selectedSpot
+      ? '<div class="vocabulary-scene-popover" style="--scene-x:' + (selectedSpot.x / 1602 * 100) + '%;--scene-y:' + (selectedSpot.y / 982 * 100) + '%" role="status">' +
+        '<button type="button" class="vocabulary-scene-popover-close" data-scene-close aria-label="Cerrar ficha">×</button>' +
+        detailMarkup(selected) + '</div>'
+      : '<div class="vocabulary-scene-selection">Selecciona un número para consultar la palabra en francés y su traducción.</div>';
+    return '<div class="vocabulary-scene-intro"><p>Selecciona un número de la imagen o una palabra de la columna.</p><span>20 términos interactivos</span></div>' +
+      '<div class="vocabulary-scene-layout"><div class="vocabulary-scene-visual">' +
+      '<div class="vocabulary-house-scene vocabulary-entry-scene">' +
+      '<img class="vocabulary-house-image" src="assets/images/Recibidor escandinavo bañado por el sol.png" alt="Entrada y pasillo de una vivienda con puerta, perchero, espejo, consola, lámpara, alfombra y zapatero" width="1602" height="982" loading="lazy" decoding="async">' +
+      '<svg class="scene-hotspot-overlay" viewBox="0 0 1602 982" preserveAspectRatio="none" role="group" aria-label="Vocabulario interactivo de la entrada y los pasillos">' +
+      pictograms + svgHotspots + '</svg></div>' + floatingCard + '</div>' +
+      '<aside class="vocabulary-scene-sidebar" aria-label="Vocabulario de entrada y pasillos"><h3>Vocabulario <span>20 términos</span></h3><div class="vocabulary-scene-legend">' + sceneLegend + '</div></aside></div>';
+  }
+
+function renderBathroomScene(words) {
     const byId = new Map(words.map(word => [word.id, word]));
     // Coordenadas sobre la imagen original (1580 × 944), centradas en cada objeto visible.
     const hotspots = [
@@ -600,7 +667,11 @@
       const sceneHeading = '<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> ' + escapeHTML(category.name) + ' <span>›</span> <strong>' + escapeHTML(subcategory.name) + '</strong></div><div class="vocabulary-heading"><div><h2>' + escapeHTML(subcategory.name) + '</h2><p>Explora la cocina y selecciona sus electrodomésticos, utensilios y objetos.</p></div><span class="vocabulary-count">' + words.length + ' elementos</span></div>';
       return sceneHeading + renderKitchenScene(words);
     }
-    if (subcategory.scene === "bathroom-hotspots") {
+        if (subcategory.scene === "entry-hallways-hotspots") {
+      const sceneHeading = '<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> ' + escapeHTML(category.name) + ' <span>›</span> <strong>' + escapeHTML(subcategory.name) + '</strong></div><div class="vocabulary-heading"><div><h2>' + escapeHTML(subcategory.name) + '</h2><p>Explora la entrada y el pasillo para aprender el nombre de sus objetos y elementos.</p></div><span class="vocabulary-count">' + words.length + ' elementos</span></div>';
+      return sceneHeading + renderEntryHallwaysScene(words);
+    }
+if (subcategory.scene === "bathroom-hotspots") {
       const sceneHeading = '<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> ' + escapeHTML(category.name) + ' <span>›</span> <strong>' + escapeHTML(subcategory.name) + '</strong></div><div class="vocabulary-heading"><div><h2>' + escapeHTML(subcategory.name) + '</h2><p>Explora el baño y descubre sus instalaciones, accesorios y productos de higiene.</p></div><span class="vocabulary-count">' + words.length + ' elementos</span></div>';
       return sceneHeading + renderBathroomScene(words);
     }
