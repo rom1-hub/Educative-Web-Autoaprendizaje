@@ -306,6 +306,7 @@
       {
         id:'house-personal-everyday',
         title:'Objetos personales y de uso cotidiano',
+        scene:'personal-everyday-hotspots',
         entries:[
           {id:'house-personal-wallet',word:'portefeuille',translation:'cartera / billetera',articleFr:'un',articleEs:'una'},
           {id:'house-personal-tissue-pack',word:'paquet de mouchoirs',translation:'paquete de pañuelos',articleFr:'un',articleEs:'un'},
