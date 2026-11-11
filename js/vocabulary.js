@@ -374,7 +374,73 @@
       '<aside class="vocabulary-scene-sidebar" aria-label="Vocabulario del salón"><h3>Vocabulario <span>25 términos</span></h3><div class="vocabulary-scene-legend">' + sceneLegend + '</div></aside></div>';
   }
 
-    function renderEntryHallwaysScene(words) {
+      function renderPersonalEverydayScene(words) {
+    const byId = new Map(words.map(word => [word.id, word]));
+    // Coordenadas sobre la imagen original (1602 × 982), centradas en cada objeto.
+    const hotspots = [
+      {id:"house-personal-wallet",x:600,y:455},
+      {id:"house-personal-tissue-pack",x:165,y:425},
+      {id:"house-personal-tissue",x:275,y:585},
+      {id:"house-personal-lighter",x:1255,y:430},
+      {id:"house-personal-coin-purse",x:810,y:455},
+      {id:"house-personal-keyring-bunch",x:1050,y:465},
+      {id:"house-personal-keyring",x:950,y:455},
+      {id:"house-personal-umbrella",x:1450,y:210},
+      {id:"house-personal-glasses",x:590,y:580},
+      {id:"house-personal-watch",x:920,y:580},
+      {id:"house-personal-mobile",x:1170,y:585},
+      {id:"house-personal-charger",x:1370,y:535},
+      {id:"house-personal-power-bank",x:1430,y:700},
+      {id:"house-personal-handbag",x:245,y:165},
+      {id:"house-personal-plastic-bag",x:1100,y:155},
+      {id:"house-personal-pen",x:325,y:800},
+      {id:"house-personal-notebook",x:155,y:790},
+      {id:"house-personal-mirror",x:445,y:790},
+      {id:"house-personal-brush",x:625,y:790},
+      {id:"house-personal-comb",x:790,y:790},
+      {id:"house-personal-paper-tissue",x:160,y:345},
+      {id:"house-personal-water-bottle",x:690,y:180},
+      {id:"house-personal-reusable-bottle",x:850,y:180},
+      {id:"house-personal-box",x:1005,y:780},
+      {id:"house-personal-package",x:1370,y:800}
+    ];
+    const selected = words.find(word => wordKey(word) === selectedWord);
+    const selectedSpot = selected ? hotspots.find(spot => spot.id === selected.id) : null;
+    const svgHotspots = hotspots.map((spot,index) => {
+      const word = byId.get(spot.id);
+      if (!word) return "";
+      const active = selectedWord === wordKey(word);
+      return '<g class="vocabulary-scene-hotspot ' + (active ? "is-selected" : "") +
+        '" data-scene-word="' + escapeHTML(wordKey(word)) + '" role="button" tabindex="0" aria-label="' +
+        escapeHTML(word.french + " — " + word.spanish) + '" aria-pressed="' + active + '">' +
+        '<circle class="scene-marker-halo" cx="' + spot.x + '" cy="' + spot.y + '" r="23"></circle>' +
+        '<circle class="scene-marker" cx="' + spot.x + '" cy="' + spot.y + '" r="17"></circle>' +
+        '<text x="' + spot.x + '" y="' + (spot.y + 6) + '" style="font-size:18px">' + (index + 1) + '</text></g>';
+    }).join("");
+    const sceneLegend = hotspots.map((spot,index) => {
+      const word = byId.get(spot.id);
+      if (!word) return "";
+      const active = selectedWord === wordKey(word);
+      return '<button type="button" class="vocabulary-scene-legend-item ' + (active ? "is-selected" : "") +
+        '" data-scene-word="' + escapeHTML(wordKey(word)) + '" aria-pressed="' + active + '">' +
+        '<span class="vocabulary-scene-legend-number">' + (index + 1) + '</span>' +
+        '<span><strong>' + escapeHTML(word.french) + '</strong><small>' + escapeHTML(word.spanish) + '</small></span></button>';
+    }).join("");
+    const floatingCard = selected && selectedSpot
+      ? '<div class="vocabulary-scene-popover" style="--scene-x:' + (selectedSpot.x / 1602 * 100) + '%;--scene-y:' + (selectedSpot.y / 982 * 100) + '%" role="status">' +
+        '<button type="button" class="vocabulary-scene-popover-close" data-scene-close aria-label="Cerrar ficha">×</button>' +
+        detailMarkup(selected) + '</div>'
+      : '<div class="vocabulary-scene-selection">Selecciona un número para consultar la palabra en francés y su traducción.</div>';
+    return '<div class="vocabulary-scene-intro"><p>Selecciona un número de la imagen o una palabra de la columna.</p><span>25 términos interactivos</span></div>' +
+      '<div class="vocabulary-scene-layout"><div class="vocabulary-scene-visual">' +
+      '<div class="vocabulary-house-scene vocabulary-personal-scene">' +
+      '<img class="vocabulary-house-image" src="assets/images/Bodegón cálido de objetos cotidianos.png" alt="Objetos personales y cotidianos organizados sobre una mesa: cartera, pañuelos, llaves, gafas, reloj, teléfono, cargador, bolsos, bolígrafo, libreta, espejo, cepillo, peine, botellas y paquetes" width="1602" height="982" loading="lazy" decoding="async">' +
+      '<svg class="scene-hotspot-overlay" viewBox="0 0 1602 982" preserveAspectRatio="none" role="group" aria-label="Vocabulario interactivo de objetos personales y cotidianos">' +
+      svgHotspots + '</svg></div>' + floatingCard + '</div>' +
+      '<aside class="vocabulary-scene-sidebar" aria-label="Vocabulario de objetos personales y cotidianos"><h3>Vocabulario <span>25 términos</span></h3><div class="vocabulary-scene-legend">' + sceneLegend + '</div></aside></div>';
+  }
+
+function renderEntryHallwaysScene(words) {
     const byId = new Map(words.map(word => [word.id, word]));
     // Imagen 1602 × 982. Los marcadores se centran en los objetos visibles.
     // Escalera, ascensor y buzón se muestran como pictogramas complementarios.
@@ -667,7 +733,11 @@ function renderBathroomScene(words) {
       const sceneHeading = '<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> ' + escapeHTML(category.name) + ' <span>›</span> <strong>' + escapeHTML(subcategory.name) + '</strong></div><div class="vocabulary-heading"><div><h2>' + escapeHTML(subcategory.name) + '</h2><p>Explora la cocina y selecciona sus electrodomésticos, utensilios y objetos.</p></div><span class="vocabulary-count">' + words.length + ' elementos</span></div>';
       return sceneHeading + renderKitchenScene(words);
     }
-        if (subcategory.scene === "entry-hallways-hotspots") {
+            if (subcategory.scene === "personal-everyday-hotspots") {
+      const sceneHeading = '<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> ' + escapeHTML(category.name) + ' <span>›</span> <strong>' + escapeHTML(subcategory.name) + '</strong></div><div class="vocabulary-heading"><div><h2>' + escapeHTML(subcategory.name) + '</h2><p>Explora los objetos personales y los artículos de uso cotidiano.</p></div><span class="vocabulary-count">' + words.length + ' elementos</span></div>';
+      return sceneHeading + renderPersonalEverydayScene(words);
+    }
+if (subcategory.scene === "entry-hallways-hotspots") {
       const sceneHeading = '<div class="vocabulary-breadcrumb">Vocabulario <span>›</span> ' + escapeHTML(category.name) + ' <span>›</span> <strong>' + escapeHTML(subcategory.name) + '</strong></div><div class="vocabulary-heading"><div><h2>' + escapeHTML(subcategory.name) + '</h2><p>Explora la entrada y el pasillo para aprender el nombre de sus objetos y elementos.</p></div><span class="vocabulary-count">' + words.length + ' elementos</span></div>';
       return sceneHeading + renderEntryHallwaysScene(words);
     }
