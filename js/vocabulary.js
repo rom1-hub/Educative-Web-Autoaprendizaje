@@ -379,7 +379,7 @@
     // Coordenadas sobre la imagen original (1602 × 982), centradas en cada objeto.
     const hotspots = [
       {id:"house-personal-wallet",x:600,y:455},
-      {id:"house-personal-tissue-pack",x:165,y:425},
+      {id:"house-personal-tissue-pack",x:355,y:425},
       {id:"house-personal-tissue",x:275,y:585},
       {id:"house-personal-lighter",x:1255,y:430},
       {id:"house-personal-coin-purse",x:810,y:455},
